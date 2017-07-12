@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<widget id="com.mendix.widget.custom.LineChart.LineChart" needsEntityContext="true" offlineCapable="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../xsd/widget.xsd">
+    <name>LineChart</name>
+    <description>Create Line chart</description>
+    <icon/>
+    <properties>
+        <property key="title" type="string" required="false">
+            <caption>Chart title</caption>
+            <category>Appearance</category>
+            <description>Chart title</description>
+        </property>
+    </properties>
+</widget>

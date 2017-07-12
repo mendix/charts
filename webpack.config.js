@@ -8,15 +8,13 @@ const name = pkg.widgetName.toLowerCase();
 
 const widgetConfig = {
     entry: {
-        BarChart: "./src/Charts/BarChart/components/BarChartContainer.ts",
-        LineChart: "./src/Charts/LineChart/components/LineChartContainer.ts"
+        BarChart: "./src/BarChart/components/BarChartContainer.ts",
+        LineChart: "./src/LineChart/components/LineChartContainer.ts"
     },
     output: {
         path: path.resolve(__dirname, "dist/tmp"),
         filename: "src/com/mendix/widget/custom/[name]/[name].js",
-        chunkFilename: "Chart/Chart[id].js",
-        libraryTarget: "umd",
-        publicPath: "charts/"
+        libraryTarget: "umd"
     },
     resolve: {
         extensions: [ ".ts", ".js", ".json" ],
@@ -51,7 +49,7 @@ const widgetConfig = {
         ], {
             copyUnmodified: true
         }),
-        new ExtractTextPlugin({ filename: `./src/com/mendix/widget/custom/${widgetName}/ui/${widgetName}.css` }),
+        new ExtractTextPlugin({ filename: `./src/com/mendix/widget/custom/${widgetName}/[name]ui/[name].css` }),
         new webpack.LoaderOptionsPlugin({
             debug: true
         })
@@ -60,13 +58,12 @@ const widgetConfig = {
 
 const previewConfig = {
     entry: {
-        BarChart: "./src/Charts/BarChart/BarChart.webmodeler.ts",
-        LineChart: "./src/Charts/LineChart/LineChart.webmodeler.ts"
+        BarChart: "./src/BarChart/BarChart.webmodeler.ts",
+        LineChart: "./src/LineChart/LineChart.webmodeler.ts"
     },
     output: {
         path: path.resolve(__dirname, "dist/tmp"),
         filename: "src/[name].webmodeler.js",
-        chunkFilename: "src/Chart[id].webmodeler.js",
         libraryTarget: "commonjs"
     },
     resolve: {
