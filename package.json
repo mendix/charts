@@ -6,7 +6,8 @@
   "copyright": "Mendix BV",
   "scripts": {
     "pretest": "tsc",
-    "lint": "tslint -c tslint.json '**/*.ts' '**/*.tsx' --exclude '**/node_modules/**'"
+    "lint": "tslint -c tslint.json '**/*.ts' '**/*.tsx' --exclude '**/node_modules/**'",
+    "start": "nodemon --watch webpack.config.js --watch Gruntfile.js --exec \"grunt"
   },
   "pre-commit": [
     "pretest",

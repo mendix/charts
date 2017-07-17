@@ -29,6 +29,11 @@ const widgetConfig = {
             {
                 test: /\.ts$/,
                 use: "ts-loader"
+            },{
+                test: /\.css$/, loader: ExtractTextPlugin.extract({
+                    fallback: "style-loader",
+                    use: "css-loader"
+                })
             },
             {
                 test: /\.scss$/,
@@ -45,11 +50,11 @@ const widgetConfig = {
         new CopyWebpackPlugin([
             { from: "src/**/*.js" },
             { from: "src/**/*.xml" },
-            { from: "src/**/*.png", to: `src/com/mendix/widget/custom/${widgetName}/` }
+            { from: "src/**/*.png", to: `src/com/mendix/widget/custom/[name]/` }
         ], {
             copyUnmodified: true
         }),
-        new ExtractTextPlugin({ filename: `./src/com/mendix/widget/custom/${widgetName}/[name]ui/[name].css` }),
+        new ExtractTextPlugin({ filename: `./src/com/mendix/widget/custom/[name]/ui/[name].css` }),
         new webpack.LoaderOptionsPlugin({
             debug: true
         })
