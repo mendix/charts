@@ -68,7 +68,7 @@ const previewConfig = {
     },
     output: {
         path: path.resolve(__dirname, "dist/tmp"),
-        filename: "src/[name].webmodeler.js",
+        filename: "src/[name]/[name].webmodeler.js",
         libraryTarget: "commonjs"
     },
     resolve: {
@@ -81,6 +81,7 @@ const previewConfig = {
                     "module": "CommonJS",
                 }
             }},
+            { test: /\.css$/, use: "raw-loader" },
             { test: /\.scss$/, use: [
                 { loader: "raw-loader" },
                 { loader: "sass-loader" }

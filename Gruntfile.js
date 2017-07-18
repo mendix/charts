@@ -76,11 +76,11 @@ module.exports = function (grunt) {
             addSourceURL: {
                 files: [ {
                     append: "\n\n//# sourceURL=BarChart.webmodeler.js\n",
-                    input: "dist/tmp/src/BarChart.webmodeler.js"
+                    input: "dist/tmp/src/BarChart/BarChart.webmodeler.js"
                 },
                 {
                     append: "\n\n//# sourceURL=LineChart.webmodeler.js\n",
-                    input: "dist/tmp/src/LineChart.webmodeler.js"
+                    input: "dist/tmp/src/LineChart/LineChart.webmodeler.js"
                 } ]
             }
         },
