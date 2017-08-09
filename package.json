@@ -63,10 +63,12 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.3",
     "mendix-client": "https://github.com/FlockOfBirds/Mendix-client-typing/archive/7.1.0.tar.gz",
+    "node-sass": "^4.5.2",
     "pre-commit": "^1.2.2",
     "raw-loader": "^0.5.1",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
+    "sass-loader": "^6.0.3",
     "source-map-loader": "^0.2.0",
     "style-loader": "^0.18.2",
     "transform-loader": "^0.2.4",
@@ -81,6 +83,7 @@
     "webworkify-webpack": "^2.0.5"
   },
   "dependencies": {
+    "classnames": "^2.2.5",
     "plotly.js": "^1.27.1"
   }
 }

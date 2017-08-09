@@ -1,20 +1,17 @@
 # Charts
 
-This widget is a wrapper for the [plotly.js library](https://plot.ly/javascript/) and you can use it to visualize your aggregated data.
+Plot and track your data across different charts.
 
 ### Available charts
-* `Bar`
-* `Line`
+* `BarChart`
+* `LineChart`
+* `PieChart`
 
 ## Dependencies
 * Mendix 7.4.0
 
 ## Demo projects
-[https://linechart.mxapps.io](https://linechart.mxapps.io)
-
-## Contributing
-
-For more information on contributing to this repository visit [Contributing to a GitHub repository](https://world.mendix.com/display/howto50/Contributing+to+a+GitHub+repository)!
+[https://charts.mxapps.io](https://charts.mxapps.io)
 
 ## Configuration
 

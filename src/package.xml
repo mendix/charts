@@ -4,10 +4,12 @@
         <widgetFiles>
             <widgetFile path="BarChart/BarChart.xml"/>
             <widgetFile path="LineChart/LineChart.xml"/>
+            <widgetFile path="PieChart/PieChart.xml"/>
         </widgetFiles>
         <files>
             <file path="com/mendix/widget/custom/BarChart"/>
             <file path="com/mendix/widget/custom/LineChart"/>
+            <file path="com/mendix/widget/custom/PieChart"/>
         </files>
     </clientModule>
 </package>

@@ -81,6 +81,10 @@ module.exports = function (grunt) {
                 {
                     append: "\n\n//# sourceURL=LineChart.webmodeler.js\n",
                     input: "dist/tmp/src/LineChart/LineChart.webmodeler.js"
+                },
+                {
+                    append: "\n\n//# sourceURL=PieChart.webmodeler.js\n",
+                    input: "dist/tmp/src/PieChart/PieChart.webmodeler.js"
                 } ]
             }
         },

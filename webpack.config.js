@@ -9,7 +9,8 @@ const name = pkg.widgetName.toLowerCase();
 const widgetConfig = {
     entry: {
         BarChart: "./src/BarChart/components/BarChartContainer.ts",
-        LineChart: "./src/LineChart/components/LineChartContainer.ts"
+        LineChart: "./src/LineChart/components/LineChartContainer.ts",
+        PieChart: "./src/PieChart/components/PieChartContainer.ts"
     },
     output: {
         path: path.resolve(__dirname, "dist/tmp"),
@@ -64,7 +65,8 @@ const widgetConfig = {
 const previewConfig = {
     entry: {
         BarChart: "./src/BarChart/BarChart.webmodeler.ts",
-        LineChart: "./src/LineChart/LineChart.webmodeler.ts"
+        LineChart: "./src/LineChart/LineChart.webmodeler.ts",
+        PieChart: "./src/PieChart/PieChart.webmodeler.ts"
     },
     output: {
         path: path.resolve(__dirname, "dist/tmp"),
