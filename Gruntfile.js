@@ -2,6 +2,7 @@
 const webpack = require("webpack");
 const webpackConfig = require("./webpack.config");
 const merge = require("webpack-merge");
+const widgetNames = [ "BarChart", "LineChart", "PieChart" ];
 
 const webpackConfigRelease = [];
 webpackConfig.forEach(function(config) {
@@ -16,11 +17,10 @@ module.exports = function (grunt) {
 
         watch: {
             updateWidgetFiles: {
-                files: [ "./dist/tmp/src/**/*" ],
+                files: [ "./src/**/*" ],
                 tasks: [ "webpack:develop", "compress:dist", "file_append", "copy:distDeployment", "copy:mpk" ],
                 options: {
-                    debounceDelay: 250,
-                    livereload: true
+                    debounceDelay: 250
                 }
             },
             sourceFiles: {
@@ -74,18 +74,12 @@ module.exports = function (grunt) {
 
         file_append: {
             addSourceURL: {
-                files: [ {
-                    append: "\n\n//# sourceURL=BarChart.webmodeler.js\n",
-                    input: "dist/tmp/src/BarChart/BarChart.webmodeler.js"
-                },
-                {
-                    append: "\n\n//# sourceURL=LineChart.webmodeler.js\n",
-                    input: "dist/tmp/src/LineChart/LineChart.webmodeler.js"
-                },
-                {
-                    append: "\n\n//# sourceURL=PieChart.webmodeler.js\n",
-                    input: "dist/tmp/src/PieChart/PieChart.webmodeler.js"
-                } ]
+                files: widgetNames.map(name => {
+                    return {
+                        append: `\n\n//# sourceURL=${name}.webmodeler.js\n`,
+                        input: `dist/tmp/src/${name}/${name}.webmodeler.js`
+                    }
+                })
             }
         },
 
