@@ -5,9 +5,9 @@
   "description": "Create charts based on the Plotly library",
   "copyright": "Mendix BV",
   "scripts": {
+    "start": "nodemon --watch webpack.config.js --watch Gruntfile.js --exec \"grunt",
     "pretest": "tsc",
-    "lint": "tslint -c tslint.json '**/*.ts' '**/*.tsx' --exclude '**/node_modules/**'",
-    "start": "nodemon --watch webpack.config.js --watch Gruntfile.js --exec \"grunt"
+    "lint": "tslint -c tslint.json '**/*.ts' --exclude '**/node_modules/**'"
   },
   "pre-commit": [
     "pretest",
@@ -82,6 +82,6 @@
   },
   "dependencies": {
     "classnames": "^2.2.5",
-    "plotly.js": "^1.29.3"
+    "plotly.js": "^1.27.1"
   }
 }
