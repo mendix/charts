@@ -23,21 +23,21 @@
   },
   "devDependencies": {
     "@types/big.js": "0.0.31",
-    "@types/classnames": "^2.2.0",
+    "@types/classnames": "^2.2.1",
     "@types/core-js": "^0.9.42",
-    "@types/enzyme": "^2.8.5",
+    "@types/enzyme": "^2.8.6",
     "@types/jasmine": "^2.5.51",
     "@types/karma": "^0.13.35",
     "@types/plotly.js": "^1.28.3",
     "@types/react": "^15.0.28",
-    "@types/react-dom": "^15.5.2",
+    "@types/react-dom": "^15.5.3",
     "check-dependencies": "^1.0.1",
     "clean-webpack-plugin": "^0.1.16",
     "copy-webpack-plugin": "^4.0.1",
     "core-js": "^2.5.0",
     "css-loader": "^0.28.2",
     "enzyme": "^2.8.2",
-    "extract-text-webpack-plugin": "^2.1.2",
+    "extract-text-webpack-plugin": "^3.0.0",
     "file-loader": "^0.11.2",
     "grunt": "1.0.1",
     "grunt-check-dependencies": "^1.0.0",
@@ -49,7 +49,7 @@
     "grunt-newer": "^1.1.1",
     "grunt-webpack": "^3.0.2",
     "istanbul": "^0.4.3",
-    "istanbul-instrumenter-loader": "^2.0.0",
+    "istanbul-instrumenter-loader": "^3.0.0",
     "jasmine": "^2.7.0",
     "json-loader": "^0.5.4",
     "karma": "^1.7.0",
@@ -75,13 +75,13 @@
     "tslint-eslint-rules": "^4.1.1",
     "typescript": "^2.4.2",
     "url-loader": "^0.5.8",
-    "webpack": "^3.5.3",
+    "webpack": "^3.5.4",
     "webpack-dev-server": "^2.7.1",
     "webpack-merge": "^4.1.0",
     "webworkify-webpack": "^2.0.5"
   },
   "dependencies": {
     "classnames": "^2.2.5",
-    "plotly.js": "^1.27.1"
+    "plotly.js": "^1.29.3"
   }
 }
