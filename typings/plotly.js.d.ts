@@ -217,8 +217,21 @@ declare namespace Plotly {
 
     export type Dash = "solid" | "dot" | "dash" | "longdash" | "dashdot" | "longdashdot";
 
-    export type Data = Partial<ScatterData>;
+    export type Data = Partial<ScatterData> | Partial<PieData>;
+
     export type Color = string | Array<string | undefined | null> | Array<Array<string | undefined | null>>;
+
+    export interface PieData {
+        hole: number;
+        hoverinfo?: "label" | "percent" | "name" | "label+percent" | "label+name" | "percent+name" | "label+percent+name";
+        labels: string[];
+        name?: string;
+        type: "pie";
+        values: number[];
+        marker?: {
+            colors: string[];
+        };
+    }
 
 // Bar Scatter
     export interface ScatterData {
