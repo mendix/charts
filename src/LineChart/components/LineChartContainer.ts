@@ -2,7 +2,7 @@ import { Component, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { LineChart, Mode } from "./LineChart";
-import { MxObject, fetchByXPath, fetchDataFromSeries } from "../../utils/data";
+import { MxObject, fetchByMicroflow, fetchByXPath, fetchDataFromSeries } from "../../utils/data";
 import { Dimensions, parseStyle } from "../../utils/style";
 
 interface WrapperProps {
@@ -125,7 +125,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
             if (this.props.dataSourceType === "XPath") {
                 fetchByXPath(mxObject.getGuid(), this.props.seriesEntity, this.props.entityConstraint, this.handleFetchedSeries); // tslint:disable max-line-length
             } else if (this.props.dataSourceType === "microflow" && this.props.dataSourceMicroflow) {
-                // this.fetchByMicroflow(mxObject.getGuid());
+                fetchByMicroflow(this.props.dataSourceMicroflow, mxObject.getGuid(), this.handleFetchedSeries);
             }
         }
     }

@@ -1,6 +1,7 @@
 export type MxObject = mendix.lib.MxObject;
+type FetchDataCallback = (objects?: mendix.lib.MxObject[], error?: Error) => void;
 
-export const fetchByXPath = (guid: string, entity: string, constraint: string, callback: (objects?: mendix.lib.MxObject[], error?: Error) => void) => { // tslint:disable max-line-length
+export const fetchByXPath = (guid: string, entity: string, constraint: string, callback: FetchDataCallback) => {
     const entityPath = entity.split("/");
     const entityName = entityPath.length > 1 ? entityPath[entityPath.length - 1] : entity;
     window.mx.data.get({
@@ -20,4 +21,11 @@ export const fetchDataFromSeries = (series: MxObject[], dataEntity: string, sort
             filter: { sort: [ [ sortAttribute, "asc" ] ] },
             xpath
         });
+    });
+
+export const fetchByMicroflow = (actionname: string, guid: string, callback: FetchDataCallback) =>
+    mx.ui.action(actionname, {
+        callback: mxObjects => callback(mxObjects as MxObject[]),
+        error: error => callback(undefined, error),
+        params: { applyto: "selection", guids: [ guid ] }
     });
