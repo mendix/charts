@@ -4,7 +4,7 @@ import * as classNames from "classnames";
 import * as Plotly from "plotly.js/dist/plotly";
 import { Dimensions, getDimensions } from "../../utils/style";
 
-interface LineChartProps extends Dimensions {
+export interface LineChartProps extends Dimensions {
     data?: Plotly.ScatterData[];
     config?: Partial<Plotly.Config>;
     layout?: Partial<Plotly.Layout>;

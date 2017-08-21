@@ -1,7 +1,7 @@
 import { Component, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
-import { LineChart, Mode } from "./LineChart";
+import { LineChart, LineChartProps, Mode } from "./LineChart";
 import { MxObject, fetchByMicroflow, fetchByXPath, fetchDataFromSeries } from "../../utils/data";
 import { Dimensions, parseStyle } from "../../utils/style";
 
@@ -64,28 +64,8 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         }
 
         return createElement(LineChart, {
-            className: this.props.class,
-            config: {
-                displayModeBar: this.props.showToolBar
-            },
-            data: this.state.data,
-            layout: {
-                autosize: this.props.responsive,
-                showlegend: this.props.showLegend,
-                xaxis: {
-                    showgrid: this.props.showGrid,
-                    title: this.props.xAxisLabel
-                },
-                yaxis: {
-                    showgrid: this.props.showGrid,
-                    title: this.props.yAxisLabel
-                }
-            },
-            style: parseStyle(this.props.style),
-            width: this.props.width,
-            height: this.props.height,
-            widthUnit: this.props.widthUnit,
-            heightUnit: this.props.heightUnit
+            ...LineChartContainer.getLineChartProps(this.props),
+            data: this.state.data
         });
     }
 
@@ -104,6 +84,24 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         return props.dataSourceType === "microflow" && !props.dataSourceMicroflow
             ? "Configuration error: data source type is set to 'Microflow' but 'Source microflow' is missing"
             : "";
+    }
+
+    public static getLineChartProps(props: LineChartContainerProps): LineChartProps {
+        return {
+            className: props.class,
+            config: { displayModeBar: props.showToolBar, doubleClick: false },
+            layout: {
+                autosize: props.responsive,
+                showlegend: props.showLegend,
+                xaxis: { showgrid: props.showGrid, title: props.xAxisLabel },
+                yaxis: { showgrid: props.showGrid, title: props.yAxisLabel }
+            },
+            style: parseStyle(props.style),
+            width: props.width,
+            height: props.height,
+            widthUnit: props.widthUnit,
+            heightUnit: props.heightUnit
+        };
     }
 
     private resetSubscriptions(mxObject?: mendix.lib.MxObject) {
