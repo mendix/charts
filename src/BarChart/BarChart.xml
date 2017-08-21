@@ -1,13 +1,148 @@
 <?xml version="1.0" encoding="utf-8"?>
-<widget id="com.mendix.widget.custom.BarChart.BarChart" needsEntityContext="true" offlineCapable="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../xsd/widget.xsd">
+<widget id="com.mendix.widget.custom.BarChart.BarChart" needsEntityContext="true" offlineCapable="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
     <name>Bar chart</name>
-    <description>Create Bar chart</description>
+    <description>Create a bar chart</description>
     <icon/>
     <properties>
-        <property key="title" type="string" required="false">
-            <caption>Chart title</caption>
+        <property key="seriesEntity" type="entity">
+            <caption>Series entity</caption>
+            <category>Data source</category>
+            <description>The entity from which the series will be retrieved</description>
+        </property>
+        <property key="dataSourceType" type="enumeration" defaultValue="XPath">
+            <caption>Data source type</caption>
+            <category>Data source</category>
+            <description/>
+            <enumerationValues>
+                <enumerationValue key="XPath">Database/XPath</enumerationValue>
+                <enumerationValue key="microflow">Microflow</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="entityConstraint" type="entityConstraint" entityProperty="seriesEntity" required="false">
+            <caption>XPath constraint</caption>
+            <category>Data source</category>
+            <description>Constraint on the data from the data entity (used when data source is Database/XPath)</description>
+        </property>
+        <property key="seriesNameAttribute" type="attribute" entityProperty="seriesEntity">
+            <caption>Series name attribute</caption>
+            <category>Data source</category>
+            <description>Attribute that holds the name of the series</description>
+            <attributeTypes>
+                <attributeType name="String"/>
+            </attributeTypes>
+        </property>
+        <property key="dataSourceMicroflow" type="microflow" required="false">
+            <caption>Microflow</caption>
+            <category>Data source</category>
+            <description>Returns a list of series</description>
+            <returnType type="Object" entityProperty="seriesEntity" isList="true"/>
+        </property>
+        <property key="dataEntity" type="entity" isPath="yes" pathType="referenceSet" entityProperty="seriesEntity">
+            <caption>Data entity</caption>
+            <category>Data source</category>
+            <description>The entity from which the data values will be retrieved</description>
+        </property>
+        <property key="xValueAttribute" type="attribute" entityProperty="dataEntity">
+            <caption>X value attribute</caption>
+            <category>Data source</category>
+            <description/>
+            <attributeTypes>
+                <attributeType name="String"/>
+            </attributeTypes>
+        </property>
+        <property key="yValueAttribute" type="attribute" entityProperty="dataEntity">
+            <caption>Y value attribute</caption>
+            <category>Data source</category>
+            <description/>
+            <attributeTypes>
+                <attributeType name="Integer"/>
+                <attributeType name="Decimal"/>
+                <attributeType name="Long"/>
+            </attributeTypes>
+        </property>
+        <property key="xAxisSortAttribute" type="attribute" entityProperty="dataEntity">
+            <caption>X-axis sort attribute</caption>
+            <category>Data source</category>
+            <description>Attribute to use for sorting the x-axis data</description>
+            <attributeTypes>
+                <attributeType name="Decimal"/>
+                <attributeType name="Long"/>
+                <attributeType name="Integer"/>
+                <attributeType name="String"/>
+                <attributeType name="AutoNumber"/>
+                <attributeType name="DateTime"/>
+            </attributeTypes>
+        </property>
+        <property key="xAxisLabel" type="translatableString" required="false">
+            <caption>X-axis label</caption>
+            <category>X-axis</category>
+            <description>Label for the x-axis (horizontal)</description>
+            <translations>
+                <translation lang="en_US"/>
+                <translation lang="nl_NL"/>
+            </translations>
+        </property>
+        <property key="yAxisLabel" type="translatableString" required="false">
+            <caption>Y-axis label</caption>
+            <category>Y-axis</category>
+            <description>Label for the y-axis (vertical)</description>
+            <translations>
+                <translation lang="en_US"/>
+                <translation lang="nl_NL"/>
+            </translations>
+        </property>
+        <property key="showToolbar" type="boolean" defaultValue="true">
+            <caption>Show toolbar</caption>
             <category>Appearance</category>
-            <description>Chart title</description>
+            <description>On hover, a toolbar is shown on the top right of the chart</description>
+        </property>
+        <property key="barMode" type="enumeration" defaultValue="group">
+            <caption>Bar mode</caption>
+            <category>Appearance</category>
+            <description>The format the bar chart should appear in</description>
+            <enumerationValues>
+                <enumerationValue key="group">Grouped</enumerationValue>
+                <enumerationValue key="stack">Stacked</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="showGrid" type="boolean" defaultValue="true">
+            <caption>Show grid</caption>
+            <category>Appearance</category>
+            <description/>
+        </property>
+        <property key="responsive" type="boolean" defaultValue="true">
+            <caption>Responsive</caption>
+            <category>Appearance</category>
+            <description/>
+        </property>
+        <property key="width" type="integer" defaultValue="100">
+            <caption>Chart width</caption>
+            <category>Appearance</category>
+            <description/>
+        </property>
+        <property key="widthUnit" type="enumeration" defaultValue="percentage">
+            <caption>Width unit</caption>
+            <category>Appearance</category>
+            <description/>
+            <enumerationValues>
+                <enumerationValue key="percentage">Percentage</enumerationValue>
+                <enumerationValue key="pixels">Pixels</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="height" type="integer" defaultValue="75">
+            <caption>Chart height</caption>
+            <category>Appearance</category>
+            <description/>
+        </property>
+        <property key="heightUnit" type="enumeration" defaultValue="percentageOfWidth">
+            <caption>Height unit</caption>
+            <category>Appearance</category>
+            <description>'Percentage of width' is the aspect ratio, 'Pixels' is absolute, Warning 'Percentage of parent' only work when parent has a absolute height, else is not displayed</description>
+            <enumerationValues>
+                <enumerationValue key="percentageOfWidth">Percentage of width</enumerationValue>
+                <enumerationValue key="pixels">Pixels</enumerationValue>
+                <enumerationValue key="percentageOfParent">Percentage of Parent</enumerationValue>
+            </enumerationValues>
         </property>
     </properties>
 </widget>
