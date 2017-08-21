@@ -6,16 +6,6 @@ import LineChartContainer, { LineChartContainerProps } from "./components/LineCh
 
 // tslint:disable-next-line class-name
 export class preview extends Component<LineChartContainerProps, {}> {
-    private data = [
-        {
-            connectgaps: true,
-            mode: "lines+markers",
-            type: "scatter",
-            x: [ 14, 20, 30, 50 ],
-            y: [ 14, 30, 20, 40 ]
-        }
-    ] as Plotly.ScatterData[];
-
     render() {
         return createElement("div", {},
             createElement(Alert, {
@@ -23,10 +13,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                 className: "widget-charts-line-alert",
                 message: LineChartContainer.validateProps(this.props)
             }),
-            createElement(LineChart, {
-                ...LineChartContainer.getLineChartProps(this.props),
-                data: this.data
-            })
+            createElement(LineChart, LineChartContainer.getLineChartProps(this.props))
         );
     }
 }
