@@ -4,7 +4,7 @@
     <description>Create a line chart</description>
     <icon/>
     <properties>
-        <property key="seriesEntity" type="entity" isPath="optional" pathType="referenceSet">
+        <property key="seriesEntity" type="entity">
             <caption>Series entity</caption>
             <category>Data source</category>
             <description>The entity from which the series will be retrieved</description>
@@ -22,12 +22,12 @@
             <category>Data source</category>
             <description>The entity from which the data values will be retrieved</description>
         </property>
-        <property key="dataSourceType" type="enumeration" defaultValue="xpath">
+        <property key="dataSourceType" type="enumeration" defaultValue="XPath">
             <caption>Data Source</caption>
             <category>Data source</category>
             <description/>
             <enumerationValues>
-                <enumerationValue key="xpath">Database/XPath</enumerationValue>
+                <enumerationValue key="XPath">Database/XPath</enumerationValue>
                 <enumerationValue key="microflow">Microflow</enumerationValue>
             </enumerationValues>
         </property>

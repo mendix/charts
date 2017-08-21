@@ -12,6 +12,8 @@ interface LineChartProps extends Dimensions {
     style?: object;
 }
 
+export type Mode = "lines" | "markers" | "lines+markers";
+
 export class LineChart extends Component<LineChartProps, {}> {
     private lineChart: HTMLDivElement;
     private data = [

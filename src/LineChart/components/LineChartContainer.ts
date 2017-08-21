@@ -1,5 +1,8 @@
 import { Component, createElement } from "react";
-import { LineChart } from "./LineChart";
+
+import { Alert } from "../../components/Alert";
+import { LineChart, Mode } from "./LineChart";
+import { MxObject, fetchByXPath, fetchDataFromSeries } from "../../utils/data";
 import { Dimensions, parseStyle } from "../../utils/style";
 
 interface WrapperProps {
@@ -14,7 +17,7 @@ export interface LineChartContainerProps extends WrapperProps, Dimensions {
     seriesEntity: string;
     seriesNameAttribute: string;
     dataEntity: string;
-    dataSourceType: "xpath" | "microflow";
+    dataSourceType: "XPath" | "microflow";
     entityConstraint: string;
     dataSourceMicroflow: string;
     xValueAttribute: string;
@@ -37,18 +40,29 @@ interface LineChartContainerState {
 
 export default class LineChartContainer extends Component<LineChartContainerProps, LineChartContainerState> {
     private subscriptionHandle: number;
+    private data: Plotly.ScatterData[] = [];
 
     constructor(props: LineChartContainerProps) {
         super(props);
 
         this.state = {
-            alertMessage: LineChartContainer.validateProps(this.props),
+            alertMessage: LineChartContainer.validateProps(props),
             data: []
         };
         this.fetchData = this.fetchData.bind(this);
+        this.handleFetchedSeries = this.handleFetchedSeries.bind(this);
+        this.processSeriesData = this.processSeriesData.bind(this);
     }
 
     render() {
+        if (this.state.alertMessage) {
+            return createElement(Alert, {
+                bootstrapStyle: "danger",
+                className: "widget-charts-line-alert",
+                message: this.state.alertMessage
+            });
+        }
+
         return createElement(LineChart, {
             className: this.props.class,
             config: {
@@ -106,6 +120,61 @@ export default class LineChartContainer extends Component<LineChartContainerProp
     }
 
     private fetchData(mxObject?: mendix.lib.MxObject) {
-        console.log(mxObject); // tslint:disable-line
+        this.data = [];
+        if (mxObject && this.props.seriesEntity) {
+            if (this.props.dataSourceType === "XPath") {
+                fetchByXPath(mxObject.getGuid(), this.props.seriesEntity, this.props.entityConstraint, this.handleFetchedSeries); // tslint:disable max-line-length
+            } else if (this.props.dataSourceType === "microflow" && this.props.dataSourceMicroflow) {
+                // this.fetchByMicroflow(mxObject.getGuid());
+            }
+        }
+    }
+
+    private handleFetchedSeries(allSeries?: MxObject[], error?: Error) {
+        if (error) {
+            const errorSource = this.props.dataSourceType === "XPath"
+                ? this.props.entityConstraint
+                : this.props.dataSourceMicroflow;
+            window.mx.ui.error(`An error occurred while retrieving data via ${this.props.dataSourceType} (${errorSource}): ${error.message}`); // tslint:disable max-line-length
+            this.setState({ data: [] });
+
+            return;
+        }
+
+        if (allSeries) {
+            fetchDataFromSeries(allSeries, this.props.dataEntity, this.props.xAxisSortAttribute, this.processSeriesData);
+        }
+    }
+
+    private processSeriesData(singleSeries: MxObject, data: MxObject[], isFinal = false, error?: Error) {
+        if (error) {
+            window.mx.ui.error(`An error occurred while retrieving chart data: ${error}`);
+            this.setState({ data: [] });
+
+            return;
+        }
+        const lineColor = singleSeries.get(this.props.lineColor) as string;
+        const seriesName = singleSeries.get(this.props.seriesNameAttribute) as string;
+        const fetchedData = data.map(value => ({
+            x: value.get(this.props.xValueAttribute) as Plotly.Datum,
+            y: parseInt(value.get(this.props.yValueAttribute) as string, 10) as Plotly.Datum
+        }));
+
+        const lineData = {
+            connectgaps: true,
+            line: {
+                color: lineColor
+            },
+            mode: this.props.mode.replace("o", "+") as Mode,
+            name: seriesName,
+            type: "scatter",
+            x: fetchedData.map(value => value.x),
+            y: fetchedData.map(value => value.y)
+        } as Plotly.ScatterData;
+
+        this.data.push(lineData);
+        if (isFinal) {
+            this.setState({ data: this.data });
+        }
     }
 }
