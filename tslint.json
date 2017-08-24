@@ -139,7 +139,8 @@
       true,
       "LF"
     ],
-    "object-literal-sort-keys": false
+    "object-literal-sort-keys": false,
+    "array-type": false
   },
   "jsRules": {
     "trailing-comma": [

@@ -14,7 +14,7 @@ export interface DataSourceProps {
 export type MxObject = mendix.lib.MxObject;
 type FetchDataCallback = (objects?: mendix.lib.MxObject[], error?: string) => void;
 
-export const fetchData = <T extends DataSourceProps>(mxObject: mendix.lib.MxObject, dataOptions: T, callback: FetchDataCallback) => { // tslint:disable max-line-length
+export const fetchSeriesData = <T extends DataSourceProps>(mxObject: MxObject, dataOptions: T, callback: FetchDataCallback) => { // tslint:disable max-line-length
     if (dataOptions.seriesEntity) {
         if (dataOptions.dataSourceType === "XPath") {
             fetchByXPath(mxObject.getGuid(), dataOptions.seriesEntity, dataOptions.entityConstraint, callback);

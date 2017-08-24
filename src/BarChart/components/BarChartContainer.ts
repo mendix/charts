@@ -2,7 +2,7 @@ import { Component, createElement } from "react";
 
 import { BarChart, BarChartProps } from "./BarChart";
 import { Alert } from "../../components/Alert";
-import { DataSourceProps, MxObject, fetchData, fetchDataFromSeries } from "../../utils/data";
+import { DataSourceProps, MxObject, fetchDataFromSeries, fetchSeriesData } from "../../utils/data";
 import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
@@ -104,7 +104,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
     private fetchData(mxObject?: mendix.lib.MxObject) {
         this.data = [];
         if (mxObject) {
-            fetchData(mxObject, this.props, this.handleFetchedSeries);
+            fetchSeriesData(mxObject, this.props, this.handleFetchedSeries);
         }
     }
 

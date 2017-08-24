@@ -2,7 +2,7 @@ import { Component, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { LineChart, LineChartProps, Mode } from "./LineChart";
-import { DataSourceProps, MxObject, fetchData, fetchDataFromSeries } from "../../utils/data";
+import { DataSourceProps, MxObject, fetchDataFromSeries, fetchSeriesData } from "../../utils/data";
 import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
@@ -100,7 +100,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
     private fetchData(mxObject?: mendix.lib.MxObject) {
         this.data = [];
         if (mxObject) {
-            fetchData(mxObject, this.props, this.handleFetchedSeries);
+            fetchSeriesData(mxObject, this.props, this.handleFetchedSeries);
         }
     }
 
@@ -119,7 +119,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
 
     private processSeriesData(singleSeries: MxObject, data: MxObject[], isFinal = false, error?: Error) {
         if (error) {
-            window.mx.ui.error(`An error occurred while retrieving chart data: ${error}`);
+            window.mx.ui.error(`An error occurred while retrieving chart data: ${error.message}`);
             this.setState({ data: [] });
 
             return;
