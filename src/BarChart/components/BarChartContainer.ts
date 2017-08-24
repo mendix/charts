@@ -2,7 +2,8 @@ import { Component, createElement } from "react";
 
 import { BarChart, BarChartProps } from "./BarChart";
 import { Alert } from "../../components/Alert";
-import { DataSourceProps, MxObject, OnClickProps, fetchDataFromSeries, fetchSeriesData, handleOnClick
+import {
+    DataSourceProps, MxObject, OnClickProps, fetchDataFromSeries, fetchSeriesData, handleOnClick
 } from "../../utils/data";
 import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";

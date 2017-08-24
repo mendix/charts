@@ -2,11 +2,13 @@ import { Component, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { LineChart, LineChartProps, Mode } from "./LineChart";
-import { DataSourceProps, MxObject, fetchDataFromSeries, fetchSeriesData } from "../../utils/data";
+import {
+    DataSourceProps, MxObject, OnClickProps, fetchDataFromSeries, fetchSeriesData, handleOnClick
+} from "../../utils/data";
 import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
-export interface LineChartContainerProps extends WrapperProps, Dimensions, DataSourceProps {
+export interface LineChartContainerProps extends WrapperProps, Dimensions, DataSourceProps, OnClickProps {
     mode: "lines" | "markers" | "text" | "linesomarkers";
     lineColor: string;
     showGrid: boolean;
@@ -34,6 +36,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         this.fetchData = this.fetchData.bind(this);
         this.handleFetchedSeries = this.handleFetchedSeries.bind(this);
         this.processSeriesData = this.processSeriesData.bind(this);
+        this.handleOnClick = this.handleOnClick.bind(this);
     }
 
     render() {
@@ -47,7 +50,8 @@ export default class LineChartContainer extends Component<LineChartContainerProp
 
         return createElement(LineChart, {
             ...LineChartContainer.getLineChartProps(this.props),
-            data: this.state.data
+            data: this.state.data,
+            onClickAction: this.handleOnClick
         });
     }
 
@@ -60,6 +64,10 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         if (this.subscriptionHandle) {
             mx.data.unsubscribe(this.subscriptionHandle);
         }
+    }
+
+    private handleOnClick() {
+        handleOnClick(this.props, this.props.mxObject);
     }
 
     public static validateProps(props: LineChartContainerProps): string {

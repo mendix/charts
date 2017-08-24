@@ -3,6 +3,7 @@ import * as classNames from "classnames";
 
 import * as Plotly from "plotly.js/dist/plotly";
 import { Dimensions, getDimensions } from "../../utils/style";
+import "core-js/es6/promise";
 
 export interface LineChartProps extends Dimensions {
     data?: Plotly.ScatterData[];
@@ -10,6 +11,7 @@ export interface LineChartProps extends Dimensions {
     layout?: Partial<Plotly.Layout>;
     className?: string;
     style?: object;
+    onClickAction?: () => void;
 }
 
 export type Mode = "lines" | "markers" | "lines+markers";
@@ -88,7 +90,12 @@ export class LineChart extends Component<LineChartProps, {}> {
     private renderChart(props: LineChartProps) {
         const data = props.data && props.data.length ? props.data : this.data;
         if (this.lineChart) {
-            Plotly.newPlot(this.lineChart, data, this.props.layout, this.props.config);
+            Plotly.newPlot(this.lineChart, data, this.props.layout, this.props.config)
+                .then(myPlot => myPlot.on("plotly_click", () => {
+                    if (props.onClickAction) {
+                        props.onClickAction();
+                    }
+                }));
         }
     }
 
