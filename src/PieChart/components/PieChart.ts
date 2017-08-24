@@ -6,6 +6,7 @@ import * as Plotly from "plotly.js/dist/plotly";
 import { ChartType } from "./PieChartContainer";
 import { PieData } from "../../../typings/plotly.js";
 import { Dimensions, getDimensions } from "../../utils/style";
+import "core-js/es6/promise";
 
 export interface PieChartProps extends Dimensions {
     data?: PieData[];

@@ -2,13 +2,14 @@ import { Component, createElement } from "react";
 
 import { BarChart, BarChartProps } from "./BarChart";
 import { Alert } from "../../components/Alert";
-import { DataSourceProps, MxObject, fetchDataFromSeries, fetchSeriesData } from "../../utils/data";
+import { DataSourceProps, MxObject, OnClickProps, fetchDataFromSeries, fetchSeriesData, handleOnClick
+} from "../../utils/data";
 import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
 import { BarMode, ScatterData } from "plotly.js";
 
-export interface BarChartContainerProps extends WrapperProps, Dimensions, DataSourceProps {
+export interface BarChartContainerProps extends WrapperProps, Dimensions, DataSourceProps, OnClickProps {
     barMode: BarMode;
     responsive: boolean;
     title?: string;
@@ -35,6 +36,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         this.fetchData = this.fetchData.bind(this);
         this.handleFetchedSeries = this.handleFetchedSeries.bind(this);
         this.processSeriesData = this.processSeriesData.bind(this);
+        this.handleOnClick = this.handleOnClick.bind(this);
     }
 
     render() {
@@ -48,7 +50,8 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
 
         return createElement(BarChart, {
             ...BarChartContainer.getBarChartProps(this.props),
-            data: this.state.data
+            data: this.state.data,
+            onClickAction: this.handleOnClick
         });
     }
 
@@ -61,6 +64,10 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         if (this.subscriptionHandle) {
             window.mx.data.unsubscribe(this.subscriptionHandle);
         }
+    }
+
+    private handleOnClick() {
+        handleOnClick(this.props, this.props.mxObject);
     }
 
     public static validateProps(props: BarChartContainerProps): string {

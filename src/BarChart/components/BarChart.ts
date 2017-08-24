@@ -3,6 +3,7 @@ import * as classNames from "classnames";
 
 import * as Plotly from "plotly.js/dist/plotly";
 import { Dimensions, getDimensions } from "../../utils/style";
+import "core-js/es6/promise";
 
 export interface BarChartProps extends Dimensions {
     config?: Partial<Plotly.Config>;
@@ -10,6 +11,7 @@ export interface BarChartProps extends Dimensions {
     layout?: Partial<Plotly.Layout>;
     style?: object;
     className?: string;
+    onClickAction?: () => void;
 }
 
 export class BarChart extends Component<BarChartProps, {}> {
@@ -84,9 +86,14 @@ export class BarChart extends Component<BarChartProps, {}> {
     }
 
     private renderChart(props: BarChartProps) {
-        const { config, data, layout } = props;
         if (this.plotlyNode) {
-            Plotly.newPlot(this.plotlyNode, data && data.length ? data : this.data, layout, config);
+            const data = props.data && props.data.length ? props.data : this.data;
+            Plotly.newPlot(this.plotlyNode, data, props.layout, props.config)
+                .then(myPlot => myPlot.on("plotly_click", () => {
+                    if (props.onClickAction) {
+                        props.onClickAction();
+                    }
+                }));
         }
     }
 
