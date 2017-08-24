@@ -14,6 +14,13 @@ export interface DataSourceProps {
 export type MxObject = mendix.lib.MxObject;
 type FetchDataCallback = (objects?: mendix.lib.MxObject[], error?: string) => void;
 
+export interface OnClickProps {
+    onClickEvent: OnClickOptions;
+    onClickPage: string;
+    onClickMicroflow: string;
+}
+type OnClickOptions = "doNothing" | "showPage" | "callMicroflow";
+
 export const fetchSeriesData = <T extends DataSourceProps>(mxObject: MxObject, dataOptions: T, callback: FetchDataCallback) => { // tslint:disable max-line-length
     if (dataOptions.seriesEntity) {
         if (dataOptions.dataSourceType === "XPath") {
@@ -56,3 +63,25 @@ export const fetchDataFromSeries = (series: MxObject[], dataEntity: string, sort
             xpath
         });
     });
+
+export const handleOnClick = <T extends OnClickProps>(options: T, mxObject?: MxObject) => {
+    if (!mxObject || options.onClickEvent === "doNothing") {
+        return;
+    }
+    if (options.onClickEvent === "callMicroflow" && options.onClickMicroflow) {
+        window.mx.ui.action(options.onClickMicroflow, {
+            error: error => window.mx.ui.error(`Error while executing microflow ${options.onClickMicroflow}: ${error.message}`), // tslint:disable-line max-line-length
+            params: {
+                applyto: "selection",
+                guids: [ mxObject.getGuid() ]
+            }
+        });
+    } else if (options.onClickEvent === "showPage" && options.onClickPage) {
+        const context = new mendix.lib.MxContext();
+        context.setContext(mxObject.getEntity(), mxObject.getGuid());
+        window.mx.ui.openForm(options.onClickPage, {
+            context,
+            error: error => window.mx.ui.error(`Error while opening page ${options.onClickPage}: ${error.message}`)
+        });
+    }
+};

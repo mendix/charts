@@ -14,6 +14,7 @@ export interface PieChartProps extends Dimensions {
     type: ChartType;
     className?: string;
     style?: CSSProperties;
+    onClickAction?: () => void;
 }
 
 export class PieChart extends Component<PieChartProps, {}> {
@@ -64,11 +65,13 @@ export class PieChart extends Component<PieChartProps, {}> {
 
     private renderChart(props: PieChartProps) {
         if (this.pieChartNode) {
-            if (props.data && props.data[0].values.length) {
-                Plotly.newPlot(this.pieChartNode, props.data as any, props.layout, props.config);
-            } else {
-                Plotly.newPlot(this.pieChartNode, this.data as any, props.layout, props.config);
-            }
+            const data = props.data && props.data[0].values.length ? props.data : this.data;
+            Plotly.newPlot(this.pieChartNode, data as any, props.layout, props.config)
+                .then(myPlot => myPlot.on("plotly_click", () => {
+                    if (this.props.onClickAction) {
+                        this.props.onClickAction();
+                    }
+                }));
         }
     }
 

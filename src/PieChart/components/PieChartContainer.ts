@@ -2,13 +2,13 @@ import { Component, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { PieChart, PieChartProps } from "./PieChart";
-import { fetchByMicroflow, fetchByXPath } from "../../utils/data";
+import { OnClickProps, fetchByMicroflow, fetchByXPath, handleOnClick } from "../../utils/data";
 import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
 export type ChartType = "pie" | "doughnut";
 
-export interface PieChartContainerProps extends WrapperProps, Dimensions {
+export interface PieChartContainerProps extends WrapperProps, Dimensions, OnClickProps {
     dataEntity: string;
     dataSourceType: "XPath" | "microflow";
     entityConstraint: string;
@@ -46,6 +46,7 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         };
         this.fetchData = this.fetchData.bind(this);
         this.processData = this.processData.bind(this);
+        this.handleOnClick = this.handleOnClick.bind(this);
     }
 
     render() {
@@ -57,7 +58,10 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
             });
         }
 
-        return createElement(PieChart, PieChartContainer.getPieChartProps(this.props, this.state));
+        return createElement(PieChart, {
+            ...PieChartContainer.getPieChartProps(this.props, this.state),
+            onClickAction: this.handleOnClick
+        });
     }
 
     componentWillReceiveProps(newProps: PieChartContainerProps) {
@@ -135,6 +139,10 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
             colors.push(value.get(this.props.colorAttribute) as string);
         });
         this.setState({ colors, labels, values });
+    }
+
+    private handleOnClick() {
+        handleOnClick(this.props, this.props.mxObject);
     }
 
     public static validateProps(props: PieChartContainerProps): string {
