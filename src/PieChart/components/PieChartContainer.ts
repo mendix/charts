@@ -26,7 +26,7 @@ interface PieChartContainerState extends PieData {
     alertMessage?: string;
 }
 
-interface PieData {
+export interface PieData {
     colors?: string[];
     labels?: string[];
     values?: number[];
