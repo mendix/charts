@@ -7,3 +7,5 @@ type VisibilityMap<T> = {
 declare module "plotly.js/dist/plotly" {
     export = Plotly;
 }
+
+declare module "css-element-queries";

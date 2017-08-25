@@ -32,7 +32,7 @@ export const getDimensions = <T extends Dimensions>(props: T): CSSProperties => 
     if (props.heightUnit === "percentageOfWidth") {
         style.paddingBottom = `${props.height}%`;
     } else if (props.heightUnit === "pixels") {
-        style.paddingBottom = `${props.height}px`;
+        style.height = `${props.height}px`;
     } else if (props.heightUnit === "percentageOfParent") {
         style.height = `${props.height}%`;
     }

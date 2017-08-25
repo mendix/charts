@@ -15,10 +15,8 @@ export interface BarChartProps extends Dimensions {
 }
 
 export class BarChart extends Component<BarChartProps, {}> {
-    private intervalID: number | null;
     private plotlyNode: HTMLDivElement;
-    private svg: SVGElement;
-    private data: Partial<Plotly.ScatterData>[] = [ // tslint:disable-line
+    private data: Partial<Plotly.ScatterData>[] = [
         {
             type: "bar",
             x: [ "Sample 1", "Sample 2", "Sample 3", "Sample 4", "Sample 5", "Sample 6", "Sample 7" ],
@@ -44,8 +42,6 @@ export class BarChart extends Component<BarChartProps, {}> {
     componentDidMount() {
         this.renderChart(this.props);
         this.setUpEvents();
-        this.adjustStyle();
-        this.fixChartRendering();
     }
 
     componentWillReceiveProps(newProps: BarChartProps) {
@@ -61,16 +57,6 @@ export class BarChart extends Component<BarChartProps, {}> {
 
     private getPlotlyNodeRef(node: HTMLDivElement) {
         this.plotlyNode = node;
-    }
-
-    private adjustStyle() {
-        if (this.plotlyNode) {
-            const wrapperElement = this.plotlyNode.parentElement;
-            if (this.props.heightUnit === "percentageOfParent" && wrapperElement) {
-                wrapperElement.style.height = "100%";
-                wrapperElement.style.width = "100%";
-            }
-        }
     }
 
     private setUpEvents() {
@@ -99,15 +85,5 @@ export class BarChart extends Component<BarChartProps, {}> {
 
     private onResize() {
         Plotly.Plots.resize(this.plotlyNode);
-    }
-
-    private fixChartRendering() {
-        this.intervalID = setInterval(() => {
-            if (this.svg && this.svg.parentElement && this.svg.parentElement.offsetHeight !== 0 && this.intervalID) {
-                Plotly.Plots.resize(this.plotlyNode);
-                clearInterval(this.intervalID);
-                this.intervalID = null;
-            }
-        }, 100);
     }
 }
