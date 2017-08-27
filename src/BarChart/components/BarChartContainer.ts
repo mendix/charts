@@ -3,14 +3,14 @@ import { Component, createElement } from "react";
 import { BarChart, BarChartProps } from "./BarChart";
 import { Alert } from "../../components/Alert";
 import {
-    DataSourceProps, MxObject, OnClickProps, fetchDataFromSeries, fetchSeriesData, handleOnClick
+    DynamicDataSourceProps, MxObject, OnClickProps, fetchDataFromSeries, fetchSeriesData, handleOnClick
 } from "../../utils/data";
 import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
 import { BarMode, ScatterData } from "plotly.js";
 
-export interface BarChartContainerProps extends WrapperProps, Dimensions, DataSourceProps, OnClickProps {
+export interface BarChartContainerProps extends WrapperProps, Dimensions, DynamicDataSourceProps, OnClickProps {
     barMode: BarMode;
     responsive: boolean;
     title?: string;
@@ -112,7 +112,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
     private fetchData(mxObject?: mendix.lib.MxObject) {
         this.data = [];
         if (mxObject) {
-            fetchSeriesData(mxObject, this.props, this.handleFetchedSeries);
+            fetchSeriesData(mxObject, this.props.seriesEntity, this.props, this.handleFetchedSeries);
         }
     }
 

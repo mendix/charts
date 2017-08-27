@@ -2,8 +2,6 @@ export interface DataSourceProps {
     dataSourceMicroflow: string;
     dataSourceType: "XPath" | "microflow";
     entityConstraint: string;
-    seriesEntity: string;
-    seriesNameAttribute: string;
     dataEntity: string;
     xAxisLabel: string;
     xValueAttribute: string;
@@ -11,6 +9,12 @@ export interface DataSourceProps {
     yValueAttribute: string;
     xAxisSortAttribute: string;
 }
+
+export interface DynamicDataSourceProps extends DataSourceProps {
+    seriesEntity: string;
+    seriesNameAttribute: string;
+}
+
 export type MxObject = mendix.lib.MxObject;
 type FetchDataCallback = (objects?: mendix.lib.MxObject[], error?: string) => void;
 
@@ -21,10 +25,10 @@ export interface OnClickProps {
 }
 type OnClickOptions = "doNothing" | "showPage" | "callMicroflow";
 
-export const fetchSeriesData = <T extends DataSourceProps>(mxObject: MxObject, dataOptions: T, callback: FetchDataCallback) => { // tslint:disable max-line-length
-    if (dataOptions.seriesEntity) {
+export const fetchSeriesData = <T extends DataSourceProps>(mxObject: MxObject, entity: string, dataOptions: T, callback: FetchDataCallback) => { // tslint:disable max-line-length
+    if (entity) {
         if (dataOptions.dataSourceType === "XPath") {
-            fetchByXPath(mxObject.getGuid(), dataOptions.seriesEntity, dataOptions.entityConstraint, callback);
+            fetchByXPath(mxObject.getGuid(), entity, dataOptions.entityConstraint, callback);
         } else if (dataOptions.dataSourceType === "microflow" && dataOptions.dataSourceMicroflow) {
             fetchByMicroflow(dataOptions.dataSourceMicroflow, mxObject.getGuid(), callback);
         }
@@ -52,7 +56,9 @@ export const fetchByMicroflow = (actionname: string, guid: string, callback: Fet
     });
 };
 
-export const fetchDataFromSeries = (series: MxObject[], dataEntity: string, sortAttribute: string, callback: (series?: MxObject, data?: MxObject[], isFinal?: boolean, error?: Error) => void) => // tslint:disable max-line-length
+type DynamicSeriesDataCallback = (series?: MxObject, data?: MxObject[], isFinal?: boolean, error?: Error) => void;
+
+export const fetchDataFromSeries = (series: MxObject[], dataEntity: string, sortAttribute: string, callback: DynamicSeriesDataCallback) => // tslint:disable max-line-length
     series.forEach((activeSeries, index) => {
         const dataEntityPath = dataEntity.split("/");
         const xpath = `//${dataEntityPath[1]}[${dataEntityPath[0]} = ${activeSeries.getGuid()}]`;

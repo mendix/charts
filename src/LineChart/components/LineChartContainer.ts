@@ -3,18 +3,19 @@ import { Component, createElement } from "react";
 import { Alert } from "../../components/Alert";
 import { LineChart, LineChartProps, Mode } from "./LineChart";
 import {
-    DataSourceProps, MxObject, OnClickProps, fetchDataFromSeries, fetchSeriesData, handleOnClick
+    DataSourceProps, DynamicDataSourceProps, MxObject, OnClickProps, fetchDataFromSeries, fetchSeriesData, handleOnClick
 } from "../../utils/data";
 import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
-export interface LineChartContainerProps extends WrapperProps, Dimensions, DataSourceProps, OnClickProps {
-    mode: "lines" | "markers" | "text" | "linesomarkers";
+export interface LineChartContainerProps extends WrapperProps, Dimensions, DynamicDataSourceProps, OnClickProps {
+    mode: Mode;
     lineColor: string;
     showGrid: boolean;
     showToolBar: boolean;
     showLegend: boolean;
     responsive: boolean;
+    staticSeries: StaticSeriesProps[];
 }
 
 interface LineChartContainerState {
@@ -22,9 +23,16 @@ interface LineChartContainerState {
     data?: Plotly.ScatterData[];
 }
 
+export interface StaticSeriesProps extends DataSourceProps {
+    name: string;
+    mode: Mode;
+    lineColor: string;
+}
+
 export default class LineChartContainer extends Component<LineChartContainerProps, LineChartContainerState> {
     private subscriptionHandle: number;
     private data: Plotly.ScatterData[] = [];
+    private activeStaticIndex = 0;
 
     constructor(props: LineChartContainerProps) {
         super(props);
@@ -35,7 +43,8 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         };
         this.fetchData = this.fetchData.bind(this);
         this.handleFetchedSeries = this.handleFetchedSeries.bind(this);
-        this.processSeriesData = this.processSeriesData.bind(this);
+        this.processDynamicSeriesData = this.processDynamicSeriesData.bind(this);
+        this.processStaticSeriesData = this.processStaticSeriesData.bind(this);
         this.handleOnClick = this.handleOnClick.bind(this);
     }
 
@@ -108,43 +117,58 @@ export default class LineChartContainer extends Component<LineChartContainerProp
     private fetchData(mxObject?: mendix.lib.MxObject) {
         this.data = [];
         if (mxObject) {
-            fetchSeriesData(mxObject, this.props, this.handleFetchedSeries);
+            this.props.staticSeries.forEach(staticSeries =>
+                fetchSeriesData(mxObject, staticSeries.dataEntity, staticSeries, this.processStaticSeriesData)
+            );
+            fetchSeriesData(mxObject, this.props.seriesEntity, this.props, this.handleFetchedSeries);
         }
+    }
+
+    private processStaticSeriesData(data: MxObject[], errorMessage?: string) {
+        const activeSeries = this.props.staticSeries[this.activeStaticIndex];
+        const isFinal = this.props.staticSeries.length === this.activeStaticIndex + 1;
+        this.activeStaticIndex = isFinal ? 0 : this.activeStaticIndex + 1;
+        if (errorMessage) {
+            this.handleFetchDataError(errorMessage);
+
+            return;
+        }
+        this.processSeriesData(activeSeries.name, activeSeries.lineColor, activeSeries.mode, data, activeSeries, isFinal); // tslint:disable-line max-line-length
     }
 
     private handleFetchedSeries(allSeries?: MxObject[], errorMessage?: string) {
         if (errorMessage) {
-            window.mx.ui.error(errorMessage);
-            this.setState({ data: [] });
+            this.handleFetchDataError(errorMessage);
 
             return;
         }
 
         if (allSeries) {
-            fetchDataFromSeries(allSeries, this.props.dataEntity, this.props.xAxisSortAttribute, this.processSeriesData); // tslint:disable max-line-length
+            fetchDataFromSeries(allSeries, this.props.dataEntity, this.props.xAxisSortAttribute, this.processDynamicSeriesData); // tslint:disable max-line-length
         }
     }
 
-    private processSeriesData(singleSeries: MxObject, data: MxObject[], isFinal = false, error?: Error) {
+    private processDynamicSeriesData(singleSeries: MxObject, data: MxObject[], isFinal = false, error?: Error) {
         if (error) {
-            window.mx.ui.error(`An error occurred while retrieving chart data: ${error.message}`);
-            this.setState({ data: [] });
+            this.handleFetchDataError(`An error occurred while retrieving dynamic chart data: ${error.message}`);
 
             return;
         }
         const lineColor = singleSeries.get(this.props.lineColor) as string;
         const seriesName = singleSeries.get(this.props.seriesNameAttribute) as string;
+        this.processSeriesData(seriesName, lineColor, this.props.mode, data, this.props, isFinal);
+    }
+
+    private processSeriesData<T extends DataSourceProps>(seriesName: string, lineColor: string, mode: Mode, data: MxObject[], dataOptions: T, isFinal = false) { // tslint:disable-line max-line-length
         const fetchedData = data.map(value => ({
-            x: value.get(this.props.xValueAttribute) as Plotly.Datum,
-            y: parseInt(value.get(this.props.yValueAttribute) as string, 10) as Plotly.Datum
+            x: value.get(dataOptions.xValueAttribute) as Plotly.Datum,
+            y: parseInt(value.get(dataOptions.yValueAttribute) as string, 10) as Plotly.Datum
         }));
 
         const lineData = {
             connectgaps: true,
-            line: {
-                color: lineColor
-            },
-            mode: this.props.mode.replace("o", "+") as Mode,
+            line: { color: lineColor },
+            mode: mode.replace("X", "+") as Mode,
             name: seriesName,
             type: "scatter",
             x: fetchedData.map(value => value.x),
@@ -155,5 +179,10 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         if (isFinal) {
             this.setState({ data: this.data });
         }
+    }
+
+    private handleFetchDataError(errorMessage: string) {
+        window.mx.ui.error(errorMessage);
+        this.setState({ data: [] });
     }
 }
