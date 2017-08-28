@@ -4,14 +4,85 @@
     <description>Create a bar chart</description>
     <icon/>
     <properties>
+        <property key="staticSeries" type="object" isList="true" required="false">
+            <caption>Series</caption>
+            <category>Static series</category>
+            <description>Add series and configure their properties</description>
+            <properties>
+                <property key="name" type="string" required="false">
+                    <caption>Series name</caption>
+                    <category>Data source</category>
+                    <description/>
+                </property>
+                <property key="dataEntity" type="entity" required="false">
+                    <caption>Data entity</caption>
+                    <category>Data source</category>
+                    <description>The entity from which the data values will be retrieved</description>
+                </property>
+                <property key="dataSourceType" type="enumeration" defaultValue="XPath">
+                    <caption>Data source type</caption>
+                    <category>Data source</category>
+                    <description>Type of source</description>
+                    <enumerationValues>
+                        <enumerationValue key="XPath">Database/XPath</enumerationValue>
+                        <enumerationValue key="microflow">Microflow</enumerationValue>
+                    </enumerationValues>
+                </property>
+                <property key="entityConstraint" type="entityConstraint" entityProperty="dataEntity" required="false">
+                    <caption>XPath constraint</caption>
+                    <category>Data source</category>
+                    <description>The constraint on the data from the data entity (used when the data source is Database/XPath)</description>
+                </property>
+                <property key="dataSourceMicroflow" type="microflow" required="false">
+                    <caption>Microflow</caption>
+                    <category>Data source</category>
+                    <description>Returns a list of data values</description>
+                    <returnType type="Object" entityProperty="dataEntity" isList="true"/>
+                </property>
+                <property key="xValueAttribute" type="attribute" entityProperty="dataEntity" required="false">
+                    <caption>X-axis data attribute</caption>
+                    <category>Data source</category>
+                    <description>Attribute containing x-axis data</description>
+                    <attributeTypes>
+                        <attributeType name="String"/>
+                        <attributeType name="Decimal"/>
+                        <attributeType name="Long"/>
+                        <attributeType name="Integer"/>
+                    </attributeTypes>
+                </property>
+                <property key="yValueAttribute" type="attribute" entityProperty="dataEntity" required="false">
+                    <caption>Y-axis data attribute</caption>
+                    <category>Data source</category>
+                    <description>Attribute containing y-axis data</description>
+                    <attributeTypes>
+                        <attributeType name="Decimal"/>
+                        <attributeType name="Long"/>
+                        <attributeType name="Integer"/>
+                    </attributeTypes>
+                </property>
+                <property key="xValueSortAttribute" type="attribute" entityProperty="dataEntity" required="false">
+                    <caption>X-axis sort attribute</caption>
+                    <category>Data source</category>
+                    <description>Attribute to use for sorting the x-axis data</description>
+                    <attributeTypes>
+                        <attributeType name="Decimal"/>
+                        <attributeType name="Long"/>
+                        <attributeType name="Integer"/>
+                        <attributeType name="String"/>
+                        <attributeType name="AutoNumber"/>
+                        <attributeType name="DateTime"/>
+                    </attributeTypes>
+                </property>
+            </properties>
+        </property>
         <property key="seriesEntity" type="entity">
             <caption>Series entity</caption>
-            <category>Data source</category>
+            <category>Dynamic series</category>
             <description>The entity from which the series will be retrieved</description>
         </property>
         <property key="dataSourceType" type="enumeration" defaultValue="XPath">
             <caption>Data source type</caption>
-            <category>Data source</category>
+            <category>Dynamic series</category>
             <description/>
             <enumerationValues>
                 <enumerationValue key="XPath">Database/XPath</enumerationValue>
@@ -20,12 +91,12 @@
         </property>
         <property key="entityConstraint" type="entityConstraint" entityProperty="seriesEntity" required="false">
             <caption>XPath constraint</caption>
-            <category>Data source</category>
+            <category>Dynamic series</category>
             <description>Constraint on the data from the data entity (used when data source is Database/XPath)</description>
         </property>
         <property key="seriesNameAttribute" type="attribute" entityProperty="seriesEntity">
             <caption>Series name attribute</caption>
-            <category>Data source</category>
+            <category>Dynamic series</category>
             <description>Attribute that holds the name of the series</description>
             <attributeTypes>
                 <attributeType name="String"/>
@@ -33,18 +104,18 @@
         </property>
         <property key="dataSourceMicroflow" type="microflow" required="false">
             <caption>Microflow</caption>
-            <category>Data source</category>
+            <category>Dynamic series</category>
             <description>Returns a list of series</description>
             <returnType type="Object" entityProperty="seriesEntity" isList="true"/>
         </property>
         <property key="dataEntity" type="entity" isPath="yes" pathType="referenceSet" entityProperty="seriesEntity">
             <caption>Data entity</caption>
-            <category>Data source</category>
+            <category>Dynamic series</category>
             <description>The entity from which the data values will be retrieved</description>
         </property>
         <property key="xValueAttribute" type="attribute" entityProperty="dataEntity">
             <caption>X value attribute</caption>
-            <category>Data source</category>
+            <category>Dynamic series</category>
             <description/>
             <attributeTypes>
                 <attributeType name="String"/>
@@ -52,7 +123,7 @@
         </property>
         <property key="yValueAttribute" type="attribute" entityProperty="dataEntity">
             <caption>Y value attribute</caption>
-            <category>Data source</category>
+            <category>Dynamic series</category>
             <description/>
             <attributeTypes>
                 <attributeType name="Integer"/>
@@ -62,7 +133,7 @@
         </property>
         <property key="xAxisSortAttribute" type="attribute" entityProperty="dataEntity">
             <caption>X-axis sort attribute</caption>
-            <category>Data source</category>
+            <category>Dynamic series</category>
             <description>Attribute to use for sorting the x-axis data</description>
             <attributeTypes>
                 <attributeType name="Decimal"/>
@@ -75,7 +146,7 @@
         </property>
         <property key="xAxisLabel" type="translatableString" required="false">
             <caption>X-axis label</caption>
-            <category>X-axis</category>
+            <category>Appearance</category>
             <description>Label for the x-axis (horizontal)</description>
             <translations>
                 <translation lang="en_US"/>
@@ -84,7 +155,7 @@
         </property>
         <property key="yAxisLabel" type="translatableString" required="false">
             <caption>Y-axis label</caption>
-            <category>Y-axis</category>
+            <category>Appearance</category>
             <description>Label for the y-axis (vertical)</description>
             <translations>
                 <translation lang="en_US"/>

@@ -159,16 +159,6 @@
                 <attributeType name="DateTime"/>
             </attributeTypes>
         </property>
-        <property key="xAxisLabel" type="string" required="false">
-            <caption>X-axis label</caption>
-            <category>Dynamic series</category>
-            <description>Label for the x-axis (horizontal)</description>
-        </property>
-        <property key="yAxisLabel" type="string" required="false">
-            <caption>Y-axis label</caption>
-            <category>Dynamic series</category>
-            <description>Label for the y-axis (vertical)</description>
-        </property>
         <property key="mode" type="enumeration" defaultValue="linesXmarkers">
             <caption>Mode</caption>
             <category>Dynamic series</category>
@@ -186,6 +176,16 @@
             <attributeTypes>
                 <attributeType name="String"/>
             </attributeTypes>
+        </property>
+        <property key="xAxisLabel" type="string" required="false">
+            <caption>X-axis label</caption>
+            <category>Appearance</category>
+            <description>Label for the x-axis (horizontal)</description>
+        </property>
+        <property key="yAxisLabel" type="string" required="false">
+            <caption>Y-axis label</caption>
+            <category>Appearance</category>
+            <description>Label for the y-axis (vertical)</description>
         </property>
         <property key="showGrid" type="boolean" defaultValue="true">
             <caption>Show grid</caption>

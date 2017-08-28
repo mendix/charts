@@ -3,7 +3,7 @@ import { Component, createElement } from "react";
 import { BarChart, BarChartProps } from "./BarChart";
 import { Alert } from "../../components/Alert";
 import {
-    DynamicDataSourceProps, MxObject, OnClickProps, fetchDataFromSeries, fetchSeriesData, handleOnClick
+    DataSourceProps, DynamicDataSourceProps, MxObject, OnClickProps, fetchDataFromSeries, fetchSeriesData, handleOnClick
 } from "../../utils/data";
 import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
@@ -16,6 +16,7 @@ export interface BarChartContainerProps extends WrapperProps, Dimensions, Dynami
     title?: string;
     showGrid: boolean;
     showToolbar: boolean;
+    staticSeries: StaticSeriesProps[];
 }
 
 interface BarChartContainerState {
@@ -23,9 +24,14 @@ interface BarChartContainerState {
     data?: ScatterData[];
 }
 
+interface StaticSeriesProps extends DataSourceProps {
+    name: string;
+}
+
 export default class BarChartContainer extends Component<BarChartContainerProps, BarChartContainerState> {
     private subscriptionHandle: number;
     private data: ScatterData[] = [];
+    private activeStaticIndex = 0;
 
     constructor(props: BarChartContainerProps) {
         super(props);
@@ -36,7 +42,8 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         };
         this.fetchData = this.fetchData.bind(this);
         this.handleFetchedSeries = this.handleFetchedSeries.bind(this);
-        this.processSeriesData = this.processSeriesData.bind(this);
+        this.processDynamicSeriesData = this.processDynamicSeriesData.bind(this);
+        this.processStaticSeriesData = this.processStaticSeriesData.bind(this);
         this.handleOnClick = this.handleOnClick.bind(this);
     }
 
@@ -112,34 +119,51 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
     private fetchData(mxObject?: mendix.lib.MxObject) {
         this.data = [];
         if (mxObject) {
+            this.props.staticSeries.forEach(staticSeries =>
+                fetchSeriesData(mxObject, staticSeries.dataEntity, staticSeries, this.processStaticSeriesData)
+            );
             fetchSeriesData(mxObject, this.props.seriesEntity, this.props, this.handleFetchedSeries);
         }
     }
 
+    private processStaticSeriesData(data: MxObject[], errorMessage?: string) {
+        const activeSeries = this.props.staticSeries[this.activeStaticIndex];
+        const isFinal = this.props.staticSeries.length === this.activeStaticIndex + 1;
+        this.activeStaticIndex = isFinal ? 0 : this.activeStaticIndex + 1;
+        if (errorMessage) {
+            this.handleFetchDataError(errorMessage);
+
+            return;
+        }
+        this.processSeriesData(activeSeries.name, data, activeSeries, isFinal);
+    }
+
     private handleFetchedSeries(allSeries?: MxObject[], errorMessage?: string) {
         if (errorMessage) {
-            window.mx.ui.error(errorMessage);
-            this.setState({ data: [] });
+            this.handleFetchDataError(errorMessage);
 
             return;
         }
 
         if (allSeries) {
-            fetchDataFromSeries(allSeries, this.props.dataEntity, this.props.xAxisSortAttribute, this.processSeriesData); // tslint:disable-line
+            fetchDataFromSeries(allSeries, this.props.dataEntity, this.props.xAxisSortAttribute, this.processDynamicSeriesData); // tslint:disable-line
         }
     }
 
-    private processSeriesData(singleSeries: MxObject, data: MxObject[], isFinal = false, error?: Error) {
+    private processDynamicSeriesData(singleSeries: MxObject, data: MxObject[], isFinal = false, error?: Error) {
         if (error) {
-            window.mx.ui.error(`An error occurred while retrieving chart data: ${error}`);
-            this.setState({ data: [] });
+            this.handleFetchDataError(`An error occurred while retrieving dynamic chart data: ${error.message}`);
 
             return;
         }
         const seriesName = singleSeries.get(this.props.seriesNameAttribute) as string;
+        this.processSeriesData(seriesName, data, this.props, isFinal);
+    }
+
+    private processSeriesData<T extends DataSourceProps>(seriesName: string, data: MxObject[], dataOptions: T, isFinal = false) { // tslint:disable-line max-line-length
         const fetchedData = data.map(value => ({
-            x: value.get(this.props.xValueAttribute) as Plotly.Datum,
-            y: parseInt(value.get(this.props.yValueAttribute) as string, 10) as Plotly.Datum
+            x: value.get(dataOptions.xValueAttribute) as Plotly.Datum,
+            y: parseInt(value.get(dataOptions.yValueAttribute) as string, 10) as Plotly.Datum
         }));
 
         const barData = {
@@ -153,5 +177,10 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         if (isFinal) {
             this.setState({ data: this.data });
         }
+    }
+
+    private handleFetchDataError(errorMessage: string) {
+        window.mx.ui.error(errorMessage);
+        this.setState({ data: [] });
     }
 }
