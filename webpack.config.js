@@ -15,7 +15,7 @@ const widgetConfig = {
         path: path.resolve(__dirname, "dist/tmp"),
         filename: "src/com/mendix/widget/custom/[name]/[name].js",
         chunkFilename: `src/com/mendix/widget/custom/${widgetName}[id].js`,
-        libraryTarget: "umd",
+        libraryTarget: "umd"
     },
     resolve: {
         extensions: [ ".ts", ".js" ],
@@ -47,7 +47,9 @@ const widgetConfig = {
         ]
     },
     devtool: "source-map",
-    externals: [ "react", "react-dom" ],
+    externals: [ "react", "react-dom", {
+        "plotly.js/dist/plotly": "widgets/com/mendix/widget/custom/charts/PlotlyCustom.js"
+    } ],
     plugins: [
         new CopyWebpackPlugin([
             { from: "src/**/*.js" },
@@ -60,6 +62,19 @@ const widgetConfig = {
         new webpack.LoaderOptionsPlugin({
             debug: true
         })
+    ]
+};
+
+const plotlyCustomConfig = {
+    entry: "./src/PlotlyCustom.ts",
+    output: {
+        path: path.resolve(__dirname, "dist/tmp/src"),
+        filename: "com/mendix/widget/custom/charts/PlotlyCustom.js",
+        libraryTarget: "amd",
+    },
+    devtool: "source-map",
+    plugins: [
+        new webpack.LoaderOptionsPlugin({ debug: true })
     ]
 };
 
@@ -98,4 +113,4 @@ const previewConfig = {
     ]
 };
 
-module.exports = [ widgetConfig, previewConfig ];
+module.exports = [ widgetConfig, plotlyCustomConfig, previewConfig ];

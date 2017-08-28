@@ -62,6 +62,7 @@
     "karma-webpack": "^2.0.3",
     "mendix-client": "https://github.com/FlockOfBirds/Mendix-client-typing/archive/7.3.0.tar.gz",
     "node-sass": "^4.5.2",
+    "nodemon": "^1.11.0",
     "pre-commit": "^1.2.2",
     "raw-loader": "^0.5.1",
     "react": "^15.4.2",

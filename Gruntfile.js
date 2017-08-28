@@ -11,7 +11,7 @@ webpackConfig.forEach(function(config) {
     }));
 });
 
-module.exports = function (grunt) {
+module.exports = function(grunt) {
     const pkg = grunt.file.readJSON("package.json");
     grunt.initConfig({
 
@@ -66,7 +66,7 @@ module.exports = function (grunt) {
                     return {
                         append: `\n\n//# sourceURL=${name}.webmodeler.js\n`,
                         input: `dist/tmp/src/${name}/${name}.webmodeler.js`
-                    }
+                    };
                 })
             }
         },
