@@ -3,6 +3,8 @@ const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
+const widgetName = require("./package").widgetName;
+
 const widgetConfig = {
     entry: {
         BarChart: "./src/BarChart/components/BarChartContainer.ts",
@@ -12,7 +14,8 @@ const widgetConfig = {
     output: {
         path: path.resolve(__dirname, "dist/tmp"),
         filename: "src/com/mendix/widget/custom/[name]/[name].js",
-        libraryTarget: "umd"
+        chunkFilename: `src/com/mendix/widget/custom/${widgetName}[id].js`,
+        libraryTarget: "umd",
     },
     resolve: {
         extensions: [ ".ts", ".js" ],
@@ -27,7 +30,8 @@ const widgetConfig = {
             {
                 test: /\.ts$/,
                 use: "ts-loader"
-            },{
+            },
+            {
                 test: /\.css$/, loader: ExtractTextPlugin.extract({
                     fallback: "style-loader",
                     use: "css-loader"

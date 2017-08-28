@@ -1,9 +1,9 @@
 import { Component, createElement } from "react";
 import * as classNames from "classnames";
 
-import * as Plotly from "plotly.js/dist/plotly";
-import { Dimensions, getDimensions } from "../../utils/style";
+import { Plots, newPlot, purge } from "plotly.js/dist/plotly";
 import "core-js/es6/promise";
+import { Dimensions, getDimensions } from "../../utils/style";
 
 export interface LineChartProps extends Dimensions {
     data?: Plotly.ScatterData[];
@@ -17,7 +17,7 @@ export interface LineChartProps extends Dimensions {
 export type Mode = "lines" | "markers" | "lines+markers";
 
 export class LineChart extends Component<LineChartProps, {}> {
-    private lineChart: HTMLDivElement;
+    private lineChartNode: HTMLDivElement;
     private data = [
         {
             connectgaps: true,
@@ -55,19 +55,19 @@ export class LineChart extends Component<LineChartProps, {}> {
     }
 
     componentWillUnmount() {
-        if (this.lineChart) {
-            Plotly.purge(this.lineChart);
+        if (this.lineChartNode) {
+            purge(this.lineChartNode);
         }
         window.removeEventListener("resize", this.onResize);
     }
 
     private getPlotlyNodeRef(node: HTMLDivElement) {
-        this.lineChart = node;
+        this.lineChartNode = node;
     }
 
     private adjustStyle() {
-        if (this.lineChart) {
-            const wrapperElement = this.lineChart.parentElement;
+        if (this.lineChartNode) {
+            const wrapperElement = this.lineChartNode.parentElement;
             if (this.props.heightUnit === "percentageOfParent" && wrapperElement) {
                 wrapperElement.style.height = "100%";
                 wrapperElement.style.width = "100%";
@@ -89,8 +89,8 @@ export class LineChart extends Component<LineChartProps, {}> {
 
     private renderChart(props: LineChartProps) {
         const data = props.data && props.data.length ? props.data : this.data;
-        if (this.lineChart) {
-            Plotly.newPlot(this.lineChart, data, this.props.layout, this.props.config)
+        if (this.lineChartNode) {
+            newPlot(this.lineChartNode, data, this.props.layout, this.props.config)
                 .then(myPlot => myPlot.on("plotly_click", () => {
                     if (props.onClickAction) {
                         props.onClickAction();
@@ -100,6 +100,6 @@ export class LineChart extends Component<LineChartProps, {}> {
     }
 
     private onResize() {
-        Plotly.Plots.resize(this.lineChart);
+        Plots.resize(this.lineChartNode);
     }
 }

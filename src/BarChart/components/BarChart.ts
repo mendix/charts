@@ -1,9 +1,9 @@
 import { Component, createElement } from "react";
 import * as classNames from "classnames";
 
-import * as Plotly from "plotly.js/dist/plotly";
-import { Dimensions, getDimensions } from "../../utils/style";
+import { Plots, newPlot, purge } from "plotly.js/dist/plotly";
 import "core-js/es6/promise";
+import { Dimensions, getDimensions } from "../../utils/style";
 
 export interface BarChartProps extends Dimensions {
     config?: Partial<Plotly.Config>;
@@ -15,7 +15,7 @@ export interface BarChartProps extends Dimensions {
 }
 
 export class BarChart extends Component<BarChartProps, {}> {
-    private plotlyNode: HTMLDivElement;
+    private barChartNode: HTMLDivElement;
     private data: Partial<Plotly.ScatterData>[] = [
         {
             type: "bar",
@@ -49,14 +49,14 @@ export class BarChart extends Component<BarChartProps, {}> {
     }
 
     componentWillUnmount() {
-        if (this.plotlyNode) {
-            Plotly.purge(this.plotlyNode);
+        if (this.barChartNode) {
+            purge(this.barChartNode);
         }
         window.removeEventListener("resize", this.onResize);
     }
 
     private getPlotlyNodeRef(node: HTMLDivElement) {
-        this.plotlyNode = node;
+        this.barChartNode = node;
     }
 
     private setUpEvents() {
@@ -72,9 +72,9 @@ export class BarChart extends Component<BarChartProps, {}> {
     }
 
     private renderChart(props: BarChartProps) {
-        if (this.plotlyNode) {
+        if (this.barChartNode) {
             const data = props.data && props.data.length ? props.data : this.data;
-            Plotly.newPlot(this.plotlyNode, data, props.layout, props.config)
+            newPlot(this.barChartNode, data, props.layout, props.config)
                 .then(myPlot => myPlot.on("plotly_click", () => {
                     if (props.onClickAction) {
                         props.onClickAction();
@@ -84,6 +84,6 @@ export class BarChart extends Component<BarChartProps, {}> {
     }
 
     private onResize() {
-        Plotly.Plots.resize(this.plotlyNode);
+        Plots.resize(this.barChartNode);
     }
 }

@@ -1,12 +1,12 @@
 import { CSSProperties, Component, createElement } from "react";
 
 import * as classNames from "classnames";
-import * as Plotly from "plotly.js/dist/plotly";
+import { Plots, newPlot, purge } from "plotly.js/dist/plotly";
 
 import { ChartType } from "./PieChartContainer";
 import { PieData } from "../../../typings/plotly.js";
-import { Dimensions, getDimensions } from "../../utils/style";
 import "core-js/es6/promise";
+import { Dimensions, getDimensions } from "../../utils/style";
 
 export interface PieChartProps extends Dimensions {
     data?: PieData[];
@@ -55,7 +55,7 @@ export class PieChart extends Component<PieChartProps, {}> {
 
     componentWillUnmount() {
         if (this.pieChartNode) {
-            Plotly.purge(this.pieChartNode);
+            purge(this.pieChartNode);
         }
         window.removeEventListener("resize", this.onResize);
     }
@@ -67,7 +67,7 @@ export class PieChart extends Component<PieChartProps, {}> {
     private renderChart(props: PieChartProps) {
         if (this.pieChartNode) {
             const data = props.data && props.data[0].values.length ? props.data : this.data;
-            Plotly.newPlot(this.pieChartNode, data as any, props.layout, props.config)
+            newPlot(this.pieChartNode, data as any, props.layout, props.config)
                 .then(myPlot => myPlot.on("plotly_click", () => {
                     if (this.props.onClickAction) {
                         this.props.onClickAction();
@@ -89,6 +89,6 @@ export class PieChart extends Component<PieChartProps, {}> {
     }
 
     private onResize() {
-        Plotly.Plots.resize(this.pieChartNode);
+        Plots.resize(this.pieChartNode);
     }
 }

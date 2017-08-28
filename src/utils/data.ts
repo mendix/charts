@@ -32,6 +32,8 @@ export const fetchSeriesData = <T extends DataSourceProps>(mxObject: MxObject, e
         } else if (dataOptions.dataSourceType === "microflow" && dataOptions.dataSourceMicroflow) {
             fetchByMicroflow(dataOptions.dataSourceMicroflow, mxObject.getGuid(), callback);
         }
+    } else {
+        callback();
     }
 };
 

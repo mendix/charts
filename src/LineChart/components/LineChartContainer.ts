@@ -1,6 +1,7 @@
 import { Component, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
+import { ChartLoading } from "../../components/ChartLoading";
 import { LineChart, LineChartProps, Mode } from "./LineChart";
 import {
     DataSourceProps, DynamicDataSourceProps, MxObject, OnClickProps, fetchDataFromSeries, fetchSeriesData, handleOnClick
@@ -21,6 +22,7 @@ export interface LineChartContainerProps extends WrapperProps, Dimensions, Dynam
 interface LineChartContainerState {
     alertMessage?: string;
     data?: Plotly.ScatterData[];
+    loading?: boolean;
 }
 
 export interface StaticSeriesProps extends DataSourceProps {
@@ -39,7 +41,8 @@ export default class LineChartContainer extends Component<LineChartContainerProp
 
         this.state = {
             alertMessage: LineChartContainer.validateProps(props),
-            data: []
+            data: [],
+            loading: true
         };
         this.fetchData = this.fetchData.bind(this);
         this.handleFetchedSeries = this.handleFetchedSeries.bind(this);
@@ -55,6 +58,10 @@ export default class LineChartContainer extends Component<LineChartContainerProp
                 className: "widget-charts-line-alert",
                 message: this.state.alertMessage
             });
+        }
+
+        if (this.state.loading) {
+            return createElement(ChartLoading, { text: "Loading" });
         }
 
         return createElement(LineChart, {
@@ -116,11 +123,16 @@ export default class LineChartContainer extends Component<LineChartContainerProp
 
     private fetchData(mxObject?: mendix.lib.MxObject) {
         this.data = [];
+        if (!this.state.loading) {
+            this.setState({ loading: true });
+        }
         if (mxObject) {
             this.props.staticSeries.forEach(staticSeries =>
                 fetchSeriesData(mxObject, staticSeries.dataEntity, staticSeries, this.processStaticSeriesData)
             );
             fetchSeriesData(mxObject, this.props.seriesEntity, this.props, this.handleFetchedSeries);
+        } else {
+            this.setState({ loading: false, data: [] });
         }
     }
 
@@ -145,6 +157,8 @@ export default class LineChartContainer extends Component<LineChartContainerProp
 
         if (allSeries) {
             fetchDataFromSeries(allSeries, this.props.dataEntity, this.props.xAxisSortAttribute, this.processDynamicSeriesData); // tslint:disable max-line-length
+        } else {
+            this.setState({ loading: false });
         }
     }
 
@@ -157,6 +171,9 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         const lineColor = singleSeries.get(this.props.lineColor) as string;
         const seriesName = singleSeries.get(this.props.seriesNameAttribute) as string;
         this.processSeriesData(seriesName, lineColor, this.props.mode, data, this.props, isFinal);
+        if (isFinal) {
+            this.setState({ loading: false });
+        }
     }
 
     private processSeriesData<T extends DataSourceProps>(seriesName: string, lineColor: string, mode: Mode, data: MxObject[], dataOptions: T, isFinal = false) { // tslint:disable-line max-line-length
@@ -183,6 +200,6 @@ export default class LineChartContainer extends Component<LineChartContainerProp
 
     private handleFetchDataError(errorMessage: string) {
         window.mx.ui.error(errorMessage);
-        this.setState({ data: [] });
+        this.setState({ data: [], loading: false });
     }
 }

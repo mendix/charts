@@ -1,6 +1,7 @@
 import { Component, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
+import { ChartLoading } from "../../components/ChartLoading";
 import { PieChart, PieChartProps } from "./PieChart";
 import { OnClickProps, fetchByMicroflow, fetchByXPath, handleOnClick } from "../../utils/data";
 import { Dimensions, parseStyle } from "../../utils/style";
@@ -24,6 +25,7 @@ export interface PieChartContainerProps extends WrapperProps, Dimensions, OnClic
 
 interface PieChartContainerState extends PieData {
     alertMessage?: string;
+    loading?: boolean;
 }
 
 export interface PieData {
@@ -42,7 +44,8 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
             alertMessage: PieChartContainer.validateProps(this.props),
             colors: [],
             labels: [],
-            values: []
+            values: [],
+            loading: true
         };
         this.fetchData = this.fetchData.bind(this);
         this.processData = this.processData.bind(this);
@@ -56,6 +59,10 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
                 className: `widget-charts-${this.props.chartType}-alert`,
                 message: this.state.alertMessage
             });
+        }
+
+        if (this.state.loading) {
+            return createElement(ChartLoading, { text: "Loading" });
         }
 
         return createElement(PieChart, {
@@ -114,31 +121,36 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
     }
 
     private fetchData(mxObject?: mendix.lib.MxObject) {
+        if (!this.state.loading) {
+            this.setState({ loading: true });
+        }
         if (mxObject && this.props.dataEntity) {
             if (this.props.dataSourceType === "XPath") {
                 fetchByXPath(mxObject.getGuid(), this.props.dataEntity, this.props.entityConstraint, this.processData);
             } else if (this.props.dataSourceType === "microflow" && this.props.dataSourceMicroflow) {
                 fetchByMicroflow(this.props.dataSourceMicroflow, mxObject.getGuid(), this.processData);
             }
+        } else {
+            this.setState({ loading: false, colors: [], labels: [], values: [] });
         }
     }
 
-    private processData(mxObjects: mendix.lib.MxObject[], error?: string) {
+    private processData(data: mendix.lib.MxObject[], error?: string) {
         if (error) {
             window.mx.ui.error(`An error occurred while retrieving chart data: ${error}`);
-            this.setState({ colors: [], labels: [], values: [] });
+            this.setState({ colors: [], labels: [], values: [], loading: false });
 
             return;
         }
         const colors: string[] = [];
         const values: number[] = [];
         const labels: string[] = [];
-        mxObjects.map(value => {
+        data.forEach(value => {
             values.push(parseFloat(value.get(this.props.valueAttribute) as string));
             labels.push(value.get(this.props.nameAttribute) as string);
             colors.push(value.get(this.props.colorAttribute) as string);
         });
-        this.setState({ colors, labels, values });
+        this.setState({ colors, labels, values, loading: false });
     }
 
     private handleOnClick() {

@@ -75,7 +75,7 @@
                 </property>
             </properties>
         </property>
-        <property key="seriesEntity" type="entity">
+        <property key="seriesEntity" type="entity" required="false">
             <caption>Series entity</caption>
             <category>Dynamic series</category>
             <description>The entity from which the series will be retrieved</description>
@@ -94,7 +94,7 @@
             <category>Dynamic series</category>
             <description>Constraint on the data from the data entity (used when data source is Database/XPath)</description>
         </property>
-        <property key="seriesNameAttribute" type="attribute" entityProperty="seriesEntity">
+        <property key="seriesNameAttribute" type="attribute" entityProperty="seriesEntity" required="false">
             <caption>Series name attribute</caption>
             <category>Dynamic series</category>
             <description>Attribute that holds the name of the series</description>
@@ -108,12 +108,12 @@
             <description>Returns a list of series</description>
             <returnType type="Object" entityProperty="seriesEntity" isList="true"/>
         </property>
-        <property key="dataEntity" type="entity" isPath="yes" pathType="referenceSet" entityProperty="seriesEntity">
+        <property key="dataEntity" type="entity" isPath="yes" pathType="referenceSet" entityProperty="seriesEntity" required="false">
             <caption>Data entity</caption>
             <category>Dynamic series</category>
             <description>The entity from which the data values will be retrieved</description>
         </property>
-        <property key="xValueAttribute" type="attribute" entityProperty="dataEntity">
+        <property key="xValueAttribute" type="attribute" entityProperty="dataEntity" required="false">
             <caption>X value attribute</caption>
             <category>Dynamic series</category>
             <description/>
@@ -121,7 +121,7 @@
                 <attributeType name="String"/>
             </attributeTypes>
         </property>
-        <property key="yValueAttribute" type="attribute" entityProperty="dataEntity">
+        <property key="yValueAttribute" type="attribute" entityProperty="dataEntity" required="false">
             <caption>Y value attribute</caption>
             <category>Dynamic series</category>
             <description/>
@@ -131,7 +131,7 @@
                 <attributeType name="Long"/>
             </attributeTypes>
         </property>
-        <property key="xAxisSortAttribute" type="attribute" entityProperty="dataEntity">
+        <property key="xAxisSortAttribute" type="attribute" entityProperty="dataEntity" required="false">
             <caption>X-axis sort attribute</caption>
             <category>Dynamic series</category>
             <description>Attribute to use for sorting the x-axis data</description>

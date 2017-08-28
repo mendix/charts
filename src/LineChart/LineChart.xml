@@ -90,7 +90,7 @@
                 </property>
             </properties>
         </property>
-        <property key="seriesEntity" type="entity">
+        <property key="seriesEntity" type="entity" required="false">
             <caption>Series entity</caption>
             <category>Dynamic series</category>
             <description>The entity from which the series will be retrieved</description>

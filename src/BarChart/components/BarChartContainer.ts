@@ -1,7 +1,8 @@
 import { Component, createElement } from "react";
 
-import { BarChart, BarChartProps } from "./BarChart";
 import { Alert } from "../../components/Alert";
+import { BarChart, BarChartProps } from "./BarChart";
+import { ChartLoading } from "../../components/ChartLoading";
 import {
     DataSourceProps, DynamicDataSourceProps, MxObject, OnClickProps, fetchDataFromSeries, fetchSeriesData, handleOnClick
 } from "../../utils/data";
@@ -22,6 +23,7 @@ export interface BarChartContainerProps extends WrapperProps, Dimensions, Dynami
 interface BarChartContainerState {
     alertMessage?: string;
     data?: ScatterData[];
+    loading?: boolean;
 }
 
 interface StaticSeriesProps extends DataSourceProps {
@@ -38,6 +40,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
 
         this.state = {
             alertMessage: BarChartContainer.validateProps(this.props),
+            loading: true,
             data: []
         };
         this.fetchData = this.fetchData.bind(this);
@@ -54,6 +57,10 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
                 className: "widget-charts-bar-alert",
                 message: this.state.alertMessage
             });
+        }
+
+        if (this.state.loading) {
+            return createElement(ChartLoading, { text: "Loading" });
         }
 
         return createElement(BarChart, {
@@ -118,11 +125,16 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
 
     private fetchData(mxObject?: mendix.lib.MxObject) {
         this.data = [];
+        if (!this.state.loading) {
+            this.setState({ loading: true });
+        }
         if (mxObject) {
             this.props.staticSeries.forEach(staticSeries =>
                 fetchSeriesData(mxObject, staticSeries.dataEntity, staticSeries, this.processStaticSeriesData)
             );
             fetchSeriesData(mxObject, this.props.seriesEntity, this.props, this.handleFetchedSeries);
+        } else {
+            this.setState({ loading: false, data: [] });
         }
     }
 
@@ -147,6 +159,8 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
 
         if (allSeries) {
             fetchDataFromSeries(allSeries, this.props.dataEntity, this.props.xAxisSortAttribute, this.processDynamicSeriesData); // tslint:disable-line
+        } else {
+            this.setState({ loading: false });
         }
     }
 
@@ -158,6 +172,9 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         }
         const seriesName = singleSeries.get(this.props.seriesNameAttribute) as string;
         this.processSeriesData(seriesName, data, this.props, isFinal);
+        if (isFinal) {
+            this.setState({ loading: false });
+        }
     }
 
     private processSeriesData<T extends DataSourceProps>(seriesName: string, data: MxObject[], dataOptions: T, isFinal = false) { // tslint:disable-line max-line-length
@@ -181,6 +198,6 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
 
     private handleFetchDataError(errorMessage: string) {
         window.mx.ui.error(errorMessage);
-        this.setState({ data: [] });
+        this.setState({ data: [], loading: false });
     }
 }
