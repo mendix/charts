@@ -22,7 +22,8 @@ export interface LineChartContainerProps extends WrapperProps, Dimensions, Dynam
 interface LineChartContainerState {
     alertMessage?: string;
     data?: Plotly.ScatterData[];
-    loading?: boolean;
+    loadingStatic?: boolean;
+    loadingDynamic?: boolean;
 }
 
 export interface StaticSeriesProps extends DataSourceProps {
@@ -42,7 +43,8 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         this.state = {
             alertMessage: LineChartContainer.validateProps(props),
             data: [],
-            loading: true
+            loadingStatic: true,
+            loadingDynamic: true
         };
         this.fetchData = this.fetchData.bind(this);
         this.handleFetchedSeries = this.handleFetchedSeries.bind(this);
@@ -60,7 +62,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
             });
         }
 
-        if (this.state.loading) {
+        if (this.state.loadingStatic || this.state.loadingDynamic) {
             return createElement(ChartLoading, { text: "Loading" });
         }
 
@@ -123,16 +125,20 @@ export default class LineChartContainer extends Component<LineChartContainerProp
 
     private fetchData(mxObject?: mendix.lib.MxObject) {
         this.data = [];
-        if (!this.state.loading) {
-            this.setState({ loading: true });
+        if (!this.state.loadingStatic || !this.state.loadingDynamic) {
+            this.setState({ loadingStatic: true, loadingDynamic: true });
         }
         if (mxObject) {
-            this.props.staticSeries.forEach(staticSeries =>
-                fetchSeriesData(mxObject, staticSeries.dataEntity, staticSeries, this.processStaticSeriesData)
-            );
+            if (this.props.staticSeries.length > 0) {
+                this.props.staticSeries.forEach(staticSeries =>
+                    fetchSeriesData(mxObject, staticSeries.dataEntity, staticSeries, this.processStaticSeriesData)
+                );
+            } else {
+                this.setState({ loadingStatic: false });
+            }
             fetchSeriesData(mxObject, this.props.seriesEntity, this.props, this.handleFetchedSeries);
         } else {
-            this.setState({ loading: false, data: [] });
+            this.setState({ loadingStatic: false, loadingDynamic: false, data: [] });
         }
     }
 
@@ -146,6 +152,9 @@ export default class LineChartContainer extends Component<LineChartContainerProp
             return;
         }
         this.processSeriesData(activeSeries.name, activeSeries.lineColor, activeSeries.mode, data, activeSeries, isFinal); // tslint:disable-line max-line-length
+        if (isFinal) {
+            this.setState({ loadingStatic: false });
+        }
     }
 
     private handleFetchedSeries(allSeries?: MxObject[], errorMessage?: string) {
@@ -155,10 +164,10 @@ export default class LineChartContainer extends Component<LineChartContainerProp
             return;
         }
 
-        if (allSeries) {
+        if (allSeries && allSeries.length) {
             fetchDataFromSeries(allSeries, this.props.dataEntity, this.props.xAxisSortAttribute, this.processDynamicSeriesData); // tslint:disable max-line-length
         } else {
-            this.setState({ loading: false });
+            this.setState({ loadingDynamic: false });
         }
     }
 
@@ -172,7 +181,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         const seriesName = singleSeries.get(this.props.seriesNameAttribute) as string;
         this.processSeriesData(seriesName, lineColor, this.props.mode, data, this.props, isFinal);
         if (isFinal) {
-            this.setState({ loading: false });
+            this.setState({ loadingDynamic: false });
         }
     }
 
@@ -200,6 +209,6 @@ export default class LineChartContainer extends Component<LineChartContainerProp
 
     private handleFetchDataError(errorMessage: string) {
         window.mx.ui.error(errorMessage);
-        this.setState({ data: [], loading: false });
+        this.setState({ data: [], loadingStatic: false, loadingDynamic: false });
     }
 }

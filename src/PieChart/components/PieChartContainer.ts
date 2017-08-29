@@ -142,15 +142,12 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
 
             return;
         }
-        const colors: string[] = [];
-        const values: number[] = [];
-        const labels: string[] = [];
-        data.forEach(value => {
-            values.push(parseFloat(value.get(this.props.valueAttribute) as string));
-            labels.push(value.get(this.props.nameAttribute) as string);
-            colors.push(value.get(this.props.colorAttribute) as string);
+        this.setState({
+            colors: data.map(value => value.get(this.props.colorAttribute) as string),
+            labels: data.map(value => value.get(this.props.nameAttribute) as string),
+            values: data.map(value => parseFloat(value.get(this.props.valueAttribute) as string)),
+            loading: false
         });
-        this.setState({ colors, labels, values, loading: false });
     }
 
     private handleOnClick() {
