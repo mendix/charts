@@ -1,8 +1,7 @@
 import { Component, createElement } from "react";
 import * as classNames from "classnames";
 
-import { Plots, newPlot, purge } from "plotly.js/dist/plotly";
-import "core-js/es6/promise";
+import { Plots, newPlot, purge } from "plotly.js/dist/plotly-basic";
 import { Dimensions, getDimensions } from "../../utils/style";
 
 export interface BarChartProps extends Dimensions {

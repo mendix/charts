@@ -4,8 +4,6 @@ type VisibilityMap<T> = {
     [P in keyof T]: boolean;
 };
 
-declare module "plotly.js/dist/plotly" {
+declare module "plotly.js/dist/plotly-basic" {
     export = Plotly;
 }
-
-declare module "css-element-queries";

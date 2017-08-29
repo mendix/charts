@@ -1,7 +1,7 @@
 import { CSSProperties, Component, createElement } from "react";
 
 import * as classNames from "classnames";
-import { Plots, newPlot, purge } from "plotly.js/dist/plotly";
+import { Plots, newPlot, purge } from "plotly.js/dist/plotly-basic";
 
 import { ChartType } from "./PieChartContainer";
 import { PieData } from "../../../typings/plotly.js";

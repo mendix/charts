@@ -221,7 +221,7 @@
             <category>Appearance</category>
             <description>Width of the chart</description>
         </property>
-        <property key="heightUnit" type="enumeration" defaultValue="percentageOfWidth">
+        <property key="heightUnit" type="enumeration" defaultValue="percentageOfParent">
             <caption>Height unit</caption>
             <category>Appearance</category>
             <description>'Percentage of width' is the aspect ratio, 'Pixels' is absolute. Warning: the 'Percentage of parent' only works when the parent has an absolute height, else it will not display</description>

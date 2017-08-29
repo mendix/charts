@@ -48,7 +48,7 @@ const widgetConfig = {
     },
     devtool: "source-map",
     externals: [ "react", "react-dom", {
-        "plotly.js/dist/plotly": "widgets/com/mendix/widget/custom/charts/PlotlyCustom.js"
+        "plotly.js/dist/plotly-basic": "widgets/com/mendix/widget/custom/charts/PlotlyCustom.js"
     } ],
     plugins: [
         new CopyWebpackPlugin([

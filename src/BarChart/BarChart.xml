@@ -205,7 +205,7 @@
             <category>Appearance</category>
             <description/>
         </property>
-        <property key="heightUnit" type="enumeration" defaultValue="percentageOfWidth">
+        <property key="heightUnit" type="enumeration" defaultValue="percentageOfParent">
             <caption>Height unit</caption>
             <category>Appearance</category>
             <description>'Percentage of width' is the aspect ratio, 'Pixels' is absolute, Warning 'Percentage of parent' only work when parent has a absolute height, else is not displayed</description>
