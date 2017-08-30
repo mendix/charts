@@ -5,7 +5,6 @@ import { Plots, newPlot, purge } from "plotly.js/dist/plotly-basic";
 
 import { ChartType } from "./PieChartContainer";
 import { PieData } from "../../../typings/plotly.js";
-import "core-js/es6/promise";
 import { Dimensions, getDimensions } from "../../utils/style";
 
 export interface PieChartProps extends Dimensions {
@@ -21,7 +20,7 @@ export interface PieChartProps extends Dimensions {
 export class PieChart extends Component<PieChartProps, {}> {
     private pieChartNode: HTMLDivElement;
     private data: PieData[] = [ {
-        hole: this.props.type === "doughnut" ? .4 : 0,
+        hole: this.props.type === "donut" ? .4 : 0,
         hoverinfo: "label+name",
         labels: [ "US", "China", "European Union", "Russian Federation", "Brazil", "India", "Rest of World" ],
         name: "GHG Emissions",

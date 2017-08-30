@@ -7,7 +7,7 @@ import { OnClickProps, fetchByMicroflow, fetchByXPath, handleOnClick } from "../
 import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
-export type ChartType = "pie" | "doughnut";
+export type ChartType = "pie" | "donut";
 
 export interface PieChartContainerProps extends WrapperProps, Dimensions, OnClickProps {
     dataEntity: string;
@@ -87,7 +87,7 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
             className: props.class,
             config: { displayModeBar: props.showToolBar },
             data: [ {
-                hole: props.chartType === "doughnut" ? .4 : 0,
+                hole: props.chartType === "donut" ? .4 : 0,
                 hoverinfo: "label",
                 labels: data.labels || [],
                 marker: { colors: data.colors || [] },
@@ -155,11 +155,8 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
     }
 
     public static validateProps(props: PieChartContainerProps): string {
-        let errorMessage = "";
-        if (props.dataSourceType === "microflow" && !props.dataSourceMicroflow) {
-            errorMessage += ` 'Data source' is set to 'Microflow' but 'Microflow' is missing \n`;
-        }
-
-        return errorMessage && `Configuration error in ${props.chartType}chart:\n\n ${errorMessage}`;
+        return props.dataSourceType === "microflow" && !props.dataSourceMicroflow
+            ? `Configuration error in pie chart: 'Data source type' is set to 'Microflow' but the microflow is missing`
+            : "";
     }
 }

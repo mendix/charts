@@ -53,7 +53,7 @@
             <description>Type of chart</description>
             <enumerationValues>
                 <enumerationValue key="pie">Pie</enumerationValue>
-                <enumerationValue key="doughnut">Doughnut</enumerationValue>
+                <enumerationValue key="donut">Donut</enumerationValue>
             </enumerationValues>
         </property>
         <property key="colorAttribute" type="attribute" entityProperty="dataEntity" required="false">
