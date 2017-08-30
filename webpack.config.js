@@ -20,9 +20,7 @@ const widgetConfig = {
     resolve: {
         extensions: [ ".ts", ".js" ],
         alias: {
-            "tests": path.resolve(__dirname, "./tests"),
-            "webworkify": "webworkify-webpack",
-            "mapbox-gl": path.resolve("./node_modules/mapbox-gl/dist/mapbox-gl.js")
+            "tests": path.resolve(__dirname, "./tests")
         }
     },
     module: {
@@ -48,7 +46,7 @@ const widgetConfig = {
     },
     devtool: "source-map",
     externals: [ "react", "react-dom", {
-        "plotly.js/dist/plotly-basic": "widgets/com/mendix/widget/custom/charts/PlotlyCustom.js"
+        [/PlotlyCustom/]: "widgets/com/mendix/widget/custom/charts/PlotlyCustom.js"
     } ],
     plugins: [
         new CopyWebpackPlugin([
