@@ -21,7 +21,7 @@ export class LineChart extends Component<LineChartProps, {}> {
         {
             connectgaps: true,
             mode: "lines+markers",
-            name: "Default data",
+            name: "Sample",
             type: "scatter",
             x: [ 14, 20, 30, 50 ],
             y: [ 14, 30, 20, 40 ]

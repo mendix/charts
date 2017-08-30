@@ -90,7 +90,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
 
     public static validateProps(props: LineChartContainerProps): string {
         return props.dataSourceType === "microflow" && !props.dataSourceMicroflow
-            ? "Configuration error: data source type is set to 'Microflow' but 'Source microflow' is missing"
+            ? "Configuration error in line chart: 'Data source type' is set to 'Microflow' but the microflow is missing"
             : "";
     }
 
