@@ -167,6 +167,11 @@
             <category>Appearance</category>
             <description>On hover, a toolbar is shown on the top right of the chart</description>
         </property>
+        <property key="showLegend" type="boolean" defaultValue="true">
+            <caption>Show legend</caption>
+            <category>Appearance</category>
+            <description/>
+        </property>
         <property key="barMode" type="enumeration" defaultValue="group">
             <caption>Bar mode</caption>
             <category>Appearance</category>

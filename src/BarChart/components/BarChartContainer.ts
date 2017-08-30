@@ -17,6 +17,7 @@ export interface BarChartContainerProps extends WrapperProps, Dimensions, Dynami
     title?: string;
     showGrid: boolean;
     showToolbar: boolean;
+    showLegend: boolean;
     staticSeries: StaticSeriesProps[];
 }
 
@@ -88,12 +89,9 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
     }
 
     public static validateProps(props: BarChartContainerProps): string {
-        let errorMessage = "";
-        if (props.dataSourceType === "microflow" && !props.dataSourceMicroflow) {
-            errorMessage = ` data source type is set to 'Microflow' but 'Source microflow' is missing`;
-        }
-
-        return errorMessage && `Configuration error : ${errorMessage}`;
+        return props.dataSourceType === "microflow" && !props.dataSourceMicroflow
+            ? `Configuration error in bar chart: 'Data source type' is set to 'Microflow' but the microflow is missing`
+            : "";
     }
 
     public static getBarChartProps(props: BarChartContainerProps): BarChartProps {
@@ -106,7 +104,8 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
                 autosize: props.responsive,
                 barmode: props.barMode,
                 xaxis: { showgrid: props.showGrid, title: props.xAxisLabel },
-                yaxis: { showgrid: props.showGrid, title: props.yAxisLabel }
+                yaxis: { showgrid: props.showGrid, title: props.yAxisLabel },
+                showlegend: props.showLegend
             },
             style: parseStyle(props.style),
             width: props.width,
