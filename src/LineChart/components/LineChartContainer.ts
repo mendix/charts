@@ -2,7 +2,7 @@ import { Component, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
-import { LineChart, LineChartProps, Mode } from "./LineChart";
+import { LineChart, Mode } from "./LineChart";
 import {
     DataSourceProps, DynamicDataSourceProps, MxObject, OnClickProps, fetchDataFromSeries, fetchSeriesData, handleOnClick
 } from "../../utils/data";
@@ -16,6 +16,7 @@ export interface LineChartContainerProps extends WrapperProps, Dimensions, Dynam
     showToolBar: boolean;
     showLegend: boolean;
     responsive: boolean;
+    tooltipForm: string;
     staticSeries: StaticSeriesProps[];
 }
 
@@ -51,6 +52,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         this.processDynamicSeriesData = this.processDynamicSeriesData.bind(this);
         this.processStaticSeriesData = this.processStaticSeriesData.bind(this);
         this.handleOnClick = this.handleOnClick.bind(this);
+        this.openTooltipForm = this.openTooltipForm.bind(this);
     }
 
     render() {
@@ -67,9 +69,23 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         }
 
         return createElement(LineChart, {
-            ...LineChartContainer.getLineChartProps(this.props),
+            className: this.props.class,
+            config: { displayModeBar: this.props.showToolBar, doubleClick: false },
+            layout: {
+                autosize: this.props.responsive,
+                hovermode: this.props.tooltipForm ? "closest" : undefined,
+                showlegend: this.props.showLegend,
+                xaxis: { showgrid: this.props.showGrid, title: this.props.xAxisLabel },
+                yaxis: { showgrid: this.props.showGrid, title: this.props.yAxisLabel }
+            },
+            style: parseStyle(this.props.style),
+            width: this.props.width,
+            height: this.props.height,
+            widthUnit: this.props.widthUnit,
+            heightUnit: this.props.heightUnit,
             data: this.state.data,
-            onClickAction: this.handleOnClick
+            onClick: this.handleOnClick,
+            onHover: this.props.tooltipForm ? this.openTooltipForm : undefined
         });
     }
 
@@ -88,28 +104,16 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         handleOnClick(this.props, this.props.mxObject);
     }
 
+    private openTooltipForm(domNode: HTMLDivElement, dataObject: mendix.lib.MxObject) {
+        const context = new mendix.lib.MxContext();
+        context.setContext(dataObject.getEntity(), dataObject.getGuid());
+        window.mx.ui.openForm(this.props.tooltipForm, { domNode, context });
+    }
+
     public static validateProps(props: LineChartContainerProps): string {
         return props.dataSourceType === "microflow" && !props.dataSourceMicroflow
             ? "Configuration error in line chart: 'Data source type' is set to 'Microflow' but the microflow is missing"
             : "";
-    }
-
-    public static getLineChartProps(props: LineChartContainerProps): LineChartProps {
-        return {
-            className: props.class,
-            config: { displayModeBar: props.showToolBar, doubleClick: false },
-            layout: {
-                autosize: props.responsive,
-                showlegend: props.showLegend,
-                xaxis: { showgrid: props.showGrid, title: props.xAxisLabel },
-                yaxis: { showgrid: props.showGrid, title: props.yAxisLabel }
-            },
-            style: parseStyle(props.style),
-            width: props.width,
-            height: props.height,
-            widthUnit: props.widthUnit,
-            heightUnit: props.heightUnit
-        };
     }
 
     private resetSubscriptions(mxObject?: mendix.lib.MxObject) {
@@ -193,12 +197,15 @@ export default class LineChartContainer extends Component<LineChartContainerProp
 
         const lineData = {
             connectgaps: true,
+            hoveron: "points",
+            hoverinfo: this.props.tooltipForm ? "text" : "all",
             line: { color: lineColor },
             mode: mode.replace("X", "+") as Mode,
             name: seriesName,
             type: "scatter",
             x: fetchedData.map(value => value.x),
-            y: fetchedData.map(value => value.y)
+            y: fetchedData.map(value => value.y),
+            mxObjects: data
         } as Plotly.ScatterData;
 
         this.data.push(lineData);

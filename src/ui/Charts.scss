@@ -1,0 +1,12 @@
+.widget-charts-tooltip {
+    background-color: #f1f1f1;
+    border-color: #f1f1f1;
+    border-radius: 6px;
+    display: inline-block;
+    opacity: 0;
+    padding: 8px;
+    margin-top: 3px;
+    pointer-events: none;
+    position: absolute;
+    z-index: 1000;
+}
