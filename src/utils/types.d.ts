@@ -4,4 +4,5 @@ export interface WrapperProps {
     mxObject?: mendix.lib.MxObject;
     style?: string;
     readOnly: boolean;
+    friendlyId: string;
 }

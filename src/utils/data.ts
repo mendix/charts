@@ -1,18 +1,14 @@
+import { ReactElement, createElement } from "react";
+
 export interface DataSourceProps {
+    name: string;
     dataSourceMicroflow: string;
     dataSourceType: "XPath" | "microflow";
     entityConstraint: string;
     dataEntity: string;
-    xAxisLabel: string;
     xValueAttribute: string;
-    yAxisLabel: string;
     yValueAttribute: string;
     xAxisSortAttribute: string;
-}
-
-export interface DynamicDataSourceProps extends DataSourceProps {
-    seriesEntity: string;
-    seriesNameAttribute: string;
 }
 
 export type MxObject = mendix.lib.MxObject;
@@ -25,12 +21,32 @@ export interface OnClickProps {
 }
 type OnClickOptions = "doNothing" | "showPage" | "callMicroflow";
 
-export const fetchSeriesData = <T extends DataSourceProps>(mxObject: MxObject, entity: string, dataOptions: T, callback: FetchDataCallback) => { // tslint:disable max-line-length
-    if (entity) {
-        if (dataOptions.dataSourceType === "XPath") {
-            fetchByXPath(mxObject.getGuid(), entity, dataOptions.entityConstraint, callback);
-        } else if (dataOptions.dataSourceType === "microflow" && dataOptions.dataSourceMicroflow) {
-            fetchByMicroflow(dataOptions.dataSourceMicroflow, mxObject.getGuid(), callback);
+export const validateSeriesProps = <T extends DataSourceProps>(dataSeries: T[], widgetId: string): string | ReactElement<any> => { // tslint:disable-line max-line-length
+    if (dataSeries && dataSeries.length) {
+        const errorMessage: string[] = [];
+        dataSeries.forEach(series => {
+            if (series.dataSourceType === "microflow" && !series.dataSourceMicroflow) {
+                errorMessage.push(`\n'Data source type' in series '${series.name}' is set to 'Microflow' but the microflow is missing.`); // tslint:disable-line max-line-length
+            }
+        });
+
+        if (errorMessage.length) {
+            return createElement("div", {},
+                `Configuration error in widget ${widgetId}:`,
+                errorMessage.map((message, key) => createElement("p", { key }, message))
+            );
+        }
+    }
+
+    return "";
+};
+
+export const fetchSeriesData = <T extends DataSourceProps>(mxObject: MxObject, seriesProps: T, callback: FetchDataCallback) => { // tslint:disable max-line-length
+    if (seriesProps.dataEntity) {
+        if (seriesProps.dataSourceType === "XPath") {
+            fetchByXPath(mxObject.getGuid(), seriesProps.dataEntity, seriesProps.entityConstraint, callback);
+        } else if (seriesProps.dataSourceType === "microflow" && seriesProps.dataSourceMicroflow) {
+            fetchByMicroflow(seriesProps.dataSourceMicroflow, mxObject.getGuid(), callback);
         }
     } else {
         callback();
@@ -57,20 +73,6 @@ export const fetchByMicroflow = (actionname: string, guid: string, callback: Fet
         params: { applyto: "selection", guids: [ guid ] }
     });
 };
-
-type DynamicSeriesDataCallback = (series?: MxObject, data?: MxObject[], isFinal?: boolean, error?: Error) => void;
-
-export const fetchDataFromSeries = (series: MxObject[], dataEntity: string, sortAttribute: string, callback: DynamicSeriesDataCallback) => // tslint:disable max-line-length
-    series.forEach((activeSeries, index) => {
-        const dataEntityPath = dataEntity.split("/");
-        const xpath = `//${dataEntityPath[1]}[${dataEntityPath[0]} = ${activeSeries.getGuid()}]`;
-        window.mx.data.get({
-            callback: mxObjects => callback(activeSeries, mxObjects, series.length === index + 1),
-            error: error => callback(undefined, undefined, false, error),
-            filter: { sort: [ [ sortAttribute, "asc" ] ] },
-            xpath
-        });
-    });
 
 export const handleOnClick = <T extends OnClickProps>(options: T, mxObject?: MxObject) => {
     if (!mxObject || options.onClickEvent === "doNothing") {

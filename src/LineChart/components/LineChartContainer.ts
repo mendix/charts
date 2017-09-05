@@ -1,15 +1,13 @@
-import { Component, createElement } from "react";
+import { Component, ReactElement, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
+import { DataSourceProps, OnClickProps, fetchSeriesData, handleOnClick, validateSeriesProps } from "../../utils/data";
 import { LineChart, Mode } from "./LineChart";
-import {
-    DataSourceProps, DynamicDataSourceProps, MxObject, OnClickProps, fetchDataFromSeries, fetchSeriesData, handleOnClick
-} from "../../utils/data";
 import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
-export interface LineChartContainerProps extends WrapperProps, Dimensions, DynamicDataSourceProps, OnClickProps {
+export interface LineChartContainerProps extends WrapperProps, Dimensions, OnClickProps {
     mode: Mode;
     lineColor: string;
     showGrid: boolean;
@@ -17,14 +15,15 @@ export interface LineChartContainerProps extends WrapperProps, Dimensions, Dynam
     showLegend: boolean;
     responsive: boolean;
     tooltipForm: string;
-    staticSeries: StaticSeriesProps[];
+    xAxisLabel: string;
+    yAxisLabel: string;
+    series: StaticSeriesProps[];
 }
 
 interface LineChartContainerState {
-    alertMessage?: string;
+    alertMessage?: string | ReactElement<any>;
     data?: Plotly.ScatterData[];
-    loadingStatic?: boolean;
-    loadingDynamic?: boolean;
+    loading?: boolean;
 }
 
 export interface StaticSeriesProps extends DataSourceProps {
@@ -42,15 +41,12 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         super(props);
 
         this.state = {
-            alertMessage: LineChartContainer.validateProps(props),
+            alertMessage: validateSeriesProps(props.series, this.props.friendlyId),
             data: [],
-            loadingStatic: true,
-            loadingDynamic: true
+            loading: true
         };
         this.fetchData = this.fetchData.bind(this);
-        this.handleFetchedSeries = this.handleFetchedSeries.bind(this);
-        this.processDynamicSeriesData = this.processDynamicSeriesData.bind(this);
-        this.processStaticSeriesData = this.processStaticSeriesData.bind(this);
+        this.processSeriesData = this.processSeriesData.bind(this);
         this.handleOnClick = this.handleOnClick.bind(this);
         this.openTooltipForm = this.openTooltipForm.bind(this);
     }
@@ -58,13 +54,12 @@ export default class LineChartContainer extends Component<LineChartContainerProp
     render() {
         if (this.state.alertMessage) {
             return createElement(Alert, {
-                bootstrapStyle: "danger",
                 className: "widget-charts-line-alert",
                 message: this.state.alertMessage
             });
         }
 
-        if (this.state.loadingStatic || this.state.loadingDynamic) {
+        if (this.state.loading) {
             return createElement(ChartLoading, { text: "Loading" });
         }
 
@@ -110,12 +105,6 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         window.mx.ui.openForm(this.props.tooltipForm, { domNode, context });
     }
 
-    public static validateProps(props: LineChartContainerProps): string {
-        return props.dataSourceType === "microflow" && !props.dataSourceMicroflow
-            ? "Configuration error in line chart: 'Data source type' is set to 'Microflow' but the microflow is missing"
-            : "";
-    }
-
     private resetSubscriptions(mxObject?: mendix.lib.MxObject) {
         this.componentWillUnmount();
 
@@ -129,79 +118,38 @@ export default class LineChartContainer extends Component<LineChartContainerProp
 
     private fetchData(mxObject?: mendix.lib.MxObject) {
         this.data = [];
-        if (!this.state.loadingStatic || !this.state.loadingDynamic) {
-            this.setState({ loadingStatic: true, loadingDynamic: true });
+        if (!this.state.loading) {
+            this.setState({ loading: true });
         }
-        if (mxObject) {
-            if (this.props.staticSeries.length > 0) {
-                this.props.staticSeries.forEach(staticSeries =>
-                    fetchSeriesData(mxObject, staticSeries.dataEntity, staticSeries, this.processStaticSeriesData)
-                );
-            } else {
-                this.setState({ loadingStatic: false });
-            }
-            fetchSeriesData(mxObject, this.props.seriesEntity, this.props, this.handleFetchedSeries);
+        if (mxObject && this.props.series.length) {
+            this.props.series.forEach(series => fetchSeriesData(mxObject, series, this.processSeriesData));
         } else {
-            this.setState({ loadingStatic: false, loadingDynamic: false, data: [] });
+            this.setState({ loading: false, data: [] });
         }
     }
 
-    private processStaticSeriesData(data: MxObject[], errorMessage?: string) {
-        const activeSeries = this.props.staticSeries[this.activeStaticIndex];
-        const isFinal = this.props.staticSeries.length === this.activeStaticIndex + 1;
+    private processSeriesData(data: mendix.lib.MxObject[], errorMessage?: string) {
+        const activeSeries = this.props.series[this.activeStaticIndex];
+        const isFinal = this.props.series.length === this.activeStaticIndex + 1;
         this.activeStaticIndex = isFinal ? 0 : this.activeStaticIndex + 1;
         if (errorMessage) {
-            this.handleFetchDataError(errorMessage);
+            window.mx.ui.error(errorMessage);
+            this.setState({ data: [], loading: false });
 
             return;
         }
-        this.processSeriesData(activeSeries.name, activeSeries.lineColor, activeSeries.mode, data, activeSeries, isFinal); // tslint:disable-line max-line-length
-        if (isFinal) {
-            this.setState({ loadingStatic: false });
-        }
-    }
-
-    private handleFetchedSeries(allSeries?: MxObject[], errorMessage?: string) {
-        if (errorMessage) {
-            this.handleFetchDataError(errorMessage);
-
-            return;
-        }
-
-        if (allSeries && allSeries.length) {
-            fetchDataFromSeries(allSeries, this.props.dataEntity, this.props.xAxisSortAttribute, this.processDynamicSeriesData); // tslint:disable max-line-length
-        } else {
-            this.setState({ loadingDynamic: false });
-        }
-    }
-
-    private processDynamicSeriesData(singleSeries: MxObject, data: MxObject[], isFinal = false, error?: Error) {
-        if (error) {
-            this.handleFetchDataError(`An error occurred while retrieving dynamic chart data: ${error.message}`);
-
-            return;
-        }
-        const lineColor = singleSeries.get(this.props.lineColor) as string;
-        const seriesName = singleSeries.get(this.props.seriesNameAttribute) as string;
-        this.processSeriesData(seriesName, lineColor, this.props.mode, data, this.props, isFinal);
-        if (isFinal) {
-            this.setState({ loadingDynamic: false });
-        }
-    }
-
-    private processSeriesData<T extends DataSourceProps>(seriesName: string, lineColor: string, mode: Mode, data: MxObject[], dataOptions: T, isFinal = false) { // tslint:disable-line max-line-length
         const fetchedData = data.map(value => ({
-            x: value.get(dataOptions.xValueAttribute) as Plotly.Datum,
-            y: parseInt(value.get(dataOptions.yValueAttribute) as string, 10) as Plotly.Datum
+            x: value.get(activeSeries.xValueAttribute) as Plotly.Datum,
+            y: parseInt(value.get(activeSeries.yValueAttribute) as string, 10) as Plotly.Datum
         }));
 
         const lineData = {
             connectgaps: true,
             hoveron: "points",
             hoverinfo: this.props.tooltipForm ? "text" : "all",
-            line: { color: lineColor },
-            mode: mode.replace("X", "+") as Mode,
-            name: seriesName,
+            line: { color: activeSeries.lineColor },
+            mode: activeSeries.mode.replace("X", "+") as Mode,
+            name: activeSeries.name,
             type: "scatter",
             x: fetchedData.map(value => value.x),
             y: fetchedData.map(value => value.y),
@@ -210,12 +158,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
 
         this.data.push(lineData);
         if (isFinal) {
-            this.setState({ data: this.data });
+            this.setState({ data: this.data, loading: false });
         }
-    }
-
-    private handleFetchDataError(errorMessage: string) {
-        window.mx.ui.error(errorMessage);
-        this.setState({ data: [], loadingStatic: false, loadingDynamic: false });
     }
 }
