@@ -3,6 +3,7 @@ import { Component, createElement } from "react";
 import { Alert } from "../components/Alert";
 import { BarChart } from "./components/BarChart";
 import BarChartContainer, { BarChartContainerProps } from "./components/BarChartContainer";
+import { parseStyle } from "../utils/style";
 
 // tslint:disable-next-line class-name
 export class preview extends Component<BarChartContainerProps, {}> {
@@ -13,7 +14,22 @@ export class preview extends Component<BarChartContainerProps, {}> {
                 className: "widget-charts-bar-alert",
                 message: BarChartContainer.validateProps(this.props)
             }),
-            createElement(BarChart, BarChartContainer.getBarChartProps(this.props))
+            createElement(BarChart, {
+                className: this.props.class,
+                config: { displayModeBar: this.props.showToolbar, doubleClick: false },
+                height: this.props.height,
+                heightUnit: this.props.heightUnit,
+                layout: {
+                    autosize: this.props.responsive,
+                    barmode: this.props.barMode,
+                    xaxis: { showgrid: this.props.showGrid, title: this.props.xAxisLabel },
+                    yaxis: { showgrid: this.props.showGrid, title: this.props.yAxisLabel },
+                    showlegend: this.props.showLegend
+                },
+                style: parseStyle(this.props.style),
+                width: this.props.width,
+                widthUnit: this.props.widthUnit
+            })
         );
     }
 }

@@ -2,7 +2,8 @@ import { Component, createElement } from "react";
 
 import { Alert } from "../components/Alert";
 import { PieChart } from "./components/PieChart";
-import PieChartContainer, { PieChartContainerProps, PieData } from "./components/PieChartContainer";
+import PieChartContainer, { PieChartContainerProps } from "./components/PieChartContainer";
+import { parseStyle } from "../utils/style";
 
 // tslint:disable-next-line class-name
 export class preview extends Component<PieChartContainerProps, {}> {
@@ -13,15 +14,21 @@ export class preview extends Component<PieChartContainerProps, {}> {
                 className: `widget-${this.props.chartType}-chart-alert`,
                 message: PieChartContainer.validateProps(this.props)
             }),
-            createElement(PieChart, PieChartContainer.getPieChartProps(this.props, this.getDefaultData()))
+            createElement(PieChart, {
+                className: this.props.class,
+                config: { displayModeBar: this.props.showToolBar },
+                height: this.props.height,
+                heightUnit: this.props.heightUnit,
+                layout: {
+                    autosize: this.props.responsive,
+                    showlegend: this.props.showLegend
+                },
+                style: parseStyle(this.props.style),
+                type: this.props.chartType,
+                width: this.props.width,
+                widthUnit: this.props.widthUnit
+            })
         );
-    }
-
-    private getDefaultData(): PieData {
-        return {
-            labels: [ "Apples", "Mangoes", "Jackfruit", "Oranges" ],
-            values: [ 16, 15, 12, 42 ]
-        };
     }
 }
 

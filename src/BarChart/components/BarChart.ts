@@ -1,8 +1,11 @@
 import { Component, createElement } from "react";
 import * as classNames from "classnames";
 
+import { ScatterHoverData } from "plotly.js";
 import { Plots, newPlot, purge } from "../../PlotlyCustom";
 import { Dimensions, getDimensions } from "../../utils/style";
+
+import "../../ui/Charts.scss";
 
 export interface BarChartProps extends Dimensions {
     config?: Partial<Plotly.Config>;
@@ -10,11 +13,13 @@ export interface BarChartProps extends Dimensions {
     layout?: Partial<Plotly.Layout>;
     style?: object;
     className?: string;
-    onClickAction?: () => void;
+    onClick?: () => void;
+    onHover?: (node: HTMLDivElement, dataObject: mendix.lib.MxObject) => void;
 }
 
 export class BarChart extends Component<BarChartProps, {}> {
     private barChartNode: HTMLDivElement;
+    private tooltipNode: HTMLDivElement;
     private data: Partial<Plotly.ScatterData>[] = [
         {
             type: "bar",
@@ -28,15 +33,22 @@ export class BarChart extends Component<BarChartProps, {}> {
         super(props);
 
         this.getPlotlyNodeRef = this.getPlotlyNodeRef.bind(this);
+        this.getTooltipNodeRef = this.getTooltipNodeRef.bind(this);
         this.onResize = this.onResize.bind(this);
+        this.onClick = this.onClick.bind(this);
+        this.onHover = this.onHover.bind(this);
+        this.clearToolTip = this.clearToolTip.bind(this);
     }
 
     render() {
-        return createElement("div", {
-            className: classNames("widget-charts-bar", this.props.className),
-            ref: this.getPlotlyNodeRef,
-            style: { ...getDimensions(this.props), ...this.props.style }
-        });
+        return createElement("div",
+            {
+                className: classNames("widget-charts-bar", this.props.className),
+                ref: this.getPlotlyNodeRef,
+                style: { ...getDimensions(this.props), ...this.props.style }
+            },
+            createElement("div", { className: "widget-charts-tooltip", ref: this.getTooltipNodeRef })
+        );
     }
 
     componentDidMount() {
@@ -59,6 +71,10 @@ export class BarChart extends Component<BarChartProps, {}> {
         this.barChartNode = node;
     }
 
+    private getTooltipNodeRef(node: HTMLDivElement) {
+        this.tooltipNode = node;
+    }
+
     private setUpEvents() {
         // A workaround for attaching the resize event to the Iframe window because the plotly
         // library does not support it. This fix will be done in the web modeler preview class when the
@@ -75,12 +91,35 @@ export class BarChart extends Component<BarChartProps, {}> {
         if (this.barChartNode) {
             const data = props.data && props.data.length ? props.data : this.data;
             newPlot(this.barChartNode, data, props.layout, props.config)
-                .then(myPlot => myPlot.on("plotly_click", () => {
-                    if (props.onClickAction) {
-                        props.onClickAction();
-                    }
-                }));
+                .then(myPlot => {
+                    myPlot.on("plotly_click", this.onClick);
+                    myPlot.on("plotly_hover", this.onHover);
+                    myPlot.on("plotly_unhover", this.clearToolTip);
+                });
         }
+    }
+
+    private onClick() {
+        if (this.props.onClick) {
+            this.props.onClick();
+        }
+    }
+
+    private onHover(data: ScatterHoverData) {
+        if (this.props.onHover) {
+            const activePoint = data.points[0];
+            const positionYaxis = window.scrollY + activePoint.yaxis.l2p(activePoint.y) + activePoint.yaxis._offset;
+            const positionXaxis = window.scrollX + activePoint.xaxis.d2p(activePoint.x) + activePoint.xaxis._offset;
+            this.tooltipNode.style.top = `${positionYaxis}px`;
+            this.tooltipNode.style.left = `${positionXaxis}px`;
+            this.tooltipNode.style.opacity = "1";
+            this.props.onHover(this.tooltipNode, activePoint.data.mxObjects[activePoint.pointNumber]);
+        }
+    }
+
+    private clearToolTip() {
+        this.tooltipNode.innerHTML = "";
+        this.tooltipNode.style.opacity = "0";
     }
 
     private onResize() {

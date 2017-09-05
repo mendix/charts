@@ -223,7 +223,7 @@ declare namespace Plotly {
 
     export interface PieData {
         hole: number;
-        hoverinfo?: "label" | "percent" | "name" | "label+percent" | "label+name" | "percent+name" | "label+percent+name";
+        hoverinfo?: "label" | "percent" | "name" | "label+percent" | "label+name" | "percent+name" | "label+percent+name" | "skip" | "none";
         labels: string[];
         name?: string;
         type: "pie";

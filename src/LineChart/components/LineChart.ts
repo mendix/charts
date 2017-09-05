@@ -1,9 +1,9 @@
 import { Component, createElement } from "react";
 import * as classNames from "classnames";
 
+import { ScatterHoverData } from "plotly.js";
 import { Plots, newPlot, purge } from "../../PlotlyCustom";
 import { Dimensions, getDimensions } from "../../utils/style";
-import { ClickHoverData } from "plotly.js";
 
 import "../../ui/Charts.scss";
 
@@ -58,7 +58,6 @@ export class LineChart extends Component<LineChartProps, {}> {
     componentDidMount() {
         this.renderChart(this.props);
         this.setUpResizeEvents();
-        this.adjustStyle();
     }
 
     componentWillReceiveProps(newProps: LineChartProps) {
@@ -78,16 +77,6 @@ export class LineChart extends Component<LineChartProps, {}> {
 
     private getTooltipNodeRef(node: HTMLDivElement) {
         this.tooltipNode = node;
-    }
-
-    private adjustStyle() {
-        if (this.lineChartNode) {
-            const wrapperElement = this.lineChartNode.parentElement;
-            if (this.props.heightUnit === "percentageOfParent" && wrapperElement) {
-                wrapperElement.style.height = "100%";
-                wrapperElement.style.width = "100%";
-            }
-        }
     }
 
     private setUpResizeEvents() {
@@ -120,11 +109,11 @@ export class LineChart extends Component<LineChartProps, {}> {
         }
     }
 
-    private onHover(data: ClickHoverData) {
+    private onHover(data: ScatterHoverData) {
         if (this.props.onHover) {
             const activePoint = data.points[0];
-            const positionYaxis = window.pageYOffset + activePoint.yaxis.l2p(activePoint.y) + activePoint.yaxis._offset;
-            const positionXaxis = window.pageXOffset + activePoint.xaxis.d2p(activePoint.x) + activePoint.xaxis._offset;
+            const positionYaxis = window.scrollY + activePoint.yaxis.l2p(activePoint.y) + activePoint.yaxis._offset;
+            const positionXaxis = window.scrollX + activePoint.xaxis.d2p(activePoint.x) + activePoint.xaxis._offset;
             this.tooltipNode.style.top = `${positionYaxis}px`;
             this.tooltipNode.style.left = `${positionXaxis}px`;
             this.tooltipNode.style.opacity = "1";

@@ -172,6 +172,11 @@
             <category>Appearance</category>
             <description/>
         </property>
+        <property key="tooltipForm" type="form" required="false">
+            <caption>Tooltip form</caption>
+            <category>Appearance</category>
+            <description>The form to show when a user hovers over a chart plot point</description>
+        </property>
         <property key="barMode" type="enumeration" defaultValue="group">
             <caption>Bar mode</caption>
             <category>Appearance</category>

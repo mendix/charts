@@ -1,7 +1,7 @@
 import { Component, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
-import { BarChart, BarChartProps } from "./BarChart";
+import { BarChart } from "./BarChart";
 import { ChartLoading } from "../../components/ChartLoading";
 import {
     DataSourceProps, DynamicDataSourceProps, MxObject, OnClickProps, fetchDataFromSeries, fetchSeriesData, handleOnClick
@@ -18,6 +18,7 @@ export interface BarChartContainerProps extends WrapperProps, Dimensions, Dynami
     showGrid: boolean;
     showToolbar: boolean;
     showLegend: boolean;
+    tooltipForm: string;
     staticSeries: StaticSeriesProps[];
 }
 
@@ -51,6 +52,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         this.processDynamicSeriesData = this.processDynamicSeriesData.bind(this);
         this.processStaticSeriesData = this.processStaticSeriesData.bind(this);
         this.handleOnClick = this.handleOnClick.bind(this);
+        this.openTooltipForm = this.openTooltipForm.bind(this);
     }
 
     render() {
@@ -67,9 +69,24 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         }
 
         return createElement(BarChart, {
-            ...BarChartContainer.getBarChartProps(this.props),
+            className: this.props.class,
+            config: { displayModeBar: this.props.showToolbar, doubleClick: false },
+            height: this.props.height,
+            heightUnit: this.props.heightUnit,
+            layout: {
+                autosize: this.props.responsive,
+                barmode: this.props.barMode,
+                xaxis: { showgrid: this.props.showGrid, title: this.props.xAxisLabel },
+                yaxis: { showgrid: this.props.showGrid, title: this.props.yAxisLabel },
+                showlegend: this.props.showLegend,
+                hovermode: this.props.tooltipForm ? "closest" : undefined
+            },
+            style: parseStyle(this.props.style),
+            width: this.props.width,
+            widthUnit: this.props.widthUnit,
             data: this.state.data,
-            onClickAction: this.handleOnClick
+            onClick: this.handleOnClick,
+            onHover: this.props.tooltipForm ? this.openTooltipForm : undefined
         });
     }
 
@@ -88,29 +105,16 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         handleOnClick(this.props, this.props.mxObject);
     }
 
+    private openTooltipForm(domNode: HTMLDivElement, dataObject: mendix.lib.MxObject) {
+        const context = new mendix.lib.MxContext();
+        context.setContext(dataObject.getEntity(), dataObject.getGuid());
+        window.mx.ui.openForm(this.props.tooltipForm, { domNode, context });
+    }
+
     public static validateProps(props: BarChartContainerProps): string {
         return props.dataSourceType === "microflow" && !props.dataSourceMicroflow
             ? `Configuration error in bar chart: 'Data source type' is set to 'Microflow' but the microflow is missing`
             : "";
-    }
-
-    public static getBarChartProps(props: BarChartContainerProps): BarChartProps {
-        return {
-            className: props.class,
-            config: { displayModeBar: props.showToolbar, doubleClick: false },
-            height: props.height,
-            heightUnit: props.heightUnit,
-            layout: {
-                autosize: props.responsive,
-                barmode: props.barMode,
-                xaxis: { showgrid: props.showGrid, title: props.xAxisLabel },
-                yaxis: { showgrid: props.showGrid, title: props.yAxisLabel },
-                showlegend: props.showLegend
-            },
-            style: parseStyle(props.style),
-            width: props.width,
-            widthUnit: props.widthUnit
-        };
     }
 
     private resetSubscriptions(mxObject?: mendix.lib.MxObject) {
@@ -194,8 +198,10 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         const barData = {
             name: seriesName,
             type: "bar",
+            hoverinfo: this.props.tooltipForm ? "text" : "all",
             x: fetchedData.map(value => value.x),
-            y: fetchedData.map(value => value.y)
+            y: fetchedData.map(value => value.y),
+            mxObjects: data
         } as ScatterData;
 
         this.data.push(barData);

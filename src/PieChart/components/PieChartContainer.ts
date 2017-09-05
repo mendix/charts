@@ -2,7 +2,7 @@ import { Component, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
-import { PieChart, PieChartProps } from "./PieChart";
+import { PieChart } from "./PieChart";
 import { OnClickProps, fetchByMicroflow, fetchByXPath, handleOnClick } from "../../utils/data";
 import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
@@ -20,6 +20,7 @@ export interface PieChartContainerProps extends WrapperProps, Dimensions, OnClic
     colorAttribute: string;
     showToolBar: boolean;
     showLegend: boolean;
+    tooltipForm: string;
     responsive: boolean;
 }
 
@@ -32,6 +33,7 @@ export interface PieData {
     colors?: string[];
     labels?: string[];
     values?: number[];
+    data?: mendix.lib.MxObject[];
 }
 
 export default class PieChartContainer extends Component<PieChartContainerProps, PieChartContainerState> {
@@ -50,6 +52,7 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         this.fetchData = this.fetchData.bind(this);
         this.processData = this.processData.bind(this);
         this.handleOnClick = this.handleOnClick.bind(this);
+        this.openTooltipForm = this.openTooltipForm.bind(this);
     }
 
     render() {
@@ -66,8 +69,28 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         }
 
         return createElement(PieChart, {
-            ...PieChartContainer.getPieChartProps(this.props, this.state),
-            onClickAction: this.handleOnClick
+            className: this.props.class,
+            config: { displayModeBar: this.props.showToolBar },
+            data: [ {
+                hole: this.props.chartType === "donut" ? .4 : 0,
+                hoverinfo: this.props.tooltipForm ? "none" : "label",
+                labels: this.state.labels || [],
+                marker: { colors: this.state.colors || [] },
+                type: "pie",
+                values: this.state.values || []
+            } ],
+            height: this.props.height,
+            heightUnit: this.props.heightUnit,
+            layout: {
+                autosize: this.props.responsive,
+                showlegend: this.props.showLegend
+            },
+            style: parseStyle(this.props.style),
+            type: this.props.chartType,
+            width: this.props.width,
+            widthUnit: this.props.widthUnit,
+            onClick: this.handleOnClick,
+            onHover: this.props.tooltipForm ? this.openTooltipForm : undefined
         });
     }
 
@@ -80,31 +103,6 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         if (this.subscriptionHandle) {
             window.mx.data.unsubscribe(this.subscriptionHandle);
         }
-    }
-
-    public static getPieChartProps<T extends PieData>(props: PieChartContainerProps, data: T): PieChartProps {
-        return {
-            className: props.class,
-            config: { displayModeBar: props.showToolBar },
-            data: [ {
-                hole: props.chartType === "donut" ? .4 : 0,
-                hoverinfo: "label",
-                labels: data.labels || [],
-                marker: { colors: data.colors || [] },
-                type: "pie",
-                values: data.values || []
-            } ],
-            height: props.height,
-            heightUnit: props.heightUnit,
-            layout: {
-                autosize: props.responsive,
-                showlegend: props.showLegend
-            },
-            style: parseStyle(props.style),
-            type: props.chartType,
-            width: props.width,
-            widthUnit: props.widthUnit
-        };
     }
 
     private resetSubscriptions(mxObject?: mendix.lib.MxObject) {
@@ -146,12 +144,22 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
             colors: data.map(value => value.get(this.props.colorAttribute) as string),
             labels: data.map(value => value.get(this.props.nameAttribute) as string),
             values: data.map(value => parseFloat(value.get(this.props.valueAttribute) as string)),
+            data,
             loading: false
         });
     }
 
     private handleOnClick() {
         handleOnClick(this.props, this.props.mxObject);
+    }
+
+    private openTooltipForm(domNode: HTMLDivElement, index: number) {
+        if (this.state.data && this.state.data.length) {
+            const dataObject = this.state.data[index];
+            const context = new mendix.lib.MxContext();
+            context.setContext(dataObject.getEntity(), dataObject.getGuid());
+            window.mx.ui.openForm(this.props.tooltipForm, { domNode, context });
+        }
     }
 
     public static validateProps(props: PieChartContainerProps): string {

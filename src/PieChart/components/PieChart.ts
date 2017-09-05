@@ -3,9 +3,11 @@ import { CSSProperties, Component, createElement } from "react";
 import * as classNames from "classnames";
 import { Plots, newPlot, purge } from "../../PlotlyCustom";
 
+import { PieData, PieHoverData } from "plotly.js";
 import { ChartType } from "./PieChartContainer";
-import { PieData } from "../../../typings/plotly.js";
 import { Dimensions, getDimensions } from "../../utils/style";
+
+import "../../ui/Charts.scss";
 
 export interface PieChartProps extends Dimensions {
     data?: PieData[];
@@ -14,11 +16,13 @@ export interface PieChartProps extends Dimensions {
     type: ChartType;
     className?: string;
     style?: CSSProperties;
-    onClickAction?: () => void;
+    onClick?: () => void;
+    onHover?: (node: HTMLDivElement, index: number) => void;
 }
 
 export class PieChart extends Component<PieChartProps, {}> {
     private pieChartNode: HTMLDivElement;
+    private tooltipNode: HTMLDivElement;
     private data: PieData[] = [ {
         hole: this.props.type === "donut" ? .4 : 0,
         hoverinfo: "label+name",
@@ -32,15 +36,22 @@ export class PieChart extends Component<PieChartProps, {}> {
         super(props);
 
         this.getPlotlyNodeRef = this.getPlotlyNodeRef.bind(this);
+        this.getTooltipNodeRef = this.getTooltipNodeRef.bind(this);
         this.onResize = this.onResize.bind(this);
+        this.onClick = this.onClick.bind(this);
+        this.onHover = this.onHover.bind(this);
+        this.clearToolTip = this.clearToolTip.bind(this);
     }
 
     render() {
-        return createElement("div", {
-            className: classNames(`widget-charts-${this.props.type}`, this.props.className),
-            ref: this.getPlotlyNodeRef,
-            style: { ...getDimensions(this.props), ...this.props.style }
-        });
+        return createElement("div",
+            {
+                className: classNames(`widget-charts-${this.props.type}`, this.props.className),
+                ref: this.getPlotlyNodeRef,
+                style: { ...getDimensions(this.props), ...this.props.style }
+            },
+            createElement("div", { className: "widget-charts-tooltip", ref: this.getTooltipNodeRef })
+        );
     }
 
     componentDidMount() {
@@ -63,16 +74,42 @@ export class PieChart extends Component<PieChartProps, {}> {
         this.pieChartNode = node;
     }
 
+    private getTooltipNodeRef(node: HTMLDivElement) {
+        this.tooltipNode = node;
+    }
+
     private renderChart(props: PieChartProps) {
         if (this.pieChartNode) {
             const data = props.data && props.data[0].values.length ? props.data : this.data;
             newPlot(this.pieChartNode, data as any, props.layout, props.config)
-                .then(myPlot => myPlot.on("plotly_click", () => {
-                    if (this.props.onClickAction) {
-                        this.props.onClickAction();
-                    }
-                }));
+                .then(myPlot => {
+                    myPlot.on("plotly_click", this.onClick);
+                    myPlot.on("plotly_hover", this.onHover);
+                    myPlot.on("plotly_unhover", this.clearToolTip);
+                });
         }
+    }
+
+    private onClick() {
+        if (this.props.onClick) {
+            this.props.onClick();
+        }
+    }
+
+    private onHover(data: PieHoverData) {
+        if (this.props.onHover) {
+            const activePoint = data.points[0];
+            this.tooltipNode.innerHTML = "";
+            this.tooltipNode.style.top = `${data.event.pageY - 100}px`;
+            this.tooltipNode.style.left = `${data.event.pageX - 60}px`;
+            this.tooltipNode.style.opacity = "1";
+            this.props.onHover(this.tooltipNode, activePoint.pointNumber);
+        }
+    }
+
+    private clearToolTip() {
+        this.tooltipNode.innerHTML = "";
+        this.tooltipNode.style.opacity = "0";
     }
 
     private setUpEvents() {
