@@ -41,6 +41,7 @@ declare module "plotly.js" {
 
     export interface ScatterData {
         mxObjects: mendix.lib.MxObject[]; // custom property, not part of the official plotly.js api
+        orientation?: "h" | "v";
     }
 
     export interface PieData {

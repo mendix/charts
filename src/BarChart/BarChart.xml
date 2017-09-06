@@ -75,6 +75,15 @@
                 </property>
             </properties>
         </property>
+        <property key="orientation" type="enumeration" defaultValue="column">
+            <caption>Orientation</caption>
+            <category>Appearance</category>
+            <description/>
+            <enumerationValues>
+                <enumerationValue key="column">Column</enumerationValue>
+                <enumerationValue key="bar">Bar</enumerationValue>
+            </enumerationValues>
+        </property>
         <property key="xAxisLabel" type="translatableString" required="false">
             <caption>X-axis label</caption>
             <category>Appearance</category>

@@ -19,6 +19,7 @@ export interface BarChartContainerProps extends WrapperProps, Dimensions, OnClic
     tooltipForm: string;
     xAxisLabel: string;
     yAxisLabel: string;
+    orientation: "bar" | "column";
     series: StaticSeriesProps[];
 }
 
@@ -144,12 +145,16 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
             y: parseInt(value.get(activeSeries.yValueAttribute) as string, 10) as Plotly.Datum
         }));
 
+        const x = fetchedData.map(value => value.x);
+        const y = fetchedData.map(value => value.y);
+
         const barData = {
             name: activeSeries.name,
             type: "bar",
             hoverinfo: this.props.tooltipForm ? "text" : "all",
-            x: fetchedData.map(value => value.x),
-            y: fetchedData.map(value => value.y),
+            x: this.props.orientation === "bar" ? y : x,
+            y: this.props.orientation === "bar" ? x : y,
+            orientation: this.props.orientation === "bar" ? "h" : "v",
             mxObjects: data
         } as ScatterData;
 
