@@ -31,6 +31,7 @@ export interface StaticSeriesProps extends DataSourceProps {
     name: string;
     mode: Mode;
     lineColor: string;
+    lineStyle: "linear" | "spline";
 }
 
 export default class LineChartContainer extends Component<LineChartContainerProps, LineChartContainerState> {
@@ -148,7 +149,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
             connectgaps: true,
             hoveron: "points",
             hoverinfo: this.props.tooltipForm ? "text" : "all",
-            line: { color: activeSeries.lineColor },
+            line: { color: activeSeries.lineColor, shape: activeSeries.lineStyle },
             mode: activeSeries.mode.replace("X", "+") as Mode,
             name: activeSeries.name,
             type: "scatter",

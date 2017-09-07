@@ -83,6 +83,15 @@
                         <enumerationValue key="linesXmarkers">Lines with markers</enumerationValue>
                     </enumerationValues>
                 </property>
+                <property key="lineStyle" type="enumeration" defaultValue="linear">
+                    <caption>Line style</caption>
+                    <category>Appearance</category>
+                    <description>Applicable only if the mode is either lines or lines withs markers</description>
+                    <enumerationValues>
+                        <enumerationValue key="linear">Linear</enumerationValue>
+                        <enumerationValue key="spline">Spline</enumerationValue>
+                    </enumerationValues>
+                </property>
                 <property key="lineColor" type="string" required="false">
                     <caption>Line color</caption>
                     <category>Appearance</category>
