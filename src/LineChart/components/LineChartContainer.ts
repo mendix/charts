@@ -17,6 +17,7 @@ export interface LineChartContainerProps extends WrapperProps, Dimensions, OnCli
     tooltipForm: string;
     xAxisLabel: string;
     yAxisLabel: string;
+    fill: boolean;
     series: StaticSeriesProps[];
 }
 
@@ -151,6 +152,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
             mode: activeSeries.mode.replace("X", "+") as Mode,
             name: activeSeries.name,
             type: "scatter",
+            fill: this.props.fill ? "tonexty" : "none",
             x: fetchedData.map(value => value.x),
             y: fetchedData.map(value => value.y),
             mxObjects: data

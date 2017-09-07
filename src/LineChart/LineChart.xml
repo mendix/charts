@@ -100,6 +100,11 @@
             <category>Appearance</category>
             <description>Label for the y-axis (vertical)</description>
         </property>
+        <property key="fill" type="boolean" defaultValue="false">
+            <caption>Area chart</caption>
+            <category>Appearance</category>
+            <description>Add fill colors to render as area chart</description>
+        </property>
         <property key="showGrid" type="boolean" defaultValue="true">
             <caption>Show grid</caption>
             <category>Appearance</category>
