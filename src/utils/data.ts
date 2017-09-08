@@ -8,7 +8,7 @@ export interface DataSourceProps {
     dataEntity: string;
     xValueAttribute: string;
     yValueAttribute: string;
-    xAxisSortAttribute: string;
+    xValueSortAttribute: string;
 }
 
 export type MxObject = mendix.lib.MxObject;
@@ -44,7 +44,7 @@ export const validateSeriesProps = <T extends DataSourceProps>(dataSeries: T[], 
 export const fetchSeriesData = <T extends DataSourceProps>(mxObject: MxObject, seriesProps: T, callback: FetchDataCallback) => { // tslint:disable max-line-length
     if (seriesProps.dataEntity) {
         if (seriesProps.dataSourceType === "XPath") {
-            fetchByXPath(mxObject.getGuid(), seriesProps.dataEntity, seriesProps.entityConstraint, callback);
+            fetchByXPath(mxObject.getGuid(), seriesProps.dataEntity, seriesProps.entityConstraint, callback, seriesProps.xValueSortAttribute);
         } else if (seriesProps.dataSourceType === "microflow" && seriesProps.dataSourceMicroflow) {
             fetchByMicroflow(seriesProps.dataSourceMicroflow, mxObject.getGuid(), callback);
         }
@@ -53,7 +53,7 @@ export const fetchSeriesData = <T extends DataSourceProps>(mxObject: MxObject, s
     }
 };
 
-export const fetchByXPath = (guid: string, entity: string, constraint: string, callback: FetchDataCallback) => {
+export const fetchByXPath = (guid: string, entity: string, constraint: string, callback: FetchDataCallback, sortBy?: string) => {
     const entityPath = entity.split("/");
     const entityName = entityPath.length > 1 ? entityPath[entityPath.length - 1] : entity;
     const xpath = "//" + entityName + (constraint ? constraint.replace("[%CurrentObject%]", guid) : "");
@@ -61,7 +61,10 @@ export const fetchByXPath = (guid: string, entity: string, constraint: string, c
     window.mx.data.get({
         callback: mxObjects => callback(mxObjects),
         error: error => callback(undefined, `${errorMessage} ${error.message}`),
-        xpath
+        xpath,
+        filter: {
+            sort: sortBy ? [ [ sortBy, "asc" ] ] : []
+        }
     });
 };
 
