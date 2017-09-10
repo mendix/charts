@@ -7,3 +7,17 @@ type VisibilityMap<T> = {
 declare module "plotly.js/dist/plotly-basic" {
     export = Plotly;
 }
+
+declare module "element-resize-detector" {
+    interface ResizeDetector {
+        listenTo: (element: HTMLElement, callback: () => void) => void;
+    }
+
+    interface ResizeOptions {
+        strategy: "scroll";
+    }
+
+    const elementResizeDetector: (options: ResizeOptions) => ResizeDetector;
+
+    export = elementResizeDetector;
+}

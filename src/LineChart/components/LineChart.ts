@@ -1,8 +1,9 @@
 import { Component, createElement } from "react";
 import * as classNames from "classnames";
 
+import * as elementResize from "element-resize-detector";
 import { ScatterHoverData } from "plotly.js";
-import { Plots, newPlot, purge } from "../../PlotlyCustom";
+import { newPlot, purge } from "../../PlotlyCustom";
 import { Dimensions, getDimensions } from "../../utils/style";
 
 import "../../ui/Charts.scss";
@@ -22,6 +23,7 @@ export type Mode = "lines" | "markers" | "lines+markers";
 export class LineChart extends Component<LineChartProps, {}> {
     private lineChartNode: HTMLDivElement;
     private tooltipNode: HTMLDivElement;
+    private timeoutId: number;
     private data = [
         {
             connectgaps: true,
@@ -38,7 +40,6 @@ export class LineChart extends Component<LineChartProps, {}> {
 
         this.getPlotlyNodeRef = this.getPlotlyNodeRef.bind(this);
         this.getTooltipNodeRef = this.getTooltipNodeRef.bind(this);
-        this.onResize = this.onResize.bind(this);
         this.onClick = this.onClick.bind(this);
         this.onHover = this.onHover.bind(this);
         this.clearToolTip = this.clearToolTip.bind(this);
@@ -57,7 +58,7 @@ export class LineChart extends Component<LineChartProps, {}> {
 
     componentDidMount() {
         this.renderChart(this.props);
-        this.setUpResizeEvents();
+        this.addResizeListener();
     }
 
     componentWillReceiveProps(newProps: LineChartProps) {
@@ -68,7 +69,6 @@ export class LineChart extends Component<LineChartProps, {}> {
         if (this.lineChartNode) {
             purge(this.lineChartNode);
         }
-        window.removeEventListener("resize", this.onResize);
     }
 
     private getPlotlyNodeRef(node: HTMLDivElement) {
@@ -79,15 +79,19 @@ export class LineChart extends Component<LineChartProps, {}> {
         this.tooltipNode = node;
     }
 
-    private setUpResizeEvents() {
-        // A workaround for attaching the resize event to the Iframe window because the plotly
-        // library does not support it. This fix will be done in the web modeler preview class when the
-        // plotly library starts supporting listening to Iframe events.
-        const iFrame = document.getElementsByClassName("t-page-editor-iframe")[0] as HTMLIFrameElement;
-        if (iFrame) {
-            (iFrame.contentWindow || iFrame.contentDocument).addEventListener("resize", this.onResize);
-        } else {
-            window.addEventListener("resize", this.onResize);
+    private addResizeListener() {
+        const resizeDetector = elementResize({ strategy: "scroll" });
+        if (this.lineChartNode.parentElement) {
+            resizeDetector.listenTo(this.lineChartNode.parentElement, () => {
+                if (this.timeoutId) {
+                    clearTimeout(this.timeoutId);
+                }
+                this.timeoutId = setTimeout(() => {
+                    purge(this.lineChartNode);
+                    this.renderChart(this.props);
+                    this.timeoutId = 0;
+                }, 100);
+            });
         }
     }
 
@@ -124,9 +128,5 @@ export class LineChart extends Component<LineChartProps, {}> {
     private clearToolTip() {
         this.tooltipNode.innerHTML = "";
         this.tooltipNode.style.opacity = "0";
-    }
-
-    private onResize() {
-        Plots.resize(this.lineChartNode);
     }
 }

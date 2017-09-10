@@ -84,6 +84,7 @@
   },
   "dependencies": {
     "classnames": "^2.2.5",
+    "element-resize-detector": "^1.1.12",
     "plotly.js": "^1.27.1"
   }
 }

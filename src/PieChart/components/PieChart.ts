@@ -1,8 +1,8 @@
 import { CSSProperties, Component, createElement } from "react";
-
 import * as classNames from "classnames";
-import { Plots, newPlot, purge } from "../../PlotlyCustom";
+import { newPlot, purge } from "../../PlotlyCustom";
 
+import * as elementResize from "element-resize-detector";
 import { PieData, PieHoverData } from "plotly.js";
 import { ChartType } from "./PieChartContainer";
 import { Dimensions, getDimensions } from "../../utils/style";
@@ -23,6 +23,7 @@ export interface PieChartProps extends Dimensions {
 export class PieChart extends Component<PieChartProps, {}> {
     private pieChartNode: HTMLDivElement;
     private tooltipNode: HTMLDivElement;
+    private timeoutId: number;
     private data: PieData[] = [ {
         hole: this.props.type === "donut" ? .4 : 0,
         hoverinfo: "label+name",
@@ -37,7 +38,6 @@ export class PieChart extends Component<PieChartProps, {}> {
 
         this.getPlotlyNodeRef = this.getPlotlyNodeRef.bind(this);
         this.getTooltipNodeRef = this.getTooltipNodeRef.bind(this);
-        this.onResize = this.onResize.bind(this);
         this.onClick = this.onClick.bind(this);
         this.onHover = this.onHover.bind(this);
         this.clearToolTip = this.clearToolTip.bind(this);
@@ -56,7 +56,7 @@ export class PieChart extends Component<PieChartProps, {}> {
 
     componentDidMount() {
         this.renderChart(this.props);
-        this.setUpEvents();
+        this.addResizeListener();
     }
 
     componentWillReceiveProps(newProps: PieChartProps) {
@@ -67,7 +67,6 @@ export class PieChart extends Component<PieChartProps, {}> {
         if (this.pieChartNode) {
             purge(this.pieChartNode);
         }
-        window.removeEventListener("resize", this.onResize);
     }
 
     private getPlotlyNodeRef(node: HTMLDivElement) {
@@ -112,19 +111,19 @@ export class PieChart extends Component<PieChartProps, {}> {
         this.tooltipNode.style.opacity = "0";
     }
 
-    private setUpEvents() {
-        // A workaround for attaching the resize event to the Iframe window because the plotly
-        // library does not support it. This fix will be done in the web modeler preview class when the
-        // plotly library starts supporting listening to Iframe events.
-        const iFrame = document.getElementsByClassName("t-page-editor-iframe")[0] as HTMLIFrameElement;
-        if (iFrame) {
-            (iFrame.contentWindow || iFrame.contentDocument).addEventListener("resize", this.onResize);
-        } else {
-            window.addEventListener("resize", this.onResize);
+    private addResizeListener() {
+        const resizeDetector = elementResize({ strategy: "scroll" });
+        if (this.pieChartNode.parentElement) {
+            resizeDetector.listenTo(this.pieChartNode.parentElement, () => {
+                if (this.timeoutId) {
+                    clearTimeout(this.timeoutId);
+                }
+                this.timeoutId = setTimeout(() => {
+                    purge(this.pieChartNode);
+                    this.renderChart(this.props);
+                    this.timeoutId = 0;
+                }, 100);
+            });
         }
-    }
-
-    private onResize() {
-        Plots.resize(this.pieChartNode);
     }
 }

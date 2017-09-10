@@ -1,8 +1,9 @@
 import { Component, createElement } from "react";
 import * as classNames from "classnames";
 
+import * as elementResize from "element-resize-detector";
 import { ScatterHoverData } from "plotly.js";
-import { Plots, newPlot, purge } from "../../PlotlyCustom";
+import { newPlot, purge } from "../../PlotlyCustom";
 import { Dimensions, getDimensions } from "../../utils/style";
 
 import "../../ui/Charts.scss";
@@ -20,6 +21,7 @@ export interface BarChartProps extends Dimensions {
 export class BarChart extends Component<BarChartProps, {}> {
     private barChartNode: HTMLDivElement;
     private tooltipNode: HTMLDivElement;
+    private timeoutId: number;
     private data: Partial<Plotly.ScatterData>[] = [
         {
             type: "bar",
@@ -34,7 +36,6 @@ export class BarChart extends Component<BarChartProps, {}> {
 
         this.getPlotlyNodeRef = this.getPlotlyNodeRef.bind(this);
         this.getTooltipNodeRef = this.getTooltipNodeRef.bind(this);
-        this.onResize = this.onResize.bind(this);
         this.onClick = this.onClick.bind(this);
         this.onHover = this.onHover.bind(this);
         this.clearToolTip = this.clearToolTip.bind(this);
@@ -53,7 +54,7 @@ export class BarChart extends Component<BarChartProps, {}> {
 
     componentDidMount() {
         this.renderChart(this.props);
-        this.setUpEvents();
+        this.addResizeListener();
     }
 
     componentWillReceiveProps(newProps: BarChartProps) {
@@ -64,7 +65,6 @@ export class BarChart extends Component<BarChartProps, {}> {
         if (this.barChartNode) {
             purge(this.barChartNode);
         }
-        window.removeEventListener("resize", this.onResize);
     }
 
     private getPlotlyNodeRef(node: HTMLDivElement) {
@@ -75,15 +75,19 @@ export class BarChart extends Component<BarChartProps, {}> {
         this.tooltipNode = node;
     }
 
-    private setUpEvents() {
-        // A workaround for attaching the resize event to the Iframe window because the plotly
-        // library does not support it. This fix will be done in the web modeler preview class when the
-        // plotly library starts supporting listening to Iframe events.
-        const iFrame = document.getElementsByClassName("t-page-editor-iframe")[0] as HTMLIFrameElement;
-        if (iFrame) {
-            (iFrame.contentWindow || iFrame.contentDocument).addEventListener("resize", this.onResize);
-        } else {
-            window.addEventListener("resize", this.onResize);
+    private addResizeListener() {
+        const resizeDetector = elementResize({ strategy: "scroll" });
+        if (this.barChartNode.parentElement) {
+            resizeDetector.listenTo(this.barChartNode.parentElement, () => {
+                if (this.timeoutId) {
+                    clearTimeout(this.timeoutId);
+                }
+                this.timeoutId = setTimeout(() => {
+                    purge(this.barChartNode);
+                    this.renderChart(this.props);
+                    this.timeoutId = 0;
+                }, 100);
+            });
         }
     }
 
@@ -120,9 +124,5 @@ export class BarChart extends Component<BarChartProps, {}> {
     private clearToolTip() {
         this.tooltipNode.innerHTML = "";
         this.tooltipNode.style.opacity = "0";
-    }
-
-    private onResize() {
-        Plots.resize(this.barChartNode);
     }
 }
