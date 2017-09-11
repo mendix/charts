@@ -22,7 +22,7 @@
                 <property key="dataSourceType" type="enumeration" defaultValue="XPath">
                     <caption>Data source type</caption>
                     <category>Data source</category>
-                    <description>Type of source</description>
+                    <description/>
                     <enumerationValues>
                         <enumerationValue key="XPath">Database/XPath</enumerationValue>
                         <enumerationValue key="microflow">Microflow</enumerationValue>

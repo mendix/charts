@@ -12,8 +12,8 @@ export interface BarChartProps extends Dimensions {
     config?: Partial<Plotly.Config>;
     data?: Plotly.ScatterData[];
     layout?: Partial<Plotly.Layout>;
-    style?: object;
     className?: string;
+    style?: object;
     onClick?: () => void;
     onHover?: (node: HTMLDivElement, dataObject: mendix.lib.MxObject) => void;
 }
@@ -53,6 +53,8 @@ export class BarChart extends Component<BarChartProps, {}> {
     }
 
     componentDidMount() {
+        console.log(this.barChartNode.clientWidth); // tslint:disable-line
+        console.log(this.barChartNode.clientHeight); // tslint:disable-line
         this.renderChart(this.props);
         this.addResizeListener();
     }

@@ -10,8 +10,8 @@ import { Dimensions, getDimensions } from "../../utils/style";
 import "../../ui/Charts.scss";
 
 export interface PieChartProps extends Dimensions {
-    data?: PieData[];
     config?: Partial<Plotly.Config>;
+    data?: PieData[];
     layout?: Partial<Plotly.Layout>;
     type: ChartType;
     className?: string;
@@ -25,7 +25,7 @@ export class PieChart extends Component<PieChartProps, {}> {
     private tooltipNode: HTMLDivElement;
     private timeoutId: number;
     private data: PieData[] = [ {
-        hole: this.props.type === "donut" ? .4 : 0,
+        hole: this.props.type === "donut" ? 0.4 : 0,
         hoverinfo: "label+name",
         labels: [ "US", "China", "European Union", "Russian Federation", "Brazil", "India", "Rest of World" ],
         name: "GHG Emissions",

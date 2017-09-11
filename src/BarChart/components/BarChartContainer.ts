@@ -10,17 +10,16 @@ import { WrapperProps } from "../../utils/types";
 import { BarMode, ScatterData } from "plotly.js";
 
 export interface BarChartContainerProps extends WrapperProps, Dimensions, OnClickProps {
-    barMode: BarMode;
-    responsive: boolean;
-    title?: string;
+    series: StaticSeriesProps[];
+    showLegend: boolean;
     showGrid: boolean;
     showToolbar: boolean;
-    showLegend: boolean;
+    barMode: BarMode;
+    orientation: "bar" | "column";
+    responsive: boolean;
     tooltipForm: string;
     xAxisLabel: string;
     yAxisLabel: string;
-    orientation: "bar" | "column";
-    series: StaticSeriesProps[];
 }
 
 interface BarChartContainerState {

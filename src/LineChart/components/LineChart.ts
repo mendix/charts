@@ -9,8 +9,8 @@ import { Dimensions, getDimensions } from "../../utils/style";
 import "../../ui/Charts.scss";
 
 export interface LineChartProps extends Dimensions {
-    data?: Plotly.ScatterData[];
     config?: Partial<Plotly.Config>;
+    data?: Plotly.ScatterData[];
     layout?: Partial<Plotly.Layout>;
     className?: string;
     style?: object;

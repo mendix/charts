@@ -8,10 +8,10 @@ Plot and track your data across different charts.
 * `PieChart`
 
 ## Dependencies
-* Mendix 7.4.0
+* Mendix 7.6.0
 
 ## Demo projects
-[https://charts.mxapps.io](https://charts.mxapps.io)
+[https://charts102.mxapps.io](https://charts.mxapps.io)
 
 ## Configuration
 

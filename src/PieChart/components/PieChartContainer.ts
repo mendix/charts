@@ -14,10 +14,10 @@ export interface PieChartContainerProps extends WrapperProps, Dimensions, OnClic
     dataSourceType: "XPath" | "microflow";
     entityConstraint: string;
     dataSourceMicroflow: string;
+    colorAttribute: string;
     nameAttribute: string;
     valueAttribute: string;
     chartType: ChartType;
-    colorAttribute: string;
     showToolBar: boolean;
     showLegend: boolean;
     tooltipForm: string;

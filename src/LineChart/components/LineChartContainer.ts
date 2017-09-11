@@ -8,17 +8,17 @@ import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
 export interface LineChartContainerProps extends WrapperProps, Dimensions, OnClickProps {
+    series: StaticSeriesProps[];
+    showGrid: boolean;
     mode: Mode;
     lineColor: string;
-    showGrid: boolean;
+    fill: boolean;
     showToolBar: boolean;
     showLegend: boolean;
     responsive: boolean;
     tooltipForm: string;
     xAxisLabel: string;
     yAxisLabel: string;
-    fill: boolean;
-    series: StaticSeriesProps[];
 }
 
 interface LineChartContainerState {
