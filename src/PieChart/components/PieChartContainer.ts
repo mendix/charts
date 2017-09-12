@@ -70,9 +70,9 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
 
         return createElement(PieChart, {
             className: this.props.class,
-            config: { displayModeBar: this.props.showToolBar },
+            config: { displayModeBar: this.props.showToolBar, doubleClick: false },
             data: [ {
-                hole: this.props.chartType === "donut" ? .4 : 0,
+                hole: this.props.chartType === "donut" ? 0.4 : 0,
                 hoverinfo: this.props.tooltipForm ? "none" : "label",
                 labels: this.state.labels || [],
                 marker: { colors: this.state.colors || [] },

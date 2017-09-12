@@ -72,8 +72,16 @@ export default class LineChartContainer extends Component<LineChartContainerProp
                 autosize: this.props.responsive,
                 hovermode: this.props.tooltipForm ? "closest" : undefined,
                 showlegend: this.props.showLegend,
-                xaxis: { showgrid: this.props.showGrid, title: this.props.xAxisLabel },
-                yaxis: { showgrid: this.props.showGrid, title: this.props.yAxisLabel }
+                xaxis: {
+                    title: this.props.xAxisLabel,
+                    showgrid: this.props.showGrid,
+                    fixedrange: true
+                },
+                yaxis: {
+                    title: this.props.yAxisLabel,
+                    showgrid: this.props.showGrid,
+                    fixedrange: true
+                }
             },
             style: parseStyle(this.props.style),
             width: this.props.width,

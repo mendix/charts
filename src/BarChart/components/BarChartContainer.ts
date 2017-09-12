@@ -71,8 +71,16 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
             layout: {
                 autosize: this.props.responsive,
                 barmode: this.props.barMode,
-                xaxis: { showgrid: this.props.showGrid, title: this.props.xAxisLabel },
-                yaxis: { showgrid: this.props.showGrid, title: this.props.yAxisLabel },
+                xaxis: {
+                    showgrid: this.props.showGrid,
+                    title: this.props.xAxisLabel,
+                    fixedrange: true
+                },
+                yaxis: {
+                    showgrid: this.props.showGrid,
+                    title: this.props.yAxisLabel,
+                    fixedrange: true
+                },
                 showlegend: this.props.showLegend,
                 hovermode: this.props.tooltipForm ? "closest" : undefined
             },
