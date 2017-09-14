@@ -5,7 +5,7 @@
     <icon/>
     <properties>
         <property key="dataEntity" type="entity">
-            <caption>Data entity</caption>
+            <caption>Entity</caption>
             <category>Data source</category>
             <description>The entity from which the data values will be retrieved</description>
         </property>
@@ -14,14 +14,14 @@
             <category>Data source</category>
             <description/>
             <enumerationValues>
-                <enumerationValue key="XPath">Database / XPath</enumerationValue>
+                <enumerationValue key="XPath">Database</enumerationValue>
                 <enumerationValue key="microflow">Microflow</enumerationValue>
             </enumerationValues>
         </property>
         <property key="entityConstraint" type="entityConstraint" entityProperty="dataEntity" required="false">
             <caption>XPath constraint</caption>
             <category>Data source</category>
-            <description>Constraint on the data from the data entity (used when data soucre is Database/XPath)</description>
+            <description>Constraint on the data from the data entity (used when data source is Database)</description>
         </property>
         <property key="dataSourceMicroflow" type="microflow" required="false">
             <caption>Microflow</caption>
@@ -32,7 +32,7 @@
         <property key="nameAttribute" type="attribute" entityProperty="dataEntity">
             <caption>Name attribute</caption>
             <category>Data source</category>
-            <description>Attribute containing the name describing the value</description>
+            <description/>
             <attributeTypes>
                 <attributeType name="String"/>
             </attributeTypes>
@@ -40,7 +40,7 @@
         <property key="valueAttribute" type="attribute" entityProperty="dataEntity">
             <caption>Value attribute</caption>
             <category>Data source</category>
-            <description>Attribute containing the value</description>
+            <description/>
             <attributeTypes>
                 <attributeType name="Integer"/>
                 <attributeType name="Decimal"/>
@@ -50,7 +50,7 @@
         <property key="chartType" type="enumeration" defaultValue="pie">
             <caption>Chart type</caption>
             <category>Appearance</category>
-            <description>Type of chart</description>
+            <description/>
             <enumerationValues>
                 <enumerationValue key="pie">Pie</enumerationValue>
                 <enumerationValue key="donut">Donut</enumerationValue>
@@ -79,11 +79,6 @@
             <category>Appearance</category>
             <description>The form to show when a user hovers over a chart plot point</description>
         </property>
-        <property key="responsive" type="boolean" defaultValue="true">
-            <caption>Responsive</caption>
-            <category>Appearance</category>
-            <description/>
-        </property>
         <property key="widthUnit" type="enumeration" defaultValue="percentage">
             <caption>Width unit</caption>
             <category>Appearance</category>
@@ -94,9 +89,9 @@
             </enumerationValues>
         </property>
         <property key="width" type="integer" defaultValue="100">
-            <caption>Chart width</caption>
+            <caption>Width</caption>
             <category>Appearance</category>
-            <description>Width of the chart</description>
+            <description/>
         </property>
         <property key="heightUnit" type="enumeration" defaultValue="percentageOfParent">
             <caption>Height unit</caption>
@@ -109,9 +104,9 @@
             </enumerationValues>
         </property>
         <property key="height" type="integer" defaultValue="100">
-            <caption>Chart height</caption>
+            <caption>Height</caption>
             <category>Appearance</category>
-            <description>Height of the chart</description>
+            <description/>
         </property>
         <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
             <caption>On click</caption>
@@ -132,7 +127,7 @@
             <caption>On click microflow</caption>
             <category>Events</category>
             <description>The microflow that will be executed on click</description>
-            <returnType type="Void" />
+            <returnType type="Void"/>
         </property>
     </properties>
 </widget>

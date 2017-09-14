@@ -16,7 +16,6 @@ export interface BarChartContainerProps extends WrapperProps, Dimensions, OnClic
     showToolbar: boolean;
     barMode: BarMode;
     orientation: "bar" | "column";
-    responsive: boolean;
     tooltipForm: string;
     xAxisLabel: string;
     yAxisLabel: string;
@@ -69,7 +68,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
             height: this.props.height,
             heightUnit: this.props.heightUnit,
             layout: {
-                autosize: this.props.responsive,
+                autosize: true,
                 barmode: this.props.barMode,
                 xaxis: {
                     showgrid: this.props.showGrid,

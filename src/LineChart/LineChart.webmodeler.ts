@@ -18,7 +18,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                 className: this.props.class,
                 config: { displayModeBar: this.props.showToolBar, doubleClick: false },
                 layout: {
-                    autosize: this.props.responsive,
+                    autosize: true,
                     hovermode: this.props.tooltipForm ? "closest" : undefined,
                     showlegend: this.props.showLegend,
                     xaxis: { showgrid: this.props.showGrid, title: this.props.xAxisLabel },

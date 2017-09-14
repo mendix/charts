@@ -54,6 +54,7 @@ declare module "plotly.js" {
         marker?: {
             colors: string[];
         };
+        sort?: boolean; // default: true
     }
 
     export interface PlotlyHTMLElement extends HTMLElement {

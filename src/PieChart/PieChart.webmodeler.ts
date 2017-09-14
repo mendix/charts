@@ -20,7 +20,7 @@ export class preview extends Component<PieChartContainerProps, {}> {
                 height: this.props.height,
                 heightUnit: this.props.heightUnit,
                 layout: {
-                    autosize: this.props.responsive,
+                    autosize: true,
                     showlegend: this.props.showLegend
                 },
                 style: parseStyle(this.props.style),

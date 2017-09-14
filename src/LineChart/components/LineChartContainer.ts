@@ -15,7 +15,6 @@ export interface LineChartContainerProps extends WrapperProps, Dimensions, OnCli
     fill: boolean;
     showToolBar: boolean;
     showLegend: boolean;
-    responsive: boolean;
     tooltipForm: string;
     xAxisLabel: string;
     yAxisLabel: string;
@@ -69,7 +68,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
             className: this.props.class,
             config: { displayModeBar: this.props.showToolBar, doubleClick: false },
             layout: {
-                autosize: this.props.responsive,
+                autosize: true,
                 hovermode: this.props.tooltipForm ? "closest" : undefined,
                 showlegend: this.props.showLegend,
                 xaxis: {

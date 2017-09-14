@@ -21,7 +21,6 @@ export interface PieChartContainerProps extends WrapperProps, Dimensions, OnClic
     showToolBar: boolean;
     showLegend: boolean;
     tooltipForm: string;
-    responsive: boolean;
 }
 
 interface PieChartContainerState extends PieData {
@@ -71,18 +70,19 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         return createElement(PieChart, {
             className: this.props.class,
             config: { displayModeBar: this.props.showToolBar, doubleClick: false },
-            data: [ {
+            data: {
                 hole: this.props.chartType === "donut" ? 0.4 : 0,
                 hoverinfo: this.props.tooltipForm ? "none" : "label",
                 labels: this.state.labels || [],
                 marker: { colors: this.state.colors || [] },
                 type: "pie",
-                values: this.state.values || []
-            } ],
+                values: this.state.values || [],
+                sort: false
+            },
             height: this.props.height,
             heightUnit: this.props.heightUnit,
             layout: {
-                autosize: this.props.responsive,
+                autosize: true,
                 showlegend: this.props.showLegend
             },
             style: parseStyle(this.props.style),

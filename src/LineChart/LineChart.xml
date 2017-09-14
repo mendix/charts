@@ -6,7 +6,7 @@
     <properties>
         <property key="series" type="object" isList="true">
             <caption>Series</caption>
-            <category>Static series</category>
+            <category>Series</category>
             <description>Add series and configure their properties</description>
             <properties>
                 <property key="name" type="string">
@@ -15,23 +15,23 @@
                     <description/>
                 </property>
                 <property key="dataEntity" type="entity">
-                    <caption>Data entity</caption>
+                    <caption>Entity</caption>
                     <category>Data source</category>
                     <description>The entity from which the data values will be retrieved</description>
                 </property>
                 <property key="dataSourceType" type="enumeration" defaultValue="XPath">
-                    <caption>Data source type</caption>
+                    <caption>Data source</caption>
                     <category>Data source</category>
-                    <description>Type of source</description>
+                    <description/>
                     <enumerationValues>
-                        <enumerationValue key="XPath">Database/XPath</enumerationValue>
+                        <enumerationValue key="XPath">Database</enumerationValue>
                         <enumerationValue key="microflow">Microflow</enumerationValue>
                     </enumerationValues>
                 </property>
                 <property key="entityConstraint" type="entityConstraint" entityProperty="dataEntity" required="false">
                     <caption>XPath constraint</caption>
                     <category>Data source</category>
-                    <description>The constraint on the data from the data entity (used when the data source is Database/XPath)</description>
+                    <description>The constraint on the data from the entity (used when the data source is Database)</description>
                 </property>
                 <property key="dataSourceMicroflow" type="microflow" required="false">
                     <caption>Microflow</caption>
@@ -42,7 +42,7 @@
                 <property key="xValueAttribute" type="attribute" entityProperty="dataEntity">
                     <caption>X-axis data attribute</caption>
                     <category>Data source</category>
-                    <description>Attribute containing x-axis data</description>
+                    <description/>
                     <attributeTypes>
                         <attributeType name="String"/>
                         <attributeType name="Decimal"/>
@@ -53,7 +53,7 @@
                 <property key="yValueAttribute" type="attribute" entityProperty="dataEntity">
                     <caption>Y-axis data attribute</caption>
                     <category>Data source</category>
-                    <description>Attribute containing y-axis data</description>
+                    <description/>
                     <attributeTypes>
                         <attributeType name="Decimal"/>
                         <attributeType name="Long"/>
@@ -86,7 +86,7 @@
                 <property key="lineStyle" type="enumeration" defaultValue="linear">
                     <caption>Line style</caption>
                     <category>Appearance</category>
-                    <description>Applicable only if the mode is either lines or lines withs markers</description>
+                    <description>Applicable only if the mode is either lines or lines with markers</description>
                     <enumerationValues>
                         <enumerationValue key="linear">Linear</enumerationValue>
                         <enumerationValue key="spline">Spline</enumerationValue>
@@ -102,12 +102,12 @@
         <property key="xAxisLabel" type="string" required="false">
             <caption>X-axis label</caption>
             <category>Appearance</category>
-            <description>Label for the x-axis (horizontal)</description>
+            <description/>
         </property>
         <property key="yAxisLabel" type="string" required="false">
             <caption>Y-axis label</caption>
             <category>Appearance</category>
-            <description>Label for the y-axis (vertical)</description>
+            <description/>
         </property>
         <property key="fill" type="boolean" defaultValue="false">
             <caption>Area chart</caption>
@@ -134,11 +134,6 @@
             <category>Appearance</category>
             <description>The form to show when a user hovers over a chart plot point</description>
         </property>
-        <property key="responsive" type="boolean" defaultValue="true">
-            <caption>Responsive</caption>
-            <category>Appearance</category>
-            <description/>
-        </property>
         <property key="widthUnit" type="enumeration" defaultValue="percentage">
             <caption>Width unit</caption>
             <category>Appearance</category>
@@ -149,9 +144,9 @@
             </enumerationValues>
         </property>
         <property key="width" type="integer" defaultValue="100">
-            <caption>Chart width</caption>
+            <caption>Width</caption>
             <category>Appearance</category>
-            <description>Width of the chart</description>
+            <description/>
         </property>
         <property key="heightUnit" type="enumeration" defaultValue="percentageOfParent">
             <caption>Height unit</caption>
@@ -164,9 +159,9 @@
             </enumerationValues>
         </property>
         <property key="height" type="integer" defaultValue="100">
-            <caption>Chart height</caption>
+            <caption>Height</caption>
             <category>Appearance</category>
-            <description>Height of the chart</description>
+            <description/>
         </property>
         <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
             <caption>On click</caption>

@@ -20,7 +20,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
                 height: this.props.height,
                 heightUnit: this.props.heightUnit,
                 layout: {
-                    autosize: this.props.responsive,
+                    autosize: true,
                     barmode: this.props.barMode,
                     xaxis: { showgrid: this.props.showGrid, title: this.props.xAxisLabel },
                     yaxis: { showgrid: this.props.showGrid, title: this.props.yAxisLabel },
