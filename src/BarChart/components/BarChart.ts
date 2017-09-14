@@ -53,8 +53,6 @@ export class BarChart extends Component<BarChartProps, {}> {
     }
 
     componentDidMount() {
-        console.log(this.barChartNode.clientWidth); // tslint:disable-line
-        console.log(this.barChartNode.clientHeight); // tslint:disable-line
         this.renderChart(this.props);
         this.addResizeListener();
     }
@@ -96,7 +94,10 @@ export class BarChart extends Component<BarChartProps, {}> {
     private renderChart(props: BarChartProps) {
         if (this.barChartNode) {
             const data = props.data && props.data.length ? props.data : this.data;
-            newPlot(this.barChartNode, data, props.layout, props.config)
+            const layout = props.layout || {};
+            layout.width = this.barChartNode.clientWidth;
+            layout.height = this.barChartNode.clientHeight;
+            newPlot(this.barChartNode, data, layout, props.config)
                 .then(myPlot => {
                     myPlot.on("plotly_click", this.onClick);
                     myPlot.on("plotly_hover", this.onHover);

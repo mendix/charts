@@ -104,11 +104,7 @@ const previewConfig = {
             ] }
         ]
     },
-    devtool: "inline-source-map",
-    externals: [ "react", "react-dom" ],
-    plugins: [
-        new webpack.LoaderOptionsPlugin({ debug: true })
-    ]
+    externals: [ "react", "react-dom" ]
 };
 
 module.exports = [ widgetConfig, plotlyCustomConfig, previewConfig ];

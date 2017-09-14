@@ -11,7 +11,7 @@ import "../../ui/Charts.scss";
 
 export interface PieChartProps extends Dimensions {
     config?: Partial<Plotly.Config>;
-    data?: PieData[];
+    data?: PieData;
     layout?: Partial<Plotly.Layout>;
     type: ChartType;
     className?: string;
@@ -24,14 +24,14 @@ export class PieChart extends Component<PieChartProps, {}> {
     private pieChartNode: HTMLDivElement;
     private tooltipNode: HTMLDivElement;
     private timeoutId: number;
-    private data: PieData[] = [ {
+    private data: PieData = {
         hole: this.props.type === "donut" ? 0.4 : 0,
         hoverinfo: "label+name",
         labels: [ "US", "China", "European Union", "Russian Federation", "Brazil", "India", "Rest of World" ],
         name: "GHG Emissions",
         type: "pie",
         values: [ 16, 15, 12, 6, 5, 4, 42 ]
-    } ];
+    };
 
     constructor(props: PieChartProps) {
         super(props);
@@ -79,8 +79,11 @@ export class PieChart extends Component<PieChartProps, {}> {
 
     private renderChart(props: PieChartProps) {
         if (this.pieChartNode) {
-            const data = props.data && props.data[0].values.length ? props.data : this.data;
-            newPlot(this.pieChartNode, data as any, props.layout, props.config)
+            const data = props.data && props.data.values.length ? props.data : this.data;
+            const layout = props.layout || {};
+            layout.width = this.pieChartNode.clientWidth;
+            layout.height = this.pieChartNode.clientHeight;
+            newPlot(this.pieChartNode, [ data as any ], props.layout, props.config)
                 .then(myPlot => {
                     myPlot.on("plotly_click", this.onClick);
                     myPlot.on("plotly_hover", this.onHover);

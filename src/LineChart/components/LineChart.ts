@@ -98,6 +98,9 @@ export class LineChart extends Component<LineChartProps, {}> {
     private renderChart(props: LineChartProps) {
         const data = props.data && props.data.length ? props.data : this.data;
         if (this.lineChartNode) {
+            const layout = props.layout || {};
+            layout.width = this.lineChartNode.clientWidth;
+            layout.height = this.lineChartNode.clientHeight;
             newPlot(this.lineChartNode, data, this.props.layout, this.props.config)
                 .then(myPlot => {
                     myPlot.on("plotly_click", this.onClick);
