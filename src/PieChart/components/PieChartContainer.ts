@@ -17,6 +17,7 @@ export interface PieChartContainerProps extends WrapperProps, Dimensions, OnClic
     colorAttribute: string;
     nameAttribute: string;
     valueAttribute: string;
+    sortAttribute: string;
     chartType: ChartType;
     showToolBar: boolean;
     showLegend: boolean;
@@ -57,7 +58,6 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
     render() {
         if (this.state.alertMessage) {
             return createElement(Alert, {
-                bootstrapStyle: "danger",
                 className: `widget-charts-${this.props.chartType}-alert`,
                 message: this.state.alertMessage
             });
@@ -122,11 +122,12 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         if (!this.state.loading) {
             this.setState({ loading: true });
         }
-        if (mxObject && this.props.dataEntity) {
-            if (this.props.dataSourceType === "XPath") {
-                fetchByXPath(mxObject.getGuid(), this.props.dataEntity, this.props.entityConstraint, this.processData);
-            } else if (this.props.dataSourceType === "microflow" && this.props.dataSourceMicroflow) {
-                fetchByMicroflow(this.props.dataSourceMicroflow, mxObject.getGuid(), this.processData);
+        const { dataEntity, dataSourceMicroflow, dataSourceType, entityConstraint, sortAttribute } = this.props;
+        if (mxObject && dataEntity) {
+            if (dataSourceType === "XPath") {
+                fetchByXPath(mxObject.getGuid(), dataEntity, entityConstraint, this.processData, sortAttribute);
+            } else if (dataSourceType === "microflow" && dataSourceMicroflow) {
+                fetchByMicroflow(dataSourceMicroflow, mxObject.getGuid(), this.processData);
             }
         } else {
             this.setState({ loading: false, colors: [], labels: [], values: [] });

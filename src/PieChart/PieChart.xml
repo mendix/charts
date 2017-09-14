@@ -47,6 +47,19 @@
                 <attributeType name="Long"/>
             </attributeTypes>
         </property>
+        <property key="sortAttribute" type="attribute" entityProperty="dataEntity">
+            <caption>Sort attribute</caption>
+            <category>Data source</category>
+            <description>Attribute to use for sorting the data (ascending)</description>
+            <attributeTypes>
+                <attributeType name="Decimal"/>
+                <attributeType name="Long"/>
+                <attributeType name="Integer"/>
+                <attributeType name="String"/>
+                <attributeType name="AutoNumber"/>
+                <attributeType name="DateTime"/>
+            </attributeTypes>
+        </property>
         <property key="chartType" type="enumeration" defaultValue="pie">
             <caption>Chart type</caption>
             <category>Appearance</category>

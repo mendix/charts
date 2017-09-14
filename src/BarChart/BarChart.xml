@@ -63,7 +63,7 @@
                 <property key="xValueSortAttribute" type="attribute" entityProperty="dataEntity">
                     <caption>X-axis sort attribute</caption>
                     <category>Data source</category>
-                    <description>Attribute to use for sorting the x-axis data</description>
+                    <description>Attribute to use for sorting the x-axis data (ascending)</description>
                     <attributeTypes>
                         <attributeType name="Decimal"/>
                         <attributeType name="Long"/>
