@@ -9,10 +9,14 @@
             <category>Series</category>
             <description>Add series and configure their properties</description>
             <properties>
-                <property key="name" type="string">
+                <property key="name" type="translatableString">
                     <caption>Series name</caption>
                     <category>Data source</category>
                     <description/>
+                    <translations>
+                        <translation lang="en_US"/>
+                        <translation lang="nl_NL"/>
+                    </translations>
                 </property>
                 <property key="dataEntity" type="entity">
                     <caption>Entity</caption>
