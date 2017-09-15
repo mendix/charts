@@ -14,7 +14,7 @@ export interface BarChartProps extends Dimensions {
     layout?: Partial<Plotly.Layout>;
     className?: string;
     style?: object;
-    onClick?: () => void;
+    onClick?: (dataObject: mendix.lib.MxObject, seriesIndex: number) => void;
     onHover?: (node: HTMLDivElement, dataObject: mendix.lib.MxObject) => void;
 }
 
@@ -106,9 +106,10 @@ export class BarChart extends Component<BarChartProps, {}> {
         }
     }
 
-    private onClick() {
+    private onClick(data: ScatterHoverData) {
+        const pointClicked = data.points[0];
         if (this.props.onClick) {
-            this.props.onClick();
+            this.props.onClick(pointClicked.data.mxObjects[pointClicked.pointNumber], pointClicked.data.seriesIndex);
         }
     }
 

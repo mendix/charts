@@ -41,6 +41,7 @@ declare module "plotly.js" {
 
     export interface ScatterData {
         mxObjects: mendix.lib.MxObject[]; // custom property, not part of the official plotly.js api
+        seriesIndex: number; // custom property, not part of the official plotly.js api
         orientation?: "h" | "v";
     }
 
@@ -58,6 +59,6 @@ declare module "plotly.js" {
     }
 
     export interface PlotlyHTMLElement extends HTMLElement {
-        on(event: "plotly_hover", callback: (data: PieHoverData) => void): void;
+        on(event: "plotly_hover" | "plotly_click", callback: (data: PieHoverData) => void): void;
     }
 }

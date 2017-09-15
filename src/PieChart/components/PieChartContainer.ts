@@ -150,8 +150,11 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         });
     }
 
-    private handleOnClick() {
-        handleOnClick(this.props, this.props.mxObject);
+    private handleOnClick(index: number) {
+        if (this.state.data && this.state.data.length) {
+            const dataObject = this.state.data[ index ];
+            handleOnClick(this.props, dataObject);
+        }
     }
 
     private openTooltipForm(domNode: HTMLDivElement, index: number) {

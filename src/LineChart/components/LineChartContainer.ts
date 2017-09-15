@@ -7,8 +7,8 @@ import { LineChart, Mode } from "./LineChart";
 import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
-export interface LineChartContainerProps extends WrapperProps, Dimensions, OnClickProps {
-    series: StaticSeriesProps[];
+export interface LineChartContainerProps extends WrapperProps, Dimensions {
+    series: SeriesProps[];
     showGrid: boolean;
     mode: Mode;
     lineColor: string;
@@ -26,7 +26,7 @@ interface LineChartContainerState {
     loading?: boolean;
 }
 
-export interface StaticSeriesProps extends DataSourceProps {
+export interface SeriesProps extends DataSourceProps, OnClickProps {
     name: string;
     mode: Mode;
     lineColor: string;
@@ -36,7 +36,7 @@ export interface StaticSeriesProps extends DataSourceProps {
 export default class LineChartContainer extends Component<LineChartContainerProps, LineChartContainerState> {
     private subscriptionHandle: number;
     private data: Plotly.ScatterData[] = [];
-    private activeStaticIndex = 0;
+    private activeSeriesIndex = 0;
 
     constructor(props: LineChartContainerProps) {
         super(props);
@@ -104,8 +104,9 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         }
     }
 
-    private handleOnClick() {
-        handleOnClick(this.props, this.props.mxObject);
+    private handleOnClick(dataObject: mendix.lib.MxObject, seriesIndex: number) {
+        const series = this.props.series[seriesIndex];
+        handleOnClick(series, dataObject);
     }
 
     private openTooltipForm(domNode: HTMLDivElement, dataObject: mendix.lib.MxObject) {
@@ -138,9 +139,9 @@ export default class LineChartContainer extends Component<LineChartContainerProp
     }
 
     private processSeriesData(data: mendix.lib.MxObject[], errorMessage?: string) {
-        const activeSeries = this.props.series[this.activeStaticIndex];
-        const isFinal = this.props.series.length === this.activeStaticIndex + 1;
-        this.activeStaticIndex = isFinal ? 0 : this.activeStaticIndex + 1;
+        const activeSeries = this.props.series[this.activeSeriesIndex];
+        const isFinal = this.props.series.length === this.activeSeriesIndex + 1;
+        this.activeSeriesIndex = isFinal ? 0 : this.activeSeriesIndex + 1;
         if (errorMessage) {
             window.mx.ui.error(errorMessage);
             this.setState({ data: [], loading: false });
@@ -152,10 +153,10 @@ export default class LineChartContainer extends Component<LineChartContainerProp
             y: parseInt(value.get(activeSeries.yValueAttribute) as string, 10) as Plotly.Datum
         }));
 
-        const lineData = {
+        const lineData: Partial<Plotly.ScatterData> = {
             connectgaps: true,
             hoveron: "points",
-            hoverinfo: this.props.tooltipForm ? "text" : "all",
+            hoverinfo: this.props.tooltipForm ? "text" : undefined,
             line: { color: activeSeries.lineColor, shape: activeSeries.lineStyle },
             mode: activeSeries.mode.replace("X", "+") as Mode,
             name: activeSeries.name,
@@ -163,10 +164,11 @@ export default class LineChartContainer extends Component<LineChartContainerProp
             fill: this.props.fill ? "tonexty" : "none",
             x: fetchedData.map(value => value.x),
             y: fetchedData.map(value => value.y),
-            mxObjects: data
-        } as Plotly.ScatterData;
+            mxObjects: data,
+            seriesIndex: this.activeSeriesIndex
+        };
 
-        this.data.push(lineData);
+        this.data.push(lineData as Plotly.ScatterData);
         if (isFinal) {
             this.setState({ data: this.data, loading: false });
         }

@@ -16,7 +16,7 @@ export interface PieChartProps extends Dimensions {
     type: ChartType;
     className?: string;
     style?: CSSProperties;
-    onClick?: () => void;
+    onClick?: (index: number) => void;
     onHover?: (node: HTMLDivElement, index: number) => void;
 }
 
@@ -92,9 +92,10 @@ export class PieChart extends Component<PieChartProps, {}> {
         }
     }
 
-    private onClick() {
+    private onClick(data: PieHoverData) {
         if (this.props.onClick) {
-            this.props.onClick();
+            const activePoint = data.points[0];
+            this.props.onClick(activePoint.pointNumber);
         }
     }
 

@@ -9,8 +9,8 @@ import { WrapperProps } from "../../utils/types";
 
 import { BarMode, ScatterData } from "plotly.js";
 
-export interface BarChartContainerProps extends WrapperProps, Dimensions, OnClickProps {
-    series: StaticSeriesProps[];
+export interface BarChartContainerProps extends WrapperProps, Dimensions {
+    series: SeriesProps[];
     showLegend: boolean;
     showGrid: boolean;
     showToolbar: boolean;
@@ -27,14 +27,14 @@ interface BarChartContainerState {
     loading?: boolean;
 }
 
-interface StaticSeriesProps extends DataSourceProps {
+interface SeriesProps extends DataSourceProps, OnClickProps {
     name: string;
 }
 
 export default class BarChartContainer extends Component<BarChartContainerProps, BarChartContainerState> {
     private subscriptionHandle: number;
     private data: ScatterData[] = [];
-    private activeStaticIndex = 0;
+    private activeSeriesIndex = 0;
 
     constructor(props: BarChartContainerProps) {
         super(props);
@@ -81,7 +81,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
                     fixedrange: true
                 },
                 showlegend: this.props.showLegend,
-                hovermode: this.props.tooltipForm ? "closest" : undefined
+                hovermode: "closest"
             },
             style: parseStyle(this.props.style),
             width: this.props.width,
@@ -103,8 +103,9 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         }
     }
 
-    private handleOnClick() {
-        handleOnClick(this.props, this.props.mxObject);
+    private handleOnClick(dataObject: mendix.lib.MxObject, seriesIndex: number) {
+        const series = this.props.series[seriesIndex];
+        handleOnClick(series, dataObject);
     }
 
     private openTooltipForm(domNode: HTMLDivElement, dataObject: mendix.lib.MxObject) {
@@ -137,9 +138,9 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
     }
 
     private processSeriesData(data: mendix.lib.MxObject[], errorMessage?: string) {
-        const activeSeries = this.props.series[this.activeStaticIndex];
-        const isFinal = this.props.series.length === this.activeStaticIndex + 1;
-        this.activeStaticIndex = isFinal ? 0 : this.activeStaticIndex + 1;
+        const activeSeries = this.props.series[this.activeSeriesIndex];
+        const isFinal = this.props.series.length === this.activeSeriesIndex + 1;
+        this.activeSeriesIndex = isFinal ? 0 : this.activeSeriesIndex + 1;
         if (errorMessage) {
             window.mx.ui.error(errorMessage);
             this.setState({ data: [], loading: false });
@@ -161,7 +162,8 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
             x: this.props.orientation === "bar" ? y : x,
             y: this.props.orientation === "bar" ? x : y,
             orientation: this.props.orientation === "bar" ? "h" : "v",
-            mxObjects: data
+            mxObjects: data,
+            seriesIndex: this.activeSeriesIndex
         } as ScatterData;
 
         this.data.push(barData);
