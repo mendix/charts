@@ -21,3 +21,5 @@ declare module "element-resize-detector" {
 
     export = elementResizeDetector;
 }
+
+declare module "*.json";

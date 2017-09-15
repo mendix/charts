@@ -1,0 +1,311 @@
+{
+  "additionalProperties": false,
+  "definitions": {},
+  "id": "plotly-layout-schema",
+  "properties": {
+    "annotations": {
+      "id": "/properties/annotations",
+      "items": {
+        "additionalProperties": false,
+        "id": "/properties/annotations/items",
+        "properties": {
+          "font": {
+            "additionalProperties": false,
+            "id": "/properties/annotations/items/properties/font",
+            "properties": {
+              "color": {
+                "id": "/properties/annotations/items/properties/font/properties/color",
+                "type": "string"
+              },
+              "family": {
+                "id": "/properties/annotations/items/properties/font/properties/family",
+                "type": "string"
+              },
+              "size": {
+                "id": "/properties/annotations/items/properties/font/properties/size",
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "showarrow": {
+            "id": "/properties/annotations/items/properties/showarrow",
+            "type": "boolean"
+          },
+          "text": {
+            "id": "/properties/annotations/items/properties/text",
+            "type": "string"
+          },
+          "x": {
+            "id": "/properties/annotations/items/properties/x",
+            "type": "number"
+          },
+          "xanchor": {
+            "id": "/properties/annotations/items/properties/xanchor",
+            "type": "string"
+          },
+          "xref": {
+            "id": "/properties/annotations/items/properties/xref",
+            "type": "string"
+          },
+          "y": {
+            "id": "/properties/annotations/items/properties/y",
+            "type": "number"
+          },
+          "yanchor": {
+            "id": "/properties/annotations/items/properties/yanchor",
+            "type": "string"
+          },
+          "yref": {
+            "id": "/properties/annotations/items/properties/yref",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "autosize": {
+      "id": "/properties/autosize",
+      "type": "boolean"
+    },
+    "height": {
+      "id": "/properties/height",
+      "type": "integer"
+    },
+    "legend": {
+      "additionalProperties": false,
+      "id": "/properties/legend",
+      "properties": {
+        "font": {
+          "additionalProperties": false,
+          "id": "/properties/legend/properties/font",
+          "properties": {
+            "size": {
+              "id": "/properties/legend/properties/font/properties/size",
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "traceorder": {
+          "id": "/properties/legend/properties/traceorder",
+          "type": "string"
+        },
+        "y": {
+          "id": "/properties/legend/properties/y",
+          "type": "number"
+        },
+        "yref": {
+          "id": "/properties/legend/properties/yref",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "margin": {
+      "additionalProperties": false,
+      "id": "/properties/margin",
+      "properties": {
+        "autoexpand": {
+          "id": "/properties/margin/properties/autoexpand",
+          "type": "boolean"
+        },
+        "l": {
+          "id": "/properties/margin/properties/l",
+          "type": "integer"
+        },
+        "r": {
+          "id": "/properties/margin/properties/r",
+          "type": "integer"
+        },
+        "t": {
+          "id": "/properties/margin/properties/t",
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "showlegend": {
+      "id": "/properties/showlegend",
+      "type": "boolean"
+    },
+    "title": {
+      "id": "/properties/title",
+      "type": "string"
+    },
+    "width": {
+      "id": "/properties/width",
+      "type": "integer"
+    },
+    "xaxis": {
+      "additionalProperties": false,
+      "id": "/properties/xaxis",
+      "properties": {
+        "autorange": {
+          "id": "/properties/xaxis/properties/autorange",
+          "type": "boolean"
+        },
+        "autotick": {
+          "id": "/properties/xaxis/properties/autotick",
+          "type": "boolean"
+        },
+        "linecolor": {
+          "id": "/properties/xaxis/properties/linecolor",
+          "type": "string"
+        },
+        "linewidth": {
+          "id": "/properties/xaxis/properties/linewidth",
+          "type": "integer"
+        },
+        "range": {
+          "id": "/properties/xaxis/properties/range",
+          "items": {
+            "id": "/properties/xaxis/properties/range/items",
+            "type": "number"
+          },
+          "type": "array"
+        },
+        "showgrid": {
+          "id": "/properties/xaxis/properties/showgrid",
+          "type": "boolean"
+        },
+        "showline": {
+          "id": "/properties/xaxis/properties/showline",
+          "type": "boolean"
+        },
+        "showticklabels": {
+          "id": "/properties/xaxis/properties/showticklabels",
+          "type": "boolean"
+        },
+        "tickcolor": {
+          "id": "/properties/xaxis/properties/tickcolor",
+          "type": "string"
+        },
+        "tickfont": {
+          "additionalProperties": false,
+          "id": "/properties/xaxis/properties/tickfont",
+          "properties": {
+            "color": {
+              "id": "/properties/xaxis/properties/tickfont/properties/color",
+              "type": "string"
+            },
+            "family": {
+              "id": "/properties/xaxis/properties/tickfont/properties/family",
+              "type": "string"
+            },
+            "size": {
+              "id": "/properties/xaxis/properties/tickfont/properties/size",
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "ticklen": {
+          "id": "/properties/xaxis/properties/ticklen",
+          "type": "integer"
+        },
+        "ticks": {
+          "id": "/properties/xaxis/properties/ticks",
+          "type": "string"
+        },
+        "tickwidth": {
+          "id": "/properties/xaxis/properties/tickwidth",
+          "type": "integer"
+        },
+        "title": {
+          "id": "/properties/xaxis/properties/title",
+          "type": "string"
+        },
+        "zeroline": {
+          "id": "/properties/xaxis/properties/zeroline",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "yaxis": {
+      "additionalProperties": false,
+      "id": "/properties/yaxis",
+      "properties": {
+        "autorange": {
+          "id": "/properties/yaxis/properties/autorange",
+          "type": "boolean"
+        },
+        "autotick": {
+          "id": "/properties/yaxis/properties/autotick",
+          "type": "boolean"
+        },
+        "linecolor": {
+          "id": "/properties/yaxis/properties/linecolor",
+          "type": "string"
+        },
+        "linewidth": {
+          "id": "/properties/yaxis/properties/linewidth",
+          "type": "integer"
+        },
+        "range": {
+          "id": "/properties/yaxis/properties/range",
+          "items": {
+            "id": "/properties/yaxis/properties/range/items",
+            "type": "number"
+          },
+          "type": "array"
+        },
+        "showline": {
+          "id": "/properties/yaxis/properties/showline",
+          "type": "boolean"
+        },
+        "showticklabels": {
+          "id": "/properties/yaxis/properties/showticklabels",
+          "type": "boolean"
+        },
+        "tickcolor": {
+          "id": "/properties/yaxis/properties/tickcolor",
+          "type": "string"
+        },
+        "tickfont": {
+          "additionalProperties": false,
+          "id": "/properties/yaxis/properties/tickfont",
+          "properties": {
+            "color": {
+              "id": "/properties/yaxis/properties/tickfont/properties/color",
+              "type": "string"
+            },
+            "family": {
+              "id": "/properties/yaxis/properties/tickfont/properties/family",
+              "type": "string"
+            },
+            "size": {
+              "id": "/properties/yaxis/properties/tickfont/properties/size",
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "ticklen": {
+          "id": "/properties/yaxis/properties/ticklen",
+          "type": "integer"
+        },
+        "ticks": {
+          "id": "/properties/yaxis/properties/ticks",
+          "type": "string"
+        },
+        "tickwidth": {
+          "id": "/properties/yaxis/properties/tickwidth",
+          "type": "integer"
+        },
+        "title": {
+          "id": "/properties/yaxis/properties/title",
+          "type": "string"
+        },
+        "zeroline": {
+          "id": "/properties/yaxis/properties/zeroline",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "type": "object"
+}

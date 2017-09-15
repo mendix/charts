@@ -7,6 +7,9 @@ import { LineChart, Mode } from "./LineChart";
 import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
+import * as dataSchema from "../data.schema.json";
+import * as layoutSchema from "../layout.schema.json";
+
 export interface LineChartContainerProps extends WrapperProps, Dimensions {
     series: SeriesProps[];
     showGrid: boolean;
@@ -18,6 +21,7 @@ export interface LineChartContainerProps extends WrapperProps, Dimensions {
     tooltipForm: string;
     xAxisLabel: string;
     yAxisLabel: string;
+    layoutOptions: string;
 }
 
 interface LineChartContainerState {
@@ -42,7 +46,11 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         super(props);
 
         this.state = {
-            alertMessage: validateSeriesProps(props.series, this.props.friendlyId),
+            alertMessage: validateSeriesProps(props.series, this.props.friendlyId, {
+                dataSchema,
+                layoutOptions: props.layoutOptions,
+                layoutSchema
+            }),
             data: [],
             loading: true
         };
@@ -80,7 +88,8 @@ export default class LineChartContainer extends Component<LineChartContainerProp
                     title: this.props.yAxisLabel,
                     showgrid: this.props.showGrid,
                     fixedrange: true
-                }
+                },
+                ...this.props.layoutOptions ? JSON.parse(this.props.layoutOptions) : {}
             },
             style: parseStyle(this.props.style),
             width: this.props.width,
@@ -152,8 +161,9 @@ export default class LineChartContainer extends Component<LineChartContainerProp
             x: value.get(activeSeries.xValueAttribute) as Plotly.Datum,
             y: parseInt(value.get(activeSeries.yValueAttribute) as string, 10) as Plotly.Datum
         }));
-
+        const rawOptions = activeSeries.seriesOptions ? JSON.parse(activeSeries.seriesOptions) : {};
         const lineData: Partial<Plotly.ScatterData> = {
+            ...rawOptions,
             connectgaps: true,
             hoveron: "points",
             hoverinfo: this.props.tooltipForm ? "text" : undefined,

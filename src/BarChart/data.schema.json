@@ -1,0 +1,101 @@
+{
+  "additionalProperties": false,
+  "definitions": {},
+  "id": "plotly-data-schema",
+  "properties": {
+    "connectgaps": {
+      "id": "/properties/connectgaps",
+      "type": "boolean"
+    },
+    "line": {
+      "additionalProperties": false,
+      "id": "/properties/line",
+      "properties": {
+        "color": {
+          "id": "/properties/line/properties/color",
+          "type": "string"
+        },
+        "dash": {
+          "id": "/properties/line/properties/dash",
+          "type": "string"
+        },
+        "shape": {
+          "id": "/properties/line/properties/shape",
+          "type": "string"
+        },
+        "width": {
+          "id": "/properties/line/properties/width",
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "marker": {
+      "additionalProperties": false,
+      "id": "/properties/marker",
+      "properties": {
+        "color": {
+          "id": "/properties/marker/properties/color",
+          "type": "string"
+        },
+        "line": {
+          "additionalProperties": false,
+          "id": "/properties/marker/properties/line",
+          "properties": {
+            "color": {
+              "id": "/properties/marker/properties/line/properties/color",
+              "type": "string"
+            },
+            "width": {
+              "id": "/properties/marker/properties/line/properties/width",
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "size": {
+          "id": "/properties/marker/properties/size",
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "mode": {
+      "id": "/properties/mode",
+      "type": "string"
+    },
+    "name": {
+      "id": "/properties/name",
+      "type": "string"
+    },
+    "text": {
+      "id": "/properties/text",
+      "items": {
+        "id": "/properties/text/items",
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "type": {
+      "id": "/properties/type",
+      "type": "string"
+    },
+    "x": {
+      "id": "/properties/x",
+      "items": {
+        "id": "/properties/x/items",
+        "type": "integer"
+      },
+      "type": "array"
+    },
+    "y": {
+      "id": "/properties/y",
+      "items": {
+        "id": "/properties/y/items",
+        "type": "integer"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}

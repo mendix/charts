@@ -7,6 +7,9 @@ import { DataSourceProps, OnClickProps, fetchSeriesData, handleOnClick, validate
 import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
+import * as dataSchema from "../data.schema.json";
+import * as layoutSchema from "../layout.schema.json";
+
 import { BarMode, ScatterData } from "plotly.js";
 
 export interface BarChartContainerProps extends WrapperProps, Dimensions {
@@ -19,6 +22,7 @@ export interface BarChartContainerProps extends WrapperProps, Dimensions {
     tooltipForm: string;
     xAxisLabel: string;
     yAxisLabel: string;
+    layoutOptions: string;
 }
 
 interface BarChartContainerState {
@@ -40,7 +44,11 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         super(props);
 
         this.state = {
-            alertMessage: validateSeriesProps(this.props.series, this.props.friendlyId),
+            alertMessage: validateSeriesProps(this.props.series, this.props.friendlyId, {
+                dataSchema,
+                layoutOptions: props.layoutOptions,
+                layoutSchema
+            }),
             loading: true,
             data: []
         };
@@ -81,7 +89,8 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
                     fixedrange: true
                 },
                 showlegend: this.props.showLegend,
-                hovermode: "closest"
+                hovermode: "closest",
+                ...this.props.layoutOptions ? JSON.parse(this.props.layoutOptions) : {}
             },
             style: parseStyle(this.props.style),
             width: this.props.width,
@@ -154,19 +163,20 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
 
         const x = fetchedData.map(value => value.x);
         const y = fetchedData.map(value => value.y);
-
-        const barData = {
+        const rawOptions = activeSeries.seriesOptions ? JSON.parse(activeSeries.seriesOptions) : {};
+        const barData: Partial<ScatterData> = {
+            ...rawOptions,
             name: activeSeries.name,
             type: "bar",
-            hoverinfo: this.props.tooltipForm ? "text" : "all",
+            hoverinfo: this.props.tooltipForm ? "text" : undefined,
             x: this.props.orientation === "bar" ? y : x,
             y: this.props.orientation === "bar" ? x : y,
             orientation: this.props.orientation === "bar" ? "h" : "v",
             mxObjects: data,
             seriesIndex: this.activeSeriesIndex
-        } as ScatterData;
+        };
 
-        this.data.push(barData);
+        this.data.push(barData as ScatterData);
         if (isFinal) {
             this.setState({ data: this.data, loading: false });
         }

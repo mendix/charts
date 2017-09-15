@@ -83,6 +83,7 @@
     "webworkify-webpack": "^2.0.5"
   },
   "dependencies": {
+    "ajv": "^5.2.2",
     "classnames": "^2.2.5",
     "element-resize-detector": "^1.1.12",
     "plotly.js": "^1.27.1"

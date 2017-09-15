@@ -6,13 +6,20 @@ import { BarChartContainerProps } from "./components/BarChartContainer";
 import { validateSeriesProps } from "../utils/data";
 import { parseStyle } from "../utils/style";
 
+import * as dataSchema from "./data.schema.json";
+import * as layoutSchema from "./layout.schema.json";
+
 // tslint:disable-next-line class-name
 export class preview extends Component<BarChartContainerProps, {}> {
     render() {
         return createElement("div", {},
             createElement(Alert, {
                 className: "widget-charts-bar-alert",
-                message: validateSeriesProps(this.props.series, this.props.friendlyId)
+                message: validateSeriesProps(this.props.series, this.props.friendlyId, {
+                    dataSchema,
+                    layoutSchema,
+                    layoutOptions: this.props.layoutOptions
+                })
             }),
             createElement(BarChart, {
                 className: this.props.class,

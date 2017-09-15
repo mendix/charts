@@ -1,4 +1,5 @@
 import { ReactElement, createElement } from "react";
+import * as Ajv from "ajv";
 
 export interface DataSourceProps {
     name: string;
@@ -9,33 +10,86 @@ export interface DataSourceProps {
     xValueAttribute: string;
     yValueAttribute: string;
     xValueSortAttribute: string;
+    seriesOptions: string;
 }
 
 export type MxObject = mendix.lib.MxObject;
 type FetchDataCallback = (objects?: mendix.lib.MxObject[], error?: string) => void;
 
 export interface OnClickProps {
-    onClickEvent: OnClickOptions;
+    onClickEvent: "doNothing" | "showPage" | "callMicroflow";
     onClickPage: string;
     onClickMicroflow: string;
 }
-type OnClickOptions = "doNothing" | "showPage" | "callMicroflow";
 
-export const validateSeriesProps = <T extends DataSourceProps>(dataSeries: T[], widgetId: string): string | ReactElement<any> => { // tslint:disable-line max-line-length
+interface AdvancedOptions {
+    dataSchema: object;
+    layoutOptions: string;
+    layoutSchema: object;
+}
+
+export const validateSeriesProps = <T extends DataSourceProps>(dataSeries: T[], widgetId: string, advanced: AdvancedOptions): string | ReactElement<any> => { // tslint:disable-line max-line-length
     if (dataSeries && dataSeries.length) {
         const errorMessage: string[] = [];
         dataSeries.forEach(series => {
             if (series.dataSourceType === "microflow" && !series.dataSourceMicroflow) {
                 errorMessage.push(`\n'Data source type' in series '${series.name}' is set to 'Microflow' but the microflow is missing.`); // tslint:disable-line max-line-length
             }
+            if (series.seriesOptions) {
+                const message = validateAdvancedSeriesOptions(series.seriesOptions, series.name, advanced.dataSchema);
+                if (message) {
+                    errorMessage.push(message);
+                }
+            }
         });
-
+        if (advanced.layoutOptions) {
+            const message = validateAdvancedLayoutOptions(advanced.layoutOptions, advanced.layoutSchema);
+            if (message) {
+                errorMessage.push(message);
+            }
+        }
         if (errorMessage.length) {
             return createElement("div", {},
                 `Configuration error in widget ${widgetId}:`,
                 errorMessage.map((message, key) => createElement("p", { key }, message))
             );
         }
+    }
+
+    return "";
+};
+
+const validateAdvancedSeriesOptions = (rawData: string, seriesName: string, schema: object): string => {
+    if (!rawData) {
+        return "";
+    }
+    const ajv = new Ajv();
+    const validate = ajv.compile(schema);
+    try {
+        if (!validate(JSON.parse(rawData))) {
+            const schemaError = ajv.errorsText(validate.errors);
+            return `Error in series "${seriesName}" advanced data configuration: ${schemaError}`;
+        }
+    } catch (error) {
+        return `Invalid options JSON for series "${seriesName}": ${error.message}`;
+    }
+
+    return "";
+};
+
+const validateAdvancedLayoutOptions = (options: string, schema: object): string => {
+    if (!options) {
+        return "";
+    }
+    const ajv = new Ajv();
+    const validate = ajv.compile(schema);
+    try {
+        if (!validate(JSON.parse(options))) {
+            const schemaError = ajv.errorsText(validate.errors);
+            return `Error in advanced layout options: ${schemaError}`;
+        }
+    } catch (error) {
+        return `Invalid layout JSON: ${error.message}`;
     }
 
     return "";

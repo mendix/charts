@@ -77,6 +77,11 @@
                         <attributeType name="DateTime"/>
                     </attributeTypes>
                 </property>
+                <property key="seriesOptions" type="string" multiline="true" required="false">
+                    <caption>Options</caption>
+                    <category>Advanced</category>
+                    <description>The Plotly series options as JSON</description>
+                </property>
                 <property key="mode" type="enumeration" defaultValue="linesXmarkers">
                     <caption>Mode</caption>
                     <category>Appearance</category>
@@ -187,6 +192,11 @@
             <caption>Height</caption>
             <category>Appearance</category>
             <description/>
+        </property>
+        <property key="layoutOptions" type="string" required="false" multiline="true">
+            <caption>Layout options</caption>
+            <category>Advanced</category>
+            <description>The JSON containing the Plotly layout options</description>
         </property>
     </properties>
 </widget>
