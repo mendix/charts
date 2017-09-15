@@ -1,6 +1,5 @@
 # Charts
-
-Plot and track your data across different charts.
+Plot and compare your data across different charts.
 
 ### Available charts
 * `BarChart`
@@ -11,16 +10,19 @@ Plot and track your data across different charts.
 * Mendix 7.6.0
 
 ## Demo projects
-[https://charts102.mxapps.io](https://charts.mxapps.io)
+[https://charts102.mxapps.io](https://charts102.mxapps.io)
 
 ## Configuration
 
-Setting up a line or (stacked) bar chart, a dataset object represents a container for a serie of datapoints. A chart can have multiple datasets(series).
+### Line & bar chart
+A line (scatter) or bar (column) chart should have one or more series, each displaying commonly grouped data points.
+Below are the available properties for configuring a series:
 
-* `name` - Caption for serie.
-* `Data Entity` - Entity containing the values.
-* `X-axis data attribute` - The attribute that contains the X value for the data point.
-* `Y-axis data attribute` - The attribute that contains the Y value for the data point.
+* `name` - Caption for series (required).
+* `Data Entity` - Entity containing the values (data points)(required).
+* `X-axis data attribute` - The attribute that contains the X value for the data point (required).
+* `Y-axis data attribute` - The attribute that contains the Y value for the data point (required).
+* `X-axis data attribute` - The attribute that contains the Y value for the data point (required).
 ## Issues, suggestions and feature requests
 We are actively maintaining this widget, please report any issues or suggestion for improvement at [https://github.com/mendixlabs/charts/issues](https://github.com/mendixlabs/charts/issues)
 
