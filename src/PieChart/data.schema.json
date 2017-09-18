@@ -1,0 +1,88 @@
+{
+  "additionalProperties": false,
+  "definitions": {},
+  "id": "plotly-pie-data-schema",
+  "properties": {
+    "domain": {
+      "id": "/properties/domain",
+      "properties": {
+        "x": {
+          "id": "/properties/domain/properties/x",
+          "items": {
+            "id": "/properties/domain/properties/x/items",
+            "type": "integer"
+          },
+          "type": "array"
+        },
+        "y": {
+          "id": "/properties/domain/properties/y",
+          "items": {
+            "id": "/properties/domain/properties/y/items",
+            "type": "integer"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "hole": {
+      "id": "/properties/hole",
+      "type": "number"
+    },
+    "hoverinfo": {
+      "id": "/properties/hoverinfo",
+      "type": "string"
+    },
+    "labels": {
+      "id": "/properties/labels",
+      "items": {
+        "id": "/properties/labels/items",
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "marker": {
+      "id": "/properties/marker",
+      "properties": {
+        "colors": {
+          "id": "/properties/marker/properties/colors",
+          "items": {
+            "id": "/properties/marker/properties/colors/items",
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "name": {
+      "id": "/properties/name",
+      "type": "string"
+    },
+    "text": {
+      "id": "/properties/text",
+      "type": "string"
+    },
+    "textinfo": {
+      "id": "/properties/textinfo",
+      "type": "string"
+    },
+    "textposition": {
+      "id": "/properties/textposition",
+      "type": "string"
+    },
+    "type": {
+      "id": "/properties/type",
+      "type": "string"
+    },
+    "values": {
+      "id": "/properties/values",
+      "items": {
+        "id": "/properties/values/items",
+        "type": "integer"
+      },
+      "type": "array"
+    }
+  },
+  "type": "object"
+}

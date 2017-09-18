@@ -1,11 +1,14 @@
-import { Component, createElement } from "react";
+import { Component, ReactElement, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
 import { PieChart } from "./PieChart";
-import { OnClickProps, fetchByMicroflow, fetchByXPath, handleOnClick } from "../../utils/data";
+import { OnClickProps, fetchByMicroflow, fetchByXPath, handleOnClick, validateAdvancedOptions } from "../../utils/data";
 import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
+
+import * as dataSchema from "../data.schema.json";
+import * as layoutSchema from "../layout.schema.json";
 
 export type ChartType = "pie" | "donut";
 
@@ -22,10 +25,12 @@ export interface PieChartContainerProps extends WrapperProps, Dimensions, OnClic
     showToolBar: boolean;
     showLegend: boolean;
     tooltipForm: string;
+    layoutOptions: string;
+    dataOptions: string;
 }
 
 interface PieChartContainerState extends PieData {
-    alertMessage?: string;
+    alertMessage?: string | ReactElement<any>;
     loading?: boolean;
 }
 
@@ -73,6 +78,7 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
             data: {
                 hole: this.props.chartType === "donut" ? 0.4 : 0,
                 hoverinfo: this.props.tooltipForm ? "none" : "label",
+                ...this.props.dataOptions ? JSON.parse(this.props.dataOptions) : {},
                 labels: this.state.labels || [],
                 marker: { colors: this.state.colors || [] },
                 type: "pie",
@@ -83,7 +89,8 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
             heightUnit: this.props.heightUnit,
             layout: {
                 autosize: true,
-                showlegend: this.props.showLegend
+                showlegend: this.props.showLegend,
+                ...this.props.layoutOptions ? JSON.parse(this.props.layoutOptions) : {}
             },
             style: parseStyle(this.props.style),
             type: this.props.chartType,
@@ -166,9 +173,30 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         }
     }
 
-    public static validateProps(props: PieChartContainerProps): string {
-        return props.dataSourceType === "microflow" && !props.dataSourceMicroflow
-            ? `Configuration error in pie chart: 'Data source type' is set to 'Microflow' but the microflow is missing`
-            : "";
+    public static validateProps(props: PieChartContainerProps): string | ReactElement<any> {
+        const errorMessage: string[] = [];
+        if (props.dataSourceType === "microflow" && !props.dataSourceMicroflow) {
+                errorMessage.push("'Data source type' is set to 'Microflow' but the microflow is missing");
+        }
+        if (props.dataOptions) {
+            const message = validateAdvancedOptions(props.dataOptions, dataSchema);
+            if (message) {
+                errorMessage.push(message);
+            }
+        }
+        if (props.layoutOptions) {
+            const message = validateAdvancedOptions(props.layoutOptions, layoutSchema);
+            if (message) {
+                errorMessage.push(message);
+            }
+        }
+        if (errorMessage.length) {
+            return createElement("div", {},
+                `Configuration error in widget ${props.friendlyId}:`,
+                errorMessage.map((message, key) => createElement("p", { key }, message))
+            );
+        }
+
+        return "";
     }
 }

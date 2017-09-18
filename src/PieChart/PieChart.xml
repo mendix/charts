@@ -142,5 +142,15 @@
             <description>The microflow that will be executed on click</description>
             <returnType type="Void"/>
         </property>
+        <property key="dataOptions" type="string" multiline="true" required="false">
+            <caption>Data options</caption>
+            <category>Advanced</category>
+            <description>The Plotly data options as JSON</description>
+        </property>
+        <property key="layoutOptions" type="string" required="false" multiline="true">
+            <caption>Layout options</caption>
+            <category>Advanced</category>
+            <description>The JSON containing the Plotly layout options</description>
+        </property>
     </properties>
 </widget>

@@ -36,14 +36,14 @@ export const validateSeriesProps = <T extends DataSourceProps>(dataSeries: T[], 
                 errorMessage.push(`\n'Data source type' in series '${series.name}' is set to 'Microflow' but the microflow is missing.`); // tslint:disable-line max-line-length
             }
             if (series.seriesOptions) {
-                const message = validateAdvancedSeriesOptions(series.seriesOptions, series.name, advanced.dataSchema);
+                const message = validateAdvancedOptions(series.seriesOptions, advanced.dataSchema as any, series.name);
                 if (message) {
                     errorMessage.push(message);
                 }
             }
         });
         if (advanced.layoutOptions) {
-            const message = validateAdvancedLayoutOptions(advanced.layoutOptions, advanced.layoutSchema);
+            const message = validateAdvancedOptions(advanced.layoutOptions, advanced.layoutSchema as any);
             if (message) {
                 errorMessage.push(message);
             }
@@ -59,7 +59,7 @@ export const validateSeriesProps = <T extends DataSourceProps>(dataSeries: T[], 
     return "";
 };
 
-const validateAdvancedSeriesOptions = (rawData: string, seriesName: string, schema: object): string => {
+export const validateAdvancedOptions = (rawData: string, schema: { id: string }, series?: string): string => {
     if (!rawData) {
         return "";
     }
@@ -68,32 +68,45 @@ const validateAdvancedSeriesOptions = (rawData: string, seriesName: string, sche
     try {
         if (!validate(JSON.parse(rawData))) {
             const schemaError = ajv.errorsText(validate.errors);
-            return `Error in series "${seriesName}" advanced data configuration: ${schemaError}`;
+
+            if (schema.id && schema.id.indexOf("data")) {
+                return series
+                    ? `Error in series "${series}" advanced data configuration: ${schemaError}`
+                    : `Error in the advanced data configurations: ${schemaError}`;
+            } else {
+                return `Error in advanced layout options: ${schemaError}`;
+            }
         }
     } catch (error) {
-        return `Invalid options JSON for series "${seriesName}": ${error.message}`;
+        if (schema.id && schema.id.indexOf("data")) {
+            return series
+                ? `Invalid options JSON for series "${series}": ${error.message}`
+                : `Invalid options JSON: ${error.message}`;
+        } else {
+            return `Invalid layout JSON: ${error.message}`;
+        }
     }
 
     return "";
 };
 
-const validateAdvancedLayoutOptions = (options: string, schema: object): string => {
-    if (!options) {
-        return "";
-    }
-    const ajv = new Ajv();
-    const validate = ajv.compile(schema);
-    try {
-        if (!validate(JSON.parse(options))) {
-            const schemaError = ajv.errorsText(validate.errors);
-            return `Error in advanced layout options: ${schemaError}`;
-        }
-    } catch (error) {
-        return `Invalid layout JSON: ${error.message}`;
-    }
-
-    return "";
-};
+// const validateAdvancedLayoutOptions = (options: string, schema: object): string => {
+//     if (!options) {
+//         return "";
+//     }
+//     const ajv = new Ajv();
+//     const validate = ajv.compile(schema);
+//     try {
+//         if (!validate(JSON.parse(options))) {
+//             const schemaError = ajv.errorsText(validate.errors);
+//             return `Error in advanced layout options: ${schemaError}`;
+//         }
+//     } catch (error) {
+//         return `Invalid layout JSON: ${error.message}`;
+//     }
+//
+//     return "";
+// };
 
 export const fetchSeriesData = <T extends DataSourceProps>(mxObject: MxObject, seriesProps: T, callback: FetchDataCallback) => { // tslint:disable max-line-length
     if (seriesProps.dataEntity) {

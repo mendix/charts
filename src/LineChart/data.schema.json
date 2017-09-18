@@ -1,7 +1,7 @@
 {
   "additionalProperties": false,
   "definitions": {},
-  "id": "plotly-data-schema",
+  "id": "plotly-line-data-schema",
   "properties": {
     "connectgaps": {
       "id": "/properties/connectgaps",
