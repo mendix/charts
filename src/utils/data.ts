@@ -1,5 +1,4 @@
 import { ReactElement, createElement } from "react";
-import * as Ajv from "ajv";
 
 export interface DataSourceProps {
     name: string;
@@ -22,13 +21,7 @@ export interface OnClickProps {
     onClickMicroflow: string;
 }
 
-interface AdvancedOptions {
-    dataSchema: object;
-    layoutOptions: string;
-    layoutSchema: object;
-}
-
-export const validateSeriesProps = <T extends DataSourceProps>(dataSeries: T[], widgetId: string, advanced: AdvancedOptions): string | ReactElement<any> => { // tslint:disable-line max-line-length
+export const validateSeriesProps = <T extends DataSourceProps>(dataSeries: T[], widgetId: string, layoutOptions: string): string | ReactElement<any> => { // tslint:disable-line max-line-length
     if (dataSeries && dataSeries.length) {
         const errorMessage: string[] = [];
         dataSeries.forEach(series => {
@@ -36,14 +29,14 @@ export const validateSeriesProps = <T extends DataSourceProps>(dataSeries: T[], 
                 errorMessage.push(`\n'Data source type' in series '${series.name}' is set to 'Microflow' but the microflow is missing.`); // tslint:disable-line max-line-length
             }
             if (series.seriesOptions) {
-                const message = validateAdvancedOptions(series.seriesOptions, advanced.dataSchema as any, series.name);
+                const message = validateAdvancedOptions(series.seriesOptions, "data", series.name);
                 if (message) {
                     errorMessage.push(message);
                 }
             }
         });
-        if (advanced.layoutOptions) {
-            const message = validateAdvancedOptions(advanced.layoutOptions, advanced.layoutSchema as any);
+        if (layoutOptions) {
+            const message = validateAdvancedOptions(layoutOptions, "layout");
             if (message) {
                 errorMessage.push(message);
             }
@@ -59,28 +52,16 @@ export const validateSeriesProps = <T extends DataSourceProps>(dataSeries: T[], 
     return "";
 };
 
-export const validateAdvancedOptions = (rawData: string, schema: { id: string }, series?: string): string => {
+export const validateAdvancedOptions = (rawData: string, usage: "data" | "layout", seriesName?: string): string => {
     if (!rawData) {
         return "";
     }
-    const ajv = new Ajv();
-    const validate = ajv.compile(schema);
     try {
-        if (!validate(JSON.parse(rawData))) {
-            const schemaError = ajv.errorsText(validate.errors);
-
-            if (schema.id && schema.id.indexOf("data")) {
-                return series
-                    ? `Error in series "${series}" advanced data configuration: ${schemaError}`
-                    : `Error in the advanced data configurations: ${schemaError}`;
-            } else {
-                return `Error in advanced layout options: ${schemaError}`;
-            }
-        }
+        JSON.parse(rawData);
     } catch (error) {
-        if (schema.id && schema.id.indexOf("data")) {
-            return series
-                ? `Invalid options JSON for series "${series}": ${error.message}`
+        if (usage === "data") {
+            return seriesName
+                ? `Invalid options JSON for series "${seriesName}": ${error.message}`
                 : `Invalid options JSON: ${error.message}`;
         } else {
             return `Invalid layout JSON: ${error.message}`;
@@ -89,24 +70,6 @@ export const validateAdvancedOptions = (rawData: string, schema: { id: string },
 
     return "";
 };
-
-// const validateAdvancedLayoutOptions = (options: string, schema: object): string => {
-//     if (!options) {
-//         return "";
-//     }
-//     const ajv = new Ajv();
-//     const validate = ajv.compile(schema);
-//     try {
-//         if (!validate(JSON.parse(options))) {
-//             const schemaError = ajv.errorsText(validate.errors);
-//             return `Error in advanced layout options: ${schemaError}`;
-//         }
-//     } catch (error) {
-//         return `Invalid layout JSON: ${error.message}`;
-//     }
-//
-//     return "";
-// };
 
 export const fetchSeriesData = <T extends DataSourceProps>(mxObject: MxObject, seriesProps: T, callback: FetchDataCallback) => { // tslint:disable max-line-length
     if (seriesProps.dataEntity) {

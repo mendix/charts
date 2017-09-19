@@ -7,9 +7,6 @@ import { DataSourceProps, OnClickProps, fetchSeriesData, handleOnClick, validate
 import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
-import * as dataSchema from "../data.schema.json";
-import * as layoutSchema from "../layout.schema.json";
-
 import { BarMode, ScatterData } from "plotly.js";
 
 export interface BarChartContainerProps extends WrapperProps, Dimensions {
@@ -28,7 +25,7 @@ export interface BarChartContainerProps extends WrapperProps, Dimensions {
 interface BarChartContainerState {
     alertMessage?: string | ReactElement<any>;
     data?: ScatterData[];
-    loading?: boolean;
+    loaded?: boolean;
 }
 
 interface SeriesProps extends DataSourceProps, OnClickProps {
@@ -36,6 +33,9 @@ interface SeriesProps extends DataSourceProps, OnClickProps {
 }
 
 export default class BarChartContainer extends Component<BarChartContainerProps, BarChartContainerState> {
+    static defaultProps: Partial<BarChartContainerProps> = {
+        orientation: "bar"
+    };
     private subscriptionHandle: number;
     private data: ScatterData[] = [];
     private activeSeriesIndex = 0;
@@ -44,12 +44,8 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         super(props);
 
         this.state = {
-            alertMessage: validateSeriesProps(this.props.series, this.props.friendlyId, {
-                dataSchema,
-                layoutOptions: props.layoutOptions,
-                layoutSchema
-            }),
-            loading: true,
+            alertMessage: validateSeriesProps(this.props.series, this.props.friendlyId, props.layoutOptions),
+            loaded: true,
             data: []
         };
         this.fetchData = this.fetchData.bind(this);
@@ -66,11 +62,12 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
             });
         }
 
-        if (this.state.loading) {
+        if (this.state.loaded) {
             return createElement(ChartLoading, { text: "Loading" });
         }
 
         return createElement(BarChart, {
+            orientation: this.props.orientation,
             className: this.props.class,
             config: { displayModeBar: this.props.showToolbar, doubleClick: false },
             height: this.props.height,
@@ -106,6 +103,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         if (!this.state.alertMessage) {
             this.fetchData(newProps.mxObject);
         }
+        console.log(newProps); // tslint:disable-line
     }
 
     componentWillUnmount() {
@@ -138,13 +136,13 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
 
     private fetchData(mxObject?: mendix.lib.MxObject) {
         this.data = [];
-        if (!this.state.loading) {
-            this.setState({ loading: true });
+        if (!this.state.loaded) {
+            this.setState({ loaded: true });
         }
         if (mxObject && this.props.series.length) {
             this.props.series.forEach(series => fetchSeriesData(mxObject, series, this.processSeriesData));
         } else {
-            this.setState({ loading: false, data: [] });
+            this.setState({ loaded: false, data: [] });
         }
     }
 
@@ -154,7 +152,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         this.activeSeriesIndex = isFinal ? 0 : this.activeSeriesIndex + 1;
         if (errorMessage) {
             window.mx.ui.error(errorMessage);
-            this.setState({ data: [], loading: false });
+            this.setState({ data: [], loaded: false });
 
             return;
         }
@@ -180,7 +178,8 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
 
         this.data.push(barData as ScatterData);
         if (isFinal) {
-            this.setState({ data: this.data, loading: false });
+            console.log("Is final!"); //tslint:disable-line
+            this.setState({ data: this.data, loaded: false });
         }
     }
 }

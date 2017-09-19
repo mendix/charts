@@ -7,9 +7,6 @@ import { LineChart, Mode } from "./LineChart";
 import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
-import * as dataSchema from "../data.schema.json";
-import * as layoutSchema from "../layout.schema.json";
-
 export interface LineChartContainerProps extends WrapperProps, Dimensions {
     series: SeriesProps[];
     showGrid: boolean;
@@ -46,11 +43,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         super(props);
 
         this.state = {
-            alertMessage: validateSeriesProps(props.series, this.props.friendlyId, {
-                dataSchema,
-                layoutOptions: props.layoutOptions,
-                layoutSchema
-            }),
+            alertMessage: validateSeriesProps(props.series, this.props.friendlyId, props.layoutOptions),
             data: [],
             loading: true
         };

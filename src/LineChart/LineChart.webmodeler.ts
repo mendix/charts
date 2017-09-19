@@ -6,20 +6,13 @@ import { LineChart } from "./components/LineChart";
 import { LineChartContainerProps } from "./components/LineChartContainer";
 import { parseStyle } from "../utils/style";
 
-import * as dataSchema from "./data.schema.json";
-import * as layoutSchema from "./layout.schema.json";
-
 // tslint:disable-next-line class-name
 export class preview extends Component<LineChartContainerProps, {}> {
     render() {
         return createElement("div", {},
             createElement(Alert, {
                 className: "widget-charts-line-alert",
-                message: validateSeriesProps(this.props.series, this.props.friendlyId, {
-                    dataSchema,
-                    layoutOptions: this.props.layoutOptions,
-                    layoutSchema
-                })
+                message: validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions)
             }),
             createElement(LineChart, {
                 className: this.props.class,

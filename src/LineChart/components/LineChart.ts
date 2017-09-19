@@ -21,7 +21,7 @@ export interface LineChartProps extends Dimensions {
 export type Mode = "lines" | "markers" | "lines+markers";
 
 export class LineChart extends Component<LineChartProps, {}> {
-    private lineChartNode: HTMLDivElement;
+    private lineChartNode?: HTMLDivElement;
     private tooltipNode: HTMLDivElement;
     private timeoutId: number;
     private data = [
@@ -81,14 +81,16 @@ export class LineChart extends Component<LineChartProps, {}> {
 
     private addResizeListener() {
         const resizeDetector = elementResize({ strategy: "scroll" });
-        if (this.lineChartNode.parentElement) {
+        if (this.lineChartNode && this.lineChartNode.parentElement) {
             resizeDetector.listenTo(this.lineChartNode.parentElement, () => {
                 if (this.timeoutId) {
                     clearTimeout(this.timeoutId);
                 }
                 this.timeoutId = setTimeout(() => {
-                    purge(this.lineChartNode);
-                    this.renderChart(this.props);
+                    if (this.lineChartNode) {
+                        purge(this.lineChartNode);
+                        this.renderChart(this.props);
+                    }
                     this.timeoutId = 0;
                 }, 100);
             });

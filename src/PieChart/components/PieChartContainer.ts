@@ -7,9 +7,6 @@ import { OnClickProps, fetchByMicroflow, fetchByXPath, handleOnClick, validateAd
 import { Dimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
-import * as dataSchema from "../data.schema.json";
-import * as layoutSchema from "../layout.schema.json";
-
 export type ChartType = "pie" | "donut";
 
 export interface PieChartContainerProps extends WrapperProps, Dimensions, OnClickProps {
@@ -181,13 +178,13 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
                 errorMessage.push("'Data source type' is set to 'Microflow' but the microflow is missing");
         }
         if (props.dataOptions) {
-            const message = validateAdvancedOptions(props.dataOptions, dataSchema);
+            const message = validateAdvancedOptions(props.dataOptions, "data");
             if (message) {
                 errorMessage.push(message);
             }
         }
         if (props.layoutOptions) {
-            const message = validateAdvancedOptions(props.layoutOptions, layoutSchema);
+            const message = validateAdvancedOptions(props.layoutOptions, "layout");
             if (message) {
                 errorMessage.push(message);
             }

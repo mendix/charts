@@ -9,6 +9,7 @@ import { Dimensions, getDimensions } from "../../utils/style";
 import "../../ui/Charts.scss";
 
 export interface BarChartProps extends Dimensions {
+    orientation: "bar" | "column";
     config?: Partial<Plotly.Config>;
     data?: Plotly.ScatterData[];
     layout?: Partial<Plotly.Layout>;
@@ -19,14 +20,15 @@ export interface BarChartProps extends Dimensions {
 }
 
 export class BarChart extends Component<BarChartProps, {}> {
-    private barChartNode: HTMLDivElement;
+    private barChartNode?: HTMLDivElement;
     private tooltipNode: HTMLDivElement;
     private timeoutId: number;
     private data: Partial<Plotly.ScatterData>[] = [
         {
             type: "bar",
-            x: [ "Sample 1", "Sample 2", "Sample 3", "Sample 4", "Sample 5", "Sample 6", "Sample 7" ],
-            y: [ 20, 14, 23, 25, 50, 32, 44 ],
+            [`${this.props.orientation === "bar" ? "y" : "x"}`]: [ "Sample 1", "Sample 2", "Sample 3", "Sample 4" ],
+            [`${this.props.orientation === "bar" ? "x" : "y"}`]: [ 20, 14, 23, 25 ],
+            orientation: this.props.orientation === "bar" ? "h" : "v",
             name: "Sample"
         }
     ];
@@ -77,14 +79,16 @@ export class BarChart extends Component<BarChartProps, {}> {
 
     private addResizeListener() {
         const resizeDetector = elementResize({ strategy: "scroll" });
-        if (this.barChartNode.parentElement) {
+        if (this.barChartNode && this.barChartNode.parentElement) {
             resizeDetector.listenTo(this.barChartNode.parentElement, () => {
                 if (this.timeoutId) {
                     clearTimeout(this.timeoutId);
                 }
                 this.timeoutId = setTimeout(() => {
-                    purge(this.barChartNode);
-                    this.renderChart(this.props);
+                    if (this.barChartNode) {
+                        purge(this.barChartNode);
+                        this.renderChart(this.props);
+                    }
                     this.timeoutId = 0;
                 }, 100);
             });

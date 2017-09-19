@@ -21,7 +21,7 @@ export interface PieChartProps extends Dimensions {
 }
 
 export class PieChart extends Component<PieChartProps, {}> {
-    private pieChartNode: HTMLDivElement;
+    private pieChartNode?: HTMLDivElement;
     private tooltipNode: HTMLDivElement;
     private timeoutId: number;
     private data: PieData = {
@@ -117,14 +117,16 @@ export class PieChart extends Component<PieChartProps, {}> {
 
     private addResizeListener() {
         const resizeDetector = elementResize({ strategy: "scroll" });
-        if (this.pieChartNode.parentElement) {
+        if (this.pieChartNode && this.pieChartNode.parentElement) {
             resizeDetector.listenTo(this.pieChartNode.parentElement, () => {
                 if (this.timeoutId) {
                     clearTimeout(this.timeoutId);
                 }
                 this.timeoutId = setTimeout(() => {
-                    purge(this.pieChartNode);
-                    this.renderChart(this.props);
+                    if (this.pieChartNode) {
+                        purge(this.pieChartNode);
+                        this.renderChart(this.props);
+                    }
                     this.timeoutId = 0;
                 }, 100);
             });
