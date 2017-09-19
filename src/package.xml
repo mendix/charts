@@ -5,12 +5,14 @@
             <widgetFile path="BarChart/BarChart.xml"/>
             <widgetFile path="ColumnChart/ColumnChart.xml"/>
             <widgetFile path="LineChart/LineChart.xml"/>
+            <widgetFile path="AreaChart/AreaChart.xml"/>
             <widgetFile path="PieChart/PieChart.xml"/>
         </widgetFiles>
         <files>
             <file path="com/mendix/widget/custom/BarChart"/>
             <file path="com/mendix/widget/custom/ColumnChart"/>
             <file path="com/mendix/widget/custom/LineChart"/>
+            <file path="com/mendix/widget/custom/AreaChart"/>
             <file path="com/mendix/widget/custom/PieChart"/>
         </files>
     </clientModule>

@@ -1,9 +1,10 @@
 import { Component, createElement } from "react";
 
 import { Alert } from "../components/Alert";
+import { LineChart } from "../LineChart/components/LineChart";
+import { LineChartContainerProps } from "../LineChart/components/LineChartContainer";
+
 import { validateSeriesProps } from "../utils/data";
-import { LineChart } from "./components/LineChart";
-import { LineChartContainerProps } from "./components/LineChartContainer";
 import { parseStyle } from "../utils/style";
 
 // tslint:disable-next-line class-name
@@ -26,11 +27,12 @@ export class preview extends Component<LineChartContainerProps, {}> {
                 },
                 data: [ {
                     connectgaps: true,
-                    mode: "lines",
+                    mode: "lines+markers",
                     name: "Sample",
                     type: "scatter",
                     x: [ 14, 20, 30, 50 ],
-                    y: [ 14, 30, 20, 40 ]
+                    y: [ 14, 30, 20, 40 ],
+                    fill: this.props.fill ? "tonexty" : "none"
                 } ] as Plotly.ScatterData[],
                 style: parseStyle(this.props.style),
                 width: this.props.width,

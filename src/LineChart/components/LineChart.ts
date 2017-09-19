@@ -24,16 +24,6 @@ export class LineChart extends Component<LineChartProps, {}> {
     private lineChartNode?: HTMLDivElement;
     private tooltipNode: HTMLDivElement;
     private timeoutId: number;
-    private data = [
-        {
-            connectgaps: true,
-            mode: "lines+markers",
-            name: "Sample",
-            type: "scatter",
-            x: [ 14, 20, 30, 50 ],
-            y: [ 14, 30, 20, 40 ]
-        }
-    ] as Plotly.ScatterData[];
 
     constructor(props: LineChartProps) {
         super(props);
@@ -98,7 +88,7 @@ export class LineChart extends Component<LineChartProps, {}> {
     }
 
     private renderChart(props: LineChartProps) {
-        const data = props.data && props.data.length ? props.data : this.data;
+        const data = props.data && props.data.length ? props.data : [];
         if (this.lineChartNode) {
             const layout = props.layout || {};
             layout.width = this.lineChartNode.clientWidth;

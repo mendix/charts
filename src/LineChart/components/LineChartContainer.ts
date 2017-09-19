@@ -35,6 +35,9 @@ export interface SeriesProps extends DataSourceProps, OnClickProps {
 }
 
 export default class LineChartContainer extends Component<LineChartContainerProps, LineChartContainerState> {
+    static defaultProps = {
+        fill: false
+    };
     private subscriptionHandle: number;
     private data: Plotly.ScatterData[] = [];
     private activeSeriesIndex = 0;

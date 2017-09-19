@@ -10,6 +10,7 @@ const widgetConfig = {
         BarChart: "./src/BarChart/components/BarChartContainer.ts",
         ColumnChart: "./src/ColumnChart/components/ColumnChartContainer.ts",
         LineChart: "./src/LineChart/components/LineChartContainer.ts",
+        AreaChart: "./src/AreaChart/components/AreaChartContainer.ts",
         PieChart: "./src/PieChart/components/PieChartContainer.ts"
     },
     output: {
