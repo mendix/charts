@@ -8,6 +8,7 @@ const widgetName = require("./package").widgetName;
 const widgetConfig = {
     entry: {
         BarChart: "./src/BarChart/components/BarChartContainer.ts",
+        ColumnChart: "./src/ColumnChart/components/ColumnChartContainer.ts",
         LineChart: "./src/LineChart/components/LineChartContainer.ts",
         PieChart: "./src/PieChart/components/PieChartContainer.ts"
     },
