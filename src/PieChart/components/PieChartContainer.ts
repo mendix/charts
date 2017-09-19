@@ -103,7 +103,9 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
 
     componentWillReceiveProps(newProps: PieChartContainerProps) {
         this.resetSubscriptions(newProps.mxObject);
-        this.fetchData(newProps.mxObject);
+        if (!this.state.alertMessage) {
+            this.fetchData(newProps.mxObject);
+        }
     }
 
     componentWillUnmount() {

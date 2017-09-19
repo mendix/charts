@@ -1,5 +1,4 @@
 {
-  "additionalProperties": false,
   "definitions": {},
   "id": "plotly-pie-data-schema",
   "properties": {

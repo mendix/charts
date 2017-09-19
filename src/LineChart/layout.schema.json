@@ -1,16 +1,13 @@
 {
-  "additionalProperties": false,
   "definitions": {},
   "id": "plotly-layout-schema",
   "properties": {
     "annotations": {
       "id": "/properties/annotations",
       "items": {
-        "additionalProperties": false,
         "id": "/properties/annotations/items",
         "properties": {
           "font": {
-            "additionalProperties": false,
             "id": "/properties/annotations/items/properties/font",
             "properties": {
               "color": {
@@ -74,11 +71,9 @@
       "type": "integer"
     },
     "legend": {
-      "additionalProperties": false,
       "id": "/properties/legend",
       "properties": {
         "font": {
-          "additionalProperties": false,
           "id": "/properties/legend/properties/font",
           "properties": {
             "size": {
@@ -104,7 +99,6 @@
       "type": "object"
     },
     "margin": {
-      "additionalProperties": false,
       "id": "/properties/margin",
       "properties": {
         "autoexpand": {
@@ -139,7 +133,6 @@
       "type": "integer"
     },
     "xaxis": {
-      "additionalProperties": false,
       "id": "/properties/xaxis",
       "properties": {
         "autorange": {
@@ -183,7 +176,6 @@
           "type": "string"
         },
         "tickfont": {
-          "additionalProperties": false,
           "id": "/properties/xaxis/properties/tickfont",
           "properties": {
             "color": {
@@ -225,7 +217,6 @@
       "type": "object"
     },
     "yaxis": {
-      "additionalProperties": false,
       "id": "/properties/yaxis",
       "properties": {
         "autorange": {
@@ -265,7 +256,6 @@
           "type": "string"
         },
         "tickfont": {
-          "additionalProperties": false,
           "id": "/properties/yaxis/properties/tickfont",
           "properties": {
             "color": {
