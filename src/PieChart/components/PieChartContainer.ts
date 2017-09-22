@@ -58,6 +58,23 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
     }
 
     render() {
+        return createElement("div", {}, this.getContent());
+    }
+
+    componentWillReceiveProps(newProps: PieChartContainerProps) {
+        this.resetSubscriptions(newProps.mxObject);
+        if (!this.state.alertMessage) {
+            this.fetchData(newProps.mxObject);
+        }
+    }
+
+    componentWillUnmount() {
+        if (this.subscriptionHandle) {
+            window.mx.data.unsubscribe(this.subscriptionHandle);
+        }
+    }
+
+    private getContent() {
         if (this.state.alertMessage) {
             return createElement(Alert, {
                 className: `widget-charts-${this.props.chartType}-alert`,
@@ -96,19 +113,6 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
             onClick: this.handleOnClick,
             onHover: this.props.tooltipForm ? this.openTooltipForm : undefined
         });
-    }
-
-    componentWillReceiveProps(newProps: PieChartContainerProps) {
-        this.resetSubscriptions(newProps.mxObject);
-        if (!this.state.alertMessage) {
-            this.fetchData(newProps.mxObject);
-        }
-    }
-
-    componentWillUnmount() {
-        if (this.subscriptionHandle) {
-            window.mx.data.unsubscribe(this.subscriptionHandle);
-        }
     }
 
     private resetSubscriptions(mxObject?: mendix.lib.MxObject) {

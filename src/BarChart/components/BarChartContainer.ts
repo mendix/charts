@@ -55,6 +55,23 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
     }
 
     render() {
+        return createElement("div", {}, this.getContent());
+    }
+
+    componentWillReceiveProps(newProps: BarChartContainerProps) {
+        this.resetSubscriptions(newProps.mxObject);
+        if (!this.state.alertMessage) {
+            this.fetchData(newProps.mxObject);
+        }
+    }
+
+    componentWillUnmount() {
+        if (this.subscriptionHandle) {
+            window.mx.data.unsubscribe(this.subscriptionHandle);
+        }
+    }
+
+    private getContent() {
         if (this.state.alertMessage) {
             return createElement(Alert, {
                 className: "widget-charts-bar-alert",
@@ -96,20 +113,6 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
             onClick: this.handleOnClick,
             onHover: this.props.tooltipForm ? this.openTooltipForm : undefined
         });
-    }
-
-    componentWillReceiveProps(newProps: BarChartContainerProps) {
-        this.resetSubscriptions(newProps.mxObject);
-        if (!this.state.alertMessage) {
-            this.fetchData(newProps.mxObject);
-        }
-        console.log(newProps); // tslint:disable-line
-    }
-
-    componentWillUnmount() {
-        if (this.subscriptionHandle) {
-            window.mx.data.unsubscribe(this.subscriptionHandle);
-        }
     }
 
     private handleOnClick(dataObject: mendix.lib.MxObject, seriesIndex: number) {

@@ -57,6 +57,23 @@ export default class LineChartContainer extends Component<LineChartContainerProp
     }
 
     render() {
+        return createElement("div", {}, this.getContent());
+    }
+
+    componentWillReceiveProps(newProps: LineChartContainerProps) {
+        this.resetSubscriptions(newProps.mxObject);
+        if (!this.state.alertMessage) {
+            this.fetchData(newProps.mxObject);
+        }
+    }
+
+    componentWillUnmount() {
+        if (this.subscriptionHandle) {
+            mx.data.unsubscribe(this.subscriptionHandle);
+        }
+    }
+
+    private getContent() {
         if (this.state.alertMessage) {
             return createElement(Alert, {
                 className: "widget-charts-line-alert",
@@ -96,19 +113,6 @@ export default class LineChartContainer extends Component<LineChartContainerProp
             onClick: this.handleOnClick,
             onHover: this.props.tooltipForm ? this.openTooltipForm : undefined
         });
-    }
-
-    componentWillReceiveProps(newProps: LineChartContainerProps) {
-        this.resetSubscriptions(newProps.mxObject);
-        if (!this.state.alertMessage) {
-            this.fetchData(newProps.mxObject);
-        }
-    }
-
-    componentWillUnmount() {
-        if (this.subscriptionHandle) {
-            mx.data.unsubscribe(this.subscriptionHandle);
-        }
     }
 
     private handleOnClick(dataObject: mendix.lib.MxObject, seriesIndex: number) {
