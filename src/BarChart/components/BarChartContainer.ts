@@ -181,7 +181,6 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
 
         this.data.push(barData as ScatterData);
         if (isFinal) {
-            console.log("Is final!"); //tslint:disable-line
             this.setState({ data: this.data, loaded: false });
         }
     }

@@ -17,10 +17,12 @@ declare module "plotly.js" {
             data: ScatterData;
             xaxis: {
                 d2p: (point: string | number) => number;
+                l2p: (point: number) => number;
                 _offset: number;
             };
             yaxis: {
-                l2p: (point: number) => number;
+                l2p: (point: number) => number; // l2p = linear-to-pixel
+                d2p: (point: string) => number;
                 _offset: number;
             };
         }>;

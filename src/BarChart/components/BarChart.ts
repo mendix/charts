@@ -120,8 +120,14 @@ export class BarChart extends Component<BarChartProps, {}> {
     private onHover(data: ScatterHoverData) {
         if (this.props.onHover) {
             const activePoint = data.points[0];
-            const positionYaxis = window.scrollY + activePoint.yaxis.l2p(activePoint.y) + activePoint.yaxis._offset;
-            const positionXaxis = window.scrollX + activePoint.xaxis.d2p(activePoint.x) + activePoint.xaxis._offset;
+            const yAxisPixels = typeof activePoint.y === "number"
+                ? activePoint.yaxis.l2p(activePoint.y)
+                : activePoint.yaxis.d2p(activePoint.y);
+            const xAxisPixels = typeof activePoint.x === "number"
+                ? activePoint.xaxis.l2p(activePoint.x as number)
+                : activePoint.xaxis.d2p(activePoint.x);
+            const positionYaxis = yAxisPixels + activePoint.yaxis._offset;
+            const positionXaxis = xAxisPixels + activePoint.xaxis._offset;
             this.tooltipNode.style.top = `${positionYaxis}px`;
             this.tooltipNode.style.left = `${positionXaxis}px`;
             this.tooltipNode.style.opacity = "1";

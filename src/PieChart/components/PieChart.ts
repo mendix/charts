@@ -103,8 +103,8 @@ export class PieChart extends Component<PieChartProps, {}> {
         if (this.props.onHover) {
             const activePoint = data.points[0];
             this.tooltipNode.innerHTML = "";
-            this.tooltipNode.style.top = `${data.event.pageY - 100}px`;
-            this.tooltipNode.style.left = `${data.event.pageX - 60}px`;
+            this.tooltipNode.style.top = `${data.event.clientY - 100}px`;
+            this.tooltipNode.style.left = `${data.event.clientX}px`;
             this.tooltipNode.style.opacity = "1";
             this.props.onHover(this.tooltipNode, activePoint.pointNumber);
         }

@@ -112,8 +112,8 @@ export class LineChart extends Component<LineChartProps, {}> {
     private onHover(data: ScatterHoverData) {
         if (this.props.onHover) {
             const activePoint = data.points[0];
-            const positionYaxis = window.scrollY + activePoint.yaxis.l2p(activePoint.y) + activePoint.yaxis._offset;
-            const positionXaxis = window.scrollX + activePoint.xaxis.d2p(activePoint.x) + activePoint.xaxis._offset;
+            const positionYaxis = activePoint.yaxis.l2p(activePoint.y) + activePoint.yaxis._offset;
+            const positionXaxis = activePoint.xaxis.d2p(activePoint.x) + activePoint.xaxis._offset;
             this.tooltipNode.style.top = `${positionYaxis}px`;
             this.tooltipNode.style.left = `${positionXaxis}px`;
             this.tooltipNode.style.opacity = "1";
