@@ -13,7 +13,6 @@ export interface DataSourceProps {
 }
 
 export type MxObject = mendix.lib.MxObject;
-type FetchDataCallback = (objects?: mendix.lib.MxObject[], error?: string) => void;
 
 export interface OnClickProps {
     onClickEvent: "doNothing" | "showPage" | "callMicroflow";
@@ -71,39 +70,49 @@ export const validateAdvancedOptions = (rawData: string, usage: "data" | "layout
     return "";
 };
 
-export const fetchSeriesData = <T extends DataSourceProps>(mxObject: MxObject, seriesProps: T, callback: FetchDataCallback) => { // tslint:disable max-line-length
-    if (seriesProps.dataEntity) {
-        if (seriesProps.dataSourceType === "XPath") {
-            fetchByXPath(mxObject.getGuid(), seriesProps.dataEntity, seriesProps.entityConstraint, callback, seriesProps.xValueSortAttribute);
-        } else if (seriesProps.dataSourceType === "microflow" && seriesProps.dataSourceMicroflow) {
-            fetchByMicroflow(seriesProps.dataSourceMicroflow, mxObject.getGuid(), callback);
-        }
-    } else {
-        callback();
-    }
-};
-
-export const fetchByXPath = (guid: string, entity: string, constraint: string, callback: FetchDataCallback, sortBy?: string) => {
-    const entityPath = entity.split("/");
-    const entityName = entityPath.length > 1 ? entityPath[entityPath.length - 1] : entity;
-    const xpath = "//" + entityName + (constraint ? constraint.replace("[%CurrentObject%]", guid) : "");
-    const errorMessage = `An error occurred while retrieving data via XPath (${xpath}): `;
-    window.mx.data.get({
-        callback: mxObjects => callback(mxObjects),
-        error: error => callback(undefined, `${errorMessage} ${error.message}`),
-        xpath,
-        filter: {
-            sort: sortBy ? [ [ sortBy, "asc" ] ] : []
+export const fetchSeriesData = <T extends DataSourceProps>(mxObject: MxObject, series: T): Promise<any> => { // tslint:disable max-line-length
+    return new Promise((resolve, reject) => {
+        if (series.dataEntity) {
+            if (series.dataSourceType === "XPath") {
+                fetchByXPath(mxObject.getGuid(), series.dataEntity, series.entityConstraint, series.xValueSortAttribute)
+                    .then(mxObjects => resolve({ data: mxObjects, series }))
+                    .catch(reject);
+            } else if (series.dataSourceType === "microflow" && series.dataSourceMicroflow) {
+                fetchByMicroflow(series.dataSourceMicroflow, mxObject.getGuid())
+                    .then(mxObjects => resolve({ data: mxObjects, series }))
+                    .catch(reject);
+            }
+        } else {
+            resolve();
         }
     });
 };
 
-export const fetchByMicroflow = (actionname: string, guid: string, callback: FetchDataCallback) => {
-    const errorMessage = `An error occurred while retrieving data by microflow (${actionname}): `;
-    mx.ui.action(actionname, {
-        callback: mxObjects => callback(mxObjects as MxObject[]),
-        error: error => callback(undefined, `${errorMessage} ${error.message}`),
-        params: { applyto: "selection", guids: [ guid ] }
+export const fetchByXPath = (guid: string, entity: string, constraint: string, sortBy?: string): Promise<MxObject[]> => {
+    return new Promise((resolve, reject) => {
+        const entityPath = entity.split("/");
+        const entityName = entityPath.length > 1 ? entityPath[entityPath.length - 1] : entity;
+        const xpath = "//" + entityName + (constraint ? constraint.replace("[%CurrentObject%]", guid) : "");
+        const errorMessage = `An error occurred while retrieving data via XPath (${xpath}): `;
+        window.mx.data.get({
+            callback: resolve,
+            error: error => reject(`${errorMessage} ${error.message}`),
+            xpath,
+            filter: {
+                sort: sortBy ? [ [ sortBy, "asc" ] ] : []
+            }
+        });
+    });
+};
+
+export const fetchByMicroflow = (actionname: string, guid: string): Promise<MxObject[]> => {
+    return new Promise((resolve, reject) => {
+        const errorMessage = `An error occurred while retrieving data by microflow (${actionname}): `;
+        mx.ui.action(actionname, {
+            callback: mxObjects => resolve(mxObjects as MxObject[]),
+            error: error => reject(`${errorMessage} ${error.message}`),
+            params: { applyto: "selection", guids: [ guid ] }
+        });
     });
 };
 

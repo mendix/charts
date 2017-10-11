@@ -1,10 +1,8 @@
 import { Component, ReactElement, createElement } from "react";
 
-import { Alert } from "../../components/Alert";
-import { ChartLoading } from "../../components/ChartLoading";
 import { PieChart } from "./PieChart";
 import { OnClickProps, fetchByMicroflow, fetchByXPath, handleOnClick, validateAdvancedOptions } from "../../utils/data";
-import { Dimensions, parseStyle } from "../../utils/style";
+import { Dimensions } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
 export type ChartType = "pie" | "donut";
@@ -19,23 +17,17 @@ export interface PieChartContainerProps extends WrapperProps, Dimensions, OnClic
     valueAttribute: string;
     sortAttribute: string;
     chartType: ChartType;
-    showToolBar: boolean;
+    showToolbar: boolean;
     showLegend: boolean;
     tooltipForm: string;
     layoutOptions: string;
     dataOptions: string;
 }
 
-interface PieChartContainerState extends PieData {
+interface PieChartContainerState {
     alertMessage?: string | ReactElement<any>;
+    data: mendix.lib.MxObject[];
     loading?: boolean;
-}
-
-export interface PieData {
-    colors?: string[];
-    labels?: string[];
-    values?: number[];
-    data?: mendix.lib.MxObject[];
 }
 
 export default class PieChartContainer extends Component<PieChartContainerProps, PieChartContainerState> {
@@ -45,14 +37,11 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         super(props);
 
         this.state = {
+            data: [],
             alertMessage: PieChartContainer.validateProps(this.props),
-            colors: [],
-            labels: [],
-            values: [],
             loading: true
         };
         this.fetchData = this.fetchData.bind(this);
-        this.processData = this.processData.bind(this);
         this.handleOnClick = this.handleOnClick.bind(this);
         this.openTooltipForm = this.openTooltipForm.bind(this);
     }
@@ -75,41 +64,11 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
     }
 
     private getContent() {
-        if (this.state.alertMessage) {
-            return createElement(Alert, {
-                className: `widget-charts-${this.props.chartType}-alert`,
-                message: this.state.alertMessage
-            });
-        }
-
-        if (this.state.loading) {
-            return createElement(ChartLoading, { text: "Loading" });
-        }
-
         return createElement(PieChart, {
-            className: this.props.class,
-            config: { displayModeBar: this.props.showToolBar, doubleClick: false },
-            data: {
-                hole: this.props.chartType === "donut" ? 0.4 : 0,
-                hoverinfo: this.props.tooltipForm ? "none" : "label",
-                ...this.props.dataOptions ? JSON.parse(this.props.dataOptions) : {},
-                labels: this.state.labels || [],
-                marker: { colors: this.state.colors || [] },
-                type: "pie",
-                values: this.state.values || [],
-                sort: false
-            },
-            height: this.props.height,
-            heightUnit: this.props.heightUnit,
-            layout: {
-                autosize: true,
-                showlegend: this.props.showLegend,
-                ...this.props.layoutOptions ? JSON.parse(this.props.layoutOptions) : {}
-            },
-            style: parseStyle(this.props.style),
-            type: this.props.chartType,
-            width: this.props.width,
-            widthUnit: this.props.widthUnit,
+            ...this.props,
+            alertMessage: this.state.alertMessage,
+            loading: this.state.loading,
+            data: this.state.data,
             onClick: this.handleOnClick,
             onHover: this.props.tooltipForm ? this.openTooltipForm : undefined
         });
@@ -135,29 +94,23 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         const { dataEntity, dataSourceMicroflow, dataSourceType, entityConstraint, sortAttribute } = this.props;
         if (mxObject && dataEntity) {
             if (dataSourceType === "XPath") {
-                fetchByXPath(mxObject.getGuid(), dataEntity, entityConstraint, this.processData, sortAttribute);
+                fetchByXPath(mxObject.getGuid(), dataEntity, entityConstraint, sortAttribute)
+                    .then(data => this.setState({ data, loading: false }))
+                    .catch(reason => {
+                        window.mx.ui.error(`An error occurred while retrieving chart data: ${reason}`);
+                        this.setState({ data: [], loading: false });
+                    });
             } else if (dataSourceType === "microflow" && dataSourceMicroflow) {
-                fetchByMicroflow(dataSourceMicroflow, mxObject.getGuid(), this.processData);
+                fetchByMicroflow(dataSourceMicroflow, mxObject.getGuid())
+                    .then(data => this.setState({ data, loading: false }))
+                    .catch(reason => {
+                        window.mx.ui.error(`An error occurred while retrieving chart data: ${reason}`);
+                        this.setState({ data: [], loading: false });
+                    });
             }
         } else {
-            this.setState({ loading: false, colors: [], labels: [], values: [] });
+            this.setState({ loading: false, data: [] });
         }
-    }
-
-    private processData(data: mendix.lib.MxObject[], error?: string) {
-        if (error) {
-            window.mx.ui.error(`An error occurred while retrieving chart data: ${error}`);
-            this.setState({ colors: [], labels: [], values: [], loading: false });
-
-            return;
-        }
-        this.setState({
-            colors: data.map(value => value.get(this.props.colorAttribute) as string),
-            labels: data.map(value => value.get(this.props.nameAttribute) as string),
-            values: data.map(value => parseFloat(value.get(this.props.valueAttribute) as string)),
-            data,
-            loading: false
-        });
     }
 
     private handleOnClick(index: number) {

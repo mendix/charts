@@ -1,10 +1,8 @@
 import { Component, ReactElement, createElement } from "react";
 
-import { Alert } from "../../components/Alert";
-import { ChartLoading } from "../../components/ChartLoading";
 import { DataSourceProps, OnClickProps, fetchSeriesData, handleOnClick, validateSeriesProps } from "../../utils/data";
-import { LineChart, Mode } from "./LineChart";
-import { Dimensions, parseStyle } from "../../utils/style";
+import { Data, LineChart, Mode } from "./LineChart";
+import { Dimensions } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
 export interface LineChartContainerProps extends WrapperProps, Dimensions {
@@ -13,7 +11,7 @@ export interface LineChartContainerProps extends WrapperProps, Dimensions {
     mode: Mode;
     lineColor: string;
     fill: boolean;
-    showToolBar: boolean;
+    showToolbar: boolean;
     showLegend: boolean;
     tooltipForm: string;
     xAxisLabel: string;
@@ -23,7 +21,9 @@ export interface LineChartContainerProps extends WrapperProps, Dimensions {
 
 interface LineChartContainerState {
     alertMessage?: string | ReactElement<any>;
-    data?: Plotly.ScatterData[];
+    data?: Data[];
+    series: SeriesProps[];
+    layoutOptions: object;
     loading?: boolean;
 }
 
@@ -39,30 +39,41 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         fill: false
     };
     private subscriptionHandle: number;
-    private data: Plotly.ScatterData[] = [];
-    private activeSeriesIndex = 0;
 
     constructor(props: LineChartContainerProps) {
         super(props);
 
+        const alertMessage = validateSeriesProps(props.series, this.props.friendlyId, props.layoutOptions);
         this.state = {
-            alertMessage: validateSeriesProps(props.series, this.props.friendlyId, props.layoutOptions),
+            alertMessage,
             data: [],
+            series: props.series.slice(),
+            layoutOptions: props.layoutOptions ? JSON.parse(props.layoutOptions) : {},
             loading: true
         };
         this.fetchData = this.fetchData.bind(this);
-        this.processSeriesData = this.processSeriesData.bind(this);
         this.handleOnClick = this.handleOnClick.bind(this);
         this.openTooltipForm = this.openTooltipForm.bind(this);
+        this.updateChart = this.updateChart.bind(this);
     }
 
     render() {
-        return createElement("div", {}, this.getContent());
+        return createElement(LineChart, {
+            ... this.props,
+            data: this.state.data,
+            loading: this.state.loading,
+            alertMessage: this.state.alertMessage,
+            onClick: this.handleOnClick,
+            onHover: this.props.tooltipForm ? this.openTooltipForm : undefined
+        });
     }
 
     componentWillReceiveProps(newProps: LineChartContainerProps) {
         this.resetSubscriptions(newProps.mxObject);
         if (!this.state.alertMessage) {
+            if (!this.state.loading) {
+                this.setState({ loading: true });
+            }
             this.fetchData(newProps.mxObject);
         }
     }
@@ -73,50 +84,13 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         }
     }
 
-    private getContent() {
-        if (this.state.alertMessage) {
-            return createElement(Alert, {
-                className: "widget-charts-line-alert",
-                message: this.state.alertMessage
-            });
-        }
-
-        if (this.state.loading) {
-            return createElement(ChartLoading, { text: "Loading" });
-        }
-
-        return createElement(LineChart, {
-            className: this.props.class,
-            config: { displayModeBar: this.props.showToolBar, doubleClick: false },
-            layout: {
-                autosize: true,
-                hovermode: this.props.tooltipForm ? "closest" : undefined,
-                showlegend: this.props.showLegend,
-                xaxis: {
-                    title: this.props.xAxisLabel,
-                    showgrid: this.props.showGrid,
-                    fixedrange: true
-                },
-                yaxis: {
-                    title: this.props.yAxisLabel,
-                    showgrid: this.props.showGrid,
-                    fixedrange: true
-                },
-                ...this.props.layoutOptions ? JSON.parse(this.props.layoutOptions) : {}
-            },
-            style: parseStyle(this.props.style),
-            width: this.props.width,
-            height: this.props.height,
-            widthUnit: this.props.widthUnit,
-            heightUnit: this.props.heightUnit,
-            data: this.state.data,
-            onClick: this.handleOnClick,
-            onHover: this.props.tooltipForm ? this.openTooltipForm : undefined
-        });
+    private updateChart(layoutOptions: object, series: SeriesProps[]) {
+        this.setState({ layoutOptions, series });
+        this.fetchData(this.props.mxObject);
     }
 
     private handleOnClick(dataObject: mendix.lib.MxObject, seriesIndex: number) {
-        const series = this.props.series[seriesIndex];
+        const series = this.state.series[seriesIndex];
         handleOnClick(series, dataObject);
     }
 
@@ -138,51 +112,16 @@ export default class LineChartContainer extends Component<LineChartContainerProp
     }
 
     private fetchData(mxObject?: mendix.lib.MxObject) {
-        this.data = [];
-        if (!this.state.loading) {
-            this.setState({ loading: true });
-        }
-        if (mxObject && this.props.series.length) {
-            this.props.series.forEach(series => fetchSeriesData(mxObject, series, this.processSeriesData));
+        if (mxObject && this.state.series.length) {
+            Promise.all(this.state.series.map(series => fetchSeriesData(mxObject, series)))
+                .then(data => {
+                    this.setState({ loading: false, data });
+                }).catch(reason => {
+                    window.mx.ui.error(reason);
+                    this.setState({ data: [], loading: false });
+                });
         } else {
             this.setState({ loading: false, data: [] });
-        }
-    }
-
-    private processSeriesData(data: mendix.lib.MxObject[], errorMessage?: string) {
-        const activeSeries = this.props.series[this.activeSeriesIndex];
-        const isFinal = this.props.series.length === this.activeSeriesIndex + 1;
-        this.activeSeriesIndex = isFinal ? 0 : this.activeSeriesIndex + 1;
-        if (errorMessage) {
-            window.mx.ui.error(errorMessage);
-            this.setState({ data: [], loading: false });
-
-            return;
-        }
-        const fetchedData = data.map(value => ({
-            x: value.get(activeSeries.xValueAttribute) as Plotly.Datum,
-            y: parseInt(value.get(activeSeries.yValueAttribute) as string, 10) as Plotly.Datum
-        }));
-        const rawOptions = activeSeries.seriesOptions ? JSON.parse(activeSeries.seriesOptions) : {};
-        const lineData: Partial<Plotly.ScatterData> = {
-            ...rawOptions,
-            connectgaps: true,
-            hoveron: "points",
-            hoverinfo: this.props.tooltipForm ? "text" : undefined,
-            line: { color: activeSeries.lineColor, shape: activeSeries.lineStyle },
-            mode: activeSeries.mode.replace("X", "+") as Mode,
-            name: activeSeries.name,
-            type: "scatter",
-            fill: this.props.fill ? "tonexty" : "none",
-            x: fetchedData.map(value => value.x),
-            y: fetchedData.map(value => value.y),
-            mxObjects: data,
-            seriesIndex: this.activeSeriesIndex
-        };
-
-        this.data.push(lineData as Plotly.ScatterData);
-        if (isFinal) {
-            this.setState({ data: this.data, loading: false });
         }
     }
 }

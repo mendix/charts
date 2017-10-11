@@ -11,6 +11,7 @@ declare module "plotly.js/dist/plotly-basic" {
 declare module "element-resize-detector" {
     interface ResizeDetector {
         listenTo: (element: HTMLElement, callback: () => void) => void;
+        removeListener: (element: HTMLElement, callback: () => void) => void;
     }
 
     interface ResizeOptions {

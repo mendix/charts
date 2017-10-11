@@ -1,37 +1,34 @@
-import { Component, createElement } from "react";
+import { Component, ReactElement, createElement } from "react";
 import * as classNames from "classnames";
 
+import { Alert } from "../../components/Alert";
+import { BarChartContainerProps, SeriesProps } from "./BarChartContainer";
 import * as elementResize from "element-resize-detector";
-import { ScatterHoverData } from "plotly.js";
+import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
 import { newPlot, purge } from "../../PlotlyCustom";
-import { Dimensions, getDimensions } from "../../utils/style";
+import { getDimensions, parseStyle } from "../../utils/style";
 
 import "../../ui/Charts.scss";
+import { ChartLoading } from "../../components/ChartLoading";
 
-export interface BarChartProps extends Dimensions {
-    orientation: "bar" | "column";
-    config?: Partial<Plotly.Config>;
-    data?: Plotly.ScatterData[];
-    layout?: Partial<Plotly.Layout>;
-    className?: string;
-    style?: object;
+export interface BarChartProps extends BarChartContainerProps {
+    alertMessage?: string | ReactElement<any>;
+    loading?: boolean;
+    data?: Data[];
+    defaultData?: ScatterData[];
     onClick?: (dataObject: mendix.lib.MxObject, seriesIndex: number) => void;
     onHover?: (node: HTMLDivElement, dataObject: mendix.lib.MxObject) => void;
+}
+
+export interface Data {
+    data: mendix.lib.MxObject[];
+    series: SeriesProps;
 }
 
 export class BarChart extends Component<BarChartProps, {}> {
     private barChartNode?: HTMLDivElement;
     private tooltipNode: HTMLDivElement;
     private timeoutId: number;
-    private data: Partial<Plotly.ScatterData>[] = [
-        {
-            type: "bar",
-            [`${this.props.orientation === "bar" ? "y" : "x"}`]: [ "Sample 1", "Sample 2", "Sample 3", "Sample 4" ],
-            [`${this.props.orientation === "bar" ? "x" : "y"}`]: [ 20, 14, 23, 25 ],
-            orientation: this.props.orientation === "bar" ? "h" : "v",
-            name: "Sample"
-        }
-    ];
 
     constructor(props: BarChartProps) {
         super(props);
@@ -41,26 +38,42 @@ export class BarChart extends Component<BarChartProps, {}> {
         this.onClick = this.onClick.bind(this);
         this.onHover = this.onHover.bind(this);
         this.clearToolTip = this.clearToolTip.bind(this);
+        this.onResize = this.onResize.bind(this);
     }
 
     render() {
+        if (this.props.alertMessage) {
+            return createElement(Alert, {
+                className: "widget-charts-bar-alert",
+                message: this.props.alertMessage
+            });
+        }
+        if (this.props.loading) {
+            return createElement(ChartLoading, { text: "Loading" });
+        }
+
         return createElement("div",
             {
-                className: classNames("widget-charts-bar", this.props.className),
+                className: classNames("widget-charts-bar", this.props.class),
                 ref: this.getPlotlyNodeRef,
-                style: { ...getDimensions(this.props), ...this.props.style }
+                style: { ...getDimensions(this.props), ...parseStyle(this.props.style) }
             },
             createElement("div", { className: "widget-charts-tooltip", ref: this.getTooltipNodeRef })
         );
     }
 
     componentDidMount() {
-        this.renderChart(this.props);
-        this.addResizeListener();
+        if (!this.props.loading) {
+            this.renderChart(this.props);
+            this.addResizeListener();
+        }
     }
 
-    componentWillReceiveProps(newProps: BarChartProps) {
-        this.renderChart(newProps);
+    componentDidUpdate(previousProps: BarChartProps) {
+        if (previousProps.loading && !this.props.loading) {
+            this.renderChart(this.props);
+            this.addResizeListener();
+        }
     }
 
     componentWillUnmount() {
@@ -80,34 +93,72 @@ export class BarChart extends Component<BarChartProps, {}> {
     private addResizeListener() {
         const resizeDetector = elementResize({ strategy: "scroll" });
         if (this.barChartNode && this.barChartNode.parentElement) {
-            resizeDetector.listenTo(this.barChartNode.parentElement, () => {
-                if (this.timeoutId) {
-                    clearTimeout(this.timeoutId);
-                }
-                this.timeoutId = setTimeout(() => {
-                    if (this.barChartNode) {
-                        purge(this.barChartNode);
-                        this.renderChart(this.props);
-                    }
-                    this.timeoutId = 0;
-                }, 100);
-            });
+            resizeDetector.listenTo(this.barChartNode.parentElement, this.onResize);
         }
     }
 
     private renderChart(props: BarChartProps) {
         if (this.barChartNode) {
-            const data = props.data && props.data.length ? props.data : this.data;
-            const layout = props.layout || {};
-            layout.width = this.barChartNode.clientWidth;
-            layout.height = this.barChartNode.clientHeight;
-            newPlot(this.barChartNode, data, layout, props.config)
+            newPlot(this.barChartNode, this.getData(props), this.getLayoutOptions(props), this.getConfigOptions(props))
                 .then(myPlot => {
                     myPlot.on("plotly_click", this.onClick);
                     myPlot.on("plotly_hover", this.onHover);
                     myPlot.on("plotly_unhover", this.clearToolTip);
                 });
         }
+    }
+
+    private getLayoutOptions(props: BarChartProps): Partial<Layout> {
+        return {
+            autosize: true,
+            barmode: props.barMode,
+            xaxis: {
+                showgrid: props.showGrid,
+                title: props.xAxisLabel,
+                fixedrange: true
+            },
+            yaxis: {
+                showgrid: props.showGrid,
+                title: props.yAxisLabel,
+                fixedrange: true
+            },
+            showlegend: props.showLegend,
+            hovermode: "closest",
+            ...props.layoutOptions ? JSON.parse(props.layoutOptions) : {},
+            width: this.barChartNode && this.barChartNode.clientWidth,
+            height: this.barChartNode && this.barChartNode.clientHeight
+        };
+    }
+
+    private getConfigOptions(props: BarChartProps): Partial<Config> {
+        return { displayModeBar: props.showToolbar, doubleClick: false };
+    }
+
+    private getData(props: BarChartProps): ScatterData[] {
+        if (props.data) {
+            return props.data.map(data => {
+                const values = data.data.map(value => ({
+                    x: value.get(data.series.xValueAttribute) as Plotly.Datum,
+                    y: parseInt(value.get(data.series.yValueAttribute) as string, 10) as Plotly.Datum
+                }));
+                const x = values.map(value => value.x);
+                const y = values.map(value => value.y);
+                const rawOptions = data.series.seriesOptions ? JSON.parse(data.series.seriesOptions) : {};
+
+                return {
+                    ...rawOptions,
+                    name: data.series.name,
+                    type: "bar",
+                    hoverinfo: this.props.tooltipForm ? "text" : undefined,
+                    x: this.props.orientation === "bar" ? y : x,
+                    y: this.props.orientation === "bar" ? x : y,
+                    orientation: this.props.orientation === "bar" ? "h" : "v",
+                    mxObjects: data.data
+                };
+            });
+        }
+
+        return props.defaultData || [];
     }
 
     private onClick(data: ScatterHoverData) {
@@ -138,5 +189,18 @@ export class BarChart extends Component<BarChartProps, {}> {
     private clearToolTip() {
         this.tooltipNode.innerHTML = "";
         this.tooltipNode.style.opacity = "0";
+    }
+
+    private onResize() {
+        if (this.timeoutId) {
+            clearTimeout(this.timeoutId);
+        }
+        this.timeoutId = setTimeout(() => {
+            if (this.barChartNode) {
+                purge(this.barChartNode);
+                this.renderChart(this.props);
+            }
+            this.timeoutId = 0;
+        }, 100);
     }
 }

@@ -1,8 +1,8 @@
 import { Component, createElement } from "react";
 
 import { Alert } from "../components/Alert";
-import { BarChart } from "./components/BarChart";
-import { BarChartContainerProps } from "./components/BarChartContainer";
+import { BarChart } from "../BarChart/components/BarChart";
+import { BarChartContainerProps } from "../BarChart/components/BarChartContainer";
 import { validateSeriesProps } from "../utils/data";
 import { ScatterData } from "plotly.js";
 
@@ -21,7 +21,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
     render() {
         return createElement("div", {},
             createElement(Alert, {
-                className: "widget-charts-bar-alert",
+                className: "widget-charts-column-alert",
                 message: validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions)
             }),
             createElement(BarChart, {

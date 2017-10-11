@@ -4,7 +4,7 @@ import { Alert } from "../components/Alert";
 import { validateSeriesProps } from "../utils/data";
 import { LineChart } from "./components/LineChart";
 import { LineChartContainerProps } from "./components/LineChartContainer";
-import { parseStyle } from "../utils/style";
+import { ScatterData } from "plotly.js";
 
 // tslint:disable-next-line class-name
 export class preview extends Component<LineChartContainerProps, {}> {
@@ -15,28 +15,11 @@ export class preview extends Component<LineChartContainerProps, {}> {
                 message: validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions)
             }),
             createElement(LineChart, {
-                className: this.props.class,
-                config: { displayModeBar: this.props.showToolBar, doubleClick: false },
-                layout: {
-                    autosize: true,
-                    hovermode: this.props.tooltipForm ? "closest" : undefined,
-                    showlegend: this.props.showLegend,
-                    xaxis: { showgrid: this.props.showGrid, title: this.props.xAxisLabel },
-                    yaxis: { showgrid: this.props.showGrid, title: this.props.yAxisLabel }
-                },
-                data: [ {
-                    connectgaps: true,
-                    mode: "lines",
-                    name: "Sample",
-                    type: "scatter",
+                ...this.props,
+                defaultData: [ {
                     x: [ 14, 20, 30, 50 ],
                     y: [ 14, 30, 20, 40 ]
-                } ] as Plotly.ScatterData[],
-                style: parseStyle(this.props.style),
-                width: this.props.width,
-                height: this.props.height,
-                widthUnit: this.props.widthUnit,
-                heightUnit: this.props.heightUnit
+                } as ScatterData ]
             })
         );
     }

@@ -1,21 +1,21 @@
-import { CSSProperties, Component, createElement } from "react";
+import { Component, ReactElement, createElement } from "react";
 import * as classNames from "classnames";
 import { newPlot, purge } from "../../PlotlyCustom";
 
+import { Alert } from "../../components/Alert";
+import { ChartLoading } from "../../components/ChartLoading";
 import * as elementResize from "element-resize-detector";
-import { PieData, PieHoverData } from "plotly.js";
-import { ChartType } from "./PieChartContainer";
-import { Dimensions, getDimensions } from "../../utils/style";
+import { Config, Layout, PieData, PieHoverData } from "plotly.js";
+import { PieChartContainerProps } from "./PieChartContainer";
+import { getDimensions, parseStyle } from "../../utils/style";
 
 import "../../ui/Charts.scss";
 
-export interface PieChartProps extends Dimensions {
-    config?: Partial<Plotly.Config>;
-    data?: PieData;
-    layout?: Partial<Plotly.Layout>;
-    type: ChartType;
-    className?: string;
-    style?: CSSProperties;
+export interface PieChartProps extends PieChartContainerProps {
+    data?: mendix.lib.MxObject[];
+    defaultData?: PieData[];
+    alertMessage?: string | ReactElement<any>;
+    loading?: boolean;
     onClick?: (index: number) => void;
     onHover?: (node: HTMLDivElement, index: number) => void;
 }
@@ -24,14 +24,7 @@ export class PieChart extends Component<PieChartProps, {}> {
     private pieChartNode?: HTMLDivElement;
     private tooltipNode: HTMLDivElement;
     private timeoutId: number;
-    private data: PieData = {
-        hole: this.props.type === "donut" ? 0.4 : 0,
-        hoverinfo: "label+name",
-        labels: [ "US", "China", "European Union", "Russian Federation", "Brazil", "India", "Rest of World" ],
-        name: "GHG Emissions",
-        type: "pie",
-        values: [ 16, 15, 12, 6, 5, 4, 42 ]
-    };
+    private resizeDetector = elementResize({ strategy: "scroll" });
 
     constructor(props: PieChartProps) {
         super(props);
@@ -41,26 +34,42 @@ export class PieChart extends Component<PieChartProps, {}> {
         this.onClick = this.onClick.bind(this);
         this.onHover = this.onHover.bind(this);
         this.clearToolTip = this.clearToolTip.bind(this);
+        this.onResize = this.onResize.bind(this);
     }
 
     render() {
+        if (this.props.alertMessage) {
+            return createElement(Alert, {
+                className: `widget-charts-${this.props.chartType}-alert`,
+                message: this.props.alertMessage
+            });
+        }
+        if (this.props.loading) {
+            return createElement(ChartLoading, { text: "Loading" });
+        }
+
         return createElement("div",
             {
-                className: classNames(`widget-charts-${this.props.type}`, this.props.className),
+                className: classNames(`widget-charts-${this.props.chartType}`, this.props.class),
                 ref: this.getPlotlyNodeRef,
-                style: { ...getDimensions(this.props), ...this.props.style }
+                style: { ...getDimensions(this.props), ...parseStyle(this.props.style) }
             },
             createElement("div", { className: "widget-charts-tooltip", ref: this.getTooltipNodeRef })
         );
     }
 
     componentDidMount() {
-        this.renderChart(this.props);
-        this.addResizeListener();
+        if (!this.props.loading) {
+            this.renderChart(this.props);
+            this.addResizeListener();
+        }
     }
 
-    componentWillReceiveProps(newProps: PieChartProps) {
-        this.renderChart(newProps);
+    componentDidUpdate(previousProps: PieChartProps) {
+        if (previousProps.loading && !this.props.loading) {
+            this.renderChart(this.props);
+            this.addResizeListener();
+        }
     }
 
     componentWillUnmount() {
@@ -79,17 +88,46 @@ export class PieChart extends Component<PieChartProps, {}> {
 
     private renderChart(props: PieChartProps) {
         if (this.pieChartNode) {
-            const data = props.data && props.data.values.length ? props.data : this.data;
-            const layout = props.layout || {};
-            layout.width = this.pieChartNode.clientWidth;
-            layout.height = this.pieChartNode.clientHeight;
-            newPlot(this.pieChartNode, [ data as any ], props.layout, props.config)
+            newPlot(this.pieChartNode, this.getData(props) as any, this.getLayoutOptions(props), this.getConfigOptions(props)) // tslint:disable-line
                 .then(myPlot => {
                     myPlot.on("plotly_click", this.onClick);
                     myPlot.on("plotly_hover", this.onHover);
                     myPlot.on("plotly_unhover", this.clearToolTip);
                 });
         }
+    }
+
+    private getData(props: PieChartProps): PieData[] {
+        if (props.data) {
+            return [ {
+                hole: this.props.chartType === "donut" ? 0.4 : 0,
+                hoverinfo: this.props.tooltipForm ? "none" : "label",
+                ...this.props.dataOptions ? JSON.parse(this.props.dataOptions) : {},
+                labels: props.data.map(value => value.get(this.props.nameAttribute) as string),
+                marker: {
+                    colors: props.data.map(value => value.get(this.props.colorAttribute) as string)
+                },
+                type: "pie",
+                values: props.data.map(value => parseFloat(value.get(this.props.valueAttribute) as string)),
+                sort: false
+            } ];
+        }
+
+        return props.defaultData || [];
+    }
+
+    private getLayoutOptions(props: PieChartProps): Partial<Layout> {
+        return {
+            autosize: true,
+            showlegend: props.showLegend,
+            ...props.layoutOptions ? JSON.parse(props.layoutOptions) : {},
+            width: this.pieChartNode && this.pieChartNode.clientWidth,
+            height: this.pieChartNode && this.pieChartNode.clientHeight
+        };
+    }
+
+    private getConfigOptions(props: PieChartProps): Partial<Config> {
+        return { displayModeBar: props.showToolbar, doubleClick: false };
     }
 
     private onClick(data: PieHoverData) {
@@ -116,20 +154,22 @@ export class PieChart extends Component<PieChartProps, {}> {
     }
 
     private addResizeListener() {
-        const resizeDetector = elementResize({ strategy: "scroll" });
         if (this.pieChartNode && this.pieChartNode.parentElement) {
-            resizeDetector.listenTo(this.pieChartNode.parentElement, () => {
-                if (this.timeoutId) {
-                    clearTimeout(this.timeoutId);
-                }
-                this.timeoutId = setTimeout(() => {
-                    if (this.pieChartNode) {
-                        purge(this.pieChartNode);
-                        this.renderChart(this.props);
-                    }
-                    this.timeoutId = 0;
-                }, 100);
-            });
+            this.resizeDetector.removeListener(this.pieChartNode.parentElement, this.onResize);
+            this.resizeDetector.listenTo(this.pieChartNode.parentElement, this.onResize);
         }
+    }
+
+    private onResize() {
+        if (this.timeoutId) {
+            clearTimeout(this.timeoutId);
+        }
+        this.timeoutId = setTimeout(() => {
+            if (this.pieChartNode) {
+                purge(this.pieChartNode);
+                this.renderChart(this.props);
+            }
+            this.timeoutId = 0;
+        }, 100);
     }
 }

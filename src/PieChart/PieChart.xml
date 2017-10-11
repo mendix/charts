@@ -82,7 +82,7 @@
             <category>Chart properties</category>
             <description/>
         </property>
-        <property key="showToolBar" type="boolean" defaultValue="false">
+        <property key="showToolbar" type="boolean" defaultValue="false">
             <caption>Show toolbar</caption>
             <category>Chart properties</category>
             <description/>

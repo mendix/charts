@@ -5,7 +5,7 @@
   "description": "Create charts based on the Plotly library",
   "copyright": "Mendix BV",
   "scripts": {
-    "start": "nodemon --watch webpack.config.js --watch Gruntfile.js --exec \"grunt",
+    "start": "nodemon --watch webpack.config.js --watch Gruntfile.js --exec grunt",
     "pretest": "tsc",
     "lint": "tslint -c tslint.json '**/*.ts' --exclude '**/node_modules/**'"
   },
@@ -60,7 +60,7 @@
     "karma-remap-istanbul": "^0.6.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.3",
-    "mendix-client": "https://github.com/FlockOfBirds/Mendix-client-typing/archive/7.4.tar.gz",
+    "mendix-client": "^7.4.1",
     "node-sass": "^4.5.2",
     "nodemon": "^1.11.0",
     "pre-commit": "^1.2.2",
@@ -86,6 +86,7 @@
     "ajv": "^5.2.2",
     "classnames": "^2.2.5",
     "element-resize-detector": "^1.1.12",
+    "format-json": "^1.0.3",
     "plotly.js": "^1.27.1"
   }
 }
