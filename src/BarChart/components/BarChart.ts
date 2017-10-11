@@ -18,7 +18,7 @@ export interface BarChartProps extends BarChartContainerProps {
     loading?: boolean;
     data?: Data[];
     defaultData?: ScatterData[];
-    onClick?: (dataObject: mendix.lib.MxObject, seriesIndex: number) => void;
+    onClick?: (series: SeriesProps, dataObject: mendix.lib.MxObject) => void;
     onHover?: (node: HTMLDivElement, dataObject: mendix.lib.MxObject) => void;
 }
 
@@ -147,16 +147,18 @@ export class BarChart extends Component<BarChartProps, {}> {
                 const x = values.map(value => value.x);
                 const y = values.map(value => value.y);
                 const rawOptions = data.series.seriesOptions ? JSON.parse(data.series.seriesOptions) : {};
-
-                return deepMerge.all([ rawOptions, {
+                const configOptions = {
                     name: data.series.name,
                     type: "bar",
                     hoverinfo: this.props.tooltipForm ? "text" : undefined,
                     x: this.props.orientation === "bar" ? y : x,
                     y: this.props.orientation === "bar" ? x : y,
                     orientation: this.props.orientation === "bar" ? "h" : "v",
-                    mxObjects: data.data
-                } ]);
+                    series: data.series
+                };
+
+                // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
+                return { ...deepMerge.all<ScatterData>([ rawOptions, configOptions ]), mxObjects: data.data };
             });
         }
 
@@ -166,7 +168,7 @@ export class BarChart extends Component<BarChartProps, {}> {
     private onClick(data: ScatterHoverData) {
         const pointClicked = data.points[0];
         if (this.props.onClick) {
-            this.props.onClick(pointClicked.data.mxObjects[pointClicked.pointNumber], pointClicked.data.seriesIndex);
+            this.props.onClick(pointClicked.data.series, pointClicked.data.mxObjects[pointClicked.pointNumber]);
         }
     }
 

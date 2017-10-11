@@ -51,7 +51,6 @@ export default class LineChartContainer extends Component<LineChartContainerProp
             loading: true
         };
         this.fetchData = this.fetchData.bind(this);
-        this.handleOnClick = this.handleOnClick.bind(this);
         this.openTooltipForm = this.openTooltipForm.bind(this);
         this.updateChart = this.updateChart.bind(this);
     }
@@ -62,7 +61,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
             data: this.state.data,
             loading: this.state.loading,
             alertMessage: this.state.alertMessage,
-            onClick: this.handleOnClick,
+            onClick: handleOnClick,
             onHover: this.props.tooltipForm ? this.openTooltipForm : undefined
         });
     }
@@ -86,11 +85,6 @@ export default class LineChartContainer extends Component<LineChartContainerProp
     private updateChart(layoutOptions: object, series: SeriesProps[]) {
         this.setState({ layoutOptions, series });
         this.fetchData(this.props.mxObject);
-    }
-
-    private handleOnClick(dataObject: mendix.lib.MxObject, seriesIndex: number) {
-        const series = this.state.series[seriesIndex];
-        handleOnClick(series, dataObject);
     }
 
     private openTooltipForm(domNode: HTMLDivElement, dataObject: mendix.lib.MxObject) {

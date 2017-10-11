@@ -18,7 +18,7 @@ export interface LineChartProps extends LineChartContainerProps {
     defaultData?: ScatterData[];
     loading?: boolean;
     alertMessage?: string | ReactElement<any>;
-    onClick?: (dataObject: mendix.lib.MxObject, seriesIndex: number) => void;
+    onClick?: (series: SeriesProps, dataObject: mendix.lib.MxObject) => void;
     onHover?: (node: HTMLDivElement, dataObject: mendix.lib.MxObject) => void;
 }
 
@@ -118,7 +118,7 @@ export class LineChart extends Component<LineChartProps, {}> {
 
         return deepMerge.all([ {
             autosize: true,
-            hovermode: props.tooltipForm ? "closest" : undefined,
+            hovermode: "closest",
             showlegend: props.showLegend,
             xaxis: {
                 title: props.xAxisLabel,
@@ -142,30 +142,31 @@ export class LineChart extends Component<LineChartProps, {}> {
     private getData(props: LineChartProps): ScatterData[] {
         if (props.data) {
             return props.data.map(data => {
+                const { series } = data;
                 const values = data.data.map(value => ({
-                    x: value.get(data.series.xValueAttribute) as Plotly.Datum,
-                    y: parseInt(value.get(data.series.yValueAttribute) as string, 10) as Plotly.Datum
+                    x: value.get(series.xValueAttribute) as Plotly.Datum,
+                    y: parseInt(value.get(series.yValueAttribute) as string, 10) as Plotly.Datum
                 }));
-                const rawOptions = data.series.seriesOptions
-                    ? JSON.parse(data.series.seriesOptions)
-                    : {};
-
-                return deepMerge.all([ rawOptions, {
+                const rawOptions = series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
+                const configOptions = {
                     connectgaps: true,
                     hoveron: "points",
                     hoverinfo: props.tooltipForm ? "text" : undefined,
                     line: {
-                        color: data.series.lineColor,
-                        shape: data.series.lineStyle
+                        color: series.lineColor,
+                        shape: series.lineStyle
                     },
-                    mode: data.series.mode.replace("X", "+") as Mode,
-                    name: data.series.name,
+                    mode: series.mode.replace("X", "+") as Mode,
+                    name: series.name,
                     type: "scatter",
                     fill: props.fill ? "tonexty" : "none",
                     x: values.map(value => value.x),
                     y: values.map(value => value.y),
-                    mxObjects: data.data
-                } ]);
+                    series: data.series
+                };
+
+                // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
+                return { ...deepMerge.all<ScatterData>([ rawOptions, configOptions ]), mxObjects: data.data };
             });
         }
 
@@ -175,7 +176,7 @@ export class LineChart extends Component<LineChartProps, {}> {
     private onClick(data: ScatterHoverData) {
         const pointClicked = data.points[0];
         if (this.props.onClick) {
-            this.props.onClick(pointClicked.data.mxObjects[pointClicked.pointNumber], pointClicked.data.seriesIndex);
+            this.props.onClick(pointClicked.data.series, pointClicked.data.mxObjects[pointClicked.pointNumber]);
         }
     }
 

@@ -43,7 +43,7 @@ declare module "plotly.js" {
 
     export interface ScatterData {
         mxObjects: mendix.lib.MxObject[]; // custom property, not part of the official plotly.js api
-        seriesIndex: number; // custom property, not part of the official plotly.js api
+        series: any; // custom property, not part of the official plotly.js api
         orientation?: "h" | "v";
     }
 
