@@ -3,8 +3,10 @@ import * as classNames from "classnames";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
-import * as elementResize from "element-resize-detector";
 import { LineChartContainerProps, SeriesProps } from "./LineChartContainer";
+
+import deepMerge from "deepmerge";
+import * as elementResize from "element-resize-detector";
 import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
 import { newPlot, purge } from "../../PlotlyCustom";
 import { getDimensions, parseStyle } from "../../utils/style";
@@ -112,7 +114,9 @@ export class LineChart extends Component<LineChartProps, {}> {
     }
 
     private getLayoutOptions(props: LineChartProps): Partial<Layout> {
-        return {
+        const advancedOptions = props.layoutOptions ? JSON.parse(props.layoutOptions) : {};
+
+        return deepMerge.all([ {
             autosize: true,
             hovermode: props.tooltipForm ? "closest" : undefined,
             showlegend: props.showLegend,
@@ -126,10 +130,9 @@ export class LineChart extends Component<LineChartProps, {}> {
                 showgrid: props.showGrid,
                 fixedrange: true
             },
-            ...props.layoutOptions ? JSON.parse(props.layoutOptions) : {},
             width: this.lineChartNode && this.lineChartNode.clientWidth,
             height: this.lineChartNode && this.lineChartNode.clientHeight
-        };
+        }, advancedOptions ]);
     }
 
     private getConfigOptions(props: LineChartProps): Partial<Config> {
@@ -146,8 +149,7 @@ export class LineChart extends Component<LineChartProps, {}> {
                 const rawOptions = data.series && data.series.seriesOptions
                     ? JSON.parse(data.series.seriesOptions)
                     : {};
-                return {
-                    ...rawOptions,
+                return deepMerge.all([ rawOptions, {
                     connectgaps: true,
                     hoveron: "points",
                     hoverinfo: props.tooltipForm ? "text" : undefined,
@@ -162,7 +164,7 @@ export class LineChart extends Component<LineChartProps, {}> {
                     x: values.map(value => value.x),
                     y: values.map(value => value.y),
                     mxObjects: data.data
-                };
+                } ]);
             });
         }
 

@@ -3,13 +3,15 @@ import * as classNames from "classnames";
 
 import { Alert } from "../../components/Alert";
 import { BarChartContainerProps, SeriesProps } from "./BarChartContainer";
+import { ChartLoading } from "../../components/ChartLoading";
+
+import deepMerge from "deepmerge";
 import * as elementResize from "element-resize-detector";
 import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
 import { newPlot, purge } from "../../PlotlyCustom";
 import { getDimensions, parseStyle } from "../../utils/style";
 
 import "../../ui/Charts.scss";
-import { ChartLoading } from "../../components/ChartLoading";
 
 export interface BarChartProps extends BarChartContainerProps {
     alertMessage?: string | ReactElement<any>;
@@ -109,7 +111,9 @@ export class BarChart extends Component<BarChartProps, {}> {
     }
 
     private getLayoutOptions(props: BarChartProps): Partial<Layout> {
-        return {
+        const advancedOptions = props.layoutOptions ? JSON.parse(props.layoutOptions) : {};
+
+        return deepMerge.all([ {
             autosize: true,
             barmode: props.barMode,
             xaxis: {
@@ -124,10 +128,9 @@ export class BarChart extends Component<BarChartProps, {}> {
             },
             showlegend: props.showLegend,
             hovermode: "closest",
-            ...props.layoutOptions ? JSON.parse(props.layoutOptions) : {},
             width: this.barChartNode && this.barChartNode.clientWidth,
             height: this.barChartNode && this.barChartNode.clientHeight
-        };
+        }, advancedOptions ]);
     }
 
     private getConfigOptions(props: BarChartProps): Partial<Config> {
@@ -145,8 +148,7 @@ export class BarChart extends Component<BarChartProps, {}> {
                 const y = values.map(value => value.y);
                 const rawOptions = data.series.seriesOptions ? JSON.parse(data.series.seriesOptions) : {};
 
-                return {
-                    ...rawOptions,
+                return deepMerge.all([ rawOptions, {
                     name: data.series.name,
                     type: "bar",
                     hoverinfo: this.props.tooltipForm ? "text" : undefined,
@@ -154,7 +156,7 @@ export class BarChart extends Component<BarChartProps, {}> {
                     y: this.props.orientation === "bar" ? x : y,
                     orientation: this.props.orientation === "bar" ? "h" : "v",
                     mxObjects: data.data
-                };
+                } ]);
             });
         }
 

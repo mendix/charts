@@ -4,9 +4,11 @@ import { newPlot, purge } from "../../PlotlyCustom";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
+import { PieChartContainerProps } from "./PieChartContainer";
+
+import deepMerge from "deepmerge";
 import * as elementResize from "element-resize-detector";
 import { Config, Layout, PieData, PieHoverData } from "plotly.js";
-import { PieChartContainerProps } from "./PieChartContainer";
 import { getDimensions, parseStyle } from "../../utils/style";
 
 import "../../ui/Charts.scss";
@@ -99,10 +101,11 @@ export class PieChart extends Component<PieChartProps, {}> {
 
     private getData(props: PieChartProps): PieData[] {
         if (props.data) {
-            return [ {
+            const advancedOptions = this.props.dataOptions ? JSON.parse(this.props.dataOptions) : {};
+
+            return [ deepMerge.all([ advancedOptions, {
                 hole: this.props.chartType === "donut" ? 0.4 : 0,
                 hoverinfo: this.props.tooltipForm ? "none" : "label",
-                ...this.props.dataOptions ? JSON.parse(this.props.dataOptions) : {},
                 labels: props.data.map(value => value.get(this.props.nameAttribute) as string),
                 marker: {
                     colors: props.data.map(value => value.get(this.props.colorAttribute) as string)
@@ -110,20 +113,21 @@ export class PieChart extends Component<PieChartProps, {}> {
                 type: "pie",
                 values: props.data.map(value => parseFloat(value.get(this.props.valueAttribute) as string)),
                 sort: false
-            } ];
+            } ]) ];
         }
 
         return props.defaultData || [];
     }
 
     private getLayoutOptions(props: PieChartProps): Partial<Layout> {
-        return {
+        const advancedOptions = props.layoutOptions ? JSON.parse(props.layoutOptions) : {};
+
+        return deepMerge.all([ advancedOptions, {
             autosize: true,
             showlegend: props.showLegend,
-            ...props.layoutOptions ? JSON.parse(props.layoutOptions) : {},
             width: this.pieChartNode && this.pieChartNode.clientWidth,
             height: this.pieChartNode && this.pieChartNode.clientHeight
-        };
+        } ]);
     }
 
     private getConfigOptions(props: PieChartProps): Partial<Config> {
