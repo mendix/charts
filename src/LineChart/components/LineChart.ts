@@ -7,7 +7,7 @@ import { LineChartContainerProps, SeriesProps } from "./LineChartContainer";
 
 import deepMerge from "deepmerge";
 import * as elementResize from "element-resize-detector";
-import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
+import { Config, Datum, Layout, ScatterData, ScatterHoverData } from "plotly.js";
 import { newPlot, purge } from "../../PlotlyCustom";
 import { getDimensions, parseStyle } from "../../utils/style";
 
@@ -22,7 +22,7 @@ export interface LineChartProps extends LineChartContainerProps {
     onHover?: (node: HTMLDivElement, dataObject: mendix.lib.MxObject) => void;
 }
 
-export type Mode = "lines" | "markers" | "lines+markers";
+export type Mode = "lines" | "markers" | "lines+markers" | "none";
 
 export interface Data {
     data: mendix.lib.MxObject[];
@@ -104,7 +104,9 @@ export class LineChart extends Component<LineChartProps, {}> {
 
     private renderChart(props: LineChartProps) {
         if (this.lineChartNode) {
-            newPlot(this.lineChartNode, this.getData(props), this.getLayoutOptions(props), this.getConfigOptions(props))
+            const data = this.getData(props);
+            const scatterData = props.area === "stacked" ? this.getStackedArea(data) : data;
+            newPlot(this.lineChartNode, scatterData, this.getLayoutOptions(props), this.getConfigOptions(props))
                 .then(myPlot => {
                     myPlot.on("plotly_click", this.onClick);
                     myPlot.on("plotly_hover", this.onHover);
@@ -144,8 +146,8 @@ export class LineChart extends Component<LineChartProps, {}> {
             return props.data.map(data => {
                 const { series } = data;
                 const values = data.data.map(value => ({
-                    x: value.get(series.xValueAttribute) as Plotly.Datum,
-                    y: parseInt(value.get(series.yValueAttribute) as string, 10) as Plotly.Datum
+                    x: value.get(series.xValueAttribute) as Datum,
+                    y: parseInt(value.get(series.yValueAttribute) as string, 10) as Datum
                 }));
                 const rawOptions = series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
                 const configOptions = {
@@ -171,6 +173,16 @@ export class LineChart extends Component<LineChartProps, {}> {
         }
 
         return props.defaultData || [];
+    }
+
+    private getStackedArea(traces: ScatterData[]) {
+        for (let i = 1; i < traces.length; i++) {
+            for (let j = 0; j < (Math.min(traces[i].y.length, traces[i - 1].y.length)); j++) {
+                (traces[i].y[j] as any) += traces[i - 1].y[j];
+            }
+        }
+
+        return traces;
     }
 
     private onClick(data: ScatterHoverData) {

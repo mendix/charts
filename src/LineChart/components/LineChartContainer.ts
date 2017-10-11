@@ -17,6 +17,7 @@ export interface LineChartContainerProps extends WrapperProps, Dimensions {
     xAxisLabel: string;
     yAxisLabel: string;
     layoutOptions: string;
+    area?: "separate" | "stacked";
 }
 
 interface LineChartContainerState {

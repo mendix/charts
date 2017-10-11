@@ -92,8 +92,8 @@
                     <category>Appearance</category>
                     <description/>
                     <enumerationValues>
+                        <enumerationValue key="none">No lines</enumerationValue>
                         <enumerationValue key="lines">Lines</enumerationValue>
-                        <enumerationValue key="markers">Markers</enumerationValue>
                         <enumerationValue key="linesXmarkers">Lines with markers</enumerationValue>
                     </enumerationValues>
                 </property>
@@ -133,6 +133,15 @@
                     <returnType type="Void" />
                 </property>
             </properties>
+        </property>
+        <property key="area" type="enumeration" defaultValue="separate">
+            <caption>Area</caption>
+            <category>Chart properties</category>
+            <description/>
+            <enumerationValues>
+                <enumerationValue key="separate">Separate</enumerationValue>
+                <enumerationValue key="stacked">Stacked</enumerationValue>
+            </enumerationValues>
         </property>
         <property key="xAxisLabel" type="string" required="false">
             <caption>X-axis label</caption>
