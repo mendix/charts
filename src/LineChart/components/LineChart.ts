@@ -74,8 +74,8 @@ export class LineChart extends Component<LineChartProps, {}> {
         }
     }
 
-    componentDidUpdate(previousProps: LineChartProps) {
-        if (previousProps.loading && !this.props.loading) {
+    componentDidUpdate() {
+        if (!this.props.loading) {
             this.renderChart(this.props);
             this.addResizeListener();
         }
@@ -146,19 +146,20 @@ export class LineChart extends Component<LineChartProps, {}> {
                     x: value.get(data.series.xValueAttribute) as Plotly.Datum,
                     y: parseInt(value.get(data.series.yValueAttribute) as string, 10) as Plotly.Datum
                 }));
-                const rawOptions = data.series && data.series.seriesOptions
+                const rawOptions = data.series.seriesOptions
                     ? JSON.parse(data.series.seriesOptions)
                     : {};
+
                 return deepMerge.all([ rawOptions, {
                     connectgaps: true,
                     hoveron: "points",
                     hoverinfo: props.tooltipForm ? "text" : undefined,
                     line: {
-                        color: data.series && data.series.lineColor,
-                        shape: data.series && data.series.lineStyle
+                        color: data.series.lineColor,
+                        shape: data.series.lineStyle
                     },
-                    mode: data.series && data.series.mode.replace("X", "+") as Mode,
-                    name: data.series && data.series.name,
+                    mode: data.series.mode.replace("X", "+") as Mode,
+                    name: data.series.name,
                     type: "scatter",
                     fill: props.fill ? "tonexty" : "none",
                     x: values.map(value => value.x),

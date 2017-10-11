@@ -43,9 +43,8 @@ export default class LineChartContainer extends Component<LineChartContainerProp
     constructor(props: LineChartContainerProps) {
         super(props);
 
-        const alertMessage = validateSeriesProps(props.series, this.props.friendlyId, props.layoutOptions);
         this.state = {
-            alertMessage,
+            alertMessage: validateSeriesProps(props.series, this.props.friendlyId, props.layoutOptions),
             data: [],
             series: props.series.slice(),
             layoutOptions: props.layoutOptions ? JSON.parse(props.layoutOptions) : {},

@@ -89,6 +89,7 @@ const previewConfig = {
         filename: "src/[name]/[name].webmodeler.js",
         libraryTarget: "commonjs"
     },
+    devtool: "source-map",
     resolve: {
         extensions: [ ".ts", ".js" ]
     },

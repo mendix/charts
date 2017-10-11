@@ -67,8 +67,8 @@ export class PieChart extends Component<PieChartProps, {}> {
         }
     }
 
-    componentDidUpdate(previousProps: PieChartProps) {
-        if (previousProps.loading && !this.props.loading) {
+    componentDidUpdate() {
+        if (!this.props.loading) {
             this.renderChart(this.props);
             this.addResizeListener();
         }

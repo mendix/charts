@@ -1,1 +1,1 @@
-export { Plots, newPlot, purge } from "plotly.js/dist/plotly-basic";
+export { Plots, newPlot, purge, update } from "plotly.js/dist/plotly-basic";

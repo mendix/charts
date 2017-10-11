@@ -10,6 +10,7 @@ export interface DataSourceProps {
     yValueAttribute: string;
     xValueSortAttribute: string;
     seriesOptions: string;
+    sampleData: string;
 }
 
 export type MxObject = mendix.lib.MxObject;
@@ -27,18 +28,22 @@ export const validateSeriesProps = <T extends DataSourceProps>(dataSeries: T[], 
             if (series.dataSourceType === "microflow" && !series.dataSourceMicroflow) {
                 errorMessage.push(`\n'Data source type' in series '${series.name}' is set to 'Microflow' but the microflow is missing.`); // tslint:disable-line max-line-length
             }
-            if (series.seriesOptions) {
-                const message = validateAdvancedOptions(series.seriesOptions, "data", series.name);
-                if (message) {
-                    errorMessage.push(message);
-                }
+            if (series.seriesOptions && series.seriesOptions.trim()) {
+                validateAdvancedOptions(series.seriesOptions.trim())
+                    .catch(reason => {
+                        errorMessage.push(`Invalid options JSON for series "${series.name}": ${reason}`);
+                    });
+            }
+            if (series.sampleData && series.sampleData.trim()) {
+                validateAdvancedOptions(series.sampleData.trim())
+                    .catch(reason => {
+                        errorMessage.push(`Invalid sample data JSON for series "${series.name}": ${reason}`);
+                    });
             }
         });
-        if (layoutOptions) {
-            const message = validateAdvancedOptions(layoutOptions, "layout");
-            if (message) {
-                errorMessage.push(message);
-            }
+        if (layoutOptions && layoutOptions.trim()) {
+            validateAdvancedOptions(layoutOptions.trim())
+                .catch(reason => errorMessage.push(`Invalid layout JSON: ${reason}`));
         }
         if (errorMessage.length) {
             return createElement("div", {},
@@ -51,23 +56,18 @@ export const validateSeriesProps = <T extends DataSourceProps>(dataSeries: T[], 
     return "";
 };
 
-export const validateAdvancedOptions = (rawData: string, usage: "data" | "layout", seriesName?: string): string => {
-    if (!rawData) {
-        return "";
-    }
-    try {
-        JSON.parse(rawData);
-    } catch (error) {
-        if (usage === "data") {
-            return seriesName
-                ? `Invalid options JSON for series "${seriesName}": ${error.message}`
-                : `Invalid options JSON: ${error.message}`;
-        } else {
-            return `Invalid layout JSON: ${error.message}`;
+export const validateAdvancedOptions = (rawData: string): Promise<string> => {
+    return new Promise(((resolve, reject) => {
+        if (!rawData) {
+            resolve();
         }
-    }
-
-    return "";
+        try {
+            JSON.parse(rawData);
+        } catch (error) {
+            reject(error.message);
+        }
+        resolve();
+    }));
 };
 
 export const fetchSeriesData = <T extends DataSourceProps>(mxObject: MxObject, series: T): Promise<any> => { // tslint:disable max-line-length

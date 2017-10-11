@@ -82,6 +82,11 @@
                     <category>Advanced</category>
                     <description>The Plotly series options as JSON</description>
                 </property>
+                <property key="sampleData" type="string" multiline="true" required="false">
+                    <caption>Sample data</caption>
+                    <category>Advanced</category>
+                    <description>To be used as a more accurate representation of project data in the web modeler</description>
+                </property>
                 <property key="mode" type="enumeration" defaultValue="linesXmarkers">
                     <caption>Mode</caption>
                     <category>Appearance</category>

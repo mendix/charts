@@ -71,8 +71,8 @@ export class BarChart extends Component<BarChartProps, {}> {
         }
     }
 
-    componentDidUpdate(previousProps: BarChartProps) {
-        if (previousProps.loading && !this.props.loading) {
+    componentDidUpdate() {
+        if (!this.props.loading) {
             this.renderChart(this.props);
             this.addResizeListener();
         }
