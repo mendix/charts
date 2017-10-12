@@ -4,7 +4,7 @@ import { Alert } from "../components/Alert";
 import { BarChart } from "../BarChart/components/BarChart";
 import { BarChartContainerProps } from "../BarChart/components/BarChartContainer";
 
-import { validateSeriesProps } from "../utils/data";
+import { getRandomNumbers, validateSeriesProps } from "../utils/data";
 import deepMerge from "deepmerge";
 import { ScatterData } from "plotly.js";
 
@@ -29,7 +29,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
                 const seriesOptions = series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
                 const sampleData = series.sampleData && series.sampleData.trim()
                     ? JSON.parse(series.sampleData.trim())
-                    : {};
+                    : preview.getSampleTraces();
 
                 return deepMerge.all([ seriesOptions, {
                     name: series.name,
@@ -44,12 +44,18 @@ export class preview extends Component<BarChartContainerProps, {}> {
         return [
             {
                 type: "bar",
-                x: [ "Sample 1", "Sample 2", "Sample 3", "Sample 4" ],
-                y: [ 20, 14, 23, 25 ],
                 orientation: "v",
-                name: "Sample"
+                name: "Sample",
+                ...preview.getSampleTraces()
             } as ScatterData
         ];
+    }
+
+    private static getSampleTraces(): { x: (string | number)[], y: (string | number)[] } {
+        return {
+            x: [ "Sample 1", "Sample 2", "Sample 3", "Sample 4" ],
+            y: getRandomNumbers(4, 100)
+        };
     }
 }
 

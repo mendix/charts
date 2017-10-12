@@ -81,7 +81,9 @@ const plotlyCustomConfig = {
 const previewConfig = {
     entry: {
         BarChart: "./src/BarChart/BarChart.webmodeler.ts",
+        ColumnChart: "./src/ColumnChart/ColumnChart.webmodeler.ts",
         LineChart: "./src/LineChart/LineChart.webmodeler.ts",
+        AreaChart: "./src/AreaChart/AreaChart.webmodeler.ts",
         PieChart: "./src/PieChart/PieChart.webmodeler.ts"
     },
     output: {

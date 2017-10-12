@@ -4,7 +4,7 @@ import { Alert } from "../components/Alert";
 import { LineChart, Mode } from "../LineChart/components/LineChart";
 import { LineChartContainerProps } from "../LineChart/components/LineChartContainer";
 
-import { validateSeriesProps } from "../utils/data";
+import { getRandomNumbers, validateSeriesProps } from "../utils/data";
 import deepMerge from "deepmerge";
 import { ScatterData } from "plotly.js";
 
@@ -18,6 +18,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
             }),
             createElement(LineChart, {
                 ...this.props,
+                fill: true,
                 defaultData: this.getData(this.props)
             })
         );
@@ -27,7 +28,9 @@ export class preview extends Component<LineChartContainerProps, {}> {
         if (props.series) {
             return props.series.map(series => {
                 const seriesOptions = series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
-                const sampleData = series.sampleData.trim() ? JSON.parse(series.sampleData.trim()) : {};
+                const sampleData = series.sampleData.trim()
+                    ? JSON.parse(series.sampleData.trim())
+                    : preview.getSampleTraces();
 
                 return deepMerge.all([ seriesOptions, {
                     connectgaps: true,
@@ -51,9 +54,15 @@ export class preview extends Component<LineChartContainerProps, {}> {
             hoveron: "points",
             name: "Sample",
             type: "scatter",
-            x: [ "Sample 1", "Sample 2", "Sample 3", "Sample 4" ],
-            y: [ 14, 30, 20, 40 ]
+            ...preview.getSampleTraces()
         } as ScatterData ];
+    }
+
+    private static getSampleTraces(): { x: (string | number)[], y: (string | number)[] } {
+        return {
+            x: [ "Sample 1", "Sample 2", "Sample 3", "Sample 4" ],
+            y: getRandomNumbers(4, 100)
+        };
     }
 }
 

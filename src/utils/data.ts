@@ -29,21 +29,23 @@ export const validateSeriesProps = <T extends DataSourceProps>(dataSeries: T[], 
                 errorMessage.push(`\n'Data source type' in series '${series.name}' is set to 'Microflow' but the microflow is missing.`); // tslint:disable-line max-line-length
             }
             if (series.seriesOptions && series.seriesOptions.trim()) {
-                validateAdvancedOptions(series.seriesOptions.trim())
-                    .catch(reason => {
-                        errorMessage.push(`Invalid options JSON for series "${series.name}": ${reason}`);
-                    });
+                const error = validateAdvancedOptions(series.seriesOptions.trim());
+                if (error) {
+                    errorMessage.push(`Invalid options JSON for series "${series.name}": ${error}`);
+                }
             }
             if (series.sampleData && series.sampleData.trim()) {
-                validateAdvancedOptions(series.sampleData.trim())
-                    .catch(reason => {
-                        errorMessage.push(`Invalid sample data JSON for series "${series.name}": ${reason}`);
-                    });
+                const error = validateAdvancedOptions(series.sampleData.trim());
+                if (error) {
+                    errorMessage.push(`Invalid sample data JSON for series "${series.name}": ${error}`);
+                }
             }
         });
         if (layoutOptions && layoutOptions.trim()) {
-            validateAdvancedOptions(layoutOptions.trim())
-                .catch(reason => errorMessage.push(`Invalid layout JSON: ${reason}`));
+            const error = validateAdvancedOptions(layoutOptions.trim());
+            if (error) {
+                errorMessage.push(`Invalid layout JSON: ${error}`);
+            }
         }
         if (errorMessage.length) {
             return createElement("div", {},
@@ -56,18 +58,17 @@ export const validateSeriesProps = <T extends DataSourceProps>(dataSeries: T[], 
     return "";
 };
 
-export const validateAdvancedOptions = (rawData: string): Promise<string> => {
-    return new Promise(((resolve, reject) => {
+export const validateAdvancedOptions = (rawData: string): string => {
         if (!rawData) {
-            resolve();
+            return "";
         }
         try {
             JSON.parse(rawData);
         } catch (error) {
-            reject(error.message);
+            return error.message;
         }
-        resolve();
-    }));
+
+        return "";
 };
 
 export const fetchSeriesData = <T extends DataSourceProps>(mxObject: MxObject, series: T): Promise<any> => { // tslint:disable max-line-length
@@ -136,4 +137,13 @@ export const handleOnClick = <T extends OnClickProps>(options: T, mxObject?: MxO
             error: error => window.mx.ui.error(`Error while opening page ${options.onClickPage}: ${error.message}`)
         });
     }
+};
+
+export const getRandomNumbers = (count: number, range: number): number[] => {
+    const numbers: number[] = [];
+    for (let i = 0; i < count; i++) {
+        numbers.push(Math.round(Math.random() * range));
+    }
+
+    return numbers;
 };

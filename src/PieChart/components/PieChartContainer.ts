@@ -136,16 +136,22 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
                 errorMessage.push("'Data source type' is set to 'Microflow' but the microflow is missing");
         }
         if (props.dataOptions && props.dataOptions.trim()) {
-            validateAdvancedOptions(props.dataOptions.trim())
-                .catch(reason => errorMessage.push(`Invalid options JSON: ${reason}`));
+            const error = validateAdvancedOptions(props.dataOptions.trim());
+            if (error) {
+                errorMessage.push(`Invalid options JSON: ${error}`);
+            }
         }
         if (props.sampleData && props.sampleData.trim()) {
-            validateAdvancedOptions(props.sampleData.trim())
-                .catch(reason => errorMessage.push(`Invalid sample data JSON: ${reason}`));
+            const error = validateAdvancedOptions(props.sampleData.trim());
+            if (error) {
+                errorMessage.push(`Invalid sample data JSON: ${error}`);
+            }
         }
         if (props.layoutOptions && props.layoutOptions.trim()) {
-            validateAdvancedOptions(props.layoutOptions.trim())
-                .catch(reason => errorMessage.push(`Invalid layout JSON: ${reason}`));
+            const error = validateAdvancedOptions(props.layoutOptions.trim());
+            if (error) {
+                errorMessage.push(`Invalid layout JSON: ${error}`);
+            }
         }
         if (errorMessage.length) {
             return createElement("div", {},

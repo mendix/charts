@@ -9,6 +9,12 @@ import { PieData } from "plotly.js";
 
 // tslint:disable-next-line class-name
 export class preview extends Component<PieChartContainerProps, {}> {
+    private sampleTraces = {
+        labels: [ "US", "China", "European Union" ],
+        name: "GHG Emissions",
+        values: [ 16, 15, 12 ]
+    };
+
     render() {
         return createElement("div", {},
             createElement(Alert, {
@@ -26,7 +32,9 @@ export class preview extends Component<PieChartContainerProps, {}> {
     private getData(props: PieChartContainerProps): PieData[] {
         if (props.sampleData) {
             const advancedOptions = props.dataOptions ? JSON.parse(props.dataOptions) : {};
-            const sampleData = props.sampleData && props.sampleData.trim() ? JSON.parse(props.sampleData.trim()) : {};
+            const sampleData = props.sampleData && props.sampleData.trim()
+                ? JSON.parse(props.sampleData.trim())
+                : this.sampleTraces;
 
             return [ deepMerge.all([ advancedOptions, {
                 hole: props.chartType === "donut" ? 0.4 : 0,
@@ -43,10 +51,9 @@ export class preview extends Component<PieChartContainerProps, {}> {
             {
                 hole: props.chartType === "donut" ? 0.4 : 0,
                 hoverinfo: "label+name",
-                labels: [ "US", "China", "European Union", "Russian Federation", "Brazil", "India", "Rest of World" ],
                 name: "GHG Emissions",
                 type: "pie",
-                values: [ 16, 15, 12, 6, 5, 4, 42 ]
+                ...this.sampleTraces
             }
         ];
     }
