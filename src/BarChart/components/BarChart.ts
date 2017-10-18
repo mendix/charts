@@ -118,12 +118,12 @@ export class BarChart extends Component<BarChartProps, {}> {
             autosize: true,
             barmode: props.barMode,
             xaxis: {
-                showgrid: props.showGrid,
+                showgrid: props.grid === "vertical" || props.grid === "both",
                 title: props.xAxisLabel,
                 fixedrange: true
             },
             yaxis: {
-                showgrid: props.showGrid,
+                showgrid: props.grid === "horizontal" || props.grid === "both",
                 title: props.yAxisLabel,
                 fixedrange: true
             },

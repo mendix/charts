@@ -10,7 +10,7 @@ import { BarMode } from "plotly.js";
 export interface BarChartContainerProps extends WrapperProps, Dimensions {
     series: SeriesProps[];
     showLegend: boolean;
-    showGrid: boolean;
+    grid: "none" | "horizontal" | "vertical" | "both";
     showToolbar: boolean;
     barMode: BarMode;
     orientation: "bar" | "column";

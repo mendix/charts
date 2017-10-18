@@ -156,12 +156,12 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             showlegend: props.showLegend,
             xaxis: {
                 title: props.xAxisLabel,
-                showgrid: props.showGrid,
+                showgrid: props.grid === "vertical" || props.grid === "both",
                 fixedrange: true
             },
             yaxis: {
                 title: props.yAxisLabel,
-                showgrid: props.showGrid,
+                showgrid: props.grid === "horizontal" || props.grid === "both",
                 fixedrange: true
             },
             width: this.lineChartNode && this.lineChartNode.clientWidth,

@@ -142,10 +142,16 @@
             <category>Chart properties</category>
             <description/>
         </property>
-        <property key="showGrid" type="boolean" defaultValue="true">
+        <property key="grid" type="enumeration" defaultValue="horizontal">
             <caption>Show grid</caption>
             <category>Chart properties</category>
             <description/>
+            <enumerationValues>
+                <enumerationValue key="none">None</enumerationValue>
+                <enumerationValue key="horizontal">Horizontal</enumerationValue>
+                <enumerationValue key="vertical">Vertical</enumerationValue>
+                <enumerationValue key="both">Horizontal and vertical</enumerationValue>
+            </enumerationValues>
         </property>
         <property key="showToolbar" type="boolean" defaultValue="true">
             <caption>Show toolbar</caption>

@@ -7,7 +7,7 @@ import { WrapperProps } from "../../utils/types";
 
 export interface LineChartContainerProps extends WrapperProps, Dimensions {
     series: SeriesProps[];
-    showGrid: boolean;
+    grid: "none" | "horizontal" | "vertical" | "both";
     mode: Mode;
     lineColor: string;
     fill: boolean;

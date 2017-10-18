@@ -149,12 +149,12 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
             showlegend: this.props.showLegend,
             xaxis: {
                 title: this.props.xAxisLabel,
-                showgrid: this.props.showGrid,
+                showgrid: this.props.grid === "vertical" || this.props.grid === "both",
                 fixedrange: true
             },
             yaxis: {
                 title: this.props.yAxisLabel,
-                showgrid: this.props.showGrid,
+                showgrid: this.props.grid === "horizontal" || this.props.grid === "both",
                 fixedrange: true
             }
         }, null, 4);
