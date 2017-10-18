@@ -24,3 +24,5 @@ declare module "element-resize-detector" {
 }
 
 declare module "*.json";
+
+declare module "react-ace";

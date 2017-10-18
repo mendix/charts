@@ -18,6 +18,7 @@ export interface LineChartContainerProps extends WrapperProps, Dimensions {
     yAxisLabel: string;
     layoutOptions: string;
     area?: "separate" | "stacked";
+    devMode: boolean;
 }
 
 interface LineChartContainerState {
@@ -36,9 +37,7 @@ export interface SeriesProps extends DataSourceProps, OnClickProps {
 }
 
 export default class LineChartContainer extends Component<LineChartContainerProps, LineChartContainerState> {
-    static defaultProps = {
-        fill: false
-    };
+    static defaultProps = { fill: false };
     private subscriptionHandle: number;
 
     constructor(props: LineChartContainerProps) {

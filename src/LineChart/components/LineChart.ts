@@ -1,9 +1,11 @@
+// tslint:disable no-console
 import { Component, ReactElement, createElement } from "react";
 import * as classNames from "classnames";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
 import { LineChartContainerProps, SeriesProps } from "./LineChartContainer";
+import { RuntimeEditor } from "../../components/RuntimeEditor";
 
 import deepMerge from "deepmerge";
 import * as elementResize from "element-resize-detector";
@@ -29,7 +31,12 @@ export interface Data {
     series: SeriesProps;
 }
 
-export class LineChart extends Component<LineChartProps, {}> {
+interface LineChartState {
+    layoutOptions: string;
+    data?: Data[];
+}
+
+export class LineChart extends Component<LineChartProps, LineChartState> {
     private lineChartNode?: HTMLDivElement;
     private tooltipNode: HTMLDivElement;
     private timeoutId: number;
@@ -44,6 +51,12 @@ export class LineChart extends Component<LineChartProps, {}> {
         this.onHover = this.onHover.bind(this);
         this.clearToolTip = this.clearToolTip.bind(this);
         this.onResize = this.onResize.bind(this);
+        this.onRuntimeUpdate = this.onRuntimeUpdate.bind(this);
+
+        this.state = {
+            layoutOptions: props.layoutOptions,
+            data: props.data
+        };
     }
 
     render() {
@@ -56,15 +69,16 @@ export class LineChart extends Component<LineChartProps, {}> {
         if (this.props.loading) {
             return createElement(ChartLoading, { text: "Loading" });
         }
+        if (this.props.devMode) {
+            return createElement(RuntimeEditor, {
+                ...this.props,
+                layoutOptions: this.state.layoutOptions,
+                data: this.state.data,
+                onChange: this.onRuntimeUpdate
+            }, this.renderLineChart());
+        }
 
-        return createElement("div",
-            {
-                className: classNames("widget-charts-line", this.props.class),
-                ref: this.getPlotlyNodeRef,
-                style: { ...getDimensions(this.props), ...parseStyle(this.props.style) }
-            },
-            createElement("div", { className: "widget-charts-tooltip", ref: this.getTooltipNodeRef })
-        );
+        return this.renderLineChart();
     }
 
     componentDidMount() {
@@ -72,6 +86,13 @@ export class LineChart extends Component<LineChartProps, {}> {
             this.renderChart(this.props);
             this.addResizeListener();
         }
+    }
+
+    componentWillReceiveProps(newProps: LineChartProps) {
+        this.setState({
+            layoutOptions: newProps.layoutOptions,
+            data: newProps.data
+        });
     }
 
     componentDidUpdate() {
@@ -85,6 +106,17 @@ export class LineChart extends Component<LineChartProps, {}> {
         if (this.lineChartNode) {
             purge(this.lineChartNode);
         }
+    }
+
+    private renderLineChart(): ReactElement<any> {
+        return createElement("div",
+            {
+                className: classNames("widget-charts-line", this.props.class),
+                ref: this.getPlotlyNodeRef,
+                style: { ...getDimensions(this.props), ...parseStyle(this.props.style) }
+            },
+            createElement("div", { className: "widget-charts-tooltip", ref: this.getTooltipNodeRef })
+        );
     }
 
     private getPlotlyNodeRef(node: HTMLDivElement) {
@@ -116,9 +148,9 @@ export class LineChart extends Component<LineChartProps, {}> {
     }
 
     private getLayoutOptions(props: LineChartProps): Partial<Layout> {
-        const advancedOptions = props.layoutOptions ? JSON.parse(props.layoutOptions) : {};
+        const advancedOptions = this.state.layoutOptions ? JSON.parse(this.state.layoutOptions) : {};
 
-        return deepMerge.all([ {
+        const layoutOptions = deepMerge.all([ {
             autosize: true,
             hovermode: "closest",
             showlegend: props.showLegend,
@@ -135,6 +167,9 @@ export class LineChart extends Component<LineChartProps, {}> {
             width: this.lineChartNode && this.lineChartNode.clientWidth,
             height: this.lineChartNode && this.lineChartNode.clientHeight
         }, advancedOptions ]);
+
+        console.log("Layout Options: ", layoutOptions);
+        return layoutOptions;
     }
 
     private getConfigOptions(props: LineChartProps): Partial<Config> {
@@ -142,8 +177,8 @@ export class LineChart extends Component<LineChartProps, {}> {
     }
 
     private getData(props: LineChartProps): ScatterData[] {
-        if (props.data) {
-            return props.data.map(data => {
+        if (this.state.data) {
+            const dataOptions = this.state.data.map(data => {
                 const { series } = data;
                 const values = data.data.map(value => ({
                     x: value.get(series.xValueAttribute) as Datum,
@@ -170,8 +205,12 @@ export class LineChart extends Component<LineChartProps, {}> {
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
                 return { ...deepMerge.all<ScatterData>([ rawOptions, configOptions ]), mxObjects: data.data };
             });
+
+            console.log("Data Options: ", dataOptions);
+            return dataOptions;
         }
 
+        console.log("Default Data: ", props.defaultData);
         return props.defaultData || [];
     }
 
@@ -207,6 +246,10 @@ export class LineChart extends Component<LineChartProps, {}> {
     private clearToolTip() {
         this.tooltipNode.innerHTML = "";
         this.tooltipNode.style.opacity = "0";
+    }
+
+    private onRuntimeUpdate(layoutOptions: string, data: Data[]) {
+        this.setState({ layoutOptions, data });
     }
 
     private onResize() {

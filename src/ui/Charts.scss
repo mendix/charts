@@ -16,3 +16,37 @@
         margin: 0;
     }
 }
+
+.widget-charts-advanced {
+    .ace_editor {
+        margin-bottom: 20px;
+        width: 100% !important;
+
+        .ace_print-margin {
+            display: none;
+        }
+
+        &.ace-editor-read-only {
+            .ace_content {
+                background-color: #eee;
+                opacity: 0.70;
+            }
+        }
+    }
+
+    .mx-tabcontainer {
+        .mx-tabcontainer-tabs {
+            li {
+                &.remove {
+                    a {
+                        &:hover {
+                            background-color: transparent;
+                            border: none;
+                            cursor: pointer;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

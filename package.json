@@ -22,6 +22,7 @@
     "url": "https://github.com/mendixlabs/charts/issues"
   },
   "devDependencies": {
+    "@types/ace": "0.0.35",
     "@types/big.js": "0.0.31",
     "@types/classnames": "^2.2.1",
     "@types/core-js": "^0.9.42",
@@ -84,10 +85,11 @@
   },
   "dependencies": {
     "ajv": "^5.2.2",
+    "brace": "^0.10.0",
     "classnames": "^2.2.5",
     "deepmerge": "^2.0.0",
     "element-resize-detector": "^1.1.12",
-    "format-json": "^1.0.3",
-    "plotly.js": "^1.27.1"
+    "plotly.js": "^1.27.1",
+    "react-ace": "^5.4.0"
   }
 }

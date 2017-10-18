@@ -1,3 +1,4 @@
+// tslint:disable no-console
 import { Component, ReactElement, createElement } from "react";
 import * as classNames from "classnames";
 import { newPlot, purge } from "../../PlotlyCustom";
@@ -103,7 +104,7 @@ export class PieChart extends Component<PieChartProps, {}> {
         if (props.data) {
             const advancedOptions = this.props.dataOptions ? JSON.parse(this.props.dataOptions) : {};
 
-            return [ deepMerge.all([ advancedOptions, {
+            const dataOptions = [ deepMerge.all([ advancedOptions, {
                 hole: this.props.chartType === "donut" ? 0.4 : 0,
                 hoverinfo: this.props.tooltipForm ? "none" : "label",
                 labels: props.data.map(value => value.get(this.props.nameAttribute) as string),
@@ -114,8 +115,12 @@ export class PieChart extends Component<PieChartProps, {}> {
                 values: props.data.map(value => parseFloat(value.get(this.props.valueAttribute) as string)),
                 sort: false
             } ]) ];
+
+            console.log("Data Options: ", dataOptions);
+            return dataOptions as PieData[];
         }
 
+        console.log("Default Data: ", props.defaultData);
         return props.defaultData || [];
     }
 

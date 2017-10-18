@@ -1,3 +1,4 @@
+// tslint:disable no-console
 import { Component, ReactElement, createElement } from "react";
 import * as classNames from "classnames";
 
@@ -113,7 +114,7 @@ export class BarChart extends Component<BarChartProps, {}> {
     private getLayoutOptions(props: BarChartProps): Partial<Layout> {
         const advancedOptions = props.layoutOptions ? JSON.parse(props.layoutOptions) : {};
 
-        return deepMerge.all([ {
+        const layoutOptions = deepMerge.all([ {
             autosize: true,
             barmode: props.barMode,
             xaxis: {
@@ -131,6 +132,9 @@ export class BarChart extends Component<BarChartProps, {}> {
             width: this.barChartNode && this.barChartNode.clientWidth,
             height: this.barChartNode && this.barChartNode.clientHeight
         }, advancedOptions ]);
+
+        console.log("Layout Options:", layoutOptions);
+        return layoutOptions;
     }
 
     private getConfigOptions(props: BarChartProps): Partial<Config> {
@@ -139,7 +143,7 @@ export class BarChart extends Component<BarChartProps, {}> {
 
     private getData(props: BarChartProps): ScatterData[] {
         if (props.data) {
-            return props.data.map(data => {
+            const dataOptions = props.data.map(data => {
                 const values = data.data.map(value => ({
                     x: value.get(data.series.xValueAttribute) as Plotly.Datum,
                     y: parseInt(value.get(data.series.yValueAttribute) as string, 10) as Plotly.Datum
@@ -160,8 +164,12 @@ export class BarChart extends Component<BarChartProps, {}> {
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
                 return { ...deepMerge.all<ScatterData>([ rawOptions, configOptions ]), mxObjects: data.data };
             });
+
+            console.log("Data Options:", dataOptions);
+            return dataOptions;
         }
 
+        console.log("Default Data: ", props.defaultData);
         return props.defaultData || [];
     }
 

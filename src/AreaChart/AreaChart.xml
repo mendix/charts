@@ -77,16 +77,6 @@
                         <attributeType name="DateTime"/>
                     </attributeTypes>
                 </property>
-                <property key="seriesOptions" type="string" multiline="true" required="false">
-                    <caption>Options</caption>
-                    <category>Advanced</category>
-                    <description>The Plotly series options as JSON</description>
-                </property>
-                <property key="sampleData" type="string" multiline="true" required="false">
-                    <caption>Sample data</caption>
-                    <category>Advanced</category>
-                    <description>To be used as a more accurate representation of project data in the web modeler</description>
-                </property>
                 <property key="mode" type="enumeration" defaultValue="linesXmarkers">
                     <caption>Mode</caption>
                     <category>Appearance</category>
@@ -131,6 +121,16 @@
                     <category>Events</category>
                     <description>The microflow that will be executed on click</description>
                     <returnType type="Void" />
+                </property>
+                <property key="seriesOptions" type="string" multiline="true" required="false">
+                    <caption>Options</caption>
+                    <category>Advanced</category>
+                    <description>The Plotly series options as JSON</description>
+                </property>
+                <property key="sampleData" type="string" multiline="true" required="false">
+                    <caption>Sample data</caption>
+                    <category>Advanced</category>
+                    <description>To be used as a more accurate representation of project data in the web modeler</description>
                 </property>
             </properties>
         </property>
