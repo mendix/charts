@@ -39,7 +39,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                         color: series.lineColor,
                         shape: series.lineStyle
                     },
-                    mode: series.mode.replace("X", "+") as Mode,
+                    mode: series.mode ? series.mode.replace("X", "+") as Mode : "lines",
                     name: series.name,
                     type: "scatter",
                     fill: "tonexty",

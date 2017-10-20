@@ -2,7 +2,7 @@
 const webpack = require("webpack");
 const webpackConfig = require("./webpack.config");
 const merge = require("webpack-merge");
-const widgetNames = [ "BarChart", "LineChart", "PieChart" ];
+const widgetNames = [ "BarChart", "LineChart", "PieChart", "AreaChart", "ColumnChart", "TimeSeries" ];
 
 const webpackConfigRelease = webpackConfig.map(config => merge(config, {
     devtool: false,

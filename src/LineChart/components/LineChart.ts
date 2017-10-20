@@ -137,8 +137,8 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     private renderChart(props: LineChartProps) {
         if (this.lineChartNode) {
             const data = this.getData(props);
-            const scatterData = props.area === "stacked" ? this.getStackedArea(data) : data;
-            newPlot(this.lineChartNode, scatterData, this.getLayoutOptions(props), this.getConfigOptions(props))
+            const scatterData = props.area === "stacked" ? LineChart.getStackedArea(data) : data;
+            newPlot(this.lineChartNode, scatterData, this.getLayoutOptions(props), LineChart.getConfigOptions(props))
                 .then(myPlot => {
                     myPlot.on("plotly_click", this.onClick);
                     myPlot.on("plotly_hover", this.onHover);
@@ -157,7 +157,9 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             xaxis: {
                 title: props.xAxisLabel,
                 showgrid: props.grid === "vertical" || props.grid === "both",
-                fixedrange: true
+                fixedrange: props.xAxisType !== "date",
+                type: this.props.xAxisType,
+                rangeslider: this.props.showRangeSlider
             },
             yaxis: {
                 title: props.yAxisLabel,
@@ -172,17 +174,13 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         return layoutOptions;
     }
 
-    private getConfigOptions(props: LineChartProps): Partial<Config> {
-        return { displayModeBar: props.showToolbar, doubleClick: false };
-    }
-
     private getData(props: LineChartProps): ScatterData[] {
         if (this.state.data) {
             const dataOptions = this.state.data.map(data => {
                 const { series } = data;
-                const values = data.data.map(value => ({
-                    x: value.get(series.xValueAttribute) as Datum,
-                    y: parseInt(value.get(series.yValueAttribute) as string, 10) as Datum
+                const values = data.data.map(mxObject => ({
+                    x: this.getXValue(mxObject, series),
+                    y: parseInt(mxObject.get(series.yValueAttribute) as string, 10) as Datum
                 }));
                 const rawOptions = series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
                 const configOptions = {
@@ -193,7 +191,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                         color: series.lineColor,
                         shape: series.lineStyle
                     },
-                    mode: series.mode.replace("X", "+") as Mode,
+                    mode: series.mode ? series.mode.replace("X", "+") as Mode : "lines",
                     name: series.name,
                     type: "scatter",
                     fill: props.fill ? "tonexty" : "none",
@@ -214,14 +212,15 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         return props.defaultData || [];
     }
 
-    private getStackedArea(traces: ScatterData[]) {
-        for (let i = 1; i < traces.length; i++) {
-            for (let j = 0; j < (Math.min(traces[i].y.length, traces[i - 1].y.length)); j++) {
-                (traces[i].y[j] as any) += traces[i - 1].y[j];
-            }
+    private getXValue(mxObject: mendix.lib.MxObject, series: SeriesProps): Datum {
+        if (mxObject.isDate(series.xValueAttribute)) {
+            const timestamp = mxObject.get(series.xValueAttribute) as number;
+            const date = new Date(timestamp);
+
+            return `${LineChart.parseDate(date)} ${LineChart.parseTime(date)}`;
         }
 
-        return traces;
+        return mxObject.get(series.xValueAttribute) as Datum;
     }
 
     private onClick(data: ScatterHoverData) {
@@ -263,5 +262,32 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             }
             this.timeoutId = 0;
         }, 100);
+    }
+
+    private static getConfigOptions(props: LineChartProps): Partial<Config> {
+        return { displayModeBar: props.showToolbar, doubleClick: false };
+    }
+
+    private static parseDate(date: Date) {
+        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+    }
+
+    private static parseTime(date: Date) {
+        const time: string[] = [];
+        time.push(date.getHours() < 10 ? `0${date.getHours()}` : `${date.getHours()}`);
+        time.push(date.getMinutes() < 10 ? `0${date.getMinutes()}` : `${date.getMinutes()}`);
+        time.push(date.getSeconds() < 10 ? `0${date.getSeconds()}` : `${date.getSeconds()}`);
+
+        return time.join(":");
+    }
+
+    private static getStackedArea(traces: ScatterData[]) {
+        for (let i = 1; i < traces.length; i++) {
+            for (let j = 0; j < (Math.min(traces[i].y.length, traces[i - 1].y.length)); j++) {
+                (traces[i].y[j] as any) += traces[i - 1].y[j];
+            }
+        }
+
+        return traces;
     }
 }

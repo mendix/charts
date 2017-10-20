@@ -1,8 +1,8 @@
 import { Component, createElement } from "react";
 
 import { Alert } from "../components/Alert";
-import { LineChart, Mode } from "./components/LineChart";
-import { LineChartContainerProps } from "./components/LineChartContainer";
+import { LineChart, Mode } from "../LineChart/components/LineChart";
+import { LineChartContainerProps } from "../LineChart/components/LineChartContainer";
 
 import { getRandomNumbers, validateSeriesProps } from "../utils/data";
 import deepMerge from "deepmerge";
@@ -13,11 +13,12 @@ export class preview extends Component<LineChartContainerProps, {}> {
     render() {
         return createElement("div", {},
             createElement(Alert, {
-                className: "widget-charts-line-alert",
+                className: "widget-charts-time-series-alert",
                 message: validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions)
             }),
             createElement(LineChart, {
                 ...this.props,
+                fill: false,
                 defaultData: this.getData(this.props)
             })
         );
@@ -41,7 +42,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                     mode: series.mode ? series.mode.replace("X", "+") as Mode : "lines",
                     name: series.name,
                     type: "scatter",
-                    fill: "none",
+                    fill: "tonexty",
                     x: sampleData.x || [],
                     y: sampleData.y || []
                 } ]);
@@ -59,7 +60,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
 
     private static getSampleTraces(): { x: (string | number)[], y: (string | number)[] } {
         return {
-            x: [ "Sample 1", "Sample 2", "Sample 3", "Sample 4" ],
+            x: [ "2017-10-04 22:23:00", "2017-11-04 22:23:00", "2017-12-04 22:23:00" ],
             y: getRandomNumbers(4, 100)
         };
     }

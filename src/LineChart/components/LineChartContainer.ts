@@ -2,20 +2,22 @@ import { Component, ReactElement, createElement } from "react";
 
 import { DataSourceProps, OnClickProps, fetchSeriesData, handleOnClick, validateSeriesProps } from "../../utils/data";
 import { Data, LineChart, Mode } from "./LineChart";
+import { AxisType } from "plotly.js";
 import { Dimensions } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
 export interface LineChartContainerProps extends WrapperProps, Dimensions {
     series: SeriesProps[];
     grid: "none" | "horizontal" | "vertical" | "both";
-    mode: Mode;
     lineColor: string;
     fill: boolean;
     showToolbar: boolean;
     showLegend: boolean;
+    showRangeSlider: boolean;
     tooltipForm: string;
     xAxisLabel: string;
     yAxisLabel: string;
+    xAxisType?: AxisType;
     layoutOptions: string;
     area?: "separate" | "stacked";
     devMode: boolean;
@@ -31,7 +33,7 @@ interface LineChartContainerState {
 
 export interface SeriesProps extends DataSourceProps, OnClickProps {
     name: string;
-    mode: Mode;
+    mode?: Mode;
     lineColor: string;
     lineStyle: "linear" | "spline";
 }

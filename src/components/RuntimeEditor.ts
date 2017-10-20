@@ -169,7 +169,7 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
                 color: series.lineColor,
                 shape: series.lineStyle
             },
-            mode: series.mode.replace("X", "+") as Mode,
+            mode: series.mode ? series.mode.replace("X", "+") as Mode : "lines",
             name: series.name,
             type: "scatter",
             fill: this.props.fill ? "tonexty" : "none"
