@@ -25,4 +25,26 @@ declare module "element-resize-detector" {
 
 declare module "*.json";
 
-declare module "react-ace";
+declare module "react-ace" {
+    import { Editor } from "brace";
+
+    export type Mode = "json" | "javascript";
+
+    export interface ReactAceProps {
+        mode: Mode;
+        value: string;
+        defaultValue?: string;
+        readOnly?: boolean;
+        theme: "github";
+        className?: string;
+        maxLines?: number;
+        minLines?: number;
+        onValidate?: (annotations: object[]) => void;
+        onChange?: (value: string) => void;
+        editorProps?: Partial<Editor>;
+    }
+
+    const ReactAce: React.ComponentClass<ReactAceProps>;
+
+    export { ReactAce as default };
+}

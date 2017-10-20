@@ -3,7 +3,7 @@ import { Component, createElement } from "react";
 import { Data, LineChartProps } from "src/LineChart/components/LineChart";
 import { SeriesProps } from "src/LineChart/components/LineChartContainer";
 import { MendixButton } from "./MendixButton";
-import AceEditor from "react-ace";
+import AceEditor, { Mode } from "react-ace";
 import { TabContainer } from "./TabContainer";
 import { TabHeader } from "./TabHeader";
 import { TabPane } from "./TabPane";
@@ -20,8 +20,6 @@ import "brace/theme/github";
 interface RuntimeEditorProps extends LineChartProps {
     onChange?: (layout: string, data: Data[]) => void;
 }
-
-type Mode = "json" | "javascript";
 
 export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: boolean }> {
     private updatedOptions: { layout: string, data: Data[] };
@@ -85,7 +83,7 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
             className: readOnly ? "ace-editor-read-only" : undefined,
             maxLines: 15,
             onValidate: this.setValidationState,
-            editorProps: { $blockScrolling: true }
+            editorProps: { $blockScrolling: Infinity }
         });
     }
 
@@ -134,7 +132,7 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
             value: layoutCode + (seriesCode ? seriesCode.join("\n\n") : ""),
             theme: "github",
             className: "ace-editor-read-only",
-            editorProps: { $blockScrolling: true }
+            editorProps: { $blockScrolling: Infinity }
         });
     }
 
