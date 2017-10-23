@@ -31,13 +31,13 @@ export class preview extends Component<BarChartContainerProps, {}> {
                     ? JSON.parse(series.sampleData.trim())
                     : preview.getSampleTraces();
 
-                return deepMerge.all([ seriesOptions, {
+                return deepMerge.all([ {
                     name: series.name,
                     type: "bar",
                     orientation: "h",
                     x: sampleData.x || [],
                     y: sampleData.y || []
-                } ]);
+                }, seriesOptions ]);
             });
         }
 

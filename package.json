@@ -32,6 +32,7 @@
     "@types/plotly.js": "^1.28.3",
     "@types/react": "^15.0.28",
     "@types/react-dom": "^15.5.3",
+    "@types/react-sidebar": "^2.2.2",
     "check-dependencies": "^1.0.1",
     "clean-webpack-plugin": "^0.1.16",
     "copy-webpack-plugin": "^4.0.1",
@@ -90,6 +91,7 @@
     "deepmerge": "^2.0.0",
     "element-resize-detector": "^1.1.12",
     "plotly.js": "^1.27.1",
-    "react-ace": "^5.4.0"
+    "react-ace": "^5.4.0",
+    "react-sidebar": "^2.3.2"
   }
 }

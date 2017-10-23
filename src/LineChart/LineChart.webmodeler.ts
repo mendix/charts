@@ -31,7 +31,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                     ? JSON.parse(series.sampleData.trim())
                     : preview.getSampleTraces();
 
-                return deepMerge.all([ seriesOptions, {
+                return deepMerge.all([ {
                     connectgaps: true,
                     hoveron: "points",
                     line: {
@@ -44,7 +44,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                     fill: "none",
                     x: sampleData.x || [],
                     y: sampleData.y || []
-                } ]);
+                }, seriesOptions ]);
             });
         }
 

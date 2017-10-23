@@ -104,7 +104,7 @@ export class PieChart extends Component<PieChartProps, {}> {
         if (props.data) {
             const advancedOptions = this.props.dataOptions ? JSON.parse(this.props.dataOptions) : {};
 
-            const dataOptions = [ deepMerge.all([ advancedOptions, {
+            const dataOptions = [ deepMerge.all([ {
                 hole: this.props.chartType === "donut" ? 0.4 : 0,
                 hoverinfo: this.props.tooltipForm ? "none" : "label",
                 labels: props.data.map(value => value.get(this.props.nameAttribute) as string),
@@ -114,7 +114,7 @@ export class PieChart extends Component<PieChartProps, {}> {
                 type: "pie",
                 values: props.data.map(value => parseFloat(value.get(this.props.valueAttribute) as string)),
                 sort: false
-            } ]) ];
+            }, advancedOptions ]) ];
 
             console.log("Data Options: ", dataOptions);
             return dataOptions as PieData[];
@@ -127,12 +127,12 @@ export class PieChart extends Component<PieChartProps, {}> {
     private getLayoutOptions(props: PieChartProps): Partial<Layout> {
         const advancedOptions = props.layoutOptions ? JSON.parse(props.layoutOptions) : {};
 
-        return deepMerge.all([ advancedOptions, {
+        return deepMerge.all([ {
             autosize: true,
             showlegend: props.showLegend,
             width: this.pieChartNode && this.pieChartNode.clientWidth,
             height: this.pieChartNode && this.pieChartNode.clientHeight
-        } ]);
+        }, advancedOptions ]);
     }
 
     private getConfigOptions(props: PieChartProps): Partial<Config> {

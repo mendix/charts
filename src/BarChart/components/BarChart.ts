@@ -162,7 +162,7 @@ export class BarChart extends Component<BarChartProps, {}> {
                 };
 
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
-                return { ...deepMerge.all<ScatterData>([ rawOptions, configOptions ]), mxObjects: data.data };
+                return { ...deepMerge.all<ScatterData>([ configOptions, rawOptions ]), mxObjects: data.data };
             });
 
             console.log("Data Options:", dataOptions);

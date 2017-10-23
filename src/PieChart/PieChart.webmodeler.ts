@@ -36,7 +36,7 @@ export class preview extends Component<PieChartContainerProps, {}> {
                 ? JSON.parse(props.sampleData.trim())
                 : this.sampleTraces;
 
-            return [ deepMerge.all([ advancedOptions, {
+            return [ deepMerge.all([ {
                 hole: props.chartType === "donut" ? 0.4 : 0,
                 hoverinfo: props.tooltipForm ? "none" : "label",
                 labels: sampleData.labels,
@@ -44,7 +44,7 @@ export class preview extends Component<PieChartContainerProps, {}> {
                 type: "pie",
                 values: sampleData.values,
                 sort: false
-            } ]) ];
+            }, advancedOptions ]) ];
         }
 
         return [
