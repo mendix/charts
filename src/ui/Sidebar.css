@@ -1,0 +1,100 @@
+/*
+ * Component: Control sidebar. By default, this is the right sidebar.
+ */
+
+.control-sidebar {
+    position: fixed;
+    padding-top: 0;
+    top: 0;
+    right: -400px;
+    width: 400px;
+    height: 100%;
+    min-height: 400px;
+    overflow: auto;
+    z-index: 1010;
+    -webkit-transition: right 0.3s ease-in-out;
+    -o-transition: right 0.3s ease-in-out;
+    transition: right 0.3s ease-in-out;
+}
+@media (max-width: 768px) {
+    .control-sidebar {
+        padding-top: 0;
+    }
+
+    .control-sidebar.control-sidebar-open {
+        width: 100%;
+    }
+}
+.control-sidebar > .tab-content {
+    padding: 10px 15px;
+}
+.control-sidebar.control-sidebar-open {
+    right: 0;
+}
+.nav-tabs.control-sidebar-tabs > li:first-of-type > a,
+.nav-tabs.control-sidebar-tabs > li:first-of-type > a:hover,
+.nav-tabs.control-sidebar-tabs > li:first-of-type > a:focus {
+    border-left-width: 0;
+}
+.nav-tabs.control-sidebar-tabs > li > a {
+    border-radius: 0;
+}
+.nav-tabs.control-sidebar-tabs > li > a,
+.nav-tabs.control-sidebar-tabs > li > a:hover {
+    border-top: none;
+    border-right: none;
+    border-left: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+}
+.nav-tabs.control-sidebar-tabs > li > a .icon {
+    font-size: 16px;
+}
+.nav-tabs.control-sidebar-tabs > li.active > a,
+.nav-tabs.control-sidebar-tabs > li.active > a:hover,
+.nav-tabs.control-sidebar-tabs > li.active > a:focus,
+.nav-tabs.control-sidebar-tabs > li.active > a:active {
+    border-top: none;
+    border-right: none;
+    border-bottom: none;
+}
+@media (max-width: 768px) {
+    .nav-tabs.control-sidebar-tabs {
+        display: table;
+    }
+    .nav-tabs.control-sidebar-tabs > li {
+        display: table-cell;
+    }
+}
+.control-sidebar-light {
+    color: #5e5e5e;
+}
+.control-sidebar-light,
+.control-sidebar-light + .control-sidebar-bg {
+    background: #f9fafc;
+    border: 1px solid #d2d6de;
+}
+.control-sidebar-light .nav-tabs.control-sidebar-tabs {
+    border-bottom: #d2d6de;
+}
+.control-sidebar-light .nav-tabs.control-sidebar-tabs > li > a {
+    background: #e8ecf4;
+    color: #444444;
+}
+.control-sidebar-light .nav-tabs.control-sidebar-tabs > li > a,
+.control-sidebar-light .nav-tabs.control-sidebar-tabs > li > a:hover,
+.control-sidebar-light .nav-tabs.control-sidebar-tabs > li > a:focus {
+    border-left-color: #d2d6de;
+    border-bottom-color: #d2d6de;
+}
+.control-sidebar-light .nav-tabs.control-sidebar-tabs > li > a:hover,
+.control-sidebar-light .nav-tabs.control-sidebar-tabs > li > a:focus,
+.control-sidebar-light .nav-tabs.control-sidebar-tabs > li > a:active {
+    background: #eff1f7;
+}
+.control-sidebar-light .nav-tabs.control-sidebar-tabs > li.active > a,
+.control-sidebar-light .nav-tabs.control-sidebar-tabs > li.active > a:hover,
+.control-sidebar-light .nav-tabs.control-sidebar-tabs > li.active > a:focus,
+.control-sidebar-light .nav-tabs.control-sidebar-tabs > li.active > a:active {
+    background: #f9fafc;
+    color: #111;
+}

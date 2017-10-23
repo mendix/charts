@@ -1,4 +1,5 @@
 import { Component, ReactElement, cloneElement, createElement, isValidElement } from "react";
+import * as classNames from "classnames";
 
 import { TabHeader } from "./TabHeader";
 import { TabPane } from "./TabPane";
@@ -7,14 +8,13 @@ import { TabTool } from "./TabTool";
 interface TabContainerProps {
     activeIndex?: number;
     header?: string;
-    style?: "tabs" | "pills";
+    className?: string;
+    tabHeaderClass?: string;
+    justified?: boolean;
 }
 
 export class TabContainer extends Component<TabContainerProps, { activeIndex: number }> {
-    static defaultProps: TabContainerProps = {
-        activeIndex: 0,
-        style: "tabs"
-    };
+    static defaultProps: TabContainerProps = { activeIndex: 0 };
 
     constructor(props: TabContainerProps) {
         super(props);
@@ -25,11 +25,16 @@ export class TabContainer extends Component<TabContainerProps, { activeIndex: nu
     }
 
     render() {
-        return createElement("div", { className: "nav-tabs-custom mx-tabcontainer" },
-            createElement("ul", { className: `nav nav-${this.props.style} mx-tabcontainer-tabs` },
-                this.getHeader(),
-                this.getTabElement("HEADER"),
-                this.getTabTools()
+        return createElement("div", { className: classNames(this.props.className) },
+            createElement("ul",
+                {
+                        className: classNames("nav nav-tabs", this.props.tabHeaderClass, {
+                            "nav-tabs-justified": this.props.justified
+                        })
+                    },
+                    this.getHeader(),
+                    this.getTabElement("HEADER"),
+                    this.getTabTools()
             ),
             createElement("div", { className: "tab-content mx-tabcontainer-content" },
                 this.getTabElement("PANE")

@@ -4,6 +4,7 @@ import { Data, LineChartProps } from "src/LineChart/components/LineChart";
 import { SeriesProps } from "src/LineChart/components/LineChartContainer";
 import { MendixButton } from "./MendixButton";
 import AceEditor, { Mode } from "react-ace";
+import { Sidebar } from "./Sidebar";
 import { TabContainer } from "./TabContainer";
 import { TabHeader } from "./TabHeader";
 import { TabPane } from "./TabPane";
@@ -41,27 +42,9 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
     }
 
     render() {
-        if (this.state.showEditor) {
-            return createElement("div", { className: "widget-charts-advanced" },
-                createElement(TabContainer, { style: "tabs" },
-                    createElement(TabHeader, { title: "Chart preview" }),
-                    createElement(TabHeader, { title: "Modeler configuration" }),
-                    createElement(TabHeader, { title: "Advanced options" }),
-                    createElement(TabHeader, { title: "Data" }),
-                    createElement(TabHeader, { title: "Full config" }),
-                    createElement(TabTool, { className: "pull-right remove", onClick: this.toggleShowEditor },
-                        createElement("em", { className: "glyphicon glyphicon-remove" })
-                    ),
-                    createElement(TabPane, {}, this.props.children),
-                    createElement(TabPane, {}, this.renderAceEditor(this.getXMLConfigs(), undefined, true)),
-                    createElement(TabPane, {}, this.renderAdvancedOptions(this.props.data || [])),
-                    createElement(TabPane, {}, this.renderData(this.props.data || [])),
-                    createElement(TabPane, {}, this.renderFullConfig())
-                )
-            );
-        }
         return createElement("div", { className: "widget-charts-advanced" },
-            createElement(MendixButton, { onClick: this.toggleShowEditor }, "Open Editor"),
+            createElement(Sidebar, { open: this.state.showEditor }, this.renderTabs()),
+            createElement(MendixButton, { onClick: this.toggleShowEditor }, "Toggle Editor"),
             this.props.children
         );
     }
@@ -73,6 +56,22 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
         };
     }
 
+    private renderTabs() {
+        return createElement(TabContainer, { tabHeaderClass: "control-sidebar-tabs", justified: true },
+            createElement(TabHeader, { title: "Advanced" }),
+            createElement(TabHeader, { title: "Modeler" }),
+            createElement(TabHeader, { title: "Data" }),
+            createElement(TabHeader, { title: "Full" }),
+            createElement(TabTool, { className: "pull-right remove", onClick: this.toggleShowEditor },
+                createElement("em", { className: "glyphicon glyphicon-remove" })
+            ),
+            createElement(TabPane, {}, this.renderAdvancedOptions(this.props.data || [])),
+            createElement(TabPane, {}, this.renderAceEditor(this.getXMLConfigs(), undefined, true)),
+            createElement(TabPane, {}, this.renderData(this.props.data || [])),
+            createElement(TabPane, {}, this.renderFullConfig())
+        );
+    }
+
     private renderAceEditor(value: string, onChange?: (value: string) => void, readOnly = false, mode: Mode = "json") {
         return createElement(AceEditor, {
             mode,
@@ -81,7 +80,7 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
             onChange,
             theme: "github",
             className: readOnly ? "ace-editor-read-only" : undefined,
-            maxLines: 15,
+            maxLines: 1000, // crappy attempt to avoid a third scroll bar
             onValidate: this.setValidationState,
             editorProps: { $blockScrolling: Infinity }
         });
@@ -131,6 +130,7 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
             readOnly: true,
             value: layoutCode + (seriesCode ? seriesCode.join("\n\n") : ""),
             theme: "github",
+            maxLines: 1000,
             className: "ace-editor-read-only",
             editorProps: { $blockScrolling: Infinity }
         });
