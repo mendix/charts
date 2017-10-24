@@ -52,6 +52,7 @@
                         <attributeType name="Decimal"/>
                         <attributeType name="Long"/>
                         <attributeType name="Integer"/>
+                        <attributeType name="DateTime"/>
                     </attributeTypes>
                 </property>
                 <property key="yValueAttribute" type="attribute" entityProperty="dataEntity">
@@ -99,7 +100,7 @@
                 <property key="lineColor" type="string" required="false">
                     <caption>Line color</caption>
                     <category>Appearance</category>
-                    <description/>
+                    <description>Color of the line eg: green, #00FF00, rgb(0,255,0)</description>
                 </property>
                 <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
                     <caption>On click</caption>
@@ -162,6 +163,16 @@
         </property>
         <property key="showToolbar" type="boolean" defaultValue="false">
             <caption>Show toolbar</caption>
+            <category>Chart properties</category>
+            <description/>
+        </property>
+        <property key="showRangeSlider" type="boolean" defaultValue="false">
+            <caption>Show range slider</caption>
+            <category>Chart properties</category>
+            <description/>
+        </property>
+        <property key="enableZoom" type="boolean" defaultValue="false">
+            <caption>Enable zoom</caption>
             <category>Chart properties</category>
             <description/>
         </property>

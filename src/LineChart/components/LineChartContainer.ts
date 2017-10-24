@@ -14,6 +14,7 @@ export interface LineChartContainerProps extends WrapperProps, Dimensions {
     showToolbar: boolean;
     showLegend: boolean;
     showRangeSlider: boolean;
+    enableZoom: boolean;
     tooltipForm: string;
     xAxisLabel: string;
     yAxisLabel: string;

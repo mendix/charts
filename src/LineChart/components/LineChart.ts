@@ -157,9 +157,8 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             xaxis: {
                 title: props.xAxisLabel,
                 showgrid: props.grid === "vertical" || props.grid === "both",
-                fixedrange: props.xAxisType !== "date",
-                type: this.props.xAxisType,
-                rangeslider: this.props.showRangeSlider
+                fixedrange: !props.enableZoom,
+                rangeslider: props.showRangeSlider
             },
             yaxis: {
                 title: props.yAxisLabel,

@@ -11,8 +11,7 @@ const widgetConfig = {
         ColumnChart: "./src/ColumnChart/components/ColumnChartContainer.ts",
         LineChart: "./src/LineChart/components/LineChartContainer.ts",
         AreaChart: "./src/AreaChart/components/AreaChartContainer.ts",
-        PieChart: "./src/PieChart/components/PieChartContainer.ts",
-        TimeSeries: "./src/TimeSeries/components/TimeSeriesContainer.ts"
+        PieChart: "./src/PieChart/components/PieChartContainer.ts"
     },
     output: {
         path: path.resolve(__dirname, "dist/tmp"),
@@ -85,8 +84,7 @@ const previewConfig = {
         ColumnChart: "./src/ColumnChart/ColumnChart.webmodeler.ts",
         LineChart: "./src/LineChart/LineChart.webmodeler.ts",
         AreaChart: "./src/AreaChart/AreaChart.webmodeler.ts",
-        PieChart: "./src/PieChart/PieChart.webmodeler.ts",
-        TimeSeries: "./src/TimeSeries/TimeSeries.webmodeler.ts"
+        PieChart: "./src/PieChart/PieChart.webmodeler.ts"
     },
     output: {
         path: path.resolve(__dirname, "dist/tmp"),
