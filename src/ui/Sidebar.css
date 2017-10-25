@@ -85,6 +85,7 @@
 .control-sidebar-light .nav-tabs.control-sidebar-tabs > li > a:focus {
     border-left-color: #d2d6de;
     border-bottom-color: #d2d6de;
+    cursor: pointer;
 }
 .control-sidebar-light .nav-tabs.control-sidebar-tabs > li > a:hover,
 .control-sidebar-light .nav-tabs.control-sidebar-tabs > li > a:focus,

@@ -47,14 +47,19 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
         this.state = { showEditor: false };
         this.updatedOptions = {
             layout: props.layoutOptions || "{}",
-            data: props.rawData || []
+            data: props.supportSeries ? props.rawData || [] : props.dataOptions || "{}"
         };
     }
 
     render() {
         return createElement("div", { className: "widget-charts-advanced" },
             createElement(Sidebar, { open: this.state.showEditor }, this.renderTabs()),
-            createElement(MendixButton, { onClick: this.toggleShowEditor }, "Toggle Editor"),
+            createElement("div", { className: "widget-charts-advanced-toggle" },
+                createElement(MendixButton, {
+                    onClick: this.toggleShowEditor,
+                    className: "pull-right"
+                }, "Toggle Editor")
+            ),
             this.props.children
         );
     }

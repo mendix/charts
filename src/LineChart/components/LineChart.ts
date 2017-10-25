@@ -244,6 +244,13 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 title: props.yAxisLabel,
                 showgrid: props.grid === "horizontal" || props.grid === "both",
                 fixedrange: !props.enableZoom
+            },
+            margin: {
+                l: 60,
+                r: 60,
+                b: 60,
+                t: 100,
+                pad: 4
             }
         };
     }

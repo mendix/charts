@@ -161,7 +161,14 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
             autosize: true,
             showlegend: props.showLegend,
             width: this.pieChartNode && this.pieChartNode.clientWidth,
-            height: this.pieChartNode && this.pieChartNode.clientHeight
+            height: this.pieChartNode && this.pieChartNode.clientHeight,
+            margin: {
+                l: 60,
+                r: 60,
+                b: 60,
+                t: 100,
+                pad: 4
+            }
         }, advancedOptions ]);
     }
 

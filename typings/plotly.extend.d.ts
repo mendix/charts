@@ -7,6 +7,14 @@ declare module "plotly.js" {
         barmode: BarMode;
     }
 
+    export interface Margin {
+        t: number;
+        b: number;
+        l: number;
+        r: number;
+        pad: number;
+    }
+
     export interface ScatterHoverData {
         event: MouseEvent;
         points: Array<{
