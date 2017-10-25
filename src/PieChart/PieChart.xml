@@ -31,7 +31,7 @@
         </property>
         <property key="nameAttribute" type="attribute" entityProperty="dataEntity">
             <caption>Name attribute</caption>
-            <category>Data point</category>
+            <category>Data points</category>
             <description/>
             <attributeTypes>
                 <attributeType name="String"/>
@@ -39,7 +39,7 @@
         </property>
         <property key="valueAttribute" type="attribute" entityProperty="dataEntity">
             <caption>Value attribute</caption>
-            <category>Data point</category>
+            <category>Data points</category>
             <description/>
             <attributeTypes>
                 <attributeType name="Integer"/>
@@ -49,7 +49,7 @@
         </property>
         <property key="sortAttribute" type="attribute" entityProperty="dataEntity" required="false">
             <caption>Sort attribute</caption>
-            <category>Data point</category>
+            <category>Data points</category>
             <description>Attribute to use for sorting the data (ascending)</description>
             <attributeTypes>
                 <attributeType name="Decimal"/>
@@ -62,7 +62,7 @@
         </property>
         <property key="colorAttribute" type="attribute" entityProperty="dataEntity" required="false">
             <caption>Color attribute</caption>
-            <category>Data point</category>
+            <category>Data points</category>
             <description/>
             <attributeTypes>
                 <attributeType name="String"/>

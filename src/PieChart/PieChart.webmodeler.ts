@@ -65,11 +65,9 @@ export function getPreviewCss() {
 
 export function getVisibleProperties(valueMap: PieChartContainerProps, visibilityMap: VisibilityMap<PieChartContainerProps>) { // tslint:disable-line max-line-length
     if (valueMap.dataSourceType === "XPath") {
-        visibilityMap.entityConstraint = true;
         visibilityMap.dataSourceMicroflow = false;
     } else if (valueMap.dataSourceType === "microflow") {
         visibilityMap.entityConstraint = false;
-        visibilityMap.dataSourceMicroflow = true;
     }
 
     return visibilityMap;

@@ -54,7 +54,7 @@
                 </property>
                 <property key="xValueAttribute" type="attribute" entityProperty="dataEntity">
                     <caption>X-axis data attribute</caption>
-                    <category>Data point</category>
+                    <category>Data points</category>
                     <description/>
                     <attributeTypes>
                         <attributeType name="String"/>
@@ -65,7 +65,7 @@
                 </property>
                 <property key="yValueAttribute" type="attribute" entityProperty="dataEntity">
                     <caption>Y-axis data attribute</caption>
-                    <category>Data point</category>
+                    <category>Data points</category>
                     <description/>
                     <attributeTypes>
                         <attributeType name="Decimal"/>
@@ -75,7 +75,7 @@
                 </property>
                 <property key="xValueSortAttribute" type="attribute" entityProperty="dataEntity">
                     <caption>X-axis sort attribute</caption>
-                    <category>Data point</category>
+                    <category>Data points</category>
                     <description>Attribute to use for sorting the x-axis data (ascending)</description>
                     <attributeTypes>
                         <attributeType name="Decimal"/>

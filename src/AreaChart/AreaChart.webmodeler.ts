@@ -67,6 +67,20 @@ export class preview extends Component<LineChartContainerProps, {}> {
     }
 }
 
+export function getVisibleProperties(valueMap: LineChartContainerProps, visibilityMap: VisibilityMap<LineChartContainerProps>) { // tslint:disable-line max-line-length
+    if (valueMap.series && Array.isArray(valueMap.series)) {
+        valueMap.series.forEach((series, index) => {
+            if (series.dataSourceType === "XPath") {
+                visibilityMap.series[index].dataSourceMicroflow = false;
+            } else if (series.dataSourceType === "microflow") {
+                visibilityMap.series[index].entityConstraint = false;
+            }
+        });
+    }
+
+    return visibilityMap;
+}
+
 export function getPreviewCss() {
     return require("plotly.js/src/css/style.scss");
 }
