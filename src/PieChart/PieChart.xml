@@ -157,5 +157,10 @@
             <category>Advanced</category>
             <description>To be used as a more accurate representation of project data in the web modeler</description>
         </property>
+        <property key="devMode" type="boolean" defaultValue="false">
+            <caption>Dev mode</caption>
+            <category>Advanced</category>
+            <description>Allows run time editing and preview of the output of the JSON properties</description>
+        </property>
     </properties>
 </widget>

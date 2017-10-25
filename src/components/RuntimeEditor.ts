@@ -9,25 +9,30 @@ import { TabPane } from "./TabPane";
 import { TabTool } from "./TabTool";
 
 import "brace";
-import { SeriesData, Trace } from "../utils/data";
+import { ScatterTrace, SeriesData } from "../utils/data";
 import deepMerge from "deepmerge";
+import { PieTraces } from "../PieChart/components/PieChart";
 import { ScatterData } from "plotly.js";
-import { LayoutProps } from "../utils/types";
 
 import "brace/mode/json";
 import "brace/mode/javascript";
 import "brace/theme/github";
 
-interface RuntimeEditorProps extends LayoutProps {
-    onChange?: (layout: string, data: SeriesData[]) => void;
-    rawData: SeriesData[];
-    chartData: ScatterData[];
-    traces: ({ name: string } & Trace)[];
+interface RuntimeEditorProps {
+    supportSeries: boolean;
+    layoutOptions: string;
+    dataOptions?: string;
     modelerConfigs: string;
+    rawData?: SeriesData[];
+    chartData?: ScatterData[];
+    traces: RuntimeSeriesTrace[] | PieTraces;
+    onChange?: (layout: string, data: SeriesData[] | string) => void;
 }
 
+type RuntimeSeriesTrace = ({ name: string } & ScatterTrace);
+
 export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: boolean }> {
-    private updatedOptions: { layout: string, data: SeriesData[] };
+    private updatedOptions: { layout: string, data: SeriesData[] | string };
     private timeoutId: number;
     private isValid: boolean;
 
@@ -89,23 +94,46 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
             createElement("h4", {}, "Layout options"),
             this.renderAceEditor(this.props.layoutOptions, value => this.updateOption("layout", value))
         );
-        const seriesOptions = this.props.rawData.map(({ series }, index) =>
-            createElement("div", { key: `series-${index}` },
-                createElement("h4", {}, series.name),
-                this.renderAceEditor(series.seriesOptions || "{}", value => this.updateOption(`series-${index}`, value))
-            )
-        );
+        if (this.props.supportSeries && this.props.rawData) {
+            const seriesOptions = this.props.rawData.map(({ series }, index) =>
+                createElement("div", { key: `series-${index}` },
+                    createElement("h4", {}, series.name),
+                    this.renderAceEditor(series.seriesOptions || "{\n\n}", value =>
+                        this.updateOption(`series-${index}`, value)
+                    )
+                )
+            );
 
-        return [ layoutOptions ].concat(seriesOptions);
+            return [ layoutOptions ].concat(seriesOptions);
+        }
+        if (!this.props.supportSeries && this.props.dataOptions) {
+            const dataOptions = createElement("div", { key: "data" },
+                createElement("h4", {}, "Data options"),
+                this.renderAceEditor(this.props.dataOptions, value => this.updateOption("layout", value))
+            );
+
+            return [ layoutOptions ].concat(dataOptions);
+        }
+
+        return layoutOptions;
     }
 
     private renderData() {
-        return this.props.traces.map((trace, index) =>
-            createElement("div", { key: `series-${index}` },
-                createElement("h4", {}, trace.name),
-                this.renderAceEditor(JSON.stringify({ x: trace.x, y: trace.y }, null, 4), undefined, true)
-            )
-        );
+        if (this.props.supportSeries && Array.isArray(this.props.traces)) {
+            return (this.props.traces as RuntimeSeriesTrace[]).map((trace, index) =>
+                createElement("div", { key: `series-${index}` },
+                    createElement("h4", {}, trace.name),
+                    this.renderAceEditor(JSON.stringify({ x: trace.x, y: trace.y }, null, 4), undefined, true)
+                )
+            );
+        }
+        if (!this.props.supportSeries && this.props.traces) {
+            return createElement("div", {},
+                this.renderAceEditor(JSON.stringify(this.props.traces as PieTraces, null, 4), undefined, true)
+            );
+        }
+
+        return null;
     }
 
     private renderFullConfig() {
@@ -113,13 +141,17 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
             JSON.parse(this.props.modelerConfigs),
             JSON.parse(this.props.layoutOptions)
         ]);
-        const layoutCode = `var layoutOptions = ${JSON.stringify(mergedLayoutOptions, null, 4)};\n\n`;
-        const seriesCode = this.props.chartData.map(RuntimeEditor.getSeriesCode);
+        let value = `var layoutOptions = ${JSON.stringify(mergedLayoutOptions, null, 4)};\n\n`;
+        if (this.props.supportSeries && this.props.chartData) {
+            value = value + this.props.chartData.map(RuntimeEditor.getSeriesCode).join("\n\n");
+        } else if (this.props.dataOptions) {
+            value = value + JSON.stringify(JSON.parse(this.props.dataOptions), null, 4);
+        }
 
         return createElement(AceEditor, {
             mode: "javascript",
             readOnly: true,
-            value: layoutCode + (seriesCode ? seriesCode.join("\n\n") : ""),
+            value,
             theme: "github",
             maxLines: 1000, // crappy attempt to avoid a third scroll bar
             className: "ace-editor-read-only",
@@ -137,7 +169,9 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
         }
         if (source.indexOf("series") > -1) {
             const index = source.split("-")[1];
-            this.updatedOptions.data[ parseInt(index, 10) ].series.seriesOptions = value;
+            (this.updatedOptions.data[ parseInt(index, 10) ] as SeriesData).series.seriesOptions = value;
+        } else if (source.indexOf("data") > -1) {
+            this.updatedOptions.data = value;
         }
         if (this.timeoutId) {
             clearTimeout(this.timeoutId);

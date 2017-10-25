@@ -35,7 +35,7 @@ export interface SeriesData {
     series: SeriesProps;
 }
 
-export interface Trace {
+export interface ScatterTrace {
     x: Datum[];
     y: number[] | Datum[];
 }
@@ -158,7 +158,7 @@ export const handleOnClick = <T extends OnClickProps>(options: T, mxObject?: MxO
     }
 };
 
-export const getSeriesTraces = ({ data, series }: SeriesData): Trace => {
+export const getSeriesTraces = ({ data, series }: SeriesData): ScatterTrace => {
     if (data) {
         return {
             x: data.map(mxObject => getXValue(mxObject, series)),
@@ -169,7 +169,7 @@ export const getSeriesTraces = ({ data, series }: SeriesData): Trace => {
     return { x: [], y: [] };
 };
 
-export const getRuntimeTraces = ({ data, series }: SeriesData): ({ name: string } & Trace) => {
+export const getRuntimeTraces = ({ data, series }: SeriesData): ({ name: string } & ScatterTrace) => {
     return { name: series.name, ...getSeriesTraces({ data, series }) };
 };
 

@@ -13,7 +13,7 @@ import * as elementResize from "element-resize-detector";
 import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
 import { newPlot, purge } from "../../PlotlyCustom";
 import { getDimensions, parseStyle } from "../../utils/style";
-import { LayoutProps, LineMode } from "../../utils/types";
+import { LineMode } from "../../utils/types";
 
 import "../../ui/Charts.scss";
 
@@ -65,8 +65,8 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         }
         if (this.props.devMode) {
             return createElement(RuntimeEditor, {
-                ...this.props as LayoutProps,
-                layoutOptions: this.state.layoutOptions || "{}",
+                supportSeries: true,
+                layoutOptions: this.state.layoutOptions || "{\n\n}",
                 rawData: this.state.data || [],
                 chartData: this.getData(this.props),
                 modelerConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 4),

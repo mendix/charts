@@ -23,6 +23,7 @@ export interface PieChartContainerProps extends WrapperProps, Dimensions, OnClic
     layoutOptions: string;
     dataOptions: string;
     sampleData: string;
+    devMode: boolean;
 }
 
 interface PieChartContainerState {

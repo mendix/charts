@@ -6,6 +6,7 @@ import { newPlot, purge } from "../../PlotlyCustom";
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
 import { PieChartContainerProps } from "./PieChartContainer";
+import { RuntimeEditor } from "../../components/RuntimeEditor";
 
 import deepMerge from "deepmerge";
 import * as elementResize from "element-resize-detector";
@@ -23,7 +24,18 @@ export interface PieChartProps extends PieChartContainerProps {
     onHover?: (node: HTMLDivElement, index: number) => void;
 }
 
-export class PieChart extends Component<PieChartProps, {}> {
+interface PieChartState {
+    layoutOptions: string;
+    dataOptions: string;
+}
+
+export interface PieTraces {
+    labels: string[];
+    colors: string[];
+    values: number[];
+}
+
+export class PieChart extends Component<PieChartProps, PieChartState> {
     private pieChartNode?: HTMLDivElement;
     private tooltipNode: HTMLDivElement;
     private timeoutId: number;
@@ -38,6 +50,11 @@ export class PieChart extends Component<PieChartProps, {}> {
         this.onHover = this.onHover.bind(this);
         this.clearToolTip = this.clearToolTip.bind(this);
         this.onResize = this.onResize.bind(this);
+        this.onRuntimeUpdate = this.onRuntimeUpdate.bind(this);
+        this.state = {
+            layoutOptions: props.layoutOptions,
+            dataOptions: props.dataOptions
+        };
     }
 
     render() {
@@ -50,15 +67,18 @@ export class PieChart extends Component<PieChartProps, {}> {
         if (this.props.loading) {
             return createElement(ChartLoading, { text: "Loading" });
         }
+        if (this.props.devMode) {
+            return createElement(RuntimeEditor, {
+                supportSeries: false,
+                layoutOptions: this.state.layoutOptions || "{\n\n}",
+                dataOptions: this.state.dataOptions || "{\n\n}",
+                modelerConfigs: JSON.stringify({ autosize: true, showlegend: this.props.showLegend }, null, 4),
+                traces: this.getTraces(this.props.data),
+                onChange: this.onRuntimeUpdate
+            }, this.renderChartNode());
+        }
 
-        return createElement("div",
-            {
-                className: classNames(`widget-charts-${this.props.chartType}`, this.props.class),
-                ref: this.getPlotlyNodeRef,
-                style: { ...getDimensions(this.props), ...parseStyle(this.props.style) }
-            },
-            createElement("div", { className: "widget-charts-tooltip", ref: this.getTooltipNodeRef })
-        );
+        return this.renderChartNode();
     }
 
     componentDidMount() {
@@ -89,6 +109,17 @@ export class PieChart extends Component<PieChartProps, {}> {
         this.tooltipNode = node;
     }
 
+    private renderChartNode() {
+        return createElement("div",
+            {
+                className: classNames(`widget-charts-${this.props.chartType}`, this.props.class),
+                ref: this.getPlotlyNodeRef,
+                style: { ...getDimensions(this.props), ...parseStyle(this.props.style) }
+            },
+            createElement("div", { className: "widget-charts-tooltip", ref: this.getTooltipNodeRef })
+        );
+    }
+
     private renderChart(props: PieChartProps) {
         if (this.pieChartNode) {
             newPlot(this.pieChartNode, this.getData(props) as any, this.getLayoutOptions(props), this.getConfigOptions(props)) // tslint:disable-line
@@ -102,17 +133,16 @@ export class PieChart extends Component<PieChartProps, {}> {
 
     private getData(props: PieChartProps): PieData[] {
         if (props.data) {
-            const advancedOptions = this.props.dataOptions ? JSON.parse(this.props.dataOptions) : {};
+            const advancedOptions = this.state.dataOptions ? JSON.parse(this.state.dataOptions) : {};
+            const traces = this.getTraces(props.data);
 
             const dataOptions = [ deepMerge.all([ {
                 hole: this.props.chartType === "donut" ? 0.4 : 0,
                 hoverinfo: this.props.tooltipForm ? "none" : "label",
-                labels: props.data.map(value => value.get(this.props.nameAttribute) as string),
-                marker: {
-                    colors: props.data.map(value => value.get(this.props.colorAttribute) as string)
-                },
+                labels: traces.labels,
+                marker: { colors: traces.colors },
                 type: "pie",
-                values: props.data.map(value => parseFloat(value.get(this.props.valueAttribute) as string)),
+                values: traces.values,
                 sort: false
             }, advancedOptions ]) ];
 
@@ -125,7 +155,7 @@ export class PieChart extends Component<PieChartProps, {}> {
     }
 
     private getLayoutOptions(props: PieChartProps): Partial<Layout> {
-        const advancedOptions = props.layoutOptions ? JSON.parse(props.layoutOptions) : {};
+        const advancedOptions = this.state.layoutOptions ? JSON.parse(this.state.layoutOptions) : {};
 
         return deepMerge.all([ {
             autosize: true,
@@ -137,6 +167,18 @@ export class PieChart extends Component<PieChartProps, {}> {
 
     private getConfigOptions(props: PieChartProps): Partial<Config> {
         return { displayModeBar: props.showToolbar, doubleClick: false };
+    }
+
+    private getTraces(data?: mendix.lib.MxObject[]): PieTraces {
+        if (data) {
+            return {
+                labels: data.map(mxObject => mxObject.get(this.props.nameAttribute) as string),
+                colors: data.map(mxObject => mxObject.get(this.props.colorAttribute) as string),
+                values: data.map(mxObject => parseFloat(mxObject.get(this.props.valueAttribute) as string))
+            };
+        }
+
+        return { labels: [], colors: [], values: [] };
     }
 
     private onClick(data: PieHoverData) {
@@ -180,5 +222,9 @@ export class PieChart extends Component<PieChartProps, {}> {
             }
             this.timeoutId = 0;
         }, 100);
+    }
+
+    private onRuntimeUpdate(layoutOptions: string, dataOptions: string) {
+        this.setState({ layoutOptions, dataOptions });
     }
 }

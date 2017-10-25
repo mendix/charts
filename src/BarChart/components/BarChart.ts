@@ -13,7 +13,6 @@ import * as elementResize from "element-resize-detector";
 import { newPlot, purge } from "../../PlotlyCustom";
 import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
 import { getDimensions, parseStyle } from "../../utils/style";
-import { LayoutProps } from "../../utils/types";
 
 import "../../ui/Charts.scss";
 
@@ -64,8 +63,8 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
         }
         if (this.props.devMode) {
             return createElement(RuntimeEditor, {
-                ...this.props as LayoutProps,
-                layoutOptions: this.state.layoutOptions || "{}",
+                supportSeries: true,
+                layoutOptions: this.state.layoutOptions || "{\n\n}",
                 rawData: this.state.data || [],
                 chartData: this.getData(this.props),
                 modelerConfigs: JSON.stringify(BarChart.defaultLayoutConfigs(this.props), null, 4),
