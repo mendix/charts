@@ -158,6 +158,45 @@ export const handleOnClick = <T extends OnClickProps>(options: T, mxObject?: MxO
     }
 };
 
+export const getSeriesTraces = ({ data, series }: SeriesData): Trace => {
+    if (data) {
+        return {
+            x: data.map(mxObject => getXValue(mxObject, series)),
+            y: data.map(mxObject => parseInt(mxObject.get(series.yValueAttribute) as string, 10))
+        };
+    }
+
+    return { x: [], y: [] };
+};
+
+export const getRuntimeTraces = ({ data, series }: SeriesData): ({ name: string } & Trace) => {
+    return { name: series.name, ...getSeriesTraces({ data, series }) };
+};
+
+export const getXValue = (mxObject: mendix.lib.MxObject, series: SeriesProps): Datum => {
+    if (mxObject.isDate(series.xValueAttribute)) {
+        const timestamp = mxObject.get(series.xValueAttribute) as number;
+        const date = new Date(timestamp);
+
+        return `${parseDate(date)} ${parseTime(date)}`;
+    }
+
+    return mxObject.get(series.xValueAttribute) as Datum;
+};
+
+export const parseDate = (date: Date): string => {
+    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+};
+
+export const parseTime = (date: Date): string => {
+    const time: string[] = [];
+    time.push(date.getHours() < 10 ? `0${date.getHours()}` : `${date.getHours()}`);
+    time.push(date.getMinutes() < 10 ? `0${date.getMinutes()}` : `${date.getMinutes()}`);
+    time.push(date.getSeconds() < 10 ? `0${date.getSeconds()}` : `${date.getSeconds()}`);
+
+    return time.join(":");
+};
+
 export const getRandomNumbers = (count: number, range: number): number[] => {
     const numbers: number[] = [];
     for (let i = 0; i < count; i++) {

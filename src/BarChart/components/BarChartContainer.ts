@@ -7,6 +7,7 @@ import { BarLayoutProps, WrapperProps } from "../../utils/types";
 
 export interface BarChartContainerProps extends WrapperProps, Dimensions, BarLayoutProps {
     series: SeriesProps[];
+    devMode: boolean;
 }
 
 interface BarChartContainerState {

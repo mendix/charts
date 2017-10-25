@@ -92,7 +92,7 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
         const seriesOptions = this.props.rawData.map(({ series }, index) =>
             createElement("div", { key: `series-${index}` },
                 createElement("h4", {}, series.name),
-                this.renderAceEditor(series.seriesOptions, value => this.updateOption(`series-${index}`, value))
+                this.renderAceEditor(series.seriesOptions || "{}", value => this.updateOption(`series-${index}`, value))
             )
         );
 

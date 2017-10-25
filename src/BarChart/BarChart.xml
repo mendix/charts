@@ -197,5 +197,10 @@
             <category>Advanced</category>
             <description>The JSON containing the Plotly layout options</description>
         </property>
+        <property key="devMode" type="boolean" defaultValue="false">
+            <caption>Dev mode</caption>
+            <category>Advanced</category>
+            <description>Allows run time editing and preview of the output of the JSON properties</description>
+        </property>
     </properties>
 </widget>

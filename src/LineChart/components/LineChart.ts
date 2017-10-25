@@ -7,10 +7,10 @@ import { ChartLoading } from "../../components/ChartLoading";
 import { LineChartContainerProps } from "./LineChartContainer";
 import { RuntimeEditor } from "../../components/RuntimeEditor";
 
-import { SeriesData, SeriesProps, Trace } from "../../utils/data";
+import { SeriesData, SeriesProps, getRuntimeTraces, getSeriesTraces } from "../../utils/data";
 import deepMerge from "deepmerge";
 import * as elementResize from "element-resize-detector";
-import { Config, Datum, Layout, ScatterData, ScatterHoverData } from "plotly.js";
+import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
 import { newPlot, purge } from "../../PlotlyCustom";
 import { getDimensions, parseStyle } from "../../utils/style";
 import { LayoutProps, LineMode } from "../../utils/types";
@@ -47,9 +47,6 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         this.clearToolTip = this.clearToolTip.bind(this);
         this.onResize = this.onResize.bind(this);
         this.onRuntimeUpdate = this.onRuntimeUpdate.bind(this);
-        this.getRuntimeTraces = this.getRuntimeTraces.bind(this);
-        this.getSeriesTraces = this.getSeriesTraces.bind(this);
-
         this.state = {
             layoutOptions: props.layoutOptions,
             data: props.data
@@ -69,11 +66,11 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         if (this.props.devMode) {
             return createElement(RuntimeEditor, {
                 ...this.props as LayoutProps,
-                layoutOptions: this.state.layoutOptions,
+                layoutOptions: this.state.layoutOptions || "{}",
                 rawData: this.state.data || [],
                 chartData: this.getData(this.props),
                 modelerConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 4),
-                traces: this.state.data ? this.state.data.map(this.getRuntimeTraces) : [],
+                traces: this.state.data ? this.state.data.map(getRuntimeTraces) : [],
                 onChange: this.onRuntimeUpdate
             }, this.renderLineChartNode());
         }
@@ -162,8 +159,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
 
     private getData(props: LineChartProps): ScatterData[] {
         if (this.state.data) {
-            const dataOptions = this.state.data.map(data => {
-                const { series } = data;
+            const dataOptions = this.state.data.map(({ data, series }) => {
                 const rawOptions = series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
                 const configOptions = {
                     connectgaps: true,
@@ -177,12 +173,12 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                     name: series.name,
                     type: "scatter",
                     fill: props.fill ? "tonexty" : "none",
-                    series: data.series,
-                    ... this.getSeriesTraces({ data: data.data, series })
+                    series,
+                    ... getSeriesTraces({ data, series })
                 };
 
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
-                return { ...deepMerge.all<ScatterData>([ configOptions, rawOptions ]), mxObjects: data.data };
+                return { ...deepMerge.all<ScatterData>([ configOptions, rawOptions ]), mxObjects: data };
             });
 
             console.log("Data Options: ", dataOptions);
@@ -191,17 +187,6 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
 
         console.log("Default Data: ", props.defaultData);
         return props.defaultData || [];
-    }
-
-    private getSeriesTraces({ data, series }: SeriesData): Trace {
-        if (data) {
-            return {
-                x: data.map(mxObject => LineChart.getXValue(mxObject, series)),
-                y: data.map(mxObject => parseInt(mxObject.get(series.yValueAttribute) as string, 10))
-            };
-        }
-
-        return { x: [], y: [] };
     }
 
     private onClick(data: ScatterHoverData) {
@@ -232,10 +217,6 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         this.setState({ layoutOptions, data });
     }
 
-    private getRuntimeTraces({ data, series }: SeriesData): ({ name: string } & Trace) {
-        return { name: series.name, ...this.getSeriesTraces({ data, series }) };
-    }
-
     private onResize() {
         if (this.timeoutId) {
             clearTimeout(this.timeoutId);
@@ -257,42 +238,18 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             xaxis: {
                 title: props.xAxisLabel,
                 showgrid: props.grid === "vertical" || props.grid === "both",
-                fixedrange: true
+                fixedrange: !props.enableZoom
             },
             yaxis: {
                 title: props.yAxisLabel,
                 showgrid: props.grid === "horizontal" || props.grid === "both",
-                fixedrange: true
+                fixedrange: !props.enableZoom
             }
         };
     }
 
-    private static getXValue(mxObject: mendix.lib.MxObject, series: SeriesProps): Datum {
-        if (mxObject.isDate(series.xValueAttribute)) {
-            const timestamp = mxObject.get(series.xValueAttribute) as number;
-            const date = new Date(timestamp);
-
-            return `${LineChart.parseDate(date)} ${LineChart.parseTime(date)}`;
-        }
-
-        return mxObject.get(series.xValueAttribute) as Datum;
-    }
-
     private static getConfigOptions(props: LineChartProps): Partial<Config> {
         return { displayModeBar: props.showToolbar, doubleClick: false };
-    }
-
-    private static parseDate(date: Date) {
-        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-    }
-
-    private static parseTime(date: Date) {
-        const time: string[] = [];
-        time.push(date.getHours() < 10 ? `0${date.getHours()}` : `${date.getHours()}`);
-        time.push(date.getMinutes() < 10 ? `0${date.getMinutes()}` : `${date.getMinutes()}`);
-        time.push(date.getSeconds() < 10 ? `0${date.getSeconds()}` : `${date.getSeconds()}`);
-
-        return time.join(":");
     }
 
     private static getStackedArea(traces: ScatterData[]) {
