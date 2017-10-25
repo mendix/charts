@@ -1,42 +1,21 @@
 import { Component, ReactElement, createElement } from "react";
 
-import { DataSourceProps, OnClickProps, fetchSeriesData, handleOnClick, validateSeriesProps } from "../../utils/data";
-import { Data, LineChart, Mode } from "./LineChart";
-import { AxisType } from "plotly.js";
+import { SeriesData, SeriesProps, fetchSeriesData, handleOnClick, validateSeriesProps } from "../../utils/data";
+import { LineChart } from "./LineChart";
 import { Dimensions } from "../../utils/style";
-import { WrapperProps } from "../../utils/types";
+import { LineLayoutProps, WrapperProps } from "../../utils/types";
 
-export interface LineChartContainerProps extends WrapperProps, Dimensions {
+export interface LineChartContainerProps extends WrapperProps, Dimensions, LineLayoutProps {
     series: SeriesProps[];
-    grid: "none" | "horizontal" | "vertical" | "both";
-    lineColor: string;
-    fill: boolean;
-    showToolbar: boolean;
-    showLegend: boolean;
-    showRangeSlider: boolean;
-    enableZoom: boolean;
-    tooltipForm: string;
-    xAxisLabel: string;
-    yAxisLabel: string;
-    xAxisType?: AxisType;
-    layoutOptions: string;
-    area?: "separate" | "stacked";
     devMode: boolean;
 }
 
 interface LineChartContainerState {
     alertMessage?: string | ReactElement<any>;
-    data?: Data[];
+    data?: SeriesData[];
     series: SeriesProps[];
     layoutOptions: object;
     loading?: boolean;
-}
-
-export interface SeriesProps extends DataSourceProps, OnClickProps {
-    name: string;
-    mode?: Mode;
-    lineColor: string;
-    lineStyle: "linear" | "spline";
 }
 
 export default class LineChartContainer extends Component<LineChartContainerProps, LineChartContainerState> {

@@ -3,9 +3,10 @@ import { Component, ReactElement, createElement } from "react";
 import * as classNames from "classnames";
 
 import { Alert } from "../../components/Alert";
-import { BarChartContainerProps, SeriesProps } from "./BarChartContainer";
+import { BarChartContainerProps } from "./BarChartContainer";
 import { ChartLoading } from "../../components/ChartLoading";
 
+import { SeriesData, SeriesProps } from "../../utils/data";
 import deepMerge from "deepmerge";
 import * as elementResize from "element-resize-detector";
 import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
@@ -17,15 +18,10 @@ import "../../ui/Charts.scss";
 export interface BarChartProps extends BarChartContainerProps {
     alertMessage?: string | ReactElement<any>;
     loading?: boolean;
-    data?: Data[];
+    data?: SeriesData[];
     defaultData?: ScatterData[];
     onClick?: (series: SeriesProps, dataObject: mendix.lib.MxObject) => void;
     onHover?: (node: HTMLDivElement, dataObject: mendix.lib.MxObject) => void;
-}
-
-export interface Data {
-    data: mendix.lib.MxObject[];
-    series: SeriesProps;
 }
 
 export class BarChart extends Component<BarChartProps, {}> {

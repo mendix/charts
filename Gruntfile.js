@@ -12,7 +12,7 @@ const webpackConfigRelease = webpackConfig.map(config => merge(config, {
 module.exports = function(grunt) {
     const pkg = grunt.file.readJSON("package.json");
     grunt.initConfig({
-
+    
         watch: {
             updateWidgetFiles: {
                 files: [ "./src/**/*", "src/**/*" ],

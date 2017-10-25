@@ -1,4 +1,6 @@
 import { ReactElement, createElement } from "react";
+import { LineMode } from "./types";
+import { Datum } from "plotly.js";
 
 export interface DataSourceProps {
     name: string;
@@ -19,6 +21,23 @@ export interface OnClickProps {
     onClickEvent: "doNothing" | "showPage" | "callMicroflow";
     onClickPage: string;
     onClickMicroflow: string;
+}
+
+export interface SeriesProps extends DataSourceProps, OnClickProps {
+    name: string;
+    mode?: LineMode;
+    lineColor: string;
+    lineStyle: "linear" | "spline";
+}
+
+export interface SeriesData {
+    data: mendix.lib.MxObject[];
+    series: SeriesProps;
+}
+
+export interface Trace {
+    x: Datum[];
+    y: number[] | Datum[];
 }
 
 export const validateSeriesProps = <T extends DataSourceProps>(dataSeries: T[], widgetId: string, layoutOptions: string): string | ReactElement<any> => { // tslint:disable-line max-line-length

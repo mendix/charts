@@ -1,7 +1,5 @@
 import { Component, createElement } from "react";
 
-import { Data, LineChartProps } from "src/LineChart/components/LineChart";
-import { SeriesProps } from "src/LineChart/components/LineChartContainer";
 import { MendixButton } from "./MendixButton";
 import AceEditor, { Mode } from "react-ace";
 import { Sidebar } from "./Sidebar";
@@ -11,19 +9,25 @@ import { TabPane } from "./TabPane";
 import { TabTool } from "./TabTool";
 
 import "brace";
+import { SeriesData, Trace } from "../utils/data";
 import deepMerge from "deepmerge";
-import { Datum } from "plotly.js";
+import { ScatterData } from "plotly.js";
+import { LayoutProps } from "../utils/types";
 
 import "brace/mode/json";
 import "brace/mode/javascript";
 import "brace/theme/github";
 
-interface RuntimeEditorProps extends LineChartProps {
-    onChange?: (layout: string, data: Data[]) => void;
+interface RuntimeEditorProps extends LayoutProps {
+    onChange?: (layout: string, data: SeriesData[]) => void;
+    rawData: SeriesData[];
+    chartData: ScatterData[];
+    traces: ({ name: string } & Trace)[];
+    modelerConfigs: string;
 }
 
 export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: boolean }> {
-    private updatedOptions: { layout: string, data: Data[] };
+    private updatedOptions: { layout: string, data: SeriesData[] };
     private timeoutId: number;
     private isValid: boolean;
 
@@ -32,12 +36,13 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
 
         this.updateOption = this.updateOption.bind(this);
         this.updateChart = this.updateChart.bind(this);
-        this.setValidationState = this.setValidationState.bind(this);
+        this.onValidate = this.onValidate.bind(this);
         this.toggleShowEditor = this.toggleShowEditor.bind(this);
+
         this.state = { showEditor: false };
         this.updatedOptions = {
             layout: props.layoutOptions || "{}",
-            data: props.data || []
+            data: props.rawData || []
         };
     }
 
@@ -49,13 +54,6 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
         );
     }
 
-    componentWillReceiveProps(newProps: RuntimeEditorProps) {
-        this.updatedOptions = {
-            layout: newProps.layoutOptions || "{}",
-            data: newProps.data || []
-        };
-    }
-
     private renderTabs() {
         return createElement(TabContainer, { tabHeaderClass: "control-sidebar-tabs", justified: true },
             createElement(TabHeader, { title: "Advanced" }),
@@ -65,9 +63,9 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
             createElement(TabTool, { className: "pull-right remove", onClick: this.toggleShowEditor },
                 createElement("em", { className: "glyphicon glyphicon-remove" })
             ),
-            createElement(TabPane, {}, this.renderAdvancedOptions(this.props.data || [])),
-            createElement(TabPane, {}, this.renderAceEditor(this.getXMLConfigs(), undefined, true)),
-            createElement(TabPane, {}, this.renderData(this.props.data || [])),
+            createElement(TabPane, {}, this.renderAdvancedOptions()),
+            createElement(TabPane, {}, this.renderAceEditor(this.props.modelerConfigs, undefined, true)),
+            createElement(TabPane, {}, this.renderData()),
             createElement(TabPane, {}, this.renderFullConfig())
         );
     }
@@ -81,17 +79,17 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
             theme: "github",
             className: readOnly ? "ace-editor-read-only" : undefined,
             maxLines: 1000, // crappy attempt to avoid a third scroll bar
-            onValidate: this.setValidationState,
+            onValidate: this.onValidate,
             editorProps: { $blockScrolling: Infinity }
         });
     }
 
-    private renderAdvancedOptions(chartData: Data[]) {
+    private renderAdvancedOptions() {
         const layoutOptions = createElement("div", { key: "layout" },
             createElement("h4", {}, "Layout options"),
             this.renderAceEditor(this.props.layoutOptions, value => this.updateOption("layout", value))
         );
-        const seriesOptions = chartData.map(({ series }, index) =>
+        const seriesOptions = this.props.rawData.map(({ series }, index) =>
             createElement("div", { key: `series-${index}` },
                 createElement("h4", {}, series.name),
                 this.renderAceEditor(series.seriesOptions, value => this.updateOption(`series-${index}`, value))
@@ -101,36 +99,29 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
         return [ layoutOptions ].concat(seriesOptions);
     }
 
-    private renderData(chartData: Data[]) {
-        return chartData.map(({ data, series }, index) => {
-            const values = this.getSeriesData({ data, series });
-
-            return createElement("div", { key: `series-${index}` },
-                createElement("h4", {}, series.name),
-                this.renderAceEditor(
-                    JSON.stringify(values, null, 4),
-                    value => this.updateOption(`series_sample_data-${index}`, value),
-                    !!data
-                )
-            );
-        });
+    private renderData() {
+        return this.props.traces.map((trace, index) =>
+            createElement("div", { key: `series-${index}` },
+                createElement("h4", {}, trace.name),
+                this.renderAceEditor(JSON.stringify({ x: trace.x, y: trace.y }, null, 4), undefined, true)
+            )
+        );
     }
 
     private renderFullConfig() {
-        const combinedLayoutOptions = deepMerge.all([
-            JSON.parse(this.getXMLConfigs()),
-            JSON.parse(this.updatedOptions.layout)
+        const mergedLayoutOptions = deepMerge.all([
+            JSON.parse(this.props.modelerConfigs),
+            JSON.parse(this.props.layoutOptions)
         ]);
-        const layoutCode = `var layoutOptions = ${JSON.stringify(combinedLayoutOptions, null, 4)};\n\n`;
-        const seriesCode = this.props.data && this.props.data
-            .map((data, index) => this.getSeriesCode(data, index));
+        const layoutCode = `var layoutOptions = ${JSON.stringify(mergedLayoutOptions, null, 4)};\n\n`;
+        const seriesCode = this.props.chartData.map(RuntimeEditor.getSeriesCode);
 
         return createElement(AceEditor, {
             mode: "javascript",
             readOnly: true,
             value: layoutCode + (seriesCode ? seriesCode.join("\n\n") : ""),
             theme: "github",
-            maxLines: 1000,
+            maxLines: 1000, // crappy attempt to avoid a third scroll bar
             className: "ace-editor-read-only",
             editorProps: { $blockScrolling: Infinity }
         });
@@ -140,82 +131,13 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
         this.setState({ showEditor: !this.state.showEditor });
     }
 
-    private getXMLConfigs() {
-        return JSON.stringify({
-            autosize: true,
-            hovermode: "closest",
-            showlegend: this.props.showLegend,
-            xaxis: {
-                title: this.props.xAxisLabel,
-                showgrid: this.props.grid === "vertical" || this.props.grid === "both",
-                fixedrange: true
-            },
-            yaxis: {
-                title: this.props.yAxisLabel,
-                showgrid: this.props.grid === "horizontal" || this.props.grid === "both",
-                fixedrange: true
-            }
-        }, null, 4);
-    }
-
-    private getDefaultSeriesOptions(series: SeriesProps) {
-        return {
-            connectgaps: true,
-            hoveron: "points",
-            hoverinfo: this.props.tooltipForm ? "text" : undefined,
-            line: {
-                color: series.lineColor,
-                shape: series.lineStyle
-            },
-            mode: series.mode ? series.mode.replace("X", "+") as Mode : "lines",
-            name: series.name,
-            type: "scatter",
-            fill: this.props.fill ? "tonexty" : "none"
-        };
-    }
-
-    private getSeriesData({ data, series }: Data) {
-        if (data) {
-            return {
-                x: data.map(value => value.get(series.xValueAttribute) as Datum),
-                y: data.map(value => parseInt(value.get(series.yValueAttribute) as string, 10))
-            };
-        }
-        if (series.sampleData && series.sampleData.trim()) {
-            return JSON.parse(series.sampleData.trim());
-        }
-        if (this.props.defaultData) {
-            return {
-                x: this.props.defaultData.map(scatterData => scatterData.x),
-                y: this.props.defaultData.map(scatterData => scatterData.y)
-            };
-        }
-
-        return {};
-    }
-
-    private getSeriesCode({ data, series }: Data, index: number) {
-        const defaultOptions = this.getDefaultSeriesOptions(series);
-        const combinedSeriesOptions = deepMerge.all([
-            defaultOptions,
-            series.seriesOptions ? JSON.parse(series.seriesOptions) : {},
-            this.getSeriesData({ data, series })
-        ]);
-
-        return `var series${index} = ${JSON.stringify(combinedSeriesOptions, null, 4)};`;
-    }
-
     private updateOption(source: string, value: string) {
         if (source === "layout") {
             this.updatedOptions.layout = value;
         }
         if (source.indexOf("series") > -1) {
             const index = source.split("-")[1];
-            if (source.indexOf("sample_data") > -1) {
-                this.updatedOptions.data[ parseInt(index, 10) ].series.sampleData = value;
-            } else {
-                this.updatedOptions.data[ parseInt(index, 10) ].series.seriesOptions = value;
-            }
+            this.updatedOptions.data[ parseInt(index, 10) ].series.seriesOptions = value;
         }
         if (this.timeoutId) {
             clearTimeout(this.timeoutId);
@@ -223,7 +145,7 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
         this.timeoutId = setTimeout(this.updateChart, 1000);
     }
 
-    private setValidationState(annotations: object[]) {
+    private onValidate(annotations: object[]) {
         this.isValid = !annotations.length;
     }
 
@@ -231,5 +153,13 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
         if (this.isValid && this.props.onChange) {
             this.props.onChange(this.updatedOptions.layout, this.updatedOptions.data);
         }
+    }
+
+    private static getSeriesCode(series: ScatterData, index: number) {
+        return `var series${index} = ${JSON.stringify(RuntimeEditor.cleanSeries(series), null, 4)};`;
+    }
+
+    private static cleanSeries(series: ScatterData): Partial<ScatterData> {
+        return { ...series, mxObjects: undefined, series: undefined };
     }
 }

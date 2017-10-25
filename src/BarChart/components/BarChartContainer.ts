@@ -1,33 +1,18 @@
 import { Component, ReactElement, createElement } from "react";
 
-import { BarChart, Data } from "./BarChart";
-import { DataSourceProps, OnClickProps, fetchSeriesData, handleOnClick, validateSeriesProps } from "../../utils/data";
+import { BarChart } from "./BarChart";
+import { SeriesData, SeriesProps, fetchSeriesData, handleOnClick, validateSeriesProps } from "../../utils/data";
 import { Dimensions } from "../../utils/style";
-import { WrapperProps } from "../../utils/types";
+import { BarLayoutProps, WrapperProps } from "../../utils/types";
 
-import { BarMode } from "plotly.js";
-
-export interface BarChartContainerProps extends WrapperProps, Dimensions {
+export interface BarChartContainerProps extends WrapperProps, Dimensions, BarLayoutProps {
     series: SeriesProps[];
-    showLegend: boolean;
-    grid: "none" | "horizontal" | "vertical" | "both";
-    showToolbar: boolean;
-    barMode: BarMode;
-    orientation: "bar" | "column";
-    tooltipForm: string;
-    xAxisLabel: string;
-    yAxisLabel: string;
-    layoutOptions: string;
 }
 
 interface BarChartContainerState {
     alertMessage?: string | ReactElement<any>;
-    data?: Data[];
+    data?: SeriesData[];
     loading?: boolean;
-}
-
-export interface SeriesProps extends DataSourceProps, OnClickProps {
-    name: string;
 }
 
 export default class BarChartContainer extends Component<BarChartContainerProps, BarChartContainerState> {

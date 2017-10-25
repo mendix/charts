@@ -1,12 +1,13 @@
 import { Component, createElement } from "react";
 
 import { Alert } from "../components/Alert";
-import { LineChart, Mode } from "./components/LineChart";
+import { LineChart } from "./components/LineChart";
 import { LineChartContainerProps } from "./components/LineChartContainer";
 
 import { getRandomNumbers, validateSeriesProps } from "../utils/data";
 import deepMerge from "deepmerge";
 import { ScatterData } from "plotly.js";
+import { LineMode } from "../utils/types";
 
 // tslint:disable-next-line class-name
 export class preview extends Component<LineChartContainerProps, {}> {
@@ -38,7 +39,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                         color: series.lineColor,
                         shape: series.lineStyle
                     },
-                    mode: series.mode ? series.mode.replace("X", "+") as Mode : "lines",
+                    mode: series.mode ? series.mode.replace("X", "+") as LineMode : "lines",
                     name: series.name,
                     type: "scatter",
                     fill: "none",

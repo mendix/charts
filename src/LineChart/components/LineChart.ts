@@ -4,19 +4,21 @@ import * as classNames from "classnames";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
-import { LineChartContainerProps, SeriesProps } from "./LineChartContainer";
+import { LineChartContainerProps } from "./LineChartContainer";
 import { RuntimeEditor } from "../../components/RuntimeEditor";
 
+import { SeriesData, SeriesProps, Trace } from "../../utils/data";
 import deepMerge from "deepmerge";
 import * as elementResize from "element-resize-detector";
 import { Config, Datum, Layout, ScatterData, ScatterHoverData } from "plotly.js";
 import { newPlot, purge } from "../../PlotlyCustom";
 import { getDimensions, parseStyle } from "../../utils/style";
+import { LayoutProps, LineMode } from "../../utils/types";
 
 import "../../ui/Charts.scss";
 
 export interface LineChartProps extends LineChartContainerProps {
-    data?: Data[];
+    data?: SeriesData[];
     defaultData?: ScatterData[];
     loading?: boolean;
     alertMessage?: string | ReactElement<any>;
@@ -24,16 +26,9 @@ export interface LineChartProps extends LineChartContainerProps {
     onHover?: (node: HTMLDivElement, dataObject: mendix.lib.MxObject) => void;
 }
 
-export type Mode = "lines" | "markers" | "lines+markers" | "none";
-
-export interface Data {
-    data: mendix.lib.MxObject[];
-    series: SeriesProps;
-}
-
 interface LineChartState {
     layoutOptions: string;
-    data?: Data[];
+    data?: SeriesData[];
 }
 
 export class LineChart extends Component<LineChartProps, LineChartState> {
@@ -52,6 +47,8 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         this.clearToolTip = this.clearToolTip.bind(this);
         this.onResize = this.onResize.bind(this);
         this.onRuntimeUpdate = this.onRuntimeUpdate.bind(this);
+        this.getRuntimeTraces = this.getRuntimeTraces.bind(this);
+        this.getSeriesTraces = this.getSeriesTraces.bind(this);
 
         this.state = {
             layoutOptions: props.layoutOptions,
@@ -71,14 +68,17 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         }
         if (this.props.devMode) {
             return createElement(RuntimeEditor, {
-                ...this.props,
+                ...this.props as LayoutProps,
                 layoutOptions: this.state.layoutOptions,
-                data: this.state.data,
+                rawData: this.state.data || [],
+                chartData: this.getData(this.props),
+                modelerConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 4),
+                traces: this.state.data ? this.state.data.map(this.getRuntimeTraces) : [],
                 onChange: this.onRuntimeUpdate
-            }, this.renderLineChart());
+            }, this.renderLineChartNode());
         }
 
-        return this.renderLineChart();
+        return this.renderLineChartNode();
     }
 
     componentDidMount() {
@@ -108,7 +108,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         }
     }
 
-    private renderLineChart(): ReactElement<any> {
+    private renderLineChartNode(): ReactElement<any> {
         return createElement("div",
             {
                 className: classNames("widget-charts-line", this.props.class),
@@ -151,20 +151,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         const advancedOptions = this.state.layoutOptions ? JSON.parse(this.state.layoutOptions) : {};
 
         const layoutOptions = deepMerge.all([ {
-            autosize: true,
-            hovermode: "closest",
-            showlegend: props.showLegend,
-            xaxis: {
-                title: props.xAxisLabel,
-                showgrid: props.grid === "vertical" || props.grid === "both",
-                fixedrange: !props.enableZoom,
-                rangeslider: props.showRangeSlider
-            },
-            yaxis: {
-                title: props.yAxisLabel,
-                showgrid: props.grid === "horizontal" || props.grid === "both",
-                fixedrange: true
-            },
+            ...LineChart.defaultLayoutConfigs(props),
             width: this.lineChartNode && this.lineChartNode.clientWidth,
             height: this.lineChartNode && this.lineChartNode.clientHeight
         }, advancedOptions ]);
@@ -177,10 +164,6 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         if (this.state.data) {
             const dataOptions = this.state.data.map(data => {
                 const { series } = data;
-                const values = data.data.map(mxObject => ({
-                    x: this.getXValue(mxObject, series),
-                    y: parseInt(mxObject.get(series.yValueAttribute) as string, 10) as Datum
-                }));
                 const rawOptions = series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
                 const configOptions = {
                     connectgaps: true,
@@ -190,13 +173,12 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                         color: series.lineColor,
                         shape: series.lineStyle
                     },
-                    mode: series.mode ? series.mode.replace("X", "+") as Mode : "lines",
+                    mode: series.mode ? series.mode.replace("X", "+") as LineMode : "lines",
                     name: series.name,
                     type: "scatter",
                     fill: props.fill ? "tonexty" : "none",
-                    x: values.map(value => value.x),
-                    y: values.map(value => value.y),
-                    series: data.series
+                    series: data.series,
+                    ... this.getSeriesTraces({ data: data.data, series })
                 };
 
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
@@ -211,15 +193,15 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         return props.defaultData || [];
     }
 
-    private getXValue(mxObject: mendix.lib.MxObject, series: SeriesProps): Datum {
-        if (mxObject.isDate(series.xValueAttribute)) {
-            const timestamp = mxObject.get(series.xValueAttribute) as number;
-            const date = new Date(timestamp);
-
-            return `${LineChart.parseDate(date)} ${LineChart.parseTime(date)}`;
+    private getSeriesTraces({ data, series }: SeriesData): Trace {
+        if (data) {
+            return {
+                x: data.map(mxObject => LineChart.getXValue(mxObject, series)),
+                y: data.map(mxObject => parseInt(mxObject.get(series.yValueAttribute) as string, 10))
+            };
         }
 
-        return mxObject.get(series.xValueAttribute) as Datum;
+        return { x: [], y: [] };
     }
 
     private onClick(data: ScatterHoverData) {
@@ -246,8 +228,12 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         this.tooltipNode.style.opacity = "0";
     }
 
-    private onRuntimeUpdate(layoutOptions: string, data: Data[]) {
+    private onRuntimeUpdate(layoutOptions: string, data: SeriesData[]) {
         this.setState({ layoutOptions, data });
+    }
+
+    private getRuntimeTraces({ data, series }: SeriesData): ({ name: string } & Trace) {
+        return { name: series.name, ...this.getSeriesTraces({ data, series }) };
     }
 
     private onResize() {
@@ -261,6 +247,35 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             }
             this.timeoutId = 0;
         }, 100);
+    }
+
+    private static defaultLayoutConfigs(props: LineChartProps): Partial<Layout> {
+        return {
+            autosize: true,
+            hovermode: "closest",
+            showlegend: props.showLegend,
+            xaxis: {
+                title: props.xAxisLabel,
+                showgrid: props.grid === "vertical" || props.grid === "both",
+                fixedrange: true
+            },
+            yaxis: {
+                title: props.yAxisLabel,
+                showgrid: props.grid === "horizontal" || props.grid === "both",
+                fixedrange: true
+            }
+        };
+    }
+
+    private static getXValue(mxObject: mendix.lib.MxObject, series: SeriesProps): Datum {
+        if (mxObject.isDate(series.xValueAttribute)) {
+            const timestamp = mxObject.get(series.xValueAttribute) as number;
+            const date = new Date(timestamp);
+
+            return `${LineChart.parseDate(date)} ${LineChart.parseTime(date)}`;
+        }
+
+        return mxObject.get(series.xValueAttribute) as Datum;
     }
 
     private static getConfigOptions(props: LineChartProps): Partial<Config> {
