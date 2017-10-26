@@ -114,7 +114,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     private renderChartNode() {
         return createElement("div",
             {
-                className: classNames("widget-charts-bar", this.props.class),
+                className: classNames("widget-charts widget-charts-bar", this.props.class),
                 ref: this.getPlotlyNodeRef,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) }
             },

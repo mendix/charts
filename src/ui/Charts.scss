@@ -19,10 +19,11 @@
 
 .widget-charts-advanced {
     .ace_editor {
-        margin-bottom: 20px;
+        margin-bottom: 0;
         width: 100% !important;
+        border-bottom: 1px solid #d7d7d7;
 
-        .ace_print-margin {
+    .ace_print-margin {
             display: none;
         }
 
@@ -42,10 +43,12 @@
     }
 }
 
-.js-plotly-plot {
-    .plotly {
-        .modebar {
-            z-index: 0;
+.widget-charts {
+    &.js-plotly-plot {
+        .plotly {
+            .modebar {
+                z-index: 0 !important; // Strange: styles from the library that can't be over written without this
+            }
         }
     }
 }

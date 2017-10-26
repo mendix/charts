@@ -72,6 +72,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 supportSeries: false,
                 layoutOptions: this.state.layoutOptions || "{\n\n}",
                 dataOptions: this.state.dataOptions || "{\n\n}",
+                chartData: this.getData(this.props),
                 modelerConfigs: JSON.stringify({ autosize: true, showlegend: this.props.showLegend }, null, 4),
                 traces: this.getTraces(this.props.data),
                 onChange: this.onRuntimeUpdate
@@ -112,7 +113,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
     private renderChartNode() {
         return createElement("div",
             {
-                className: classNames(`widget-charts-${this.props.chartType}`, this.props.class),
+                className: classNames(`widget-charts widget-charts-${this.props.chartType}`, this.props.class),
                 ref: this.getPlotlyNodeRef,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) }
             },

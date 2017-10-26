@@ -1,5 +1,6 @@
 import { Component, createElement } from "react";
 
+import { Accordion } from "./Accordion";
 import { MendixButton } from "./MendixButton";
 import AceEditor, { Mode } from "react-ace";
 import { Sidebar } from "./Sidebar";
@@ -12,6 +13,7 @@ import "brace";
 import { ScatterTrace, SeriesData } from "../utils/data";
 import deepMerge from "deepmerge";
 import { PieTraces } from "../PieChart/components/PieChart";
+import { PieData } from "../../typings/plotly.js";
 import { ScatterData } from "plotly.js";
 
 import "brace/mode/json";
@@ -24,7 +26,7 @@ interface RuntimeEditorProps {
     dataOptions?: string;
     modelerConfigs: string;
     rawData?: SeriesData[];
-    chartData?: ScatterData[];
+    chartData: ScatterData[] | PieData[];
     traces: RuntimeSeriesTrace[] | PieTraces;
     onChange?: (layout: string, data: SeriesData[] | string) => void;
 }
@@ -71,7 +73,7 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
             createElement(TabHeader, { title: "Data" }),
             createElement(TabHeader, { title: "Full" }),
             createElement(TabTool, { className: "pull-right remove", onClick: this.toggleShowEditor },
-                createElement("em", { className: "glyphicon glyphicon-remove" })
+                createElement("em", { className: "glyphicon glyphicon-chevron-right" })
             ),
             createElement(TabPane, {}, this.renderAdvancedOptions()),
             createElement(TabPane, {}, this.renderAceEditor(this.props.modelerConfigs, undefined, true)),
@@ -95,14 +97,23 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
     }
 
     private renderAdvancedOptions() {
-        const layoutOptions = createElement("div", { key: "layout" },
-            createElement("h4", {}, "Layout options"),
+        const layoutOptions = createElement(Accordion, {
+                key: "layout",
+                title: "Layout options",
+                titleClass: "item-header",
+                show: true
+            },
             this.renderAceEditor(this.props.layoutOptions, value => this.updateOption("layout", value))
         );
         if (this.props.supportSeries && this.props.rawData) {
             const seriesOptions = this.props.rawData.map(({ series }, index) =>
-                createElement("div", { key: `series-${index}` },
-                    createElement("h4", {}, series.name),
+                createElement(Accordion,
+                    {
+                        key: `series-${index}`,
+                        title: series.name,
+                        titleClass: "item-header",
+                        show: true
+                    },
                     this.renderAceEditor(series.seriesOptions || "{\n\n}", value =>
                         this.updateOption(`series-${index}`, value)
                     )
@@ -112,9 +123,13 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
             return [ layoutOptions ].concat(seriesOptions);
         }
         if (!this.props.supportSeries && this.props.dataOptions) {
-            const dataOptions = createElement("div", { key: "data" },
-                createElement("h4", {}, "Data options"),
-                this.renderAceEditor(this.props.dataOptions, value => this.updateOption("layout", value))
+            const dataOptions = createElement(Accordion, {
+                    key: "data",
+                    title: "Data options",
+                    titleClass: "item-header",
+                    show: true
+                },
+                this.renderAceEditor(this.props.dataOptions, value => this.updateOption("data", value))
             );
 
             return [ layoutOptions ].concat(dataOptions);
@@ -126,8 +141,12 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
     private renderData() {
         if (this.props.supportSeries && Array.isArray(this.props.traces)) {
             return (this.props.traces as RuntimeSeriesTrace[]).map((trace, index) =>
-                createElement("div", { key: `series-${index}` },
-                    createElement("h4", {}, trace.name),
+                createElement(Accordion, {
+                        key: `series-${index}`,
+                        title: trace.name,
+                        titleClass: "item-header",
+                        show: true
+                    },
                     this.renderAceEditor(JSON.stringify({ x: trace.x, y: trace.y }, null, 4), undefined, true)
                 )
             );
@@ -147,10 +166,14 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
             JSON.parse(this.props.layoutOptions)
         ]);
         let value = `var layoutOptions = ${JSON.stringify(mergedLayoutOptions, null, 4)};\n\n`;
-        if (this.props.supportSeries && this.props.chartData) {
-            value = value + this.props.chartData.map(RuntimeEditor.getSeriesCode).join("\n\n");
-        } else if (this.props.dataOptions) {
-            value = value + JSON.stringify(JSON.parse(this.props.dataOptions), null, 4);
+        if (this.props.supportSeries) {
+            value = value + (this.props.chartData as ScatterData[]).map(RuntimeEditor.getSeriesCode).join("\n\n");
+        } else if (!this.props.supportSeries) {
+            const mergedDataOptions = deepMerge.all([
+                JSON.parse(this.props.dataOptions || "{}"),
+                (this.props.chartData as PieData[])[0]
+            ]);
+            value = value + `var data = [${JSON.stringify(mergedDataOptions, null, 4)}]`;
         }
 
         return createElement(AceEditor, {

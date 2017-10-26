@@ -108,7 +108,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     private renderLineChartNode(): ReactElement<any> {
         return createElement("div",
             {
-                className: classNames("widget-charts-line", this.props.class),
+                className: classNames("widget-charts widget-charts-line", this.props.class),
                 ref: this.getPlotlyNodeRef,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) }
             },
