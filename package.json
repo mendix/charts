@@ -90,6 +90,8 @@
     "classnames": "^2.2.5",
     "deepmerge": "^2.0.0",
     "element-resize-detector": "^1.1.12",
+    "fast-json-patch": "^2.0.6",
+    "json-source-map": "^0.4.0",
     "plotly.js": "^1.27.1",
     "react-ace": "^5.4.0",
     "react-sidebar": "^2.3.2"

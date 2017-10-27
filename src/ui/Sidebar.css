@@ -117,3 +117,18 @@
     font-size: 16px;
     margin-bottom: 0;
 }
+
+.replaced-config {
+    position: absolute;
+}
+
+.replaced-config:after {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 1px;
+    background: #c00;
+    content: "";
+    width: 100%;
+    display: block;
+}

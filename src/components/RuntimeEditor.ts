@@ -1,8 +1,10 @@
 import { Component, createElement } from "react";
+import AceEditor, { Marker, Mode } from "react-ace";
+import { Operation, compare } from "fast-json-patch";
+import jsonMap = require("json-source-map");
 
 import { Accordion } from "./Accordion";
 import { MendixButton } from "./MendixButton";
-import AceEditor, { Mode } from "react-ace";
 import { Sidebar } from "./Sidebar";
 import { TabContainer } from "./TabContainer";
 import { TabHeader } from "./TabHeader";
@@ -76,13 +78,51 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
                 createElement("em", { className: "glyphicon glyphicon-chevron-right" })
             ),
             createElement(TabPane, {}, this.renderAdvancedOptions()),
-            createElement(TabPane, {}, this.renderAceEditor(this.props.modelerConfigs, undefined, true)),
+            createElement(TabPane, {}, this.renderAceEditor(this.props.modelerConfigs, undefined, true, "json", this.props.layoutOptions)),
             createElement(TabPane, {}, this.renderData()),
             createElement(TabPane, {}, this.renderFullConfig())
         );
     }
 
-    private renderAceEditor(value: string, onChange?: (value: string) => void, readOnly = false, mode: Mode = "json") {
+    private getStartAndEndPosOfDiff(textValue: string, diff: Operation) {
+        const result = jsonMap.parse(textValue);
+        const pointer = result.pointers[diff.path];
+        if (pointer) {
+            return {
+                startRow: pointer.key.line,
+                startCol: pointer.key.column,
+                endRow: pointer.valueEnd.line,
+                endCol: pointer.valueEnd.column
+            };
+        }
+    }
+
+    private getMarker(left: string, right?: string): Marker[] {
+        const markers: Marker[] = [];
+        if (right) {
+            const diffs = compare(JSON.parse(left), JSON.parse(right));
+            diffs.forEach(diff => {
+                if (diff.op === "replace") {
+                    const pos = this.getStartAndEndPosOfDiff(left, diff);
+                    if (pos) {
+                        markers.push({
+                            startRow: pos.startRow,
+                            startCol: pos.startCol,
+                            endRow: pos.endRow,
+                            endCol: pos.endCol,
+                            type: "text",
+                            className: "replaced-config"
+                        });
+                    }
+                }
+            });
+        }
+        return markers;
+    }
+
+    private renderAceEditor(value: string, onChange?: (value: string) => void, readOnly = false, mode: Mode = "json", overwriteValue?: string) {
+        const markers = this.getMarker(value, overwriteValue);
+
         return createElement(AceEditor, {
             mode,
             value,
@@ -90,6 +130,7 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
             onChange,
             theme: "github",
             className: readOnly ? "ace-editor-read-only" : undefined,
+            markers,
             maxLines: 1000, // crappy attempt to avoid a third scroll bar
             onValidate: this.onValidate,
             editorProps: { $blockScrolling: Infinity }
