@@ -1,7 +1,5 @@
 // tslint:disable no-console
 import { Component, ReactElement, createElement } from "react";
-import * as classNames from "classnames";
-import { newPlot, purge } from "../../PlotlyCustom";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
@@ -9,8 +7,8 @@ import { PieChartContainerProps } from "./PieChartContainer";
 import { RuntimeEditor } from "../../components/RuntimeEditor";
 
 import deepMerge from "deepmerge";
-import * as elementResize from "element-resize-detector";
 import { Config, Layout, PieData, PieHoverData } from "plotly.js";
+import { PlotlyChart } from "../../components/PlotlyChart";
 import { getDimensions, parseStyle } from "../../utils/style";
 
 import "../../ui/Charts.scss";
@@ -36,20 +34,14 @@ export interface PieTraces {
 }
 
 export class PieChart extends Component<PieChartProps, PieChartState> {
-    private pieChartNode?: HTMLDivElement;
     private tooltipNode: HTMLDivElement;
-    private timeoutId: number;
-    private resizeDetector = elementResize({ strategy: "scroll" });
 
     constructor(props: PieChartProps) {
         super(props);
 
-        this.getPlotlyNodeRef = this.getPlotlyNodeRef.bind(this);
         this.getTooltipNodeRef = this.getTooltipNodeRef.bind(this);
         this.onClick = this.onClick.bind(this);
         this.onHover = this.onHover.bind(this);
-        this.clearToolTip = this.clearToolTip.bind(this);
-        this.onResize = this.onResize.bind(this);
         this.onRuntimeUpdate = this.onRuntimeUpdate.bind(this);
         this.state = {
             layoutOptions: props.layoutOptions,
@@ -76,68 +68,51 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 modelerConfigs: JSON.stringify({ autosize: true, showlegend: this.props.showLegend }, null, 4),
                 traces: this.getTraces(this.props.data),
                 onChange: this.onRuntimeUpdate
-            }, this.renderChartNode());
+            }, this.renderChart());
         }
 
-        return this.renderChartNode();
+        return this.renderChart();
     }
 
     componentDidMount() {
         if (!this.props.loading) {
-            this.renderChart(this.props);
-            this.addResizeListener();
+            this.renderChart();
         }
     }
 
     componentDidUpdate() {
         if (!this.props.loading) {
-            this.renderChart(this.props);
-            this.addResizeListener();
+            this.renderChart();
         }
-    }
-
-    componentWillUnmount() {
-        if (this.pieChartNode) {
-            purge(this.pieChartNode);
-        }
-    }
-
-    private getPlotlyNodeRef(node: HTMLDivElement) {
-        this.pieChartNode = node;
     }
 
     private getTooltipNodeRef(node: HTMLDivElement) {
         this.tooltipNode = node;
     }
 
-    private renderChartNode() {
-        return createElement("div",
+    private renderChart() {
+        return createElement(PlotlyChart,
             {
-                className: classNames(`widget-charts widget-charts-${this.props.chartType}`, this.props.class),
-                ref: this.getPlotlyNodeRef,
-                style: { ...getDimensions(this.props), ...parseStyle(this.props.style) }
-            },
-            createElement("div", { className: "widget-charts-tooltip", ref: this.getTooltipNodeRef })
+                type: "pie",
+                className: this.props.class,
+                style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
+                layout: this.getLayoutOptions(this.props),
+                data: this.getData(this.props),
+                config: PieChart.getConfigOptions(this.props),
+                onClick: this.onClick,
+                onHover: this.onHover,
+                getTooltipNode: this.getTooltipNodeRef
+            }
         );
     }
 
-    private renderChart(props: PieChartProps) {
-        if (this.pieChartNode) {
-            newPlot(this.pieChartNode, this.getData(props) as any, this.getLayoutOptions(props), this.getConfigOptions(props)) // tslint:disable-line
-                .then(myPlot => {
-                    myPlot.on("plotly_click", this.onClick);
-                    myPlot.on("plotly_hover", this.onHover);
-                    myPlot.on("plotly_unhover", this.clearToolTip);
-                });
-        }
-    }
-
     private getData(props: PieChartProps): PieData[] {
+        let data: PieData[] = props.defaultData || [];
         if (props.data) {
             const advancedOptions = this.state.dataOptions ? JSON.parse(this.state.dataOptions) : {};
             const traces = this.getTraces(props.data);
 
-            const dataOptions = [ deepMerge.all([ {
+            data = [ deepMerge.all([ {
                 hole: this.props.chartType === "donut" ? 0.4 : 0,
                 hoverinfo: this.props.tooltipForm ? "none" : "label",
                 labels: traces.labels,
@@ -146,13 +121,10 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 values: traces.values,
                 sort: false
             }, advancedOptions ]) ];
-
-            console.log("Data Options: ", dataOptions);
-            return dataOptions as PieData[];
         }
 
-        console.log("Default Data: ", props.defaultData);
-        return props.defaultData || [];
+        console.log("Data Options: ", data);
+        return data;
     }
 
     private getLayoutOptions(props: PieChartProps): Partial<Layout> {
@@ -161,8 +133,6 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         return deepMerge.all([ {
             autosize: true,
             showlegend: props.showLegend,
-            width: this.pieChartNode && this.pieChartNode.clientWidth,
-            height: this.pieChartNode && this.pieChartNode.clientHeight,
             margin: {
                 l: 60,
                 r: 60,
@@ -171,10 +141,6 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 pad: 4
             }
         }, advancedOptions ]);
-    }
-
-    private getConfigOptions(props: PieChartProps): Partial<Config> {
-        return { displayModeBar: props.showToolbar, doubleClick: false };
     }
 
     private getTraces(data?: mendix.lib.MxObject[]): PieTraces {
@@ -207,32 +173,11 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         }
     }
 
-    private clearToolTip() {
-        this.tooltipNode.innerHTML = "";
-        this.tooltipNode.style.opacity = "0";
-    }
-
-    private addResizeListener() {
-        if (this.pieChartNode && this.pieChartNode.parentElement) {
-            this.resizeDetector.removeListener(this.pieChartNode.parentElement, this.onResize);
-            this.resizeDetector.listenTo(this.pieChartNode.parentElement, this.onResize);
-        }
-    }
-
-    private onResize() {
-        if (this.timeoutId) {
-            clearTimeout(this.timeoutId);
-        }
-        this.timeoutId = setTimeout(() => {
-            if (this.pieChartNode) {
-                purge(this.pieChartNode);
-                this.renderChart(this.props);
-            }
-            this.timeoutId = 0;
-        }, 100);
-    }
-
     private onRuntimeUpdate(layoutOptions: string, dataOptions: string) {
         this.setState({ layoutOptions, dataOptions });
+    }
+
+    private static getConfigOptions(props: PieChartProps): Partial<Config> {
+        return { displayModeBar: props.showToolbar, doubleClick: false };
     }
 }

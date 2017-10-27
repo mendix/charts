@@ -1,16 +1,14 @@
 // tslint:disable no-console
 import { Component, ReactElement, createElement } from "react";
-import * as classNames from "classnames";
 
 import { Alert } from "../../components/Alert";
 import { BarChartContainerProps } from "./BarChartContainer";
 import { ChartLoading } from "../../components/ChartLoading";
+import { PlotlyChart } from "../../components/PlotlyChart";
 import { RuntimeEditor } from "../../components/RuntimeEditor";
 
 import { SeriesData, SeriesProps, getRuntimeTraces, getSeriesTraces } from "../../utils/data";
 import deepMerge from "deepmerge";
-import * as elementResize from "element-resize-detector";
-import { newPlot, purge } from "../../PlotlyCustom";
 import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
 import { getDimensions, parseStyle } from "../../utils/style";
 
@@ -31,19 +29,14 @@ interface BarChartState {
 }
 
 export class BarChart extends Component<BarChartProps, BarChartState> {
-    private barChartNode?: HTMLDivElement;
     private tooltipNode: HTMLDivElement;
-    private timeoutId: number;
 
     constructor(props: BarChartProps) {
         super(props);
 
-        this.getPlotlyNodeRef = this.getPlotlyNodeRef.bind(this);
         this.getTooltipNodeRef = this.getTooltipNodeRef.bind(this);
         this.onClick = this.onClick.bind(this);
         this.onHover = this.onHover.bind(this);
-        this.clearToolTip = this.clearToolTip.bind(this);
-        this.onResize = this.onResize.bind(this);
         this.onRuntimeUpdate = this.onRuntimeUpdate.bind(this);
         this.state = {
             layoutOptions: props.layoutOptions,
@@ -70,16 +63,15 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                 modelerConfigs: JSON.stringify(BarChart.defaultLayoutConfigs(this.props), null, 4),
                 traces: this.state.data ? this.state.data.map(getRuntimeTraces) : [],
                 onChange: this.onRuntimeUpdate
-            }, this.renderChartNode());
+            }, this.renderChart());
         }
 
-        return this.renderChartNode();
+        return this.renderChart();
     }
 
     componentDidMount() {
         if (!this.props.loading) {
-            this.renderChart(this.props);
-            this.addResizeListener();
+            this.renderChart();
         }
     }
 
@@ -92,52 +84,28 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
 
     componentDidUpdate() {
         if (!this.props.loading) {
-            this.renderChart(this.props);
-            this.addResizeListener();
+            this.renderChart();
         }
-    }
-
-    componentWillUnmount() {
-        if (this.barChartNode) {
-            purge(this.barChartNode);
-        }
-    }
-
-    private getPlotlyNodeRef(node: HTMLDivElement) {
-        this.barChartNode = node;
     }
 
     private getTooltipNodeRef(node: HTMLDivElement) {
         this.tooltipNode = node;
     }
 
-    private renderChartNode() {
-        return createElement("div",
+    private renderChart() {
+        return createElement(PlotlyChart,
             {
-                className: classNames("widget-charts widget-charts-bar", this.props.class),
-                ref: this.getPlotlyNodeRef,
-                style: { ...getDimensions(this.props), ...parseStyle(this.props.style) }
-            },
-            createElement("div", { className: "widget-charts-tooltip", ref: this.getTooltipNodeRef })
+                type: "bar",
+                className: this.props.class,
+                style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
+                layout: this.getLayoutOptions(this.props),
+                data: this.getData(this.props),
+                config: BarChart.getConfigOptions(this.props),
+                onClick: this.onClick,
+                onHover: this.onHover,
+                getTooltipNode: this.getTooltipNodeRef
+            }
         );
-    }
-
-    private addResizeListener() {
-        const resizeDetector = elementResize({ strategy: "scroll" });
-        if (this.barChartNode && this.barChartNode.parentElement) {
-            resizeDetector.listenTo(this.barChartNode.parentElement, this.onResize);
-        }
-    }
-
-    private renderChart(props: BarChartProps) {
-        if (this.barChartNode) {
-            newPlot(this.barChartNode, this.getData(props), this.getLayoutOptions(props), BarChart.getConfigOptions(props)) // tslint:disable-line max-line-length
-                .then(myPlot => {
-                    myPlot.on("plotly_click", this.onClick);
-                    myPlot.on("plotly_hover", this.onHover);
-                    myPlot.on("plotly_unhover", this.clearToolTip);
-                });
-        }
     }
 
     private getLayoutOptions(props: BarChartProps): Partial<Layout> {
@@ -157,9 +125,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                 fixedrange: !props.enableZoom
             },
             showlegend: props.showLegend,
-            hovermode: "closest",
-            width: this.barChartNode && this.barChartNode.clientWidth,
-            height: this.barChartNode && this.barChartNode.clientHeight
+            hovermode: "closest"
         }, advancedOptions ]);
 
         console.log("Layout Options:", layoutOptions);
@@ -167,8 +133,9 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     }
 
     private getData(props: BarChartProps): ScatterData[] {
+        let barData: ScatterData[] = props.defaultData || [];
         if (props.data) {
-            const dataOptions = props.data.map(({ data, series }) => {
+            barData = props.data.map(({ data, series }) => {
                 const rawOptions = series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
                 const traces = getSeriesTraces({ data, series });
                 const configOptions = {
@@ -184,13 +151,10 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
                 return { ...deepMerge.all<ScatterData>([ configOptions, rawOptions ]), mxObjects: data };
             });
-
-            console.log("Data Options:", dataOptions);
-            return dataOptions;
         }
 
-        console.log("Default Data: ", props.defaultData);
-        return props.defaultData || [];
+        console.log("Data Options:", barData);
+        return barData;
     }
 
     private onClick(data: ScatterHoverData) {
@@ -216,24 +180,6 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
             this.tooltipNode.style.opacity = "1";
             this.props.onHover(this.tooltipNode, activePoint.data.mxObjects[activePoint.pointNumber]);
         }
-    }
-
-    private clearToolTip() {
-        this.tooltipNode.innerHTML = "";
-        this.tooltipNode.style.opacity = "0";
-    }
-
-    private onResize() {
-        if (this.timeoutId) {
-            clearTimeout(this.timeoutId);
-        }
-        this.timeoutId = setTimeout(() => {
-            if (this.barChartNode) {
-                purge(this.barChartNode);
-                this.renderChart(this.props);
-            }
-            this.timeoutId = 0;
-        }, 100);
     }
 
     private onRuntimeUpdate(layoutOptions: string, data: SeriesData[]) {
