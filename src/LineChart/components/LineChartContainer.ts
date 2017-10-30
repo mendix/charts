@@ -7,7 +7,6 @@ import { LineLayoutProps, WrapperProps } from "../../utils/types";
 
 export interface LineChartContainerProps extends WrapperProps, Dimensions, LineLayoutProps {
     series: SeriesProps[];
-    devMode: boolean;
 }
 
 interface LineChartContainerState {

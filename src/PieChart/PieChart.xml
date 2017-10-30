@@ -157,10 +157,15 @@
             <category>Advanced</category>
             <description>To be used as a more accurate representation of project data in the web modeler</description>
         </property>
-        <property key="devMode" type="boolean" defaultValue="false">
+        <property key="devMode" type="enumeration" defaultValue="basic">
             <caption>Dev mode</caption>
             <category>Advanced</category>
-            <description>Allows run time editing and preview of the output of the JSON properties</description>
+            <description>Advanced dev option enables the playground for run time editing and preview of the output of the JSON properties</description>
+            <enumerationValues>
+                <enumerationValue key="basic">Basic</enumerationValue>
+                <enumerationValue key="advanced">Advanced</enumerationValue>
+                <enumerationValue key="advancedDev">Advanced dev</enumerationValue>
+            </enumerationValues>
         </property>
     </properties>
 </widget>

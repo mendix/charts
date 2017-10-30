@@ -23,7 +23,7 @@ export interface PieChartContainerProps extends WrapperProps, Dimensions, EventP
     layoutOptions: string;
     dataOptions: string;
     sampleData: string;
-    devMode: boolean;
+    devMode: "basic" | "advanced" | "advancedDev";
 }
 
 interface PieChartContainerState {

@@ -19,6 +19,7 @@ export interface LayoutProps {
     xAxisLabel: string;
     yAxisLabel: string;
     layoutOptions: string;
+    devMode: "basic" | "advanced" | "advancedDev";
 }
 
 export interface BarLayoutProps extends LayoutProps {

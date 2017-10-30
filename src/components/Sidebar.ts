@@ -1,14 +1,11 @@
-import { Component, createElement } from "react";
-import * as className from "classnames";
+import { SFC, createElement } from "react";
+import * as classNames from "classnames";
 
 import "../ui/Sidebar.css";
 
-export class Sidebar extends Component<{ className?: string, open: boolean }, {}> {
-    render() {
-        return createElement("div", {
-            className: className("control-sidebar", "control-sidebar-light", this.props.className, {
-                "control-sidebar-open": this.props.open
-            })
-        }, this.props.children);
-    }
-}
+export const Sidebar: SFC<{ className?: string, open: boolean }> = ({ className, children, open }) =>
+    createElement("div", {
+        className: classNames("control-sidebar", "control-sidebar-light", className, {
+            "control-sidebar-open": open
+        })
+    }, children);

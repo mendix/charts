@@ -60,7 +60,12 @@ export class preview extends Component<PieChartContainerProps, {}> {
 }
 
 export function getPreviewCss() {
-    return require("plotly.js/src/css/style.scss");
+    return (
+        require("../ui/Charts.scss") +
+        require("../ui/ChartsLoading.scss") +
+        require("../ui/Accordion.scss") +
+        require("../ui/Sidebar.css")
+    );
 }
 
 export function getVisibleProperties(valueMap: PieChartContainerProps, visibilityMap: VisibilityMap<PieChartContainerProps>) { // tslint:disable-line max-line-length
@@ -68,6 +73,10 @@ export function getVisibleProperties(valueMap: PieChartContainerProps, visibilit
         visibilityMap.dataSourceMicroflow = false;
     } else if (valueMap.dataSourceType === "microflow") {
         visibilityMap.entityConstraint = false;
+    }
+    if (valueMap.devMode === "basic") {
+        visibilityMap.layoutOptions = false;
+        visibilityMap.sampleData = false;
     }
 
     return visibilityMap;

@@ -215,10 +215,15 @@
             <category>Advanced</category>
             <description>The JSON containing the Plotly layout options</description>
         </property>
-        <property key="devMode" type="boolean" defaultValue="false">
+        <property key="devMode" type="enumeration" defaultValue="basic">
             <caption>Dev mode</caption>
             <category>Advanced</category>
-            <description>Allows run time editing and preview of the output of the JSON properties</description>
+            <description>Advanced dev option enables the playground for run time editing and preview of the output of the JSON properties</description>
+            <enumerationValues>
+                <enumerationValue key="basic">Basic</enumerationValue>
+                <enumerationValue key="advanced">Advanced</enumerationValue>
+                <enumerationValue key="advancedDev">Advanced dev</enumerationValue>
+            </enumerationValues>
         </property>
     </properties>
 </widget>

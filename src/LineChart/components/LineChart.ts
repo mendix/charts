@@ -55,7 +55,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         if (this.props.loading) {
             return createElement(ChartLoading, { text: "Loading" });
         }
-        if (this.props.devMode) {
+        if (this.props.devMode === "advancedDev") {
             return createElement(Playground, {
                 supportSeries: true,
                 layoutOptions: this.state.layoutOptions || "{\n\n}",

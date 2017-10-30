@@ -67,12 +67,24 @@ export function getVisibleProperties(valueMap: BarChartContainerProps, visibilit
             } else if (series.dataSourceType === "microflow") {
                 visibilityMap.series[index].entityConstraint = false;
             }
+            if (valueMap.devMode === "basic") {
+                visibilityMap.series[index].seriesOptions = false;
+                visibilityMap.series[index].sampleData = false;
+            }
         });
+    }
+    if (valueMap.devMode === "basic") {
+        visibilityMap.layoutOptions = false;
     }
 
     return visibilityMap;
 }
 
 export function getPreviewCss() {
-    return (require("plotly.js/src/css/style.scss"));
+    return (
+        require("../ui/Charts.scss") +
+        require("../ui/ChartsLoading.scss") +
+        require("../ui/Accordion.scss") +
+        require("../ui/Sidebar.css")
+    );
 }
