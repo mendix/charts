@@ -141,7 +141,9 @@
     ],
     "object-literal-sort-keys": false,
     "array-type": false,
-    "max-line-length": false
+    "max-line-length": false,
+    "no-submodule-imports": false,
+    "no-implicit-dependencies": false
   },
   "jsRules": {
     "trailing-comma": [
