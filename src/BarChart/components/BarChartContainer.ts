@@ -41,7 +41,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
             loading: this.state.loading,
             data: this.state.data,
             onClick: handleOnClick,
-            onHover: this.props.tooltipForm ? this.openTooltipForm : undefined
+            onHover: this.openTooltipForm
         });
     }
 
@@ -58,10 +58,10 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         }
     }
 
-    private openTooltipForm(domNode: HTMLDivElement, dataObject: mendix.lib.MxObject) {
+    private openTooltipForm(domNode: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) {
         const context = new mendix.lib.MxContext();
         context.setContext(dataObject.getEntity(), dataObject.getGuid());
-        window.mx.ui.openForm(this.props.tooltipForm, { domNode, context });
+        window.mx.ui.openForm(tooltipForm, { domNode, context });
     }
 
     private resetSubscriptions(mxObject?: mendix.lib.MxObject) {

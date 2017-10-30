@@ -4,8 +4,8 @@ import { Component, ReactElement, createElement } from "react";
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
 import { LineChartContainerProps } from "./LineChartContainer";
+import { Playground } from "../../components/Playground";
 import { PlotlyChart } from "../../components/PlotlyChart";
-import { RuntimeEditor } from "../../components/RuntimeEditor";
 
 import { SeriesData, SeriesProps, getRuntimeTraces, getSeriesTraces } from "../../utils/data";
 import deepMerge from "deepmerge";
@@ -21,7 +21,7 @@ export interface LineChartProps extends LineChartContainerProps {
     loading?: boolean;
     alertMessage?: string | ReactElement<any>;
     onClick?: (series: SeriesProps, dataObject: mendix.lib.MxObject) => void;
-    onHover?: (node: HTMLDivElement, dataObject: mendix.lib.MxObject) => void;
+    onHover?: (node: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) => void;
 }
 
 interface LineChartState {
@@ -56,7 +56,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             return createElement(ChartLoading, { text: "Loading" });
         }
         if (this.props.devMode) {
-            return createElement(RuntimeEditor, {
+            return createElement(Playground, {
                 supportSeries: true,
                 layoutOptions: this.state.layoutOptions || "{\n\n}",
                 rawData: this.state.data || [],
@@ -110,10 +110,10 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         if (this.state.data) {
             lineData = this.state.data.map(({ data, series }) => {
                 const rawOptions = series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
-                const configOptions = {
+                const configOptions: Partial<ScatterData> = {
                     connectgaps: true,
                     hoveron: "points",
-                    hoverinfo: props.tooltipForm ? "text" : undefined,
+                    hoverinfo: series.tooltipForm ? "text" : undefined,
                     line: {
                         color: series.lineColor,
                         shape: series.lineStyle
@@ -127,7 +127,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 };
 
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
-                return { ...deepMerge.all<ScatterData>([ configOptions, rawOptions ]), mxObjects: data };
+                return { ...deepMerge.all<ScatterData>([ configOptions, rawOptions ]), customdata: data };
             });
         }
 
@@ -137,22 +137,22 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         return dataOptions;
     }
 
-    private onClick(data: ScatterHoverData) {
+    private onClick(data: ScatterHoverData<mendix.lib.MxObject>) {
         const pointClicked = data.points[0];
         if (this.props.onClick) {
-            this.props.onClick(pointClicked.data.series, pointClicked.data.mxObjects[pointClicked.pointNumber]);
+            this.props.onClick(pointClicked.data.series, pointClicked.customdata);
         }
     }
 
-    private onHover(data: ScatterHoverData) {
-        if (this.props.onHover) {
-            const activePoint = data.points[0];
-            const positionYaxis = activePoint.yaxis.l2p(activePoint.y) + activePoint.yaxis._offset;
-            const positionXaxis = activePoint.xaxis.d2p(activePoint.x) + activePoint.xaxis._offset;
+    private onHover({ points }: ScatterHoverData<mendix.lib.MxObject>) {
+        const { customdata, data, x, xaxis, y, yaxis } = points[0];
+        if (this.props.onHover && data.series.tooltipForm) {
+            const positionYaxis = yaxis.l2p(y) + yaxis._offset;
+            const positionXaxis = xaxis.d2p(x) + xaxis._offset;
             this.tooltipNode.style.top = `${positionYaxis}px`;
             this.tooltipNode.style.left = `${positionXaxis}px`;
             this.tooltipNode.style.opacity = "1";
-            this.props.onHover(this.tooltipNode, activePoint.data.mxObjects[activePoint.pointNumber]);
+            this.props.onHover(this.tooltipNode, data.series.tooltipForm, customdata);
         }
     }
 

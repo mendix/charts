@@ -123,6 +123,11 @@
                     <description>The microflow that will be executed on click</description>
                     <returnType type="Void" />
                 </property>
+                <property key="tooltipForm" type="form" required="false">
+                    <caption>Tooltip form</caption>
+                    <category>Events</category>
+                    <description>The form to show when a user hovers over a chart plot point</description>
+                </property>
                 <property key="seriesOptions" type="string" multiline="true" required="false">
                     <caption>Options</caption>
                     <category>Advanced</category>
@@ -175,11 +180,6 @@
             <caption>Enable zoom</caption>
             <category>Chart properties</category>
             <description>Select a section on the chart to zoom in</description>
-        </property>
-        <property key="tooltipForm" type="form" required="false">
-            <caption>Tooltip form</caption>
-            <category>Chart properties</category>
-            <description>The form to show when a user hovers over a chart plot point</description>
         </property>
         <property key="widthUnit" type="enumeration" defaultValue="percentage">
             <caption>Width unit</caption>

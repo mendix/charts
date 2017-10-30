@@ -17,13 +17,14 @@ export interface DataSourceProps {
 
 export type MxObject = mendix.lib.MxObject;
 
-export interface OnClickProps {
+export interface EventProps {
     onClickEvent: "doNothing" | "showPage" | "callMicroflow";
     onClickPage: string;
     onClickMicroflow: string;
+    tooltipForm: string;
 }
 
-export interface SeriesProps extends DataSourceProps, OnClickProps {
+export interface SeriesProps extends DataSourceProps, EventProps {
     name: string;
     mode?: LineMode;
     lineColor: string;
@@ -90,7 +91,7 @@ export const validateAdvancedOptions = (rawData: string): string => {
         return "";
 };
 
-export const fetchSeriesData = <T extends DataSourceProps>(mxObject: MxObject, series: T): Promise<any> => { // tslint:disable max-line-length
+export const fetchSeriesData = <T extends DataSourceProps>(mxObject: MxObject, series: T): Promise<any> => {
     return new Promise((resolve, reject) => {
         if (series.dataEntity) {
             if (series.dataSourceType === "XPath") {
@@ -136,7 +137,7 @@ export const fetchByMicroflow = (actionname: string, guid: string): Promise<MxOb
     });
 };
 
-export const handleOnClick = <T extends OnClickProps>(options: T, mxObject?: MxObject) => {
+export const handleOnClick = <T extends EventProps>(options: T, mxObject?: MxObject) => {
     if (!mxObject || options.onClickEvent === "doNothing") {
         return;
     }

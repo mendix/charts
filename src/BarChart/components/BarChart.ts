@@ -4,8 +4,8 @@ import { Component, ReactElement, createElement } from "react";
 import { Alert } from "../../components/Alert";
 import { BarChartContainerProps } from "./BarChartContainer";
 import { ChartLoading } from "../../components/ChartLoading";
+import { Playground } from "../../components/Playground";
 import { PlotlyChart } from "../../components/PlotlyChart";
-import { RuntimeEditor } from "../../components/RuntimeEditor";
 
 import { SeriesData, SeriesProps, getRuntimeTraces, getSeriesTraces } from "../../utils/data";
 import deepMerge from "deepmerge";
@@ -20,7 +20,7 @@ export interface BarChartProps extends BarChartContainerProps {
     data?: SeriesData[];
     defaultData?: ScatterData[];
     onClick?: (series: SeriesProps, dataObject: mendix.lib.MxObject) => void;
-    onHover?: (node: HTMLDivElement, dataObject: mendix.lib.MxObject) => void;
+    onHover?: (node: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) => void;
 }
 
 interface BarChartState {
@@ -55,7 +55,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
             return createElement(ChartLoading, { text: "Loading" });
         }
         if (this.props.devMode) {
-            return createElement(RuntimeEditor, {
+            return createElement(Playground, {
                 supportSeries: true,
                 layoutOptions: this.state.layoutOptions || "{\n\n}",
                 rawData: this.state.data || [],
@@ -138,10 +138,10 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
             barData = props.data.map(({ data, series }) => {
                 const rawOptions = series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
                 const traces = getSeriesTraces({ data, series });
-                const configOptions = {
+                const configOptions: Partial<ScatterData> = {
                     name: series.name,
                     type: "bar",
-                    hoverinfo: this.props.tooltipForm ? "text" : undefined,
+                    hoverinfo: series.tooltipForm ? "text" : undefined,
                     x: this.props.orientation === "bar" ? traces.y : traces.x,
                     y: this.props.orientation === "bar" ? traces.x : traces.y,
                     orientation: this.props.orientation === "bar" ? "h" : "v",
@@ -149,7 +149,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                 };
 
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
-                return { ...deepMerge.all<ScatterData>([ configOptions, rawOptions ]), mxObjects: data };
+                return { ...deepMerge.all<ScatterData>([ configOptions, rawOptions ]), customdata: data };
             });
         }
 
@@ -157,28 +157,25 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
         return barData;
     }
 
-    private onClick(data: ScatterHoverData) {
+    private onClick(data: ScatterHoverData<mendix.lib.MxObject>) {
         const pointClicked = data.points[0];
         if (this.props.onClick) {
-            this.props.onClick(pointClicked.data.series, pointClicked.data.mxObjects[pointClicked.pointNumber]);
+            this.props.onClick(pointClicked.data.series, pointClicked.customdata);
         }
     }
 
-    private onHover(data: ScatterHoverData) {
-        if (this.props.onHover) {
-            const activePoint = data.points[0];
-            const yAxisPixels = typeof activePoint.y === "number"
-                ? activePoint.yaxis.l2p(activePoint.y)
-                : activePoint.yaxis.d2p(activePoint.y);
-            const xAxisPixels = typeof activePoint.x === "number"
-                ? activePoint.xaxis.l2p(activePoint.x as number)
-                : activePoint.xaxis.d2p(activePoint.x);
-            const positionYaxis = yAxisPixels + activePoint.yaxis._offset;
-            const positionXaxis = xAxisPixels + activePoint.xaxis._offset;
+    private onHover({ points }: ScatterHoverData<mendix.lib.MxObject>) {
+        const { customdata, data, x, xaxis, y, yaxis } = points[0];
+        if (this.props.onHover && data.series.tooltipForm) {
+            console.log("Custom Data", customdata);
+            const yAxisPixels = typeof y === "number" ? yaxis.l2p(y) : yaxis.d2p(y);
+            const xAxisPixels = typeof x === "number" ? xaxis.l2p(x as number) : xaxis.d2p(x);
+            const positionYaxis = yAxisPixels + yaxis._offset;
+            const positionXaxis = xAxisPixels + xaxis._offset;
             this.tooltipNode.style.top = `${positionYaxis}px`;
             this.tooltipNode.style.left = `${positionXaxis}px`;
             this.tooltipNode.style.opacity = "1";
-            this.props.onHover(this.tooltipNode, activePoint.data.mxObjects[activePoint.pointNumber]);
+            this.props.onHover(this.tooltipNode, data.series.tooltipForm, customdata);
         }
     }
 

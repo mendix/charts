@@ -13,8 +13,8 @@ interface PlotlyChartProps {
     config: Partial<Config>;
     className?: string;
     style?: CSSProperties;
-    onClick?: (data: ScatterHoverData | PieHoverData) => void;
-    onHover?: (data: ScatterHoverData | PieHoverData) => void;
+    onClick?: (data: ScatterHoverData<any> | PieHoverData) => void;
+    onHover?: (data: ScatterHoverData<any> | PieHoverData) => void;
     getTooltipNode?: (node: HTMLDivElement) => void;
 }
 

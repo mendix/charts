@@ -1,13 +1,13 @@
 import { Component, ReactElement, createElement } from "react";
 
 import { PieChart } from "./PieChart";
-import { OnClickProps, fetchByMicroflow, fetchByXPath, handleOnClick, validateAdvancedOptions } from "../../utils/data";
+import { EventProps, fetchByMicroflow, fetchByXPath, handleOnClick, validateAdvancedOptions } from "../../utils/data";
 import { Dimensions } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
 export type ChartType = "pie" | "donut";
 
-export interface PieChartContainerProps extends WrapperProps, Dimensions, OnClickProps {
+export interface PieChartContainerProps extends WrapperProps, Dimensions, EventProps {
     dataEntity: string;
     dataSourceType: "XPath" | "microflow";
     entityConstraint: string;

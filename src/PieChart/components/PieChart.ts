@@ -4,11 +4,11 @@ import { Component, ReactElement, createElement } from "react";
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
 import { PieChartContainerProps } from "./PieChartContainer";
-import { RuntimeEditor } from "../../components/RuntimeEditor";
+import { Playground } from "../../components/Playground";
+import { PlotlyChart } from "../../components/PlotlyChart";
 
 import deepMerge from "deepmerge";
 import { Config, Layout, PieData, PieHoverData } from "plotly.js";
-import { PlotlyChart } from "../../components/PlotlyChart";
 import { getDimensions, parseStyle } from "../../utils/style";
 
 import "../../ui/Charts.scss";
@@ -60,7 +60,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
             return createElement(ChartLoading, { text: "Loading" });
         }
         if (this.props.devMode) {
-            return createElement(RuntimeEditor, {
+            return createElement(Playground, {
                 supportSeries: false,
                 layoutOptions: this.state.layoutOptions || "{\n\n}",
                 dataOptions: this.state.dataOptions || "{\n\n}",

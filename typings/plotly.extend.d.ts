@@ -15,7 +15,7 @@ declare module "plotly.js" {
         pad: number;
     }
 
-    export interface ScatterHoverData {
+    export interface ScatterHoverData<T> {
         event: MouseEvent;
         points: Array<{
             x: string | number;
@@ -33,6 +33,7 @@ declare module "plotly.js" {
                 d2p: (point: string) => number;
                 _offset: number;
             };
+            customdata: T;
         }>;
     }
 
@@ -50,9 +51,9 @@ declare module "plotly.js" {
     }
 
     export interface ScatterData {
-        mxObjects: mendix.lib.MxObject[]; // custom property, not part of the official plotly.js api
         series: any; // custom property, not part of the official plotly.js api
         orientation?: "h" | "v";
+        customdata: any[];
     }
 
     export interface PieData {

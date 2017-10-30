@@ -22,25 +22,25 @@ import "brace/mode/json";
 import "brace/mode/javascript";
 import "brace/theme/github";
 
-interface RuntimeEditorProps {
+interface PlaygroundProps {
     supportSeries: boolean;
     layoutOptions: string;
     dataOptions?: string;
     modelerConfigs: string;
     rawData?: SeriesData[];
     chartData: ScatterData[] | PieData[];
-    traces: RuntimeSeriesTrace[] | PieTraces;
+    traces: PlaygroundSeriesTrace[] | PieTraces;
     onChange?: (layout: string, data: SeriesData[] | string) => void;
 }
 
-type RuntimeSeriesTrace = ({ name: string } & ScatterTrace);
+type PlaygroundSeriesTrace = ({ name: string } & ScatterTrace);
 
-export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: boolean }> {
+export class Playground extends Component<PlaygroundProps, { showEditor: boolean }> {
     private updatedOptions: { layout: string, data: SeriesData[] | string };
     private timeoutId: number;
     private isValid: boolean;
 
-    constructor(props: RuntimeEditorProps) {
+    constructor(props: PlaygroundProps) {
         super(props);
 
         this.updateOption = this.updateOption.bind(this);
@@ -181,7 +181,7 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
 
     private renderData() {
         if (this.props.supportSeries && Array.isArray(this.props.traces)) {
-            return (this.props.traces as RuntimeSeriesTrace[]).map((trace, index) =>
+            return (this.props.traces as PlaygroundSeriesTrace[]).map((trace, index) =>
                 createElement(Accordion, {
                         key: `series-${index}`,
                         title: trace.name,
@@ -208,7 +208,7 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
         ]);
         let value = `var layoutOptions = ${JSON.stringify(mergedLayoutOptions, null, 4)};\n\n`;
         if (this.props.supportSeries) {
-            value = value + (this.props.chartData as ScatterData[]).map(RuntimeEditor.getSeriesCode).join("\n\n");
+            value = value + (this.props.chartData as ScatterData[]).map(Playground.getSeriesCode).join("\n\n");
         } else if (!this.props.supportSeries) {
             const mergedDataOptions = deepMerge.all([
                 JSON.parse(this.props.dataOptions || "{}"),
@@ -259,10 +259,10 @@ export class RuntimeEditor extends Component<RuntimeEditorProps, { showEditor: b
     }
 
     private static getSeriesCode(series: ScatterData, index: number) {
-        return `var series${index} = ${JSON.stringify(RuntimeEditor.cleanSeries(series), null, 4)};`;
+        return `var series${index} = ${JSON.stringify(Playground.cleanSeries(series), null, 4)};`;
     }
 
     private static cleanSeries(series: ScatterData): Partial<ScatterData> {
-        return { ...series, mxObjects: undefined, series: undefined };
+        return { ...series, customdata: undefined, series: undefined };
     }
 }
