@@ -59,10 +59,7 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
         return createElement("div", { className: "widget-charts-advanced" },
             createElement(Sidebar, { open: this.state.showEditor }, this.renderTabs()),
             createElement("div", { className: "widget-charts-advanced-toggle" },
-                createElement(MendixButton, {
-                    onClick: this.toggleShowEditor,
-                    className: "pull-right"
-                }, "Toggle Playground")
+                createElement(MendixButton, { onClick: this.toggleShowEditor }, "Toggle Playground")
             ),
             this.props.children
         );
