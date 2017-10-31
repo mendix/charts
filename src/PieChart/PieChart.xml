@@ -82,11 +82,6 @@
             <category>Chart properties</category>
             <description/>
         </property>
-        <property key="showToolbar" type="boolean" defaultValue="false">
-            <caption>Show toolbar</caption>
-            <category>Chart properties</category>
-            <description/>
-        </property>
         <property key="widthUnit" type="enumeration" defaultValue="percentage">
             <caption>Width unit</caption>
             <category>Appearance</category>
@@ -111,7 +106,7 @@
                 <enumerationValue key="percentageOfParent">Percentage of parent</enumerationValue>
             </enumerationValues>
         </property>
-        <property key="height" type="integer" defaultValue="30">
+        <property key="height" type="integer" defaultValue="75">
             <caption>Height</caption>
             <category>Appearance</category>
             <description/>

@@ -17,7 +17,6 @@ export interface PieChartContainerProps extends WrapperProps, Dimensions, EventP
     valueAttribute: string;
     sortAttribute: string;
     chartType: ChartType;
-    showToolbar: boolean;
     showLegend: boolean;
     tooltipForm: string;
     layoutOptions: string;

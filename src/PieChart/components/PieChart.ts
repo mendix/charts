@@ -98,7 +98,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 layout: this.getLayoutOptions(this.props),
                 data: this.getData(this.props),
-                config: PieChart.getConfigOptions(this.props),
+                config: PieChart.getConfigOptions(),
                 onClick: this.onClick,
                 onHover: this.onHover,
                 getTooltipNode: this.getTooltipNodeRef
@@ -177,7 +177,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         this.setState({ layoutOptions, dataOptions });
     }
 
-    private static getConfigOptions(props: PieChartProps): Partial<Config> {
-        return { displayModeBar: props.showToolbar, doubleClick: false };
+    private static getConfigOptions(): Partial<Config> {
+        return { displayModeBar: false, doubleClick: false };
     }
 }

@@ -85,7 +85,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 layout: this.getLayoutOptions(this.props),
                 data: this.getData(this.props),
-                config: LineChart.getConfigOptions(this.props),
+                config: LineChart.getConfigOptions(),
                 onClick: this.onClick,
                 onHover: this.onHover,
                 getTooltipNode: this.getTooltipNodeRef
@@ -168,12 +168,12 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             xaxis: {
                 title: props.xAxisLabel,
                 showgrid: props.grid === "vertical" || props.grid === "both",
-                fixedrange: !props.enableZoom
+                fixedrange: true
             },
             yaxis: {
                 title: props.yAxisLabel,
                 showgrid: props.grid === "horizontal" || props.grid === "both",
-                fixedrange: !props.enableZoom
+                fixedrange: true
             },
             margin: {
                 l: 60,
@@ -185,8 +185,8 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         };
     }
 
-    private static getConfigOptions(props: LineChartProps): Partial<Config> {
-        return { displayModeBar: props.showToolbar, doubleClick: false };
+    private static getConfigOptions(): Partial<Config> {
+        return { displayModeBar: false, doubleClick: false };
     }
 
     private static getStackedArea(traces: ScatterData[]) {

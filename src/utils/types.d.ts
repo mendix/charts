@@ -12,10 +12,7 @@ export interface WrapperProps {
 export interface LayoutProps {
     defaultData?: ScatterData[];
     grid: "none" | "horizontal" | "vertical" | "both";
-    showToolbar: boolean;
     showLegend: boolean;
-    showRangeSlider: boolean;
-    enableZoom: boolean;
     xAxisLabel: string;
     yAxisLabel: string;
     layoutOptions: string;

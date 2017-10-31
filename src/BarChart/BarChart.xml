@@ -159,11 +159,6 @@
                 <enumerationValue key="both">Horizontal and vertical</enumerationValue>
             </enumerationValues>
         </property>
-        <property key="showToolbar" type="boolean" defaultValue="true">
-            <caption>Show toolbar</caption>
-            <category>Chart properties</category>
-            <description>On hover, a toolbar is shown on the top right of the chart</description>
-        </property>
         <property key="widthUnit" type="enumeration" defaultValue="percentage">
             <caption>Width unit</caption>
             <category>Appearance</category>
@@ -188,7 +183,7 @@
                 <enumerationValue key="percentageOfParent">Percentage of Parent</enumerationValue>
             </enumerationValues>
         </property>
-        <property key="height" type="integer" defaultValue="30">
+        <property key="height" type="integer" defaultValue="75">
             <caption>Height</caption>
             <category>Appearance</category>
             <description/>

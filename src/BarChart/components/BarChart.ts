@@ -100,7 +100,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 layout: this.getLayoutOptions(this.props),
                 data: this.getData(this.props),
-                config: BarChart.getConfigOptions(this.props),
+                config: BarChart.getConfigOptions(),
                 onClick: this.onClick,
                 onHover: this.onHover,
                 getTooltipNode: this.getTooltipNodeRef
@@ -110,23 +110,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
 
     private getLayoutOptions(props: BarChartProps): Partial<Layout> {
         const advancedOptions = this.state.layoutOptions ? JSON.parse(this.state.layoutOptions) : {};
-
-        const layoutOptions = deepMerge.all([ {
-            autosize: true,
-            barmode: props.barMode,
-            xaxis: {
-                showgrid: props.grid === "vertical" || props.grid === "both",
-                title: props.xAxisLabel,
-                fixedrange: !props.enableZoom
-            },
-            yaxis: {
-                showgrid: props.grid === "horizontal" || props.grid === "both",
-                title: props.yAxisLabel,
-                fixedrange: !props.enableZoom
-            },
-            showlegend: props.showLegend,
-            hovermode: "closest"
-        }, advancedOptions ]);
+        const layoutOptions = deepMerge.all([ BarChart.defaultLayoutConfigs(props), advancedOptions ]);
 
         console.log("Layout Options:", layoutOptions);
         return layoutOptions;
@@ -192,12 +176,12 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
             xaxis: {
                 title: props.xAxisLabel,
                 showgrid: props.grid === "vertical" || props.grid === "both",
-                fixedrange: !props.enableZoom
+                fixedrange: true
             },
             yaxis: {
                 title: props.yAxisLabel,
                 showgrid: props.grid === "horizontal" || props.grid === "both",
-                fixedrange: !props.enableZoom
+                fixedrange: true
             },
             margin: {
                 l: 60,
@@ -209,7 +193,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
         };
     }
 
-    private static getConfigOptions(props: BarChartProps): Partial<Config> {
-        return { displayModeBar: props.showToolbar, doubleClick: false };
+    private static getConfigOptions(): Partial<Config> {
+        return { displayModeBar: false, doubleClick: false };
     }
 }

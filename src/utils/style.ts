@@ -27,7 +27,7 @@ export const parseStyle = (style = ""): {[key: string]: string} => { // Doesn't 
 
 export const getDimensions = <T extends Dimensions>(props: T): CSSProperties => {
     const style: CSSProperties = {
-        width: props.widthUnit === "percentage" ? `${props.width}%` : `${props.width}`
+        width: props.widthUnit === "percentage" ? `${props.width}%` : `${props.width}px`
     };
     if (props.heightUnit === "percentageOfWidth") {
         style.paddingBottom = `${props.height}%`;
