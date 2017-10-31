@@ -61,7 +61,10 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 layoutOptions: this.state.layoutOptions || "{\n\n}",
                 rawData: this.state.data || [],
                 chartData: this.getData(this.props),
-                modelerConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 4),
+                modelerLayoutConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 4),
+                modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
+                    JSON.stringify(LineChart.getDefaultSeriesOptions(series, this.props), null, 4)
+                ),
                 traces: this.state.data ? this.state.data.map(getRuntimeTraces) : [],
                 onChange: this.onRuntimeUpdate
             }, this.renderLineChart());
@@ -111,18 +114,8 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             lineData = this.state.data.map(({ data, series }) => {
                 const rawOptions = series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
                 const configOptions: Partial<ScatterData> = {
-                    connectgaps: true,
-                    hoveron: "points",
-                    hoverinfo: series.tooltipForm ? "text" : undefined,
-                    line: {
-                        color: series.lineColor,
-                        shape: series.lineStyle
-                    },
-                    mode: series.mode ? series.mode.replace("X", "+") as LineMode : "lines",
-                    name: series.name,
-                    type: "scatter",
-                    fill: props.fill ? "tonexty" : "none",
                     series,
+                    ... LineChart.getDefaultSeriesOptions(series, props),
                     ... getSeriesTraces({ data, series })
                 };
 
@@ -187,6 +180,22 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
 
     private static getConfigOptions(): Partial<Config> {
         return { displayModeBar: false, doubleClick: false };
+    }
+
+    private static getDefaultSeriesOptions(series: SeriesProps, props: LineChartProps): Partial<ScatterData> {
+        return {
+            connectgaps: true,
+            hoveron: "points",
+            hoverinfo: series.tooltipForm ? "text" : undefined,
+            line: {
+                color: series.lineColor,
+                shape: series.lineStyle
+            },
+            mode: series.mode ? series.mode.replace("X", "+") as LineMode : "lines",
+            name: series.name,
+            type: "scatter",
+            fill: props.fill ? "tonexty" : "none"
+        };
     }
 
     private static getStackedArea(traces: ScatterData[]) {

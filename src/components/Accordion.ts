@@ -3,7 +3,7 @@ import * as classNames from "classnames";
 
 import "../ui/Accordion.scss";
 
-interface AccordionProps {
+export interface AccordionProps {
     title?: string;
     className?: string;
     titleClass?: string;

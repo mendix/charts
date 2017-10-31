@@ -3,7 +3,7 @@ import AceEditor, { Marker, Mode } from "react-ace";
 import { Operation, compare } from "fast-json-patch";
 import jsonMap = require("json-source-map");
 
-import { Accordion } from "./Accordion";
+import { Accordion, AccordionProps } from "./Accordion";
 import { MendixButton } from "./MendixButton";
 import { Sidebar } from "./Sidebar";
 import { TabContainer } from "./TabContainer";
@@ -12,7 +12,7 @@ import { TabPane } from "./TabPane";
 import { TabTool } from "./TabTool";
 
 import "brace";
-import { ScatterTrace, SeriesData } from "../utils/data";
+import { ScatterTrace, SeriesData, SeriesProps } from "../utils/data";
 import deepMerge from "deepmerge";
 import { PieTraces } from "../PieChart/components/PieChart";
 import { PieData } from "../../typings/plotly.js";
@@ -26,7 +26,8 @@ interface PlaygroundProps {
     supportSeries: boolean;
     layoutOptions: string;
     dataOptions?: string;
-    modelerConfigs: string;
+    modelerLayoutConfigs: string;
+    modelerSeriesConfigs?: string[];
     rawData?: SeriesData[];
     chartData: ScatterData[] | PieData[];
     traces: PlaygroundSeriesTrace[] | PieTraces;
@@ -66,19 +67,110 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
     }
 
     private renderTabs() {
+        if (!this.props.supportSeries && this.props.traces) {
+            return createElement(TabContainer, { tabHeaderClass: "control-sidebar-tabs", justified: true },
+                createElement(TabHeader, { title: "Layout" }),
+                createElement(TabHeader, { title: "Data" }),
+                createElement(TabHeader, { title: "Full" }),
+                createElement(TabPane, {}, this.renderLayoutOptions()),
+                createElement(TabPane, {}, this.renderData()),
+                createElement(TabPane, {}, this.renderFullConfig()),
+                this.renderSidebarCloser()
+            );
+        }
+
         return createElement(TabContainer, { tabHeaderClass: "control-sidebar-tabs", justified: true },
-            createElement(TabHeader, { title: "Advanced" }),
-            createElement(TabHeader, { title: "Modeler" }),
-            createElement(TabHeader, { title: "Data" }),
+            createElement(TabHeader, { title: "Layout" }),
+            createElement(TabPane, {}, this.renderLayoutOptions()),
+            ...this.renderSeriesTabHeaders(),
+            ...this.renderSeriesTabPanes(),
             createElement(TabHeader, { title: "Full" }),
-            createElement(TabTool, { className: "pull-right remove", onClick: this.toggleShowEditor },
-                createElement("em", { className: "glyphicon glyphicon-chevron-right" })
-            ),
-            createElement(TabPane, {}, this.renderAdvancedOptions()),
-            createElement(TabPane, {}, this.renderAceEditor(this.props.modelerConfigs, undefined, true, "json", this.props.layoutOptions)),
-            createElement(TabPane, {}, this.renderData()),
-            createElement(TabPane, {}, this.renderFullConfig())
+            createElement(TabPane, {}, this.renderFullConfig()),
+            this.renderSidebarCloser()
         );
+    }
+
+    private renderSidebarCloser() {
+        return createElement(TabTool, { className: "pull-right remove", onClick: this.toggleShowEditor },
+            createElement("em", { className: "glyphicon glyphicon-chevron-right" })
+        );
+    }
+
+    private renderSeriesTabHeaders() {
+        if (this.props.rawData) {
+            return this.props.rawData.map(({ series }, index) =>
+                createElement(TabHeader, { title: series.name, key: `series-header-${index}` })
+            );
+        }
+
+        return [];
+    }
+
+    private renderSeriesTabPanes() {
+        if (this.props.rawData) {
+            return this.props.rawData.map(({ series }, index) =>
+                createElement(TabPane, { key: `series-pane-${index}` },
+                    this.renderSeriesOptions(series, index),
+                    this.renderSeriesModelerConfig(index),
+                    this.renderSeriesData(series, index)
+                )
+            );
+        }
+
+        return [];
+    }
+
+    private renderSeriesOptions(series: SeriesProps, index: number) {
+        return createElement(Accordion,
+            {
+                title: "Advanced options",
+                titleClass: "item-header",
+                show: true
+            },
+            this.renderAceEditor(series.seriesOptions || "{\n\n}", value =>
+                this.updateOption(`series-${index}`, value)
+            )
+        );
+    }
+
+    private renderSeriesData(series: SeriesProps, index: number) {
+        if (this.props.supportSeries && Array.isArray(this.props.traces)) {
+            const seriesTrace = (this.props.traces as PlaygroundSeriesTrace[]).find(trace => trace.name === series.name);
+            if (seriesTrace) {
+                return createElement(Accordion, {
+                        key: `series-${index}`,
+                        title: "Data",
+                        titleClass: "item-header",
+                        show: false
+                    },
+                    this.renderAceEditor(JSON.stringify({ x: seriesTrace.x, y: seriesTrace.y }, null, 4), undefined, true)
+                );
+            }
+        }
+
+        return null;
+    }
+
+    private renderSeriesModelerConfig(index: number) {
+        if (this.props.modelerSeriesConfigs && this.props.rawData) {
+            return createElement(Accordion,
+                {
+                    title: "Modeler",
+                    titleClass: "item-header",
+                    show: true
+                },
+                this.renderAceEditor(
+                    this.props.modelerSeriesConfigs[index] || "{\n\n}",
+                    undefined,
+                    true,
+                    "json",
+                    this.props.rawData[index].series.seriesOptions
+                )
+            );
+        }
+
+        return null;
+
     }
 
     private getStartAndEndPosOfDiff(textValue: string, diff: Operation) {
@@ -134,61 +226,32 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
         });
     }
 
-    private renderAdvancedOptions() {
-        const layoutOptions = createElement(Accordion, {
-                key: "layout",
-                title: "Layout options",
-                titleClass: "item-header",
-                show: true
-            },
-            this.renderAceEditor(this.props.layoutOptions, value => this.updateOption("layout", value))
-        );
-        if (this.props.supportSeries && this.props.rawData) {
-            const seriesOptions = this.props.rawData.map(({ series }, index) =>
-                createElement(Accordion,
-                    {
-                        key: `series-${index}`,
-                        title: series.name,
-                        titleClass: "item-header",
-                        show: true
-                    },
-                    this.renderAceEditor(series.seriesOptions || "{\n\n}", value =>
-                        this.updateOption(`series-${index}`, value)
-                    )
-                )
-            );
+    private setAccordionProps(title: string, titleClass: string, show = true): AccordionProps {
+        return { title, titleClass, show };
+    }
 
-            return [ layoutOptions ].concat(seriesOptions);
-        }
+    private renderLayoutOptions() {
+        const layoutOptions = createElement(Accordion, {
+            key: "layout",
+            ...this.setAccordionProps("Advanced options", "item-header")
+        }, this.renderAceEditor(this.props.layoutOptions, value => this.updateOption("layout", value)));
+        const modelerOptions = createElement(Accordion, {
+            key: "modeler",
+            ...this.setAccordionProps("Modeler", "item-header")
+        }, this.renderAceEditor(this.props.modelerLayoutConfigs, undefined, true, "json", this.props.layoutOptions));
         if (!this.props.supportSeries && this.props.dataOptions) {
             const dataOptions = createElement(Accordion, {
-                    key: "data",
-                    title: "Data options",
-                    titleClass: "item-header",
-                    show: true
-                },
-                this.renderAceEditor(this.props.dataOptions, value => this.updateOption("data", value))
-            );
+                key: "data",
+                ...this.setAccordionProps("Data options", "item-header")
+            }, this.renderAceEditor(this.props.dataOptions, value => this.updateOption("data", value)));
 
-            return [ layoutOptions ].concat(dataOptions);
+            return [ layoutOptions, modelerOptions, dataOptions ];
         }
 
-        return layoutOptions;
+        return [ layoutOptions, modelerOptions ];
     }
 
     private renderData() {
-        if (this.props.supportSeries && Array.isArray(this.props.traces)) {
-            return (this.props.traces as PlaygroundSeriesTrace[]).map((trace, index) =>
-                createElement(Accordion, {
-                        key: `series-${index}`,
-                        title: trace.name,
-                        titleClass: "item-header",
-                        show: true
-                    },
-                    this.renderAceEditor(JSON.stringify({ x: trace.x, y: trace.y }, null, 4), undefined, true)
-                )
-            );
-        }
         if (!this.props.supportSeries && this.props.traces) {
             return createElement("div", {},
                 this.renderAceEditor(JSON.stringify(this.props.traces as PieTraces, null, 4), undefined, true)
@@ -200,7 +263,7 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
 
     private renderFullConfig() {
         const mergedLayoutOptions = deepMerge.all([
-            JSON.parse(this.props.modelerConfigs),
+            JSON.parse(this.props.modelerLayoutConfigs),
             JSON.parse(this.props.layoutOptions)
         ]);
         let value = `var layoutOptions = ${JSON.stringify(mergedLayoutOptions, null, 4)};\n\n`;

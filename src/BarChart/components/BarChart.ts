@@ -60,7 +60,10 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                 layoutOptions: this.state.layoutOptions || "{\n\n}",
                 rawData: this.state.data || [],
                 chartData: this.getData(this.props),
-                modelerConfigs: JSON.stringify(BarChart.defaultLayoutConfigs(this.props), null, 4),
+                modelerLayoutConfigs: JSON.stringify(BarChart.defaultLayoutConfigs(this.props), null, 4),
+                modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
+                    JSON.stringify(BarChart.getDefaultSeriesOptions(series, this.props), null, 4)
+                ),
                 traces: this.state.data ? this.state.data.map(getRuntimeTraces) : [],
                 onChange: this.onRuntimeUpdate
             }, this.renderChart());
@@ -123,13 +126,10 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                 const rawOptions = series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
                 const traces = getSeriesTraces({ data, series });
                 const configOptions: Partial<ScatterData> = {
-                    name: series.name,
-                    type: "bar",
-                    hoverinfo: series.tooltipForm ? "text" : undefined,
-                    x: this.props.orientation === "bar" ? traces.y : traces.x,
-                    y: this.props.orientation === "bar" ? traces.x : traces.y,
-                    orientation: this.props.orientation === "bar" ? "h" : "v",
-                    series
+                    x: props.orientation === "bar" ? traces.y : traces.x,
+                    y: props.orientation === "bar" ? traces.x : traces.y,
+                    series,
+                    ... BarChart.getDefaultSeriesOptions(series, props)
                 };
 
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
@@ -195,5 +195,14 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
 
     private static getConfigOptions(): Partial<Config> {
         return { displayModeBar: false, doubleClick: false };
+    }
+
+    private static getDefaultSeriesOptions(series: SeriesProps, props: BarChartProps): Partial<ScatterData> {
+        return {
+            name: series.name,
+            type: "bar",
+            hoverinfo: series.tooltipForm ? "text" : undefined,
+            orientation: props.orientation === "bar" ? "h" : "v"
+        };
     }
 }
