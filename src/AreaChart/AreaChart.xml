@@ -194,17 +194,17 @@
             <category>Appearance</category>
             <description/>
         </property>
-        <property key="heightUnit" type="enumeration" defaultValue="percentageOfParent">
+        <property key="heightUnit" type="enumeration" defaultValue="percentageOfWidth">
             <caption>Height unit</caption>
             <category>Appearance</category>
-            <description>'Percentage of width' is the aspect ratio, 'Pixels' is absolute, Warning 'Percentage of parent' only work when parent has a absolute height, else is not displayed --> 'Percentage of width' is the aspect ratio, 'Pixels' is absolute. Warning: When using 'Percentage of parent' the parent container must have an absolute height, else nothing is displayed.</description>
+            <description>'Percentage of width' is the aspect ratio, 'Pixels' is absolute. Warning: When using 'Percentage of parent' the parent container must have an absolute height, else nothing is displayed.</description>
             <enumerationValues>
                 <enumerationValue key="percentageOfWidth">Percentage of width</enumerationValue>
                 <enumerationValue key="pixels">Pixels</enumerationValue>
                 <enumerationValue key="percentageOfParent">Percentage of parent</enumerationValue>
             </enumerationValues>
         </property>
-        <property key="height" type="integer" defaultValue="100">
+        <property key="height" type="integer" defaultValue="30">
             <caption>Height</caption>
             <category>Appearance</category>
             <description/>
