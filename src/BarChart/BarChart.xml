@@ -61,6 +61,7 @@
                         <attributeType name="Decimal"/>
                         <attributeType name="Long"/>
                         <attributeType name="Integer"/>
+                        <attributeType name="Enum"/>
                     </attributeTypes>
                 </property>
                 <property key="yValueAttribute" type="attribute" entityProperty="dataEntity">

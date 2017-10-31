@@ -181,6 +181,11 @@ export const getXValue = (mxObject: mendix.lib.MxObject, series: SeriesProps): D
 
         return `${parseDate(date)} ${parseTime(date)}`;
     }
+    if (mxObject.isEnum(series.xValueAttribute)) {
+        const enumValue = mxObject.get(series.xValueAttribute) as string;
+
+        return mxObject.getEnumCaption(series.xValueAttribute, enumValue);
+    }
 
     return mxObject.get(series.xValueAttribute) as Datum;
 };

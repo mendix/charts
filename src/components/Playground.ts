@@ -62,7 +62,7 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
                 createElement(MendixButton, {
                     onClick: this.toggleShowEditor,
                     className: "pull-right"
-                }, "Toggle Editor")
+                }, "Toggle Playground")
             ),
             this.props.children
         );
