@@ -44,7 +44,6 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
     constructor(props: PlaygroundProps) {
         super(props);
 
-        this.updateOption = this.updateOption.bind(this);
         this.updateChart = this.updateChart.bind(this);
         this.onValidate = this.onValidate.bind(this);
         this.toggleShowEditor = this.toggleShowEditor.bind(this);
@@ -128,7 +127,7 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
                 show: true
             },
             this.renderAceEditor(series.seriesOptions || "{\n\n}", value =>
-                this.updateOption(`series-${index}`, value)
+                this.onUpdate(`series-${index}`, value)
             )
         );
     }
@@ -234,7 +233,7 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
         const layoutOptions = createElement(Accordion, {
             key: "layout",
             ...this.setAccordionProps("Advanced options", "item-header")
-        }, this.renderAceEditor(this.props.layoutOptions, value => this.updateOption("layout", value)));
+        }, this.renderAceEditor(this.props.layoutOptions, value => this.onUpdate("layout", value)));
         const modelerOptions = createElement(Accordion, {
             key: "modeler",
             ...this.setAccordionProps("Modeler", "item-header")
@@ -243,7 +242,7 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
             const dataOptions = createElement(Accordion, {
                 key: "data",
                 ...this.setAccordionProps("Data options", "item-header")
-            }, this.renderAceEditor(this.props.dataOptions, value => this.updateOption("data", value)));
+            }, this.renderAceEditor(this.props.dataOptions, value => this.onUpdate("data", value)));
 
             return [ layoutOptions, modelerOptions, dataOptions ];
         }
@@ -292,28 +291,32 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
         this.setState({ showEditor: !this.state.showEditor });
     }
 
-    private updateOption(source: string, value: string) {
-        if (source === "layout") {
-            this.updatedOptions.layout = value;
-        }
-        if (source.indexOf("series") > -1) {
-            const index = source.split("-")[1];
-            (this.updatedOptions.data[ parseInt(index, 10) ] as SeriesData).series.seriesOptions = value;
-        } else if (source.indexOf("data") > -1) {
-            this.updatedOptions.data = value;
-        }
+    private onUpdate(source: string, value: string) {
         if (this.timeoutId) {
             clearTimeout(this.timeoutId);
         }
-        this.timeoutId = setTimeout(this.updateChart, 1000);
+        this.timeoutId = setTimeout(() => {
+            if (this.isValid) {
+                this.updateChart(source, value);
+            }
+        }, 1000);
     }
 
     private onValidate(annotations: object[]) {
         this.isValid = !annotations.length;
     }
 
-    private updateChart() {
-        if (this.isValid && this.props.onChange) {
+    private updateChart(source: string, value: string) {
+        if (source === "layout") {
+            this.updatedOptions.layout = value;
+        }
+        if (source.indexOf("series") > -1) {
+            const index = source.split("-")[ 1 ];
+            (this.updatedOptions.data[ parseInt(index, 10) ] as SeriesData).series.seriesOptions = value;
+        } else if (source.indexOf("data") > -1) {
+            this.updatedOptions.data = value;
+        }
+        if (this.props.onChange) {
             this.props.onChange(this.updatedOptions.layout, this.updatedOptions.data);
         }
     }
