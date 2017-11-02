@@ -1,5 +1,6 @@
 import { Component, createElement } from "react";
 import AceEditor, { Marker, Mode } from "react-ace";
+import * as classNames from "classnames";
 import { Operation, compare } from "fast-json-patch";
 import jsonMap = require("json-source-map");
 
@@ -13,7 +14,6 @@ import { TabTool } from "./TabTool";
 
 import "brace";
 import { ScatterTrace, SeriesData, SeriesProps } from "../utils/data";
-import deepMerge from "deepmerge";
 import { PieTraces } from "../PieChart/components/PieChart";
 import { PieData } from "../../typings/plotly.js";
 import { ScatterData } from "plotly.js";
@@ -56,10 +56,12 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
     }
 
     render() {
-        return createElement("div", { className: "widget-charts-advanced" },
+        return createElement("div", {
+                className: classNames("widget-charts-playground", { "playground-open": this.state.showEditor })
+            },
             createElement(Sidebar, { open: this.state.showEditor }, this.renderTabs()),
-            createElement("div", { className: "widget-charts-advanced-toggle" },
-                createElement(MendixButton, { onClick: this.toggleShowEditor }, "Toggle Playground")
+            createElement("div", { className: "widget-charts-playground-toggle" },
+                createElement(MendixButton, { onClick: this.toggleShowEditor }, "Toggle Editor")
             ),
             this.props.children
         );
@@ -70,10 +72,8 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
             return createElement(TabContainer, { tabHeaderClass: "control-sidebar-tabs", justified: true },
                 createElement(TabHeader, { title: "Layout" }),
                 createElement(TabHeader, { title: "Data" }),
-                createElement(TabHeader, { title: "Full" }),
                 createElement(TabPane, {}, this.renderLayoutOptions()),
                 createElement(TabPane, {}, this.renderData()),
-                createElement(TabPane, {}, this.renderFullConfig()),
                 this.renderSidebarCloser()
             );
         }
@@ -83,8 +83,6 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
             createElement(TabPane, {}, this.renderLayoutOptions()),
             ...this.renderSeriesTabHeaders(),
             ...this.renderSeriesTabPanes(),
-            createElement(TabHeader, { title: "Full" }),
-            createElement(TabPane, {}, this.renderFullConfig()),
             this.renderSidebarCloser()
         );
     }
@@ -260,33 +258,6 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
         return null;
     }
 
-    private renderFullConfig() {
-        const mergedLayoutOptions = deepMerge.all([
-            JSON.parse(this.props.modelerLayoutConfigs),
-            JSON.parse(this.props.layoutOptions)
-        ]);
-        let value = `var layoutOptions = ${JSON.stringify(mergedLayoutOptions, null, 4)};\n\n`;
-        if (this.props.supportSeries) {
-            value = value + (this.props.chartData as ScatterData[]).map(Playground.getSeriesCode).join("\n\n");
-        } else if (!this.props.supportSeries) {
-            const mergedDataOptions = deepMerge.all([
-                JSON.parse(this.props.dataOptions || "{}"),
-                (this.props.chartData as PieData[])[0]
-            ]);
-            value = value + `var data = [${JSON.stringify(mergedDataOptions, null, 4)}]`;
-        }
-
-        return createElement(AceEditor, {
-            mode: "javascript",
-            readOnly: true,
-            value,
-            theme: "github",
-            maxLines: 1000, // crappy attempt to avoid a third scroll bar
-            className: "ace-editor-read-only",
-            editorProps: { $blockScrolling: Infinity }
-        });
-    }
-
     private toggleShowEditor() {
         this.setState({ showEditor: !this.state.showEditor });
     }
@@ -319,13 +290,5 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
         if (this.props.onChange) {
             this.props.onChange(this.updatedOptions.layout, this.updatedOptions.data);
         }
-    }
-
-    private static getSeriesCode(series: ScatterData, index: number) {
-        return `var series${index} = ${JSON.stringify(Playground.cleanSeries(series), null, 4)};`;
-    }
-
-    private static cleanSeries(series: ScatterData): Partial<ScatterData> {
-        return { ...series, customdata: undefined, series: undefined };
     }
 }

@@ -17,7 +17,9 @@
     }
 }
 
-.widget-charts-advanced {
+.widget-charts-playground {
+    padding: 5px;
+
     .ace_editor {
         margin-bottom: 0;
         width: 100% !important;
@@ -35,12 +37,17 @@
         }
     }
 
-    .widget-charts-advanced-toggle {
+    .widget-charts-playground-toggle {
         .btn {
             position: absolute;
-            right: 0;
+            right: 5px;
             z-index: 1;
         }
+    }
+
+    &.playground-open {
+        border: 1px solid #66afe9;
+        border-radius: 5px;
     }
 }
 
@@ -50,6 +57,18 @@
             .modebar {
                 z-index: 0 !important; // Strange: styles from the library that can't be over written without this
             }
+        }
+    }
+
+    .plot-container {
+        &.plotly {
+            position: absolute;
+            width: 100%;
+            padding: 5px 5px 50%;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
         }
     }
 }

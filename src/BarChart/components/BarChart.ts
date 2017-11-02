@@ -187,7 +187,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                 l: 60,
                 r: 60,
                 b: 60,
-                t: 100,
+                t: 60,
                 pad: 4
             }
         };
