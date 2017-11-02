@@ -137,7 +137,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 l: 60,
                 r: 60,
                 b: 60,
-                t: 60,
+                t: 0,
                 pad: 4
             }
         }, advancedOptions ]);

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <widget id="com.mendix.widget.custom.PieChart.PieChart" needsEntityContext="true" offlineCapable="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
     <name>Pie chart</name>
-    <description>Renders a pie or donut chart</description>
+    <description>Renders a pie or doughnut chart</description>
     <icon/>
     <properties>
         <property key="dataEntity" type="entity">
@@ -74,7 +74,7 @@
             <description/>
             <enumerationValues>
                 <enumerationValue key="pie">Pie</enumerationValue>
-                <enumerationValue key="donut">Donut</enumerationValue>
+                <enumerationValue key="donut">Doughnut</enumerationValue>
             </enumerationValues>
         </property>
         <property key="showLegend" type="boolean" defaultValue="true">
@@ -142,6 +142,16 @@
             <category>Advanced</category>
             <description>The Plotly data options as JSON</description>
         </property>
+        <property key="devMode" type="enumeration" defaultValue="basic">
+            <caption>Dev mode</caption>
+            <category>Advanced</category>
+            <description>Developer mode adds a button to the charts when running the app which can be used to toggle a live editor for the advanced configuration options.</description>
+            <enumerationValues>
+                <enumerationValue key="basic">Basic</enumerationValue>
+                <enumerationValue key="advanced">Advanced</enumerationValue>
+                <enumerationValue key="advancedDev">Developer</enumerationValue>
+            </enumerationValues>
+        </property>
         <property key="layoutOptions" type="string" required="false" multiline="true">
             <caption>Layout options</caption>
             <category>Advanced</category>
@@ -151,16 +161,6 @@
             <caption>Sample data</caption>
             <category>Advanced</category>
             <description>To be used as a more accurate representation of project data in the web modeler</description>
-        </property>
-        <property key="devMode" type="enumeration" defaultValue="basic">
-            <caption>Dev mode</caption>
-            <category>Advanced</category>
-            <description>Advanced dev option enables the playground for run time editing and preview of the output of the JSON properties</description>
-            <enumerationValues>
-                <enumerationValue key="basic">Basic</enumerationValue>
-                <enumerationValue key="advanced">Advanced</enumerationValue>
-                <enumerationValue key="advancedDev">Advanced dev</enumerationValue>
-            </enumerationValues>
         </property>
     </properties>
 </widget>

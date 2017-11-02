@@ -172,7 +172,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 l: 60,
                 r: 60,
                 b: 60,
-                t: 60,
+                t: 0,
                 pad: 4
             }
         };

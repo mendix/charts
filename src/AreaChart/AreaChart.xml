@@ -204,20 +204,20 @@
             <category>Appearance</category>
             <description/>
         </property>
+        <property key="devMode" type="enumeration" defaultValue="basic">
+            <caption>Dev mode</caption>
+            <category>Advanced</category>
+            <description>Developer mode adds a button to the charts when running the app which can be used to toggle a live editor for the advanced configuration options.</description>
+            <enumerationValues>
+                <enumerationValue key="basic">Basic</enumerationValue>
+                <enumerationValue key="advanced">Advanced</enumerationValue>
+                <enumerationValue key="advancedDev">Developer</enumerationValue>
+            </enumerationValues>
+        </property>
         <property key="layoutOptions" type="string" required="false" multiline="true">
             <caption>Layout options</caption>
             <category>Advanced</category>
             <description>The JSON containing the Plotly layout options</description>
-        </property>
-        <property key="devMode" type="enumeration" defaultValue="basic">
-            <caption>Dev mode</caption>
-            <category>Advanced</category>
-            <description>Advanced dev option enables the playground for run time editing and preview of the output of the JSON properties</description>
-            <enumerationValues>
-                <enumerationValue key="basic">Basic</enumerationValue>
-                <enumerationValue key="advanced">Advanced</enumerationValue>
-                <enumerationValue key="advancedDev">Advanced dev</enumerationValue>
-            </enumerationValues>
         </property>
     </properties>
 </widget>
