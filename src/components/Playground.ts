@@ -48,6 +48,7 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
         this.updateChart = this.updateChart.bind(this);
         this.onValidate = this.onValidate.bind(this);
         this.toggleShowEditor = this.toggleShowEditor.bind(this);
+        this.closeEditor = this.closeEditor.bind(this);
 
         this.state = { showEditor: false };
         this.updatedOptions = {
@@ -60,7 +61,7 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
         return createElement("div", {
                 className: classNames("widget-charts-playground", { "playground-open": this.state.showEditor })
             },
-            createElement(Sidebar, { open: this.state.showEditor }, this.renderTabs()),
+            createElement(Sidebar, { open: this.state.showEditor, onBlur: this.closeEditor }, this.renderTabs()),
             createElement("div", { className: "widget-charts-playground-toggle" },
                 createElement(MendixButton, { onClick: this.toggleShowEditor }, "Toggle Editor")
             ),
@@ -284,6 +285,12 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
 
     private toggleShowEditor() {
         this.setState({ showEditor: !this.state.showEditor });
+    }
+
+    private closeEditor() {
+        if (this.state.showEditor) {
+            this.setState({ showEditor: false });
+        }
     }
 
     private onUpdate(source: string, value: string) {
