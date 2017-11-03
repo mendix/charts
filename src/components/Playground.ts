@@ -1,10 +1,11 @@
-import { Component, createElement } from "react";
+import { Component, ReactChild, createElement } from "react";
 import AceEditor, { Marker, Mode } from "react-ace";
 import * as classNames from "classnames";
 import { Operation, compare } from "fast-json-patch";
 import jsonMap = require("json-source-map");
 
 import { Accordion, AccordionProps } from "./Accordion";
+import { Alert } from "./Alert";
 import { MendixButton } from "./MendixButton";
 import { Sidebar } from "./Sidebar";
 import { TabContainer } from "./TabContainer";
@@ -72,8 +73,10 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
             return createElement(TabContainer, { tabHeaderClass: "control-sidebar-tabs", justified: true },
                 createElement(TabHeader, { title: "Layout" }),
                 createElement(TabHeader, { title: "Data" }),
+                createElement(TabHeader, { title: "Help" }),
                 createElement(TabPane, {}, this.renderLayoutOptions()),
                 createElement(TabPane, {}, this.renderData()),
+                createElement(TabPane, { className: "widget-charts-playground-help" }, this.renderHelpContent()),
                 this.renderSidebarCloser()
             );
         }
@@ -83,7 +86,9 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
             createElement(TabPane, {}, this.renderLayoutOptions()),
             ...this.renderSeriesTabHeaders(),
             ...this.renderSeriesTabPanes(),
-            this.renderSidebarCloser()
+            this.renderSidebarCloser(),
+            createElement(TabHeader, { title: "Help" }),
+            createElement(TabPane, { className: "widget-charts-playground-help" }, this.renderHelpContent())
         );
     }
 
@@ -168,6 +173,25 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
 
         return null;
 
+    }
+
+    private renderHelpContent() {
+        return createElement(Alert, { key: 0, bootstrapStyle: "info" },
+            this.renderParagraph(createElement("em", { className: "glyphicon glyphicon-exclamation-sign" }),
+                "  Changes made in this editor are only for preview purposes and are not automatically saved to the widget"
+            ),
+            this.renderParagraph("The JSON can be copied and pasted into the widget in the desktop and web modelers."),
+            this.renderParagraph("JSON in the 'Data' tab/panel can be added to the widget as 'Sample data' for a more accurate representation of user data in the web modeler"), // tslint:disable-line max-line-length
+            this.renderParagraph("Plotly API reference: ",
+                createElement("a", { href: "https://plot.ly/javascript/reference/", className: "" },
+                    "https://plot.ly/javascript/reference/"
+                )
+            )
+        );
+    }
+
+    private renderParagraph(...content: ReactChild[]) {
+        return createElement("p", {}, content);
     }
 
     private getStartAndEndPosOfDiff(textValue: string, diff: Operation) {

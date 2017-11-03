@@ -13,10 +13,9 @@ import { LineMode } from "../utils/types";
 export class preview extends Component<LineChartContainerProps, {}> {
     render() {
         return createElement("div", {},
-            createElement(Alert, {
-                className: "widget-charts-area-alert",
-                message: validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions)
-            }),
+            createElement(Alert, { className: "widget-charts-area-alert" },
+                validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions)
+            ),
             createElement(LineChart, {
                 ...this.props,
                 fill: true,

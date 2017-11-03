@@ -40,14 +40,25 @@
     .widget-charts-playground-toggle {
         .btn {
             position: absolute;
-            right: 5px;
+            right: 10px;
+            top: 10px;
             z-index: 1;
         }
     }
 
     &.playground-open {
-        border: 1px solid #66afe9;
-        border-radius: 5px;
+        .main-svg {
+            border: 1px solid #66afe9;
+            border-radius: 5px;
+        }
+    }
+
+    .widget-charts-playground-help {
+        padding: 5px;
+
+        .alert {
+            padding: 8px;
+        }
     }
 }
 

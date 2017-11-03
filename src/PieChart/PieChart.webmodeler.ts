@@ -17,11 +17,9 @@ export class preview extends Component<PieChartContainerProps, {}> {
 
     render() {
         return createElement("div", {},
-            createElement(Alert, {
-                bootstrapStyle: "danger",
-                className: `widget-${this.props.chartType}-chart-alert`,
-                message: PieChartContainer.validateProps(this.props)
-            }),
+            createElement(Alert, { className: `widget-${this.props.chartType}-chart-alert` },
+                PieChartContainer.validateProps(this.props)
+            ),
             createElement(PieChart, {
                 ...this.props,
                 defaultData: this.getData(this.props)

@@ -46,10 +46,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
 
     render() {
         if (this.props.alertMessage) {
-            return createElement(Alert, {
-                className: "widget-charts-bar-alert",
-                message: this.props.alertMessage
-            });
+            return createElement(Alert, { className: "widget-charts-bar-alert" }, this.props.alertMessage);
         }
         if (this.props.loading) {
             return createElement(ChartLoading, { text: "Loading" });

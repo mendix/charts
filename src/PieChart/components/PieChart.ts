@@ -51,10 +51,9 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
 
     render() {
         if (this.props.alertMessage) {
-            return createElement(Alert, {
-                className: `widget-charts-${this.props.chartType}-alert`,
-                message: this.props.alertMessage
-            });
+            return createElement(Alert, { className: `widget-charts-${this.props.chartType}-alert` },
+                this.props.alertMessage
+            );
         }
         if (this.props.loading) {
             return createElement(ChartLoading, { text: "Loading" });

@@ -12,10 +12,9 @@ import { ScatterData } from "plotly.js";
 export class preview extends Component<BarChartContainerProps, {}> {
     render() {
         return createElement("div", {},
-            createElement(Alert, {
-                className: "widget-charts-column-alert",
-                message: validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions)
-            }),
+            createElement(Alert, { className: "widget-charts-column-alert" },
+                validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions)
+            ),
             createElement(BarChart, {
                 ...this.props,
                 defaultData: this.getData(this.props)
