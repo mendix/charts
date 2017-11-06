@@ -2,10 +2,11 @@ import { Component, createElement } from "react";
 
 import { Alert } from "../components/Alert";
 import { PieChart } from "./components/PieChart";
-import PieChartContainer, { PieChartContainerProps } from "./components/PieChartContainer";
+import { PieChartContainerProps } from "./components/PieChartContainer";
 
 import deepMerge from "deepmerge";
 import { PieData } from "plotly.js";
+import { validateSeriesProps } from "../utils/data";
 
 // tslint:disable-next-line class-name
 export class preview extends Component<PieChartContainerProps, {}> {
@@ -18,12 +19,9 @@ export class preview extends Component<PieChartContainerProps, {}> {
     render() {
         return createElement("div", {},
             createElement(Alert, { className: `widget-${this.props.chartType}-chart-alert` },
-                PieChartContainer.validateProps(this.props)
+                validateSeriesProps([ { ...this.props, seriesOptions: this.props.dataOptions } ], this.props.friendlyId, this.props.layoutOptions)
             ),
-            createElement(PieChart, {
-                ...this.props,
-                defaultData: this.getData(this.props)
-            })
+            createElement(PieChart, { ...this.props, defaultData: this.getData(this.props) })
         );
     }
 

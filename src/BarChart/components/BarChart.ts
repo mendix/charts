@@ -1,5 +1,5 @@
 // tslint:disable no-console
-import { Component, ReactElement, createElement } from "react";
+import { Component, ReactChild, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { BarChartContainerProps } from "./BarChartContainer";
@@ -15,7 +15,7 @@ import { getDimensions, parseStyle } from "../../utils/style";
 import "../../ui/Charts.scss";
 
 export interface BarChartProps extends BarChartContainerProps {
-    alertMessage?: string | ReactElement<any>;
+    alertMessage?: ReactChild;
     loading?: boolean;
     data?: SeriesData[];
     defaultData?: ScatterData[];

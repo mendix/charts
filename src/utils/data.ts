@@ -1,21 +1,24 @@
-import { ReactElement, createElement } from "react";
-import { LineMode } from "./types";
+import { ReactChild, createElement } from "react";
 import { Datum } from "plotly.js";
+import { LineMode } from "./types";
 
 export interface DataSourceProps {
-    name: string;
     dataSourceMicroflow: string;
     dataSourceType: "XPath" | "microflow";
     entityConstraint: string;
     dataEntity: string;
-    xValueAttribute: string;
-    yValueAttribute: string;
-    xValueSortAttribute: string;
-    seriesOptions: string;
     sampleData: string;
 }
 
+export interface SeriesDataSourceProps extends DataSourceProps {
+    xValueAttribute: string;
+    xValueSortAttribute: string;
+    sortOrder: SortOrder;
+    yValueAttribute: string;
+}
+
 export type MxObject = mendix.lib.MxObject;
+export type SortOrder = "asc" | "desc";
 
 export interface EventProps {
     onClickEvent: "doNothing" | "showPage" | "callMicroflow";
@@ -24,8 +27,12 @@ export interface EventProps {
     tooltipForm: string;
 }
 
-export interface SeriesProps extends DataSourceProps, EventProps {
+export interface SeriesProps extends SeriesDataSourceProps, EventProps {
     name: string;
+    seriesOptions: string;
+}
+
+export interface LineSeriesProps extends SeriesProps {
     mode?: LineMode;
     lineColor: string;
     lineStyle: "linear" | "spline";
@@ -41,23 +48,24 @@ export interface ScatterTrace {
     y: number[] | Datum[];
 }
 
-export const validateSeriesProps = <T extends DataSourceProps>(dataSeries: T[], widgetId: string, layoutOptions: string): string | ReactElement<any> => { // tslint:disable-line max-line-length
+export const validateSeriesProps = <T extends Partial<SeriesProps>>(dataSeries: T[], widgetId: string, layoutOptions: string): ReactChild => { // tslint:disable-line max-line-length
     if (dataSeries && dataSeries.length) {
         const errorMessage: string[] = [];
         dataSeries.forEach(series => {
+            const identifier = series.name ? `series "${series.name}"` : "the widget";
             if (series.dataSourceType === "microflow" && !series.dataSourceMicroflow) {
-                errorMessage.push(`\n'Data source type' in series '${series.name}' is set to 'Microflow' but the microflow is missing.`); // tslint:disable-line max-line-length
+                errorMessage.push(`\n'Data source type' in ${identifier} is set to 'Microflow' but no microflow is specified.`); // tslint:disable-line max-line-length
             }
             if (series.seriesOptions && series.seriesOptions.trim()) {
                 const error = validateAdvancedOptions(series.seriesOptions.trim());
                 if (error) {
-                    errorMessage.push(`Invalid options JSON for series "${series.name}": ${error}`);
+                    errorMessage.push(`Invalid options JSON for ${identifier}: ${error}`);
                 }
             }
             if (series.sampleData && series.sampleData.trim()) {
                 const error = validateAdvancedOptions(series.sampleData.trim());
                 if (error) {
-                    errorMessage.push(`Invalid sample data JSON for series "${series.name}": ${error}`);
+                    errorMessage.push(`Invalid sample data JSON for ${identifier}: ${error}`);
                 }
             }
         });
@@ -79,23 +87,22 @@ export const validateSeriesProps = <T extends DataSourceProps>(dataSeries: T[], 
 };
 
 export const validateAdvancedOptions = (rawData: string): string => {
-        if (!rawData) {
-            return "";
-        }
+    if (rawData && rawData.trim()) {
         try {
-            JSON.parse(rawData);
+            JSON.parse(rawData.trim());
         } catch (error) {
             return error.message;
         }
+    }
 
-        return "";
+    return "";
 };
 
-export const fetchSeriesData = <T extends DataSourceProps>(mxObject: MxObject, series: T): Promise<any> => {
-    return new Promise((resolve, reject) => {
+export const fetchSeriesData = (mxObject: MxObject, series: SeriesProps): Promise<SeriesData> =>
+    new Promise<SeriesData>((resolve, reject) => {
         if (series.dataEntity) {
             if (series.dataSourceType === "XPath") {
-                fetchByXPath(mxObject.getGuid(), series.dataEntity, series.entityConstraint, series.xValueSortAttribute)
+                fetchByXPath(mxObject.getGuid(), series.dataEntity, series.entityConstraint, series.xValueSortAttribute, series.sortOrder)
                     .then(mxObjects => resolve({ data: mxObjects, series }))
                     .catch(reject);
             } else if (series.dataSourceType === "microflow" && series.dataSourceMicroflow) {
@@ -107,35 +114,31 @@ export const fetchSeriesData = <T extends DataSourceProps>(mxObject: MxObject, s
             resolve();
         }
     });
-};
 
-export const fetchByXPath = (guid: string, entity: string, constraint: string, sortBy?: string): Promise<MxObject[]> => {
-    return new Promise((resolve, reject) => {
+export const fetchByXPath = (guid: string, entity: string, constraint: string, sortBy?: string, sortOrder: SortOrder = "asc"): Promise<MxObject[]> =>
+    new Promise((resolve, reject) => {
         const entityPath = entity.split("/");
         const entityName = entityPath.length > 1 ? entityPath[entityPath.length - 1] : entity;
-        const xpath = "//" + entityName + (constraint ? constraint.replace("[%CurrentObject%]", guid) : "");
-        const errorMessage = `An error occurred while retrieving data via XPath (${xpath}): `;
+        const xpath = "//" + entityName + constraint.replace("[%CurrentObject%]", guid);
         window.mx.data.get({
             callback: resolve,
-            error: error => reject(`${errorMessage} ${error.message}`),
+            error: error => reject(`An error occurred while retrieving data via XPath (${xpath}): ${error.message}`),
             xpath,
             filter: {
-                sort: sortBy ? [ [ sortBy, "asc" ] ] : []
+                sort: sortBy ? [ [ sortBy, sortOrder ] ] : []
             }
         });
     });
-};
 
-export const fetchByMicroflow = (actionname: string, guid: string): Promise<MxObject[]> => {
-    return new Promise((resolve, reject) => {
+export const fetchByMicroflow = (actionname: string, guid: string): Promise<MxObject[]> =>
+    new Promise((resolve, reject) => {
         const errorMessage = `An error occurred while retrieving data by microflow (${actionname}): `;
         mx.ui.action(actionname, {
-            callback: mxObjects => resolve(mxObjects as MxObject[]),
+            callback: (mxObjects: MxObject[]) => resolve(mxObjects),
             error: error => reject(`${errorMessage} ${error.message}`),
             params: { applyto: "selection", guids: [ guid ] }
         });
     });
-};
 
 export const handleOnClick = <T extends EventProps>(options: T, mxObject?: MxObject) => {
     if (!mxObject || options.onClickEvent === "doNothing") {
@@ -159,20 +162,14 @@ export const handleOnClick = <T extends EventProps>(options: T, mxObject?: MxObj
     }
 };
 
-export const getSeriesTraces = ({ data, series }: SeriesData): ScatterTrace => {
-    if (data) {
-        return {
-            x: data.map(mxObject => getXValue(mxObject, series)),
-            y: data.map(mxObject => parseInt(mxObject.get(series.yValueAttribute) as string, 10))
-        };
-    }
+export const getSeriesTraces = ({ data, series }: SeriesData): ScatterTrace =>
+    ({
+        x: data ? data.map(mxObject => getXValue(mxObject, series)) : [],
+        y: data ? data.map(mxObject => parseInt(mxObject.get(series.yValueAttribute) as string, 10)) : []
+    });
 
-    return { x: [], y: [] };
-};
-
-export const getRuntimeTraces = ({ data, series }: SeriesData): ({ name: string } & ScatterTrace) => {
-    return { name: series.name, ...getSeriesTraces({ data, series }) };
-};
+export const getRuntimeTraces = ({ data, series }: SeriesData): ({ name: string } & ScatterTrace) =>
+    ({ name: series.name, ...getSeriesTraces({ data, series }) });
 
 export const getXValue = (mxObject: mendix.lib.MxObject, series: SeriesProps): Datum => {
     if (mxObject.isDate(series.xValueAttribute)) {
@@ -190,9 +187,7 @@ export const getXValue = (mxObject: mendix.lib.MxObject, series: SeriesProps): D
     return mxObject.get(series.xValueAttribute) as Datum;
 };
 
-export const parseDate = (date: Date): string => {
-    return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-};
+export const parseDate = (date: Date): string => `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
 
 export const parseTime = (date: Date): string => {
     const time: string[] = [];

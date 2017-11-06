@@ -1,5 +1,5 @@
 // tslint:disable no-console
-import { Component, ReactElement, createElement } from "react";
+import { Component, ReactChild, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
@@ -16,10 +16,10 @@ import "../../ui/Charts.scss";
 export interface PieChartProps extends PieChartContainerProps {
     data?: mendix.lib.MxObject[];
     defaultData?: PieData[];
-    alertMessage?: string | ReactElement<any>;
+    alertMessage?: ReactChild;
     loading?: boolean;
-    onClick?: (index: number) => void;
-    onHover?: (node: HTMLDivElement, index: number) => void;
+    onClick?: (props: PieChartProps, dataObject: mendix.lib.MxObject) => void;
+    onHover?: (node: HTMLDivElement, dataObject: mendix.lib.MxObject) => void;
 }
 
 interface PieChartState {
@@ -154,21 +154,19 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         return { labels: [], colors: [], values: [] };
     }
 
-    private onClick(data: PieHoverData) {
-        if (this.props.onClick) {
-            const activePoint = data.points[0];
-            this.props.onClick(activePoint.pointNumber);
+    private onClick({ points }: PieHoverData) {
+        if (this.props.onClick && this.props.data) {
+            this.props.onClick(this.props, this.props.data[points[0].pointNumber]);
         }
     }
 
-    private onHover(data: PieHoverData) {
-        if (this.props.onHover) {
-            const activePoint = data.points[0];
+    private onHover({ event, points }: PieHoverData) {
+        if (this.props.onHover && this.props.data) {
             this.tooltipNode.innerHTML = "";
-            this.tooltipNode.style.top = `${data.event.clientY - 100}px`;
-            this.tooltipNode.style.left = `${data.event.clientX}px`;
+            this.tooltipNode.style.top = `${event.clientY - 100}px`;
+            this.tooltipNode.style.left = `${event.clientX}px`;
             this.tooltipNode.style.opacity = "1";
-            this.props.onHover(this.tooltipNode, activePoint.pointNumber);
+            this.props.onHover(this.tooltipNode, this.props.data[points[0].pointNumber]);
         }
     }
 

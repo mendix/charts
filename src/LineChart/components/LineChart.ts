@@ -1,5 +1,5 @@
 // tslint:disable no-console
-import { Component, ReactElement, createElement } from "react";
+import { Component, ReactChild, ReactElement, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
@@ -7,7 +7,7 @@ import { LineChartContainerProps } from "./LineChartContainer";
 import { Playground } from "../../components/Playground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
-import { SeriesData, SeriesProps, getRuntimeTraces, getSeriesTraces } from "../../utils/data";
+import { LineSeriesProps, SeriesData, SeriesProps, getRuntimeTraces, getSeriesTraces } from "../../utils/data";
 import deepMerge from "deepmerge";
 import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
 import { getDimensions, parseStyle } from "../../utils/style";
@@ -19,7 +19,7 @@ export interface LineChartProps extends LineChartContainerProps {
     data?: SeriesData[];
     defaultData?: ScatterData[];
     loading?: boolean;
-    alertMessage?: string | ReactElement<any>;
+    alertMessage?: ReactChild;
     onClick?: (series: SeriesProps, dataObject: mendix.lib.MxObject) => void;
     onHover?: (node: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) => void;
 }
@@ -60,7 +60,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 chartData: this.getData(this.props),
                 modelerLayoutConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 4),
                 modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
-                    JSON.stringify(LineChart.getDefaultSeriesOptions(series, this.props), null, 4)
+                    JSON.stringify(LineChart.getDefaultSeriesOptions(series as LineSeriesProps, this.props), null, 4)
                 ),
                 traces: this.state.data ? this.state.data.map(getRuntimeTraces) : [],
                 onChange: this.onRuntimeUpdate
@@ -112,7 +112,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 const rawOptions = series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
                 const configOptions: Partial<ScatterData> = {
                     series,
-                    ... LineChart.getDefaultSeriesOptions(series, props),
+                    ... LineChart.getDefaultSeriesOptions(series as LineSeriesProps, props),
                     ... getSeriesTraces({ data, series })
                 };
 
@@ -179,7 +179,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         return { displayModeBar: false, doubleClick: false };
     }
 
-    private static getDefaultSeriesOptions(series: SeriesProps, props: LineChartProps): Partial<ScatterData> {
+    private static getDefaultSeriesOptions(series: LineSeriesProps, props: LineChartProps): Partial<ScatterData> {
         return {
             connectgaps: true,
             hoveron: "points",
