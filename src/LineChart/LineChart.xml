@@ -103,8 +103,8 @@
                     <category>Appearance</category>
                     <description>Applicable only if the mode is either lines or lines with markers</description>
                     <enumerationValues>
-                        <enumerationValue key="linear">Linear</enumerationValue>
-                        <enumerationValue key="spline">Spline</enumerationValue>
+                        <enumerationValue key="linear">Straight line</enumerationValue>
+                        <enumerationValue key="spline">Curved line (spline)</enumerationValue>
                     </enumerationValues>
                 </property>
                 <property key="lineColor" type="string" required="false">
@@ -212,7 +212,7 @@
             <enumerationValues>
                 <enumerationValue key="basic">Basic</enumerationValue>
                 <enumerationValue key="advanced">Advanced</enumerationValue>
-                <enumerationValue key="advancedDev">Developer</enumerationValue>
+                <enumerationValue key="developer">Developer</enumerationValue>
             </enumerationValues>
         </property>
         <property key="layoutOptions" type="string" required="false" multiline="true">

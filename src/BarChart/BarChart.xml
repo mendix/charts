@@ -204,7 +204,7 @@
             <enumerationValues>
                 <enumerationValue key="basic">Basic</enumerationValue>
                 <enumerationValue key="advanced">Advanced</enumerationValue>
-                <enumerationValue key="advancedDev">Developer</enumerationValue>
+                <enumerationValue key="developer">Developer</enumerationValue>
             </enumerationValues>
         </property>
         <property key="layoutOptions" type="string" required="false" multiline="true">

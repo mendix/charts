@@ -58,7 +58,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         if (this.props.loading) {
             return createElement(ChartLoading, { text: "Loading" });
         }
-        if (this.props.devMode === "advancedDev") {
+        if (this.props.devMode === "developer") {
             return createElement(Playground, {
                 supportSeries: false,
                 layoutOptions: this.state.layoutOptions || "{\n\n}",

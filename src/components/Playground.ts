@@ -31,13 +31,17 @@ interface PlaygroundProps {
     modelerSeriesConfigs?: string[];
     rawData?: SeriesData[];
     chartData: ScatterData[] | PieData[];
-    traces: PlaygroundSeriesTrace[] | PieTraces;
+    traces?: PlaygroundSeriesTrace[] | PieTraces;
     onChange?: (layout: string, data: SeriesData[] | string) => void;
 }
 
 type PlaygroundSeriesTrace = ({ name: string } & ScatterTrace);
 
 export class Playground extends Component<PlaygroundProps, { showEditor: boolean }> {
+    static defaultProps: Partial<PlaygroundProps> = {
+        rawData: [],
+        traces: []
+    };
     private updatedOptions: { layout: string, data: SeriesData[] | string };
     private timeoutId: number;
     private isValid: boolean;

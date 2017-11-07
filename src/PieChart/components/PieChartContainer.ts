@@ -20,7 +20,7 @@ export interface PieChartContainerProps extends DataSourceProps, Dimensions, Eve
     tooltipForm: string;
     layoutOptions: string;
     dataOptions: string;
-    devMode: "basic" | "advanced" | "advancedDev";
+    devMode: "basic" | "advanced" | "developer";
 }
 
 interface PieChartContainerState {

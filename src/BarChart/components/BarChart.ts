@@ -1,5 +1,5 @@
 // tslint:disable no-console
-import { Component, ReactChild, createElement } from "react";
+import { Component, ReactChild, ReactElement, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { BarChartContainerProps } from "./BarChartContainer";
@@ -51,19 +51,8 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
         if (this.props.loading) {
             return createElement(ChartLoading, { text: "Loading" });
         }
-        if (this.props.devMode === "advancedDev") {
-            return createElement(Playground, {
-                supportSeries: true,
-                layoutOptions: this.state.layoutOptions || "{\n\n}",
-                rawData: this.state.data || [],
-                chartData: this.getData(this.props),
-                modelerLayoutConfigs: JSON.stringify(BarChart.defaultLayoutConfigs(this.props), null, 4),
-                modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
-                    JSON.stringify(BarChart.getDefaultSeriesOptions(series, this.props), null, 4)
-                ),
-                traces: this.state.data ? this.state.data.map(getRuntimeTraces) : [],
-                onChange: this.onRuntimeUpdate
-            }, this.renderChart());
+        if (this.props.devMode === "developer") {
+            return this.renderPlayground();
         }
 
         return this.renderChart();
@@ -108,6 +97,21 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
         );
     }
 
+    private renderPlayground(): ReactElement<any> {
+        return createElement(Playground, {
+            supportSeries: true,
+            layoutOptions: this.state.layoutOptions || "{\n\n}",
+            rawData: this.state.data,
+            chartData: this.getData(this.props),
+            modelerLayoutConfigs: JSON.stringify(BarChart.defaultLayoutConfigs(this.props), null, 4),
+            modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
+                JSON.stringify(BarChart.getDefaultSeriesOptions(series, this.props), null, 4)
+            ),
+            traces: this.state.data && this.state.data.map(getRuntimeTraces),
+            onChange: this.onRuntimeUpdate
+        }, this.renderChart());
+    }
+
     private getLayoutOptions(props: BarChartProps): Partial<Layout> {
         const advancedOptions = this.state.layoutOptions ? JSON.parse(this.state.layoutOptions) : {};
         const layoutOptions = deepMerge.all([ BarChart.defaultLayoutConfigs(props), advancedOptions ]);
@@ -130,7 +134,10 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                 };
 
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
-                return { ...deepMerge.all<ScatterData>([ configOptions, rawOptions ]), customdata: data };
+                return {
+                    ...deepMerge.all<ScatterData>([ configOptions, rawOptions ]),
+                    customdata: data
+                };
             });
         }
 

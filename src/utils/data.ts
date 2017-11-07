@@ -133,7 +133,7 @@ export const fetchByXPath = (guid: string, entity: string, constraint: string, s
 export const fetchByMicroflow = (actionname: string, guid: string): Promise<MxObject[]> =>
     new Promise((resolve, reject) => {
         const errorMessage = `An error occurred while retrieving data by microflow (${actionname}): `;
-        mx.ui.action(actionname, {
+        window.mx.ui.action(actionname, {
             callback: (mxObjects: MxObject[]) => resolve(mxObjects),
             error: error => reject(`${errorMessage} ${error.message}`),
             params: { applyto: "selection", guids: [ guid ] }

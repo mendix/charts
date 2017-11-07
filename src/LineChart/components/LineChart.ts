@@ -52,19 +52,8 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         if (this.props.loading) {
             return createElement(ChartLoading, { text: "Loading" });
         }
-        if (this.props.devMode === "advancedDev") {
-            return createElement(Playground, {
-                supportSeries: true,
-                layoutOptions: this.state.layoutOptions || "{\n\n}",
-                rawData: this.state.data || [],
-                chartData: this.getData(this.props),
-                modelerLayoutConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 4),
-                modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
-                    JSON.stringify(LineChart.getDefaultSeriesOptions(series as LineSeriesProps, this.props), null, 4)
-                ),
-                traces: this.state.data ? this.state.data.map(getRuntimeTraces) : [],
-                onChange: this.onRuntimeUpdate
-            }, this.renderLineChart());
+        if (this.props.devMode === "developer") {
+            return this.renderPlayground();
         }
 
         return this.renderLineChart();
@@ -93,6 +82,21 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         );
     }
 
+    private renderPlayground(): ReactElement<any> {
+        return createElement(Playground, {
+            supportSeries: true,
+            layoutOptions: this.state.layoutOptions || "{\n\n}",
+            rawData: this.state.data,
+            chartData: this.getData(this.props),
+            modelerLayoutConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 4),
+            modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
+                JSON.stringify(LineChart.getDefaultSeriesOptions(series as LineSeriesProps, this.props), null, 4)
+            ),
+            traces: this.state.data && this.state.data.map(getRuntimeTraces),
+            onChange: this.onRuntimeUpdate
+        }, this.renderLineChart());
+    }
+
     private getTooltipNodeRef(node: HTMLDivElement) {
         this.tooltipNode = node;
     }
@@ -109,7 +113,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         let lineData: ScatterData[] = props.defaultData || [];
         if (this.state.data) {
             lineData = this.state.data.map(({ data, series }) => {
-                const rawOptions = series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
+                const advancedOptions = series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
                 const configOptions: Partial<ScatterData> = {
                     series,
                     ... LineChart.getDefaultSeriesOptions(series as LineSeriesProps, props),
@@ -117,7 +121,10 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 };
 
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
-                return { ...deepMerge.all<ScatterData>([ configOptions, rawOptions ]), customdata: data };
+                return {
+                    ...deepMerge.all<ScatterData>([ configOptions, advancedOptions ]),
+                    customdata: data
+                };
             });
         }
 
@@ -127,10 +134,9 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         return dataOptions;
     }
 
-    private onClick(data: ScatterHoverData<mendix.lib.MxObject>) {
-        const pointClicked = data.points[0];
+    private onClick({ points }: ScatterHoverData<mendix.lib.MxObject>) {
         if (this.props.onClick) {
-            this.props.onClick(pointClicked.data.series, pointClicked.customdata);
+            this.props.onClick(points[0].data.series, points[0].customdata);
         }
     }
 
