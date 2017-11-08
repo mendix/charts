@@ -50,7 +50,7 @@
         <property key="sortAttribute" type="attribute" entityProperty="dataEntity" required="false">
             <caption>Sort attribute</caption>
             <category>Data points</category>
-            <description>Attribute to use for sorting the data (ascending)</description>
+            <description>Attribute to use for sorting the data</description>
             <attributeTypes>
                 <attributeType name="Decimal"/>
                 <attributeType name="Long"/>
@@ -146,20 +146,20 @@
             <category>Events</category>
             <description>The form to show when a user hovers over a chart plot point</description>
         </property>
-        <property key="dataOptions" type="string" multiline="true" required="false">
-            <caption>Data options</caption>
-            <category>Advanced</category>
-            <description>The Plotly data options as JSON</description>
-        </property>
         <property key="devMode" type="enumeration" defaultValue="basic">
-            <caption>Dev mode</caption>
+            <caption>Options</caption>
             <category>Advanced</category>
-            <description>Developer mode adds a button to the charts when running the app which can be used to toggle a live editor for the advanced configuration options.</description>
+            <description>The developer option adds a button to the charts when running the app which can be used to toggle a live editor for the advanced configuration options.</description>
             <enumerationValues>
                 <enumerationValue key="basic">Basic</enumerationValue>
                 <enumerationValue key="advanced">Advanced</enumerationValue>
                 <enumerationValue key="developer">Developer</enumerationValue>
             </enumerationValues>
+        </property>
+        <property key="dataOptions" type="string" multiline="true" required="false">
+            <caption>Data options</caption>
+            <category>Advanced</category>
+            <description>The Plotly data options as JSON</description>
         </property>
         <property key="layoutOptions" type="string" required="false" multiline="true">
             <caption>Layout options</caption>
