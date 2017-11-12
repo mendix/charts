@@ -77,10 +77,10 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
         if (!this.props.supportSeries && this.props.traces) {
             return createElement(TabContainer, { tabHeaderClass: "control-sidebar-tabs", justified: true },
                 createElement(TabHeader, { title: "Layout" }),
-                createElement(TabHeader, { title: "Data" }),
+                // createElement(TabHeader, { title: "Data" }),
                 createElement(TabHeader, { title: "Help" }),
                 createElement(TabPane, {}, this.renderLayoutOptions()),
-                createElement(TabPane, {}, this.renderData()),
+                // createElement(TabPane, {}, this.renderData()),
                 createElement(TabPane, { className: "widget-charts-playground-help" }, this.renderHelpContent()),
                 this.renderSidebarCloser()
             );
@@ -118,8 +118,8 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
             return this.props.rawData.map(({ series }, index) =>
                 createElement(TabPane, { key: `series-pane-${index}` },
                     this.renderSeriesOptions(series, index),
-                    this.renderSeriesModelerConfig(index),
-                    this.renderSeriesData(series, index)
+                    this.renderSeriesModelerConfig(index)
+                    // this.renderSeriesData(series, index)
                 )
             );
         }
@@ -132,7 +132,8 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
             {
                 title: "Advanced options",
                 titleClass: "item-header",
-                show: true
+                show: true,
+                collapsible: false
             },
             this.renderAceEditor(series.seriesOptions || "{\n\n}", value =>
                 this.onUpdate(`series-${index}`, value)
@@ -140,23 +141,24 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
         );
     }
 
-    private renderSeriesData(series: SeriesProps, index: number) {
-        if (this.props.supportSeries && Array.isArray(this.props.traces)) {
-            const seriesTrace = (this.props.traces as PlaygroundSeriesTrace[]).find(trace => trace.name === series.name);
-            if (seriesTrace) {
-                return createElement(Accordion, {
-                        key: `series-${index}`,
-                        title: "Data",
-                        titleClass: "item-header",
-                        show: false
-                    },
-                    this.renderAceEditor(JSON.stringify({ x: seriesTrace.x, y: seriesTrace.y }, null, 4), undefined, true)
-                );
-            }
-        }
-
-        return null;
-    }
+    // private renderSeriesData(series: SeriesProps, index: number) {
+    //     if (this.props.supportSeries && Array.isArray(this.props.traces)) {
+    //         const seriesTrace = (this.props.traces as PlaygroundSeriesTrace[]).find(trace => trace.name === series.name);
+    //         if (seriesTrace) {
+    //             return createElement(Accordion, {
+    //                     key: `series-${index}`,
+    //                     title: "Data",
+    //                     titleClass: "item-header",
+    //                     show: false,
+    //                     collapsible: false
+    //                 },
+    //                 this.renderAceEditor(JSON.stringify({ x: seriesTrace.x, y: seriesTrace.y }, null, 4), undefined, true)
+    //             );
+    //         }
+    //     }
+    //
+    //     return null;
+    // }
 
     private renderSeriesModelerConfig(index: number) {
         if (this.props.modelerSeriesConfigs && this.props.rawData) {
@@ -164,7 +166,8 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
                 {
                     title: "Modeler",
                     titleClass: "item-header",
-                    show: true
+                    show: true,
+                    collapsible: false
                 },
                 this.renderAceEditor(
                     this.props.modelerSeriesConfigs[index] || "{\n\n}",
@@ -186,7 +189,7 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
                 "  Changes made in this editor are only for preview purposes and are not automatically saved to the widget"
             ),
             this.renderParagraph("The JSON can be copied and pasted into the widget in the desktop and web modelers."),
-            this.renderParagraph("JSON in the 'Data' tab/panel can be added to the widget as 'Sample data' for a more accurate representation of user data in the web modeler"), // tslint:disable-line max-line-length
+            // this.renderParagraph("JSON in the 'Data' tab/panel can be added to the widget as 'Sample data' for a more accurate representation of user data in the web modeler"), // tslint:disable-line max-line-length
             this.renderParagraph("Plotly API reference: ",
                 createElement("a", { href: "https://plot.ly/javascript/reference/", className: "" },
                     "https://plot.ly/javascript/reference/"
@@ -253,7 +256,7 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
     }
 
     private setAccordionProps(title: string, titleClass: string, show = true): AccordionProps {
-        return { title, titleClass, show };
+        return { title, titleClass, show, collapsible: false };
     }
 
     private renderLayoutOptions() {
@@ -265,27 +268,27 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
             key: "modeler",
             ...this.setAccordionProps("Modeler", "item-header")
         }, this.renderAceEditor(this.props.modelerLayoutConfigs, undefined, true, "json", this.props.layoutOptions));
-        if (!this.props.supportSeries && this.props.dataOptions) {
-            const dataOptions = createElement(Accordion, {
-                key: "data",
-                ...this.setAccordionProps("Data options", "item-header")
-            }, this.renderAceEditor(this.props.dataOptions, value => this.onUpdate("data", value)));
-
-            return [ layoutOptions, modelerOptions, dataOptions ];
-        }
+        // if (!this.props.supportSeries && this.props.dataOptions) {
+        //     const dataOptions = createElement(Accordion, {
+        //         key: "data",
+        //         ...this.setAccordionProps("Data options", "item-header")
+        //     }, this.renderAceEditor(this.props.dataOptions, value => this.onUpdate("data", value)));
+        //
+        //     return [ layoutOptions, modelerOptions, dataOptions ];
+        // }
 
         return [ layoutOptions, modelerOptions ];
     }
 
-    private renderData() {
-        if (!this.props.supportSeries && this.props.traces) {
-            return createElement("div", {},
-                this.renderAceEditor(JSON.stringify(this.props.traces as PieTraces, null, 4), undefined, true)
-            );
-        }
-
-        return null;
-    }
+    // private renderData() {
+    //     if (!this.props.supportSeries && this.props.traces) {
+    //         return createElement("div", {},
+    //             this.renderAceEditor(JSON.stringify(this.props.traces as PieTraces, null, 4), undefined, true)
+    //         );
+    //     }
+    //
+    //     return null;
+    // }
 
     private toggleShowEditor() {
         this.setState({ showEditor: !this.state.showEditor });

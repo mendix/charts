@@ -8,9 +8,14 @@ export interface AccordionProps {
     className?: string;
     titleClass?: string;
     show: boolean;
+    collapsible?: boolean;
 }
 
 export class Accordion extends Component<AccordionProps, { show: boolean }> {
+    static defaultProps: Partial<AccordionProps> = {
+        collapsible: true
+    };
+
     constructor(props: AccordionProps) {
         super(props);
 
@@ -33,15 +38,17 @@ export class Accordion extends Component<AccordionProps, { show: boolean }> {
         if (this.props.title) {
             return createElement("div",
                 {
-                    className: classNames("widget-charts-accordion-header", this.props.titleClass),
-                    onClick: this.toggleShow
+                    className: classNames("widget-charts-accordion-header", this.props.titleClass)
                 },
-                createElement("i", {
-                    className: classNames("glyphicon", {
-                        "glyphicon-menu-down": this.state.show,
-                        "glyphicon-menu-right": !this.state.show
-                    })
-                }),
+                createElement("i",
+                    {
+                        className: classNames("glyphicon", {
+                            "hidden": !this.props.collapsible,
+                            "glyphicon-menu-down": this.state.show,
+                            "glyphicon-menu-right": !this.state.show
+                        }),
+                        onClick: this.toggleShow
+                    }),
                 this.props.title
             );
         }
