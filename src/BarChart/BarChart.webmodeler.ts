@@ -16,7 +16,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
                 validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions)
             ),
             createElement(BarChart, {
-                ...this.props,
+                ...this.props as BarChartContainerProps,
                 defaultData: this.getData(this.props)
             })
         );

@@ -16,8 +16,7 @@ import { TabTool } from "./TabTool";
 import "brace";
 import { ScatterTrace, SeriesData, SeriesProps } from "../utils/data";
 import { PieTraces } from "../PieChart/components/PieChart";
-import { PieData } from "../../typings/plotly.js";
-import { ScatterData } from "plotly.js";
+import { PieData, ScatterData } from "plotly.js";
 
 import "brace/mode/json";
 import "brace/mode/javascript";
@@ -30,7 +29,7 @@ interface PlaygroundProps {
     modelerLayoutConfigs: string;
     modelerSeriesConfigs?: string[];
     rawData?: SeriesData[];
-    chartData: ScatterData[] | PieData[];
+    chartData: Partial<ScatterData>[] | Partial<PieData>[];
     traces?: PlaygroundSeriesTrace[] | PieTraces;
     onChange?: (layout: string, data: SeriesData[] | string) => void;
 }

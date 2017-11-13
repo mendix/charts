@@ -10,7 +10,6 @@ import { WrapperProps } from "../../utils/types";
 export type ChartType = "pie" | "donut";
 
 export interface PieChartContainerProps extends DataSourceProps, Dimensions, EventProps, WrapperProps {
-    colorAttribute: string;
     nameAttribute: string;
     valueAttribute: string;
     sortAttribute: string;
@@ -63,7 +62,7 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
 
     private getContent() {
         return createElement(PieChart, {
-            ...this.props,
+            ...this.props as PieChartContainerProps,
             alertMessage: this.state.alertMessage,
             loading: this.state.loading,
             data: this.state.data,

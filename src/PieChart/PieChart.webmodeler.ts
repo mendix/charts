@@ -21,7 +21,10 @@ export class preview extends Component<PieChartContainerProps, {}> {
             createElement(Alert, { className: `widget-${this.props.chartType}-chart-alert` },
                 validateSeriesProps([ { ...this.props, seriesOptions: this.props.dataOptions } ], this.props.friendlyId, this.props.layoutOptions)
             ),
-            createElement(PieChart, { ...this.props, defaultData: this.getData(this.props) })
+            createElement(PieChart, {
+                ...this.props as PieChartContainerProps,
+                defaultData: this.getData(this.props)
+            })
         );
     }
 
@@ -36,7 +39,6 @@ export class preview extends Component<PieChartContainerProps, {}> {
                 hole: props.chartType === "donut" ? 0.4 : 0,
                 hoverinfo: props.tooltipForm ? "none" : "label",
                 labels: sampleData.labels,
-                marker: { colors: sampleData.colors },
                 type: "pie",
                 values: sampleData.values,
                 sort: false

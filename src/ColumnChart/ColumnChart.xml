@@ -74,7 +74,7 @@
                         <attributeType name="Integer"/>
                     </attributeTypes>
                 </property>
-                <property key="xValueSortAttribute" type="attribute" entityProperty="dataEntity">
+                <property key="xValueSortAttribute" type="attribute" entityProperty="dataEntity" required="false">
                     <caption>X-axis sort attribute</caption>
                     <category>Data points</category>
                     <description>Attribute to use for sorting the x-axis data</description>

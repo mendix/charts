@@ -17,7 +17,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                 validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions)
             ),
             createElement(LineChart, {
-                ...this.props,
+                ...this.props as LineChartContainerProps,
                 defaultData: this.getData(this.props)
             })
         );

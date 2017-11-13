@@ -31,6 +31,7 @@ interface LineChartState {
 
 export class LineChart extends Component<LineChartProps, LineChartState> {
     private tooltipNode: HTMLDivElement;
+    private defaultColors: string[] = [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ];
 
     constructor(props: LineChartProps) {
         super(props);
@@ -112,10 +113,11 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     private getData(props: LineChartProps): ScatterData[] {
         let lineData: ScatterData[] = props.defaultData || [];
         if (this.state.data) {
-            lineData = this.state.data.map(({ data, series }) => {
+            lineData = this.state.data.map(({ data, series }, index) => {
                 const advancedOptions = series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
                 const configOptions: Partial<ScatterData> = {
                     series,
+                    marker: index < this.defaultColors.length ? { color: this.defaultColors[index] } : undefined,
                     ... LineChart.getDefaultSeriesOptions(series as LineSeriesProps, props),
                     ... getSeriesTraces({ data, series })
                 };
@@ -158,25 +160,42 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
 
     private static defaultLayoutConfigs(props: LineChartProps): Partial<Layout> {
         return {
+            font: {
+                family: "Open Sans, sans-serif",
+                size: 12,
+                color: "#888"
+            },
             autosize: true,
             hovermode: "closest",
             showlegend: props.showLegend,
             xaxis: {
+                gridcolor: "#eaeaea",
                 title: props.xAxisLabel,
                 showgrid: props.grid === "vertical" || props.grid === "both",
                 fixedrange: true
             },
             yaxis: {
+                rangemode: "tozero",
+                zeroline: true,
+                zerolinecolor: "#eaeaea",
+                gridcolor: "#eaeaea",
                 title: props.yAxisLabel,
                 showgrid: props.grid === "horizontal" || props.grid === "both",
                 fixedrange: true
+            },
+            hoverlabel: {
+                bgcolor: "#888",
+                bordercolor: "#888",
+                font: {
+                    color: "#FFF"
+                }
             },
             margin: {
                 l: 60,
                 r: 60,
                 b: 60,
-                t: 0,
-                pad: 4
+                t: 10,
+                pad: 10
             }
         };
     }

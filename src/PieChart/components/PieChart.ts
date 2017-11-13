@@ -7,8 +7,9 @@ import { PieChartContainerProps } from "./PieChartContainer";
 import { Playground } from "../../components/Playground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
+import { SeriesData } from "../../utils/data";
 import deepMerge from "deepmerge";
-import { Config, Layout, PieData, PieHoverData } from "plotly.js";
+import { Config, Layout, PieData, PieHoverData, ScatterHoverData } from "plotly.js";
 import { getDimensions, parseStyle } from "../../utils/style";
 
 import "../../ui/Charts.scss";
@@ -29,7 +30,6 @@ interface PieChartState {
 
 export interface PieTraces {
     labels: string[];
-    colors: string[];
     values: number[];
 }
 
@@ -115,7 +115,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 hole: this.props.chartType === "donut" ? 0.4 : 0,
                 hoverinfo: this.props.tooltipForm ? "none" : "label",
                 labels: traces.labels,
-                marker: { colors: traces.colors },
+                marker: { colors: [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ] },
                 type: "pie",
                 values: traces.values,
                 sort: false
@@ -130,14 +130,25 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         const advancedOptions = this.state.layoutOptions ? JSON.parse(this.state.layoutOptions) : {};
 
         return deepMerge.all([ {
+            font: {
+                family: "Open Sans, sans-serif",
+                size: 12
+            },
             autosize: true,
             showlegend: props.showLegend,
+            hoverlabel: {
+                bgcolor: "#888",
+                bordercolor: "#888",
+                font: {
+                    color: "#FFF"
+                }
+            },
             margin: {
                 l: 60,
                 r: 60,
                 b: 60,
-                t: 0,
-                pad: 4
+                t: 10,
+                pad: 10
             }
         }, advancedOptions ]);
     }
@@ -146,21 +157,20 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         if (data) {
             return {
                 labels: data.map(mxObject => mxObject.get(this.props.nameAttribute) as string),
-                colors: data.map(mxObject => mxObject.get(this.props.colorAttribute) as string),
                 values: data.map(mxObject => parseFloat(mxObject.get(this.props.valueAttribute) as string))
             };
         }
 
-        return { labels: [], colors: [], values: [] };
+        return { labels: [], values: [] };
     }
 
-    private onClick({ points }: PieHoverData) {
+    private onClick({ points }: ScatterHoverData<any> | PieHoverData) {
         if (this.props.onClick && this.props.data) {
             this.props.onClick(this.props, this.props.data[points[0].pointNumber]);
         }
     }
 
-    private onHover({ event, points }: PieHoverData) {
+    private onHover({ event, points }: ScatterHoverData<any> | PieHoverData) {
         if (this.props.onHover && this.props.data) {
             this.tooltipNode.innerHTML = "";
             this.tooltipNode.style.top = `${event.clientY - 100}px`;
@@ -170,8 +180,8 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         }
     }
 
-    private onRuntimeUpdate(layoutOptions: string, dataOptions: string) {
-        this.setState({ layoutOptions, dataOptions });
+    private onRuntimeUpdate(layoutOptions: string, dataOptions: string | SeriesData[]) {
+        this.setState({ layoutOptions, dataOptions: dataOptions as string });
     }
 
     private static getConfigOptions(): Partial<Config> {
