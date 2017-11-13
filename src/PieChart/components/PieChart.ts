@@ -1,4 +1,3 @@
-// tslint:disable no-console
 import { Component, ReactChild, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
@@ -7,7 +6,6 @@ import { PieChartContainerProps } from "./PieChartContainer";
 import { Playground } from "../../components/Playground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
-import { SeriesData } from "../../utils/data";
 import deepMerge from "deepmerge";
 import { Config, Layout, PieData, PieHoverData, ScatterHoverData } from "plotly.js";
 import { getDimensions, parseStyle } from "../../utils/style";
@@ -60,13 +58,15 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         }
         if (this.props.devMode === "developer") {
             return createElement(Playground, {
-                supportSeries: false,
+                pie: {
+                    dataOptions: this.state.dataOptions || "{\n\n}",
+                    modelerDataConfigs: JSON.stringify(PieChart.getDefaultDataOptions(this.props), null, 4),
+                    chartData: this.getData(this.props),
+                    traces: this.getTraces(this.props.data),
+                    onChange: this.onRuntimeUpdate
+                },
                 layoutOptions: this.state.layoutOptions || "{\n\n}",
-                dataOptions: this.state.dataOptions || "{\n\n}",
-                chartData: this.getData(this.props),
-                modelerLayoutConfigs: JSON.stringify({ autosize: true, showlegend: this.props.showLegend }, null, 4),
-                traces: this.getTraces(this.props.data),
-                onChange: this.onRuntimeUpdate
+                modelerLayoutConfigs: JSON.stringify({ autosize: true, showlegend: this.props.showLegend }, null, 4)
             }, this.renderChart());
         }
 
@@ -106,12 +106,11 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
     }
 
     private getData(props: PieChartProps): PieData[] {
-        let data: PieData[] = props.defaultData || [];
         if (props.data) {
             const advancedOptions = this.state.dataOptions ? JSON.parse(this.state.dataOptions) : {};
             const traces = this.getTraces(props.data);
 
-            data = [ deepMerge.all([ {
+            return [ deepMerge.all([ {
                 hole: this.props.chartType === "donut" ? 0.4 : 0,
                 hoverinfo: this.props.tooltipForm ? "none" : "label",
                 labels: traces.labels,
@@ -122,35 +121,13 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
             }, advancedOptions ]) ];
         }
 
-        console.log("Data Options: ", data);
-        return data;
+        return props.defaultData || [];
     }
 
     private getLayoutOptions(props: PieChartProps): Partial<Layout> {
         const advancedOptions = this.state.layoutOptions ? JSON.parse(this.state.layoutOptions) : {};
 
-        return deepMerge.all([ {
-            font: {
-                family: "Open Sans, sans-serif",
-                size: 12
-            },
-            autosize: true,
-            showlegend: props.showLegend,
-            hoverlabel: {
-                bgcolor: "#888",
-                bordercolor: "#888",
-                font: {
-                    color: "#FFF"
-                }
-            },
-            margin: {
-                l: 60,
-                r: 60,
-                b: 60,
-                t: 10,
-                pad: 10
-            }
-        }, advancedOptions ]);
+        return deepMerge.all([ PieChart.getDefaultLayoutOptions(props), advancedOptions ]);
     }
 
     private getTraces(data?: mendix.lib.MxObject[]): PieTraces {
@@ -180,11 +157,46 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         }
     }
 
-    private onRuntimeUpdate(layoutOptions: string, dataOptions: string | SeriesData[]) {
-        this.setState({ layoutOptions, dataOptions: dataOptions as string });
+    private onRuntimeUpdate(layoutOptions: string, dataOptions: string) {
+        this.setState({ layoutOptions, dataOptions });
     }
 
     private static getConfigOptions(): Partial<Config> {
         return { displayModeBar: false, doubleClick: false };
+    }
+
+    private static getDefaultLayoutOptions(props: PieChartProps): Partial<Layout> {
+        return {
+            font: {
+                family: "Open Sans, sans-serif",
+                size: 12
+            },
+            autosize: true,
+            showlegend: props.showLegend,
+            hoverlabel: {
+                bgcolor: "#888",
+                bordercolor: "#888",
+                font: {
+                    color: "#FFF"
+                }
+            },
+            margin: {
+                l: 60,
+                r: 60,
+                b: 60,
+                t: 10,
+                pad: 10
+            }
+        };
+    }
+
+    private static getDefaultDataOptions(props: PieChartProps): Partial<PieData> {
+        return {
+            hole: props.chartType === "donut" ? 0.4 : 0,
+            hoverinfo: props.tooltipForm ? "none" : "label",
+            marker: { colors: [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ] },
+            type: "pie",
+            sort: false
+        };
     }
 }

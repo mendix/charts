@@ -23,25 +23,33 @@ import "brace/mode/javascript";
 import "brace/theme/github";
 
 interface PlaygroundProps {
-    supportSeries: boolean;
+    pie?: PiePlaygroundOptions;
+    series?: SeriesPlaygroundOptions;
     layoutOptions: string;
-    dataOptions?: string;
     modelerLayoutConfigs: string;
+}
+
+interface PiePlaygroundOptions {
+    dataOptions: string;
+    modelerDataConfigs: string;
+    chartData: Partial<PieData>[];
+    traces: PieTraces;
+    onChange?: (layout: string, data: string) => void;
+}
+
+interface SeriesPlaygroundOptions {
     modelerSeriesConfigs?: string[];
     rawData?: SeriesData[];
-    chartData: Partial<ScatterData>[] | Partial<PieData>[];
-    traces?: PlaygroundSeriesTrace[] | PieTraces;
-    onChange?: (layout: string, data: SeriesData[] | string) => void;
+    chartData?: Partial<ScatterData>[];
+    traces?: PlaygroundSeriesTrace[];
+    onChange?: (layout: string, data: SeriesData[]) => void;
 }
 
 type PlaygroundSeriesTrace = ({ name: string } & ScatterTrace);
 
 export class Playground extends Component<PlaygroundProps, { showEditor: boolean }> {
-    static defaultProps: Partial<PlaygroundProps> = {
-        rawData: [],
-        traces: []
-    };
-    private updatedOptions: { layout: string, data: SeriesData[] | string };
+    private updatedSeriesOptions: { layout: string, data: SeriesData[] };
+    private updatedPieOptions: { layout: string, data: string };
     private timeoutId: number;
     private isValid: boolean;
 
@@ -54,17 +62,29 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
         this.closeEditor = this.closeEditor.bind(this);
 
         this.state = { showEditor: false };
-        this.updatedOptions = {
+        this.updatedSeriesOptions = {
             layout: props.layoutOptions || "{}",
-            data: props.supportSeries ? props.rawData || [] : props.dataOptions || "{}"
+            data: props.series && props.series.rawData || []
+        };
+        this.updatedPieOptions = {
+            layout: props.layoutOptions || "{}",
+            data: props.pie && props.pie.dataOptions || "{/n/n}"
         };
     }
 
     render() {
         return createElement("div", {
-                className: classNames("widget-charts-playground", { "playground-open": this.state.showEditor })
+                className: classNames("widget-charts-playground", {
+                    "playground-open": this.state.showEditor
+                })
             },
-            createElement(Sidebar, { open: this.state.showEditor, onBlur: this.closeEditor }, this.renderTabs()),
+            createElement(Sidebar,
+                {
+                    open: this.state.showEditor,
+                    onBlur: this.closeEditor
+                },
+                this.renderTabs()
+            ),
             createElement("div", { className: "widget-charts-playground-toggle" },
                 createElement(MendixButton, { onClick: this.toggleShowEditor }, "Toggle Editor")
             ),
@@ -73,13 +93,13 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
     }
 
     private renderTabs() {
-        if (!this.props.supportSeries && this.props.traces) {
+        if (this.props.pie) {
             return createElement(TabContainer, { tabHeaderClass: "control-sidebar-tabs", justified: true },
                 createElement(TabHeader, { title: "Layout" }),
-                // createElement(TabHeader, { title: "Data" }),
+                createElement(TabHeader, { title: "Data" }),
                 createElement(TabHeader, { title: "Help" }),
                 createElement(TabPane, {}, this.renderLayoutOptions()),
-                // createElement(TabPane, {}, this.renderData()),
+                createElement(TabPane, {}, this.renderPieDataPanes()),
                 createElement(TabPane, { className: "widget-charts-playground-help" }, this.renderHelpContent()),
                 this.renderSidebarCloser()
             );
@@ -103,8 +123,8 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
     }
 
     private renderSeriesTabHeaders() {
-        if (this.props.rawData) {
-            return this.props.rawData.map(({ series }, index) =>
+        if (this.props.series && this.props.series.rawData) {
+            return this.props.series.rawData.map(({ series }, index) =>
                 createElement(TabHeader, { title: series.name, key: `series-header-${index}` })
             );
         }
@@ -113,12 +133,11 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
     }
 
     private renderSeriesTabPanes() {
-        if (this.props.rawData) {
-            return this.props.rawData.map(({ series }, index) =>
+        if (this.props.series && this.props.series.rawData) {
+            return this.props.series.rawData.map(({ series }, index) =>
                 createElement(TabPane, { key: `series-pane-${index}` },
                     this.renderSeriesOptions(series, index),
                     this.renderSeriesModelerConfig(index)
-                    // this.renderSeriesData(series, index)
                 )
             );
         }
@@ -140,27 +159,8 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
         );
     }
 
-    // private renderSeriesData(series: SeriesProps, index: number) {
-    //     if (this.props.supportSeries && Array.isArray(this.props.traces)) {
-    //         const seriesTrace = (this.props.traces as PlaygroundSeriesTrace[]).find(trace => trace.name === series.name);
-    //         if (seriesTrace) {
-    //             return createElement(Accordion, {
-    //                     key: `series-${index}`,
-    //                     title: "Data",
-    //                     titleClass: "item-header",
-    //                     show: false,
-    //                     collapsible: false
-    //                 },
-    //                 this.renderAceEditor(JSON.stringify({ x: seriesTrace.x, y: seriesTrace.y }, null, 4), undefined, true)
-    //             );
-    //         }
-    //     }
-    //
-    //     return null;
-    // }
-
     private renderSeriesModelerConfig(index: number) {
-        if (this.props.modelerSeriesConfigs && this.props.rawData) {
+        if (this.props.series && this.props.series.modelerSeriesConfigs && this.props.series.rawData) {
             return createElement(Accordion,
                 {
                     title: "Modeler",
@@ -169,11 +169,11 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
                     collapsible: false
                 },
                 this.renderAceEditor(
-                    this.props.modelerSeriesConfigs[index] || "{\n\n}",
+                    this.props.series.modelerSeriesConfigs[index] || "{\n\n}",
                     undefined,
                     true,
                     "json",
-                    this.props.rawData[index].series.seriesOptions
+                    this.props.series.rawData[index].series.seriesOptions
                 )
             );
         }
@@ -188,7 +188,6 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
                 "  Changes made in this editor are only for preview purposes and are not automatically saved to the widget"
             ),
             this.renderParagraph("The JSON can be copied and pasted into the widget in the desktop and web modelers."),
-            // this.renderParagraph("JSON in the 'Data' tab/panel can be added to the widget as 'Sample data' for a more accurate representation of user data in the web modeler"), // tslint:disable-line max-line-length
             this.renderParagraph("Plotly API reference: ",
                 createElement("a", { href: "https://plot.ly/javascript/reference/", className: "" },
                     "https://plot.ly/javascript/reference/"
@@ -259,35 +258,48 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
     }
 
     private renderLayoutOptions() {
-        const layoutOptions = createElement(Accordion, {
-            key: "layout",
-            ...this.setAccordionProps("Advanced options", "item-header")
-        }, this.renderAceEditor(this.props.layoutOptions, value => this.onUpdate("layout", value)));
-        const modelerOptions = createElement(Accordion, {
-            key: "modeler",
-            ...this.setAccordionProps("Modeler", "item-header")
-        }, this.renderAceEditor(this.props.modelerLayoutConfigs, undefined, true, "json", this.props.layoutOptions));
-        // if (!this.props.supportSeries && this.props.dataOptions) {
-        //     const dataOptions = createElement(Accordion, {
-        //         key: "data",
-        //         ...this.setAccordionProps("Data options", "item-header")
-        //     }, this.renderAceEditor(this.props.dataOptions, value => this.onUpdate("data", value)));
-        //
-        //     return [ layoutOptions, modelerOptions, dataOptions ];
-        // }
-
-        return [ layoutOptions, modelerOptions ];
+        return [
+            createElement(Accordion,
+                {
+                    key: "layout",
+                    ...this.setAccordionProps("Advanced options", "item-header")
+                },
+                this.renderAceEditor(this.props.layoutOptions, value => this.onUpdate("layout", value))
+            ),
+            createElement(Accordion,
+                {
+                    key: "modeler",
+                    ...this.setAccordionProps("Modeler", "item-header")
+                },
+                this.renderAceEditor(this.props.modelerLayoutConfigs, undefined, true, "json", this.props.layoutOptions)
+            )
+        ];
     }
 
-    // private renderData() {
-    //     if (!this.props.supportSeries && this.props.traces) {
-    //         return createElement("div", {},
-    //             this.renderAceEditor(JSON.stringify(this.props.traces as PieTraces, null, 4), undefined, true)
-    //         );
-    //     }
-    //
-    //     return null;
-    // }
+    private renderPieDataPanes() {
+        if (this.props.pie && this.props.pie.dataOptions) {
+            const { dataOptions, modelerDataConfigs } = this.props.pie;
+
+            return [
+                createElement(Accordion,
+                    {
+                        key: "data",
+                        ...this.setAccordionProps("Data options", "item-header")
+                    },
+                    this.renderAceEditor(dataOptions, value => this.onUpdate("data", value))
+                ),
+                createElement(Accordion,
+                    {
+                        key: "modeler",
+                        ...this.setAccordionProps("Modeler", "item-header")
+                    },
+                    this.renderAceEditor(modelerDataConfigs, undefined, true, "json", dataOptions)
+                )
+            ];
+        }
+
+        return null;
+    }
 
     private toggleShowEditor() {
         this.setState({ showEditor: !this.state.showEditor });
@@ -316,16 +328,19 @@ export class Playground extends Component<PlaygroundProps, { showEditor: boolean
 
     private updateChart(source: string, value: string) {
         if (source === "layout") {
-            this.updatedOptions.layout = value;
+            this.updatedSeriesOptions.layout = value;
         }
         if (source.indexOf("series") > -1) {
             const index = source.split("-")[ 1 ];
-            (this.updatedOptions.data[ parseInt(index, 10) ] as SeriesData).series.seriesOptions = value;
+            (this.updatedSeriesOptions.data[ parseInt(index, 10) ] as SeriesData).series.seriesOptions = value;
         } else if (source.indexOf("data") > -1) {
-            this.updatedOptions.data = value;
+            this.updatedPieOptions.data = value;
         }
-        if (this.props.onChange) {
-            this.props.onChange(this.updatedOptions.layout, this.updatedOptions.data);
+        if (this.props.series && this.props.series.onChange) {
+            this.props.series.onChange(this.updatedSeriesOptions.layout, this.updatedSeriesOptions.data);
+        }
+        if (this.props.pie && this.props.pie.onChange) {
+            this.props.pie.onChange(this.updatedSeriesOptions.layout, this.updatedPieOptions.data);
         }
     }
 }

@@ -1,4 +1,3 @@
-// tslint:disable no-console
 import { Component, ReactChild, ReactElement, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
@@ -100,31 +99,29 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
 
     private renderPlayground(): ReactElement<any> {
         return createElement(Playground, {
-            supportSeries: true,
+            series: {
+                rawData: this.state.data,
+                chartData: this.getData(this.props),
+                modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
+                    JSON.stringify(BarChart.getDefaultSeriesOptions(series, this.props), null, 4)
+                ),
+                traces: this.state.data && this.state.data.map(getRuntimeTraces),
+                onChange: this.onRuntimeUpdate
+            },
             layoutOptions: this.state.layoutOptions || "{\n\n}",
-            rawData: this.state.data,
-            chartData: this.getData(this.props),
-            modelerLayoutConfigs: JSON.stringify(BarChart.defaultLayoutConfigs(this.props), null, 4),
-            modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
-                JSON.stringify(BarChart.getDefaultSeriesOptions(series, this.props), null, 4)
-            ),
-            traces: this.state.data && this.state.data.map(getRuntimeTraces),
-            onChange: this.onRuntimeUpdate
+            modelerLayoutConfigs: JSON.stringify(BarChart.defaultLayoutConfigs(this.props), null, 4)
         }, this.renderChart());
     }
 
     private getLayoutOptions(props: BarChartProps): Partial<Layout> {
         const advancedOptions = this.state.layoutOptions ? JSON.parse(this.state.layoutOptions) : {};
-        const layoutOptions = deepMerge.all([ BarChart.defaultLayoutConfigs(props), advancedOptions ]);
 
-        console.log("Layout Options:", layoutOptions);
-        return layoutOptions;
+        return deepMerge.all([ BarChart.defaultLayoutConfigs(props), advancedOptions ]);
     }
 
     private getData(props: BarChartProps): ScatterData[] {
-        let barData: ScatterData[] = props.defaultData || [];
         if (props.data) {
-            barData = props.data.map(({ data, series }, index) => {
+            return props.data.map(({ data, series }, index) => {
                 const rawOptions = series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
                 const traces = getSeriesTraces({ data, series });
                 const configOptions: Partial<ScatterData> = {
@@ -143,8 +140,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
             });
         }
 
-        console.log("Data Options:", barData);
-        return barData;
+        return props.defaultData || [];
     }
 
     private onClick(data: ScatterHoverData<mendix.lib.MxObject>) {
@@ -157,7 +153,6 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     private onHover({ points }: ScatterHoverData<mendix.lib.MxObject>) {
         const { customdata, data, x, xaxis, y, yaxis } = points[0];
         if (this.props.onHover && data.series.tooltipForm) {
-            console.log("Custom Data", customdata);
             const yAxisPixels = typeof y === "number" ? yaxis.l2p(y) : yaxis.d2p(y);
             const xAxisPixels = typeof x === "number" ? xaxis.l2p(x as number) : xaxis.d2p(x);
             const positionYaxis = yAxisPixels + yaxis._offset;

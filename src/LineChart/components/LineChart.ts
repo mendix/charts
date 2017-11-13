@@ -1,4 +1,3 @@
-// tslint:disable no-console
 import { Component, ReactChild, ReactElement, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
@@ -85,16 +84,17 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
 
     private renderPlayground(): ReactElement<any> {
         return createElement(Playground, {
-            supportSeries: true,
+            series: {
+                rawData: this.state.data,
+                chartData: this.getData(this.props),
+                modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
+                    JSON.stringify(LineChart.getDefaultSeriesOptions(series as LineSeriesProps, this.props), null, 4)
+                ),
+                traces: this.state.data && this.state.data.map(getRuntimeTraces),
+                onChange: this.onRuntimeUpdate
+            },
             layoutOptions: this.state.layoutOptions || "{\n\n}",
-            rawData: this.state.data,
-            chartData: this.getData(this.props),
-            modelerLayoutConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 4),
-            modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
-                JSON.stringify(LineChart.getDefaultSeriesOptions(series as LineSeriesProps, this.props), null, 4)
-            ),
-            traces: this.state.data && this.state.data.map(getRuntimeTraces),
-            onChange: this.onRuntimeUpdate
+            modelerLayoutConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 4)
         }, this.renderLineChart());
     }
 
@@ -104,10 +104,8 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
 
     private getLayoutOptions(props: LineChartProps): Partial<Layout> {
         const advancedOptions = this.state.layoutOptions ? JSON.parse(this.state.layoutOptions) : {};
-        const layoutOptions = deepMerge.all([ LineChart.defaultLayoutConfigs(props), advancedOptions ]);
 
-        console.log("Layout Options: ", layoutOptions);
-        return layoutOptions;
+        return deepMerge.all([ LineChart.defaultLayoutConfigs(props), advancedOptions ]);
     }
 
     private getData(props: LineChartProps): ScatterData[] {
@@ -130,10 +128,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             });
         }
 
-        const dataOptions = props.area === "stacked" ? LineChart.getStackedArea(lineData) : lineData;
-        console.log("Data Options: ", dataOptions);
-
-        return dataOptions;
+        return props.area === "stacked" ? LineChart.getStackedArea(lineData) : lineData;
     }
 
     private onClick({ points }: ScatterHoverData<mendix.lib.MxObject>) {
