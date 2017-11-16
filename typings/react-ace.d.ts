@@ -23,6 +23,7 @@ declare module "react-ace" {
         markers?: Marker[];
         maxLines?: number;
         minLines?: number;
+        showGutter?: boolean;
         onValidate?: (annotations: object[]) => void;
         onChange?: (value: string) => void;
         editorProps?: Partial<Editor>;

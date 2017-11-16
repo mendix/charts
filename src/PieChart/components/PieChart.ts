@@ -66,7 +66,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                     onChange: this.onRuntimeUpdate
                 },
                 layoutOptions: this.state.layoutOptions || "{\n\n}",
-                modelerLayoutConfigs: JSON.stringify({ autosize: true, showlegend: this.props.showLegend }, null, 4)
+                modelerLayoutConfigs: JSON.stringify(PieChart.getDefaultLayoutOptions(this.props), null, 4)
             }, this.renderChart());
         }
 
@@ -169,7 +169,8 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         return {
             font: {
                 family: "Open Sans, sans-serif",
-                size: 12
+                size: 12,
+                color: "#FFF"
             },
             autosize: true,
             showlegend: props.showLegend,
@@ -178,6 +179,11 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 bordercolor: "#888",
                 font: {
                     color: "#FFF"
+                }
+            },
+            legend: {
+                font: {
+                    color: "#888"
                 }
             },
             margin: {
