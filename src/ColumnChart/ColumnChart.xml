@@ -5,7 +5,7 @@
     <icon/>
     <properties>
         <property key="barMode" type="enumeration" defaultValue="group">
-            <caption>Mode</caption>
+            <caption>Bar mode</caption>
             <category>Chart properties</category>
             <description>The format the bar chart should appear in</description>
             <enumerationValues>
@@ -198,7 +198,7 @@
             <description/>
         </property>
         <property key="devMode" type="enumeration" defaultValue="basic">
-            <caption>Options</caption>
+            <caption>Mode</caption>
             <category>Advanced</category>
             <description>The developer option adds a button to the charts when running the app which can be used to toggle a live editor for the advanced configuration options.</description>
             <enumerationValues>

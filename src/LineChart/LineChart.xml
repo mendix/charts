@@ -89,7 +89,7 @@
                     </enumerationValues>
                 </property>
                 <property key="mode" type="enumeration" defaultValue="linesXmarkers">
-                    <caption>Mode</caption>
+                    <caption>Line mode</caption>
                     <category>Appearance</category>
                     <description/>
                     <enumerationValues>
@@ -205,7 +205,7 @@
             <description/>
         </property>
         <property key="devMode" type="enumeration" defaultValue="basic">
-            <caption>Options</caption>
+            <caption>Mode</caption>
             <category>Advanced</category>
             <description>The developer option adds a button to the charts when running the app which can be used to toggle a live editor for the advanced configuration options.</description>
             <enumerationValues>
