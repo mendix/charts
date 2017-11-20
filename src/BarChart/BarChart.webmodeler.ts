@@ -66,15 +66,12 @@ export function getVisibleProperties(valueMap: BarChartContainerProps, visibilit
             } else if (series.dataSourceType === "microflow") {
                 visibilityMap.series[index].entityConstraint = false;
             }
-            if (valueMap.devMode === "basic") {
-                visibilityMap.series[index].seriesOptions = false;
-                visibilityMap.series[index].sampleData = false;
-            }
+            visibilityMap.series[index].seriesOptions = false;
+            visibilityMap.series[index].sampleData = false;
         });
     }
-    if (valueMap.devMode === "basic") {
-        visibilityMap.layoutOptions = false;
-    }
+    visibilityMap.layoutOptions = false;
+    visibilityMap.devMode = false;
 
     return visibilityMap;
 }

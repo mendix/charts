@@ -72,10 +72,9 @@ export function getVisibleProperties(valueMap: PieChartContainerProps, visibilit
     } else if (valueMap.dataSourceType === "microflow") {
         visibilityMap.entityConstraint = false;
     }
-    if (valueMap.devMode === "basic") {
-        visibilityMap.layoutOptions = false;
-        visibilityMap.sampleData = false;
-    }
+    visibilityMap.layoutOptions = false;
+    visibilityMap.sampleData = false;
+    visibilityMap.devMode = false;
 
     return visibilityMap;
 }
