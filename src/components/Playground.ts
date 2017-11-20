@@ -5,15 +5,16 @@ import { Operation, compare } from "fast-json-patch";
 import jsonMap = require("json-source-map");
 
 import { Accordion, AccordionProps } from "./Accordion";
-// import { Alert } from "./Alert";
+import { Alert } from "./Alert";
+import { HelpTooltip } from "./HelpTooltip";
 import { MendixButton } from "./MendixButton";
 import { Sidebar } from "./Sidebar";
 
-import "brace";
 import { ScatterTrace, SeriesData, SeriesProps } from "../utils/data";
 import { PieTraces } from "../PieChart/components/PieChart";
 import { PieData, ScatterData } from "plotly.js";
 
+import "brace";
 import "brace/mode/json";
 import "brace/theme/github";
 import "../ui/Playground.scss";
@@ -70,7 +71,7 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
         };
         this.newPieOptions = {
             layout: props.layoutOptions || "{}",
-            data: props.pie && props.pie.dataOptions || "{/n/n}"
+            data: props.pie && props.pie.dataOptions || "{\n\n}"
         };
     }
 
@@ -91,7 +92,10 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
                             })
                         )
                     ),
-                    createElement("div", { className: "sidebar-content-body" }, this.renderContent())
+                    createElement("div", { className: "sidebar-content-body" },
+                        createElement(HelpTooltip, {}, this.renderHelpContent()),
+                        this.renderContent()
+                    )
                 )
             ),
             createElement("div", { className: "widget-charts-playground-toggle" },
@@ -139,10 +143,6 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
         return null;
     }
 
-    private updateView({ currentTarget }: SyntheticEvent<HTMLSelectElement>) {
-        this.setState({ activeOption: currentTarget.value });
-    }
-
     private renderSeriesPanes(activeIndex: number) {
         if (this.props.series && this.props.series.rawData) {
             const activeSeriesData = this.props.series.rawData[activeIndex];
@@ -165,7 +165,7 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
                 collapsible: false,
                 key: `options-${index}`
             },
-            this.renderAceEditor(series.seriesOptions || "{\n\n}", value =>
+            this.renderAceEditor(`${series.seriesOptions || "{\n\n}"}`, value =>
                 this.onUpdate(`series-${index}`, value)
             )
         );
@@ -195,39 +195,40 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
 
     }
 
-    // private renderHelpContent() {
-    //     return createElement(Alert, { key: 0, bootstrapStyle: "info" },
-    //         createElement("p", {},
-    //             createElement("em", { className: "glyphicon glyphicon-exclamation-sign" }),
-    //             "  Changes made in this editor are only for preview purposes and are not automatically saved to the widget"
-    //         ),
-    //         createElement("p", {},
-    //             "The JSON can be copied and pasted into the widget in the desktop and web modelers."
-    //         ),
-    //         createElement("p", {},
-    //             "Plotly API reference: ",
-    //             createElement("a", { href: "https://plot.ly/javascript/reference/", className: "" },
-    //                 "https://plot.ly/javascript/reference/"
-    //             )
-    //         )
-    //     );
-    // }
+    private renderHelpContent() {
+        return createElement(Alert, { key: 0, bootstrapStyle: "info" },
+            createElement("p", {},
+                createElement("strong", {},
+                    "  Changes made in this editor are only for preview purposes."
+                )
+            ),
+            createElement("p", {},
+                "The JSON can be copied and pasted into the widget in the desktop and web modelers."
+            ),
+            createElement("p", {},
+                "Check out the chart options here: ",
+                createElement("a", { href: "https://plot.ly/javascript/reference/", target: "_BLANK" },
+                    "https://plot.ly/javascript/reference/"
+                )
+            )
+        );
+    }
 
     private renderAceEditor(value: string, onChange?: (value: string) => void, readOnly = false, mode: Mode = "json", overwriteValue?: string) {
         const markers = this.getMarker(value, overwriteValue);
 
         return createElement(AceEditor, {
             mode,
-            value,
+            value: `${value}\n`,
             readOnly,
             onChange,
             theme: "github",
-            showGutter: false,
             className: readOnly ? "ace-editor-read-only" : undefined,
             markers,
             maxLines: 1000, // crappy attempt to avoid a third scroll bar
             onValidate: this.onValidate,
-            editorProps: { $blockScrolling: Infinity }
+            editorProps: { $blockScrolling: Infinity },
+            setOptions: { showLineNumbers: false, highlightActiveLine: false }
         });
     }
 
@@ -242,7 +243,7 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
                     key: "layout",
                     ...this.setAccordionProps("Custom settings", "item-header")
                 },
-                this.renderAceEditor(this.props.layoutOptions, value => this.onUpdate("layout", value))
+                this.renderAceEditor(`${this.props.layoutOptions}`, value => this.onUpdate("layout", value))
             ),
             createElement(Accordion,
                 {
@@ -264,7 +265,7 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
                         key: "data",
                         ...this.setAccordionProps("Custom settings", "item-header")
                     },
-                    this.renderAceEditor(dataOptions, value => this.onUpdate("data", value))
+                    this.renderAceEditor(`${dataOptions}`, value => this.onUpdate("data", value))
                 ),
                 createElement(Accordion,
                     {
@@ -277,6 +278,10 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
         }
 
         return null;
+    }
+
+    private updateView({ currentTarget }: SyntheticEvent<HTMLSelectElement>) {
+        this.setState({ activeOption: currentTarget.value });
     }
 
     private toggleShowEditor() {
@@ -305,14 +310,15 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
     }
 
     private updateChart(source: string, value: string) {
+        const cleanValue = Playground.removeTrailingNewLine(value);
         if (source === "layout") {
-            this.newSeriesOptions.layout = value;
+            this.newSeriesOptions.layout = cleanValue;
         }
         if (source.indexOf("series") > -1) {
             const index = source.split("-")[ 1 ];
-            (this.newSeriesOptions.data[ parseInt(index, 10) ] as SeriesData).series.seriesOptions = value;
+            (this.newSeriesOptions.data[ parseInt(index, 10) ] as SeriesData).series.seriesOptions = cleanValue;
         } else if (source.indexOf("data") > -1) {
-            this.newPieOptions.data = value;
+            this.newPieOptions.data = cleanValue;
         }
         if (this.props.series && this.props.series.onChange) {
             this.props.series.onChange(this.newSeriesOptions.layout, this.newSeriesOptions.data);
@@ -342,6 +348,7 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
                 }
             });
         }
+
         return markers;
     }
 
@@ -356,5 +363,14 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
                 endCol: pointer.valueEnd.column
             };
         }
+    }
+
+    private static removeTrailingNewLine(value: string): string {
+        const splitValue = value.split("\n");
+        if (splitValue[splitValue.length - 1] === "") {
+            splitValue.pop();
+        }
+
+        return splitValue.join("\n");
     }
 }

@@ -3,6 +3,9 @@
  */
 
 .control-sidebar {
+    color: #5e5e5e;
+    background: #FFF;
+    border: 1px solid #d2d6de;
     position: fixed;
     padding-top: 0;
     top: 0;
@@ -16,6 +19,7 @@
     -o-transition: right 0.3s ease-in-out;
     transition: right 0.3s ease-in-out;
 }
+
 @media (max-width: 768px) {
     .control-sidebar {
         padding-top: 0;
@@ -25,19 +29,9 @@
         width: 100%;
     }
 }
-.control-sidebar > .tab-content {
-    padding: 10px 15px;
-}
+
 .control-sidebar.control-sidebar-open {
     right: 0;
-}
-.control-sidebar-light {
-    color: #5e5e5e;
-}
-.control-sidebar-light,
-.control-sidebar-light + .control-sidebar-bg {
-    background: #FFF;
-    border: 1px solid #d2d6de;
 }
 
 .control-sidebar .item-header {
