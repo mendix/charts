@@ -103,7 +103,9 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     private getLayoutOptions(props: LineChartProps): Partial<Layout> {
-        const advancedOptions = this.state.layoutOptions ? JSON.parse(this.state.layoutOptions) : {};
+        const advancedOptions = props.devMode !== "basic" && this.state.layoutOptions
+            ? JSON.parse(this.state.layoutOptions)
+            : {};
 
         return deepMerge.all([ LineChart.defaultLayoutConfigs(props), advancedOptions ]);
     }
@@ -112,7 +114,9 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         let lineData: ScatterData[] = props.defaultData || [];
         if (this.state.data) {
             lineData = this.state.data.map(({ data, series }, index) => {
-                const advancedOptions = series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
+                const advancedOptions = props.devMode !== "basic" && series.seriesOptions
+                    ? JSON.parse(series.seriesOptions)
+                    : {};
                 const configOptions: Partial<ScatterData> = {
                     series,
                     marker: index < this.defaultColors.length ? { color: this.defaultColors[index] } : undefined,

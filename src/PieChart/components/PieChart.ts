@@ -107,7 +107,9 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
 
     private getData(props: PieChartProps): PieData[] {
         if (props.data) {
-            const advancedOptions = this.state.dataOptions ? JSON.parse(this.state.dataOptions) : {};
+            const advancedOptions = props.devMode !== "basic" && this.state.dataOptions
+                ? JSON.parse(this.state.dataOptions)
+                : {};
             const traces = this.getTraces(props.data);
 
             return [ deepMerge.all([ {
@@ -125,7 +127,9 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
     }
 
     private getLayoutOptions(props: PieChartProps): Partial<Layout> {
-        const advancedOptions = this.state.layoutOptions ? JSON.parse(this.state.layoutOptions) : {};
+        const advancedOptions = props.devMode !== "basic" && this.state.layoutOptions
+            ? JSON.parse(this.state.layoutOptions)
+            : {};
 
         return deepMerge.all([ PieChart.getDefaultLayoutOptions(props), advancedOptions ]);
     }

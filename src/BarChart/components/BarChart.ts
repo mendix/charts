@@ -114,7 +114,9 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     }
 
     private getLayoutOptions(props: BarChartProps): Partial<Layout> {
-        const advancedOptions = this.state.layoutOptions ? JSON.parse(this.state.layoutOptions) : {};
+        const advancedOptions = props.devMode !== "basic" && this.state.layoutOptions
+            ? JSON.parse(this.state.layoutOptions)
+            : {};
 
         return deepMerge.all([ BarChart.defaultLayoutConfigs(props), advancedOptions ]);
     }
@@ -122,7 +124,9 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     private getData(props: BarChartProps): ScatterData[] {
         if (props.data) {
             return props.data.map(({ data, series }, index) => {
-                const rawOptions = series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
+                const rawOptions = props.devMode !== "basic" && series.seriesOptions
+                    ? JSON.parse(series.seriesOptions)
+                    : {};
                 const traces = getSeriesTraces({ data, series });
                 const configOptions: Partial<ScatterData> = {
                     x: props.orientation === "bar" ? traces.y : traces.x,
