@@ -7,7 +7,9 @@
   "scripts": {
     "start": "nodemon --watch webpack.config.js --watch Gruntfile.js --exec grunt",
     "pretest": "tsc",
-    "lint": "tslint -c tslint.json '**/*.ts' --exclude '**/node_modules/**'"
+    "lint": "tslint -c tslint.json '**/*.ts' --exclude '**/node_modules/**'",
+    "test:dev": "karma start",
+    "test:unit": "karma start --single-run --codeCoverage && node tests/remap.js"
   },
   "pre-commit": [
     "pretest",
@@ -27,17 +29,18 @@
     "@types/classnames": "^2.2.3",
     "@types/core-js": "^0.9.43",
     "@types/enzyme": "^3.1.4",
-    "@types/jasmine": "^2.6.3",
+    "@types/jasmine": "^2.8.2",
     "@types/karma": "^1.7.2",
     "@types/plotly.js": "^1.28.9",
-    "@types/react": "^16.0.22",
+    "@types/react": "^16.0.25",
     "@types/react-dom": "^16.0.3",
     "check-dependencies": "^1.1.0",
     "clean-webpack-plugin": "^0.1.17",
-    "copy-webpack-plugin": "^4.2.0",
+    "copy-webpack-plugin": "^4.2.1",
     "core-js": "^2.5.1",
     "css-loader": "^0.28.7",
-    "enzyme": "^3.1.1",
+    "enzyme": "^3.2.0",
+    "enzyme-adapter-react-16": "^1.1.0",
     "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^1.1.5",
     "grunt": "1.0.1",
@@ -62,10 +65,12 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.6",
     "mendix-client": "^7.6.5",
-    "node-sass": "^4.6.1",
+    "node-sass": "^4.7.2",
     "nodemon": "^1.12.1",
     "pre-commit": "^1.2.2",
     "raw-loader": "^0.5.1",
+    "react": "^16.1.1",
+    "react-dom": "^16.1.1",
     "sass-loader": "^6.0.3",
     "source-map-loader": "^0.2.3",
     "style-loader": "^0.19.0",
@@ -82,13 +87,13 @@
     "webworkify-webpack": "^2.1.0"
   },
   "dependencies": {
-    "brace": "^0.10.0",
+    "brace": "^0.11.0",
     "classnames": "^2.2.5",
     "deepmerge": "^2.0.1",
     "element-resize-detector": "^1.1.12",
     "fast-json-patch": "^2.0.6",
     "json-source-map": "^0.4.0",
     "plotly.js": "^1.31.2",
-    "react-ace": "^5.5.0"
+    "react-ace": "^5.7.0"
   }
 }
