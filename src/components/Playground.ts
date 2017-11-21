@@ -203,7 +203,7 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
                 )
             ),
             createElement("p", {},
-                "The JSON can be copied and pasted into the widget in the desktop and web modelers."
+                "The JSON can be copied and pasted into the widgets properties in the desktop modeler"
             ),
             createElement("p", {},
                 "Check out the chart options here: ",
@@ -228,7 +228,7 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
             maxLines: 1000, // crappy attempt to avoid a third scroll bar
             onValidate: this.onValidate,
             editorProps: { $blockScrolling: Infinity },
-            setOptions: { showLineNumbers: false, highlightActiveLine: false }
+            setOptions: { showLineNumbers: false, highlightActiveLine: false, highlightGutterLine: true }
         });
     }
 

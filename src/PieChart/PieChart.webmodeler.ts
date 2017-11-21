@@ -60,9 +60,7 @@ export class preview extends Component<PieChartContainerProps, {}> {
 export function getPreviewCss() {
     return (
         require("../ui/Charts.scss") +
-        require("../ui/ChartsLoading.scss") +
-        require("../ui/Accordion.scss") +
-        require("../ui/Sidebar.css")
+        require("../ui/ChartsLoading.scss")
     );
 }
 

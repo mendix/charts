@@ -14,8 +14,8 @@
                     <category>Data source</category>
                     <description/>
                     <translations>
-                        <translation lang="en_US"/>
-                        <translation lang="nl_NL"/>
+                        <translation lang="en_US">Series name</translation>
+                        <translation lang="nl_NL">Serie naam</translation>
                     </translations>
                 </property>
                 <property key="dataEntity" type="entity">

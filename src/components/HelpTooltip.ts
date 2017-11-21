@@ -1,5 +1,4 @@
 import { CSSProperties, Component, createElement } from "react";
-
 import "../ui/HelpTooltip.scss";
 
 interface HelpTooltipState {
@@ -45,6 +44,7 @@ export class HelpTooltip extends Component<{ show?: boolean }, HelpTooltipState>
         if (this.state.showInfo) {
             return createElement("div", {
                 className: "widget-help-tooltip-info",
+                onClick: this.toggleShowInfo,
                 style: this.state.style
             }, this.props.children);
         }

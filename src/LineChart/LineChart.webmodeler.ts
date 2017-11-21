@@ -65,6 +65,13 @@ export class preview extends Component<LineChartContainerProps, {}> {
     }
 }
 
+export function getPreviewCss() {
+    return (
+        require("../ui/Charts.scss") +
+        require("../ui/ChartsLoading.scss")
+    );
+}
+
 export function getVisibleProperties(valueMap: LineChartContainerProps, visibilityMap: VisibilityMap<LineChartContainerProps>) { // tslint:disable-line max-line-length
     if (valueMap.series && Array.isArray(valueMap.series)) {
         valueMap.series.forEach((series, index) => {
@@ -81,13 +88,4 @@ export function getVisibleProperties(valueMap: LineChartContainerProps, visibili
     visibilityMap.layoutOptions = false;
 
     return visibilityMap;
-}
-
-export function getPreviewCss() {
-    return (
-        require("../ui/Charts.scss") +
-        require("../ui/ChartsLoading.scss") +
-        require("../ui/Accordion.scss") +
-        require("../ui/Sidebar.css")
-    );
 }

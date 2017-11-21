@@ -15,6 +15,7 @@ declare module "react-ace" {
 
     interface RendererOptions {
         showLineNumbers: boolean;
+        highlightGutterLine: boolean;
     }
 
     interface EditorOptions {
