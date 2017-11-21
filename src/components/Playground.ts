@@ -2,12 +2,12 @@ import { Component, ReactElement, SyntheticEvent, createElement } from "react";
 import AceEditor, { Marker, Mode } from "react-ace";
 import * as classNames from "classnames";
 import { Operation, compare } from "fast-json-patch";
-import jsonMap = require("json-source-map");
+import * as jsonMap from "json-source-map";
 
-import { Accordion, AccordionProps } from "./Accordion";
 import { Alert } from "./Alert";
-import { HelpTooltip } from "./HelpTooltip";
+import { InfoTooltip } from "./InfoTooltip";
 import { MendixButton } from "./MendixButton";
+import { Panel } from "./Panel";
 import { Sidebar } from "./Sidebar";
 
 import { ScatterTrace, SeriesData, SeriesProps } from "../utils/data";
@@ -63,7 +63,6 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
         this.toggleShowEditor = this.toggleShowEditor.bind(this);
         this.closeEditor = this.closeEditor.bind(this);
         this.updateView = this.updateView.bind(this);
-
         this.state = { showEditor: false, activeOption: "layout" };
         this.newSeriesOptions = {
             layout: props.layoutOptions || "{}",
@@ -93,7 +92,7 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
                         )
                     ),
                     createElement("div", { className: "sidebar-content-body" },
-                        createElement(HelpTooltip, {}, this.renderHelpContent()),
+                        createElement(InfoTooltip, {}, this.renderHelpContent()),
                         this.renderContent()
                     )
                 )
@@ -157,12 +156,9 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
     }
 
     private renderSeriesOptions(series: SeriesProps, index: number) {
-        return createElement(Accordion,
+        return createElement(Panel,
             {
-                title: "Custom settings",
-                titleClass: "item-header",
-                show: true,
-                collapsible: false,
+                heading: "Custom settings",
                 key: `options-${index}`
             },
             this.renderAceEditor(`${series.seriesOptions || "{\n\n}"}`, value =>
@@ -173,12 +169,10 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
 
     private renderSeriesModelerConfig(index: number) {
         if (this.props.series && this.props.series.modelerSeriesConfigs && this.props.series.rawData) {
-            return createElement(Accordion,
+            return createElement(Panel,
                 {
-                    title: "Settings from the Modeler",
-                    titleClass: "item-header read-only",
-                    show: true,
-                    collapsible: false,
+                    heading: "Settings from the Modeler",
+                    headingClass: "read-only",
                     key: `modeler-${index}`
                 },
                 this.renderAceEditor(
@@ -193,6 +187,53 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
 
         return null;
 
+    }
+
+    private renderLayoutOptions() {
+        return [
+            createElement(Panel,
+                {
+                    key: "layout",
+                    heading: "Custom settings"
+                },
+                this.renderAceEditor(`${this.props.layoutOptions}`, value => this.onUpdate("layout", value))
+            ),
+            createElement(Panel,
+                {
+                    key: "modeler",
+                    heading: "Settings from the Modeler",
+                    headingClass: "read-only"
+                },
+                this.renderAceEditor(this.props.modelerLayoutConfigs, undefined, true, "json", this.props.layoutOptions)
+            )
+        ];
+    }
+
+    private renderPieDataPanes() {
+        if (this.props.pie && this.props.pie.dataOptions) {
+            const { dataOptions, modelerDataConfigs } = this.props.pie;
+
+            return [
+                createElement(Panel,
+                    {
+                        key: "data",
+                        heading: "Custom settings",
+                        headingClass: "item-header"
+                    },
+                    this.renderAceEditor(`${dataOptions}`, value => this.onUpdate("data", value))
+                ),
+                createElement(Panel,
+                    {
+                        key: "modeler",
+                        heading: "Settings from the Modeler",
+                        headingClass: "read-only"
+                    },
+                    this.renderAceEditor(modelerDataConfigs, undefined, true, "json", dataOptions)
+                )
+            ];
+        }
+
+        return null;
     }
 
     private renderHelpContent() {
@@ -230,54 +271,6 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
             editorProps: { $blockScrolling: Infinity },
             setOptions: { showLineNumbers: false, highlightActiveLine: false, highlightGutterLine: true }
         });
-    }
-
-    private setAccordionProps(title: string, titleClass: string, show = true): AccordionProps {
-        return { title, titleClass, show, collapsible: false };
-    }
-
-    private renderLayoutOptions() {
-        return [
-            createElement(Accordion,
-                {
-                    key: "layout",
-                    ...this.setAccordionProps("Custom settings", "item-header")
-                },
-                this.renderAceEditor(`${this.props.layoutOptions}`, value => this.onUpdate("layout", value))
-            ),
-            createElement(Accordion,
-                {
-                    key: "modeler",
-                    ...this.setAccordionProps("Settings from the Modeler", "item-header read-only")
-                },
-                this.renderAceEditor(this.props.modelerLayoutConfigs, undefined, true, "json", this.props.layoutOptions)
-            )
-        ];
-    }
-
-    private renderPieDataPanes() {
-        if (this.props.pie && this.props.pie.dataOptions) {
-            const { dataOptions, modelerDataConfigs } = this.props.pie;
-
-            return [
-                createElement(Accordion,
-                    {
-                        key: "data",
-                        ...this.setAccordionProps("Custom settings", "item-header")
-                    },
-                    this.renderAceEditor(`${dataOptions}`, value => this.onUpdate("data", value))
-                ),
-                createElement(Accordion,
-                    {
-                        key: "modeler",
-                        ...this.setAccordionProps("Settings from the Modeler", "item-header read-only")
-                    },
-                    this.renderAceEditor(modelerDataConfigs, undefined, true, "json", dataOptions)
-                )
-            ];
-        }
-
-        return null;
     }
 
     private updateView({ currentTarget }: SyntheticEvent<HTMLSelectElement>) {

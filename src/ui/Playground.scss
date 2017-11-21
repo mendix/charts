@@ -67,33 +67,4 @@
             padding: 8px;
         }
     }
-
-    .control-sidebar {
-        .sidebar-content {
-            height: 100%;
-            position: relative;
-
-            .sidebar-content-header {
-                padding: 8px;
-                border-bottom: 1px solid #DDD;
-
-                .remove {
-                    font-size: 20px;
-                    margin-top: 8px;
-                    margin-right: 10px;
-                    cursor: pointer;
-                }
-
-                select {
-                    &.form-control {
-                        background-color: #EEE;
-
-                        option {
-                            background-color: #FFF;
-                        }
-                    }
-                }
-            }
-        }
-    }
 }

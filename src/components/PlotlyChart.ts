@@ -3,7 +3,7 @@ import * as classNames from "classnames";
 
 import deepMerge from "deepmerge";
 import * as elementResize from "element-resize-detector";
-import { Config, Layout, PieData, PieHoverData, ScatterData, ScatterHoverData } from "plotly.js";
+import { Config, Data, Layout, PieData, PieHoverData, ScatterData, ScatterHoverData } from "plotly.js";
 import { newPlot, purge } from "../PlotlyCustom";
 
 interface PlotlyChartProps {
@@ -79,7 +79,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, {}> {
                     height: this.chartNode.clientHeight
                 }
             ]);
-            newPlot(this.chartNode, data as any, layoutOptions, config)
+            newPlot(this.chartNode, data as Data[], layoutOptions, config)
                 .then(myPlot => {
                     myPlot.on("plotly_click", onClick as any);
                     myPlot.on("plotly_hover", onHover as any);

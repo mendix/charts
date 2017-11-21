@@ -1,4 +1,4 @@
-.widget-help-tooltip {
+.widget-info-tooltip {
     position: relative;
     float: right;
     z-index: 1;
@@ -8,7 +8,7 @@
     color: #0595DB;
     cursor: pointer;
 
-    .widget-help-tooltip-info {
+    .widget-info-tooltip-info {
         position: absolute;
         right: 5px;
         margin-top: 5px;

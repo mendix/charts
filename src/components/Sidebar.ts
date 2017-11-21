@@ -1,7 +1,7 @@
 import { Component, createElement } from "react";
 import * as classNames from "classnames";
 
-import "../ui/Sidebar.css";
+import "../ui/Sidebar.scss";
 
 interface SidebarProps {
     className?: string;
@@ -19,8 +19,8 @@ export class Sidebar extends Component<SidebarProps, {}> {
     render() {
         return createElement("div",
             {
-                className: classNames("control-sidebar", "control-sidebar-light", this.props.className, {
-                    "control-sidebar-open": this.props.open
+                className: classNames("widget-sidebar", this.props.className, {
+                    "widget-sidebar-open": this.props.open
                 })
             },
             createElement("div", { className: "overlay", onClick: this.overlayClicked }),

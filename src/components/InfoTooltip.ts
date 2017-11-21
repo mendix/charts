@@ -1,12 +1,12 @@
-import { CSSProperties, Component, createElement } from "react";
-import "../ui/HelpTooltip.scss";
+import { Component, createElement } from "react";
+import "../ui/InfoTooltip.scss";
 
-interface HelpTooltipState {
-    showInfo: boolean;
-    style?: CSSProperties;
+interface InfoTooltipState {
+    show: boolean;
+    width?: number;
 }
 
-export class HelpTooltip extends Component<{ show?: boolean }, HelpTooltipState> {
+export class InfoTooltip extends Component<{ show?: boolean }, InfoTooltipState> {
     static defaultProps: Partial<{ show?: boolean }> = {
         show: false
     };
@@ -17,12 +17,12 @@ export class HelpTooltip extends Component<{ show?: boolean }, HelpTooltipState>
 
         this.toggleShowInfo = this.toggleShowInfo.bind(this);
         this.getRef = this.getRef.bind(this);
-        this.state = { showInfo: props.show };
+        this.state = { show: props.show };
     }
 
     render() {
         return createElement("div", {
-            className: "widget-help-tooltip glyphicon glyphicon-info-sign",
+            className: "widget-info-tooltip glyphicon glyphicon-info-sign",
             onClick: this.toggleShowInfo,
             ref: this.getRef
         }, this.renderInfo());
@@ -31,7 +31,7 @@ export class HelpTooltip extends Component<{ show?: boolean }, HelpTooltipState>
     componentDidMount() {
         if (this.tooltipNode && this.tooltipNode.parentElement) {
             this.setState({
-                style: { width: `${this.tooltipNode.parentElement.clientWidth * 0.9}px` }
+                width: this.tooltipNode.parentElement.clientWidth * 0.9
             });
         }
     }
@@ -41,11 +41,11 @@ export class HelpTooltip extends Component<{ show?: boolean }, HelpTooltipState>
     }
 
     private renderInfo() {
-        if (this.state.showInfo) {
+        if (this.state.show) {
             return createElement("div", {
-                className: "widget-help-tooltip-info",
+                className: "widget-info-tooltip-info",
                 onClick: this.toggleShowInfo,
-                style: this.state.style
+                style: this.state.width && { width: `${this.state.width}px` }
             }, this.props.children);
         }
 
@@ -53,6 +53,6 @@ export class HelpTooltip extends Component<{ show?: boolean }, HelpTooltipState>
     }
 
     private toggleShowInfo() {
-        this.setState({ showInfo: !this.state.showInfo });
+        this.setState({ show: !this.state.show });
     }
 }
