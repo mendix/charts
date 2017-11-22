@@ -207,7 +207,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         return {
             connectgaps: true,
             hoveron: "points",
-            hoverinfo: series.tooltipForm ? "text" : undefined,
+            hoverinfo: series.tooltipForm ? "text" : "y" as any, // typings don't have a hoverinfo value of "y"
             line: {
                 color: series.lineColor,
                 shape: series.lineStyle

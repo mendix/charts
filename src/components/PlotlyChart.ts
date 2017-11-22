@@ -45,6 +45,9 @@ export class PlotlyChart extends Component<PlotlyChartProps, {}> {
     }
 
     componentDidMount() {
+        if (this.chartNode && this.chartNode.parentElement) {
+            this.chartNode.parentElement.classList.add("widget-charts-wrapper");
+        }
         this.renderChart(this.props);
         this.addResizeListener();
     }
@@ -72,11 +75,13 @@ export class PlotlyChart extends Component<PlotlyChartProps, {}> {
 
     private renderChart({ config, data, layout, onClick, onHover }: PlotlyChartProps) {
         if (this.chartNode) {
+            const style = window.getComputedStyle(this.chartNode);
+
             const layoutOptions = deepMerge.all([
                 layout,
                 {
-                    width: this.chartNode.clientWidth,
-                    height: this.chartNode.clientHeight
+                    width: parseFloat(style.getPropertyValue("width").split("px")[0]),
+                    height: parseFloat(style.getPropertyValue("height").split("px")[0])
                 }
             ]);
             newPlot(this.chartNode, data as Data[], layoutOptions, config)

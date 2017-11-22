@@ -220,10 +220,12 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     }
 
     private static getDefaultSeriesOptions(series: SeriesProps, props: BarChartProps): Partial<ScatterData> {
+        const hoverinfo = (props.orientation === "bar" ? "x" : "y") as any;
+
         return {
             name: series.name,
             type: "bar",
-            hoverinfo: series.tooltipForm ? "text" : undefined,
+            hoverinfo: series.tooltipForm ? "text" : hoverinfo, // typings don't have a hoverinfo value of "y"
             orientation: props.orientation === "bar" ? "h" : "v"
         };
     }

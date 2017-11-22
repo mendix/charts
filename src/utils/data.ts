@@ -189,8 +189,9 @@ export const getXValue = (mxObject: mendix.lib.MxObject, series: SeriesProps): D
 
         return mxObject.getEnumCaption(series.xValueAttribute, enumValue);
     }
+    const value = mxObject.get(series.xValueAttribute);
 
-    return mxObject.get(series.xValueAttribute) as Datum;
+    return value !== null ? value.toString() : "";
 };
 
 export const parseDate = (date: Date): string => `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;

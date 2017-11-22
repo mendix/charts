@@ -1,29 +1,33 @@
-import { Component, createElement } from "react";
+import { Component, SyntheticEvent, createElement } from "react";
 import "../ui/InfoTooltip.scss";
 
+interface InfoTooltipProps {
+    show?: boolean;
+    onClick: () => void;
+}
+
 interface InfoTooltipState {
-    show: boolean;
     width?: number;
 }
 
-export class InfoTooltip extends Component<{ show?: boolean }, InfoTooltipState> {
-    static defaultProps: Partial<{ show?: boolean }> = {
+export class InfoTooltip extends Component<InfoTooltipProps, InfoTooltipState> {
+    static defaultProps: Partial<InfoTooltipProps> = {
         show: false
     };
     private tooltipNode: HTMLDivElement;
 
-    constructor(props: { show: boolean }) {
+    constructor(props: InfoTooltipProps) {
         super(props);
 
-        this.toggleShowInfo = this.toggleShowInfo.bind(this);
         this.getRef = this.getRef.bind(this);
-        this.state = { show: props.show };
+        this.onInfoClick = this.onInfoClick.bind(this);
+        this.state = {};
     }
 
     render() {
         return createElement("div", {
             className: "widget-info-tooltip glyphicon glyphicon-info-sign",
-            onClick: this.toggleShowInfo,
+            onClick: this.props.onClick,
             ref: this.getRef
         }, this.renderInfo());
     }
@@ -41,18 +45,18 @@ export class InfoTooltip extends Component<{ show?: boolean }, InfoTooltipState>
     }
 
     private renderInfo() {
-        if (this.state.show) {
+        if (this.props.show) {
             return createElement("div", {
                 className: "widget-info-tooltip-info",
-                onClick: this.toggleShowInfo,
-                style: this.state.width && { width: `${this.state.width}px` }
+                style: this.state.width && { width: `${this.state.width}px` },
+                onClick: this.onInfoClick
             }, this.props.children);
         }
 
         return null;
     }
 
-    private toggleShowInfo() {
-        this.setState({ show: !this.state.show });
+    private onInfoClick(event: SyntheticEvent<HTMLDivElement>) {
+        event.stopPropagation();
     }
 }

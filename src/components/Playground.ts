@@ -28,6 +28,7 @@ interface PlaygroundProps {
 
 interface PlaygroundState {
     showEditor: boolean;
+    showTooltip: boolean;
     activeOption: string;
 }
 
@@ -62,8 +63,14 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
         this.onValidate = this.onValidate.bind(this);
         this.toggleShowEditor = this.toggleShowEditor.bind(this);
         this.closeEditor = this.closeEditor.bind(this);
+        this.closeTooltip = this.closeTooltip.bind(this);
+        this.toggleTooltip = this.toggleTooltip.bind(this);
         this.updateView = this.updateView.bind(this);
-        this.state = { showEditor: false, activeOption: "layout" };
+        this.state = {
+            showEditor: false,
+            showTooltip: false,
+            activeOption: "layout"
+        };
         this.newSeriesOptions = {
             layout: props.layoutOptions || "{}",
             data: props.series && props.series.rawData || []
@@ -80,8 +87,13 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
                     "playground-open": this.state.showEditor
                 })
             },
-            createElement(Sidebar, { open: this.state.showEditor, onBlur: this.closeEditor },
-                createElement("div", { className: "sidebar-content" },
+            createElement(Sidebar,
+                {
+                    open: this.state.showEditor,
+                    onBlur: this.closeEditor,
+                    onClick: this.closeTooltip
+                },
+                createElement("div", { className: "sidebar-content", onClick: this.closeTooltip },
                     createElement("div", { className: "sidebar-content-header row" },
                         createElement("div", { className: "col-sm-9 col-xs-9" }, this.renderOptions()),
                         createElement("div", { className: "col-sm-3 col-xs-3" },
@@ -92,8 +104,11 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
                         )
                     ),
                     createElement("div", { className: "sidebar-content-body" },
-                        createElement(InfoTooltip, {}, this.renderHelpContent()),
-                        this.renderContent()
+                        createElement(InfoTooltip, {
+                            show: this.state.showTooltip,
+                            onClick: this.toggleTooltip
+                        }, this.renderHelpContent()),
+                        this.renderSidebarContent()
                     )
                 )
             ),
@@ -128,7 +143,7 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
         return [];
     }
 
-    private renderContent() {
+    private renderSidebarContent() {
         if (this.state.activeOption === "layout") {
             return this.renderLayoutOptions();
         }
@@ -285,6 +300,16 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
         if (this.state.showEditor) {
             this.setState({ showEditor: false });
         }
+    }
+
+    private closeTooltip() {
+        if (this.state.showTooltip) {
+            this.setState({ showTooltip: false });
+        }
+    }
+
+    private toggleTooltip() {
+        this.setState({ showTooltip: !this.state.showTooltip });
     }
 
     private onUpdate(source: string, value: string) {

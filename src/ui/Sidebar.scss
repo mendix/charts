@@ -9,7 +9,7 @@
     width: 400px;
     height: 100%;
     min-height: 400px;
-    overflow: auto;
+    overflow-x: hidden;
     z-index: 1010;
     -webkit-transition: right 0.3s ease-in-out;
     -o-transition: right 0.3s ease-in-out;
