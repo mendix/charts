@@ -2,7 +2,9 @@
 <widget id="com.mendix.widget.custom.PieChart.PieChart" needsEntityContext="true" offlineCapable="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
     <name>Pie chart</name>
     <description>Renders a pie or doughnut chart</description>
-    <icon/>
+    <icon>
+        iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAAAXNSR0IArs4c6QAAArBJREFUKBVVk01ME1EUhc/8gZTSCh1aShBjS2MVtEEIhOACTcREIC6ILpCVG92o0YVxaWDDxsjShDUmAiYGYWGCglExAQQCIWILiElrgVJakMK0M53xTrFFzmLmvNz3vXvv+2Hwn8aBnATQoAFNDOBqAK7e6MM7jYGPpg0zGsb6b2I/jbBpMwI4JKDHWFDUXdF4rT0JWPSYqsJSV36l3WIs6k4q6GnthSPN8LrRQYbhXpRV1Vbaz5SL2n4cBKdEACwmm7neYzev/l4qmPNNWFt7lbuvb2GF7aNSZaDD6amuLBSLxWj/RyRW1zKwSvDe3h6CwSCKxVKxwlFdKcvooHZyWCP1aDKLNbaTTnFnbBaKRFkVJQOTpdJVKGRCoRBK7Q4x32Sr2f2DBpayNpU43dbY3BJkHYSKJC2tpsum+nU4vUA0GkXZidNWVUYTTzFXbq7RIC36CKR9JiVlBbRoSkoCwcEPg9/+DQ9/Glw8TTrOgeFlSSL0AJ7yTnsX7O47CC7i/T20HBJHHU8tRXe3IooqcIIal7GILe+E/VRb5/WncUbANE3PPYpkRiE9sy8c3qzNOyaY5+Nr3hm7o62z+Ylks1sGztdXuxMJujYkTTuoymAwYGtjMzY1Ov5Z73l4JRxs1DhmfZLArsZHkmgtHHBdKHf7/f4UlAZZlkVJSQl8MwthVZbf8NvAWEKOvVwyO98+IzDfWtjvrKpwh8PhIyDDMDCZTPi18CMSDaxPQjKN0BVOiUFL19mcQmvvuabLHok2Tz9X/Xh0cRyH7KwsbP70RwJzi/NJVb6NV/eXuVRU/5RezFO2djzbgaCBz87muCyB5QSBVeMJZW9tI+b/MhkIzX7/pMX2H2Do8bKOpDPrHqh7mAOZvwQt2UyjMorm0+lFyC+B4YYgKKP4+jzzqv4C8CI5R6Ex7v8AAAAASUVORK5CYII=
+    </icon>
     <properties>
         <property key="dataEntity" type="entity" allowNonPersistableEntities="true">
             <caption>Entity</caption>

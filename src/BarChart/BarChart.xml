@@ -2,7 +2,9 @@
 <widget id="com.mendix.widget.custom.BarChart.BarChart" needsEntityContext="true" offlineCapable="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
     <name>Bar chart</name>
     <description>Create a bar chart</description>
-    <icon/>
+    <icon>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAPCAYAAADtc08vAAAAAXNSR0IArs4c6QAAAjdJREFUKBWdk81rU0EUxc97mZe0qZrvVKooFClI3UVx23/AhRu3gouCIOrGlSBFcO1GcO2fINS9uLPRRdBNi4su2jRtmk/SvI+ZO+OdSYzGnT6Y4cKbc+5vzn3Pe3Fv/Q60WcH/PL7XFIbMpa13H9+Slv9kkfIDbN3feCgMjNc63AfRvMGjr8D3ccaZ3sjGeFOb90+lAlit0Jr8YvUipAznTnwbDXDz1kT1pV5Hvpybex8Ei7BaIZXx280DqL8IjM6g2+2i3+9jvbCNV40PzqDqXcHd6lMIJrBaoQ38fKWKJJknMDTkDhrGGGgi1GoTmp2dOi4Ui0inmYC1QitigkNHMHzwHF5jD6nrq9Cbr52BNSHS6HQ6joYU18fHjsBqBWmTypcriJmg19jF7WebDvWx2sd7ujYhkIpNyBmSJJwvFJBhAqsVipig1YRSEopzHX1qIPy8C/Vy7bdI0axWXHdPTiBEwNQ2RE2pXKmMOA5xygYyTiDB3STv3NUta8BL81UUE5zL55HJLMJqmQD+aevIEUg2SOIYCTRkGM66El9BEV9DE2RC6LXbUwIbIlmCEqIoxJE1iCI24I7xhMCGqP7IQCUKS7kcFhZ4Cqzl70AGNlWbge08ISCocTgboyX4FaIlGPBEzjgDqxX9UZQtLS87gx9sYISAKOWhwgi+7/NdMwiHY3ie5+qzYQR73oZotd7GavDEGL1mZ1fp6ctuhrw1sytoLk1/0qAJpHlNn6sD/8CWnufv/QQta4dIziei0AAAAABJRU5ErkJggg==
+    </icon>
     <properties>
         <property key="barMode" type="enumeration" defaultValue="group">
             <caption>Bar mode</caption>

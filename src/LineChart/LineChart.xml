@@ -2,7 +2,9 @@
 <widget id="com.mendix.widget.custom.LineChart.LineChart" needsEntityContext="true" offlineCapable="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
     <name>Line chart</name>
     <description>Create a line chart</description>
-    <icon/>
+    <icon>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAPCAYAAADtc08vAAAAAXNSR0IArs4c6QAAAk1JREFUKBWVUktoE1EUPTOZOJOSTsUxDTatuipUjZ+MVEUrrtpIxFr8tLRKjRSLdCuI+6xciC4qCkXBUhCpiAsx4qIWrUXIIJSktIlJJF9D8UOMScjMZJw3pRRNofUu3n3vvHPOvY93KWwknjY+ADSxlkpJTC24BqJoz4nBUKdXLJVKBsFkMuHx2wnQNfTxLW6MCwGQvBL9S37oJmOvHkoMwyCfz6NYLAKq9o/BmC6S4fN2Dookg5xJkKxoPX0dF8RUKgWO42B0ImswrRTBfZ2kwTfg7hcjkQiOHTjaFIyE2uDhbAA1cqajW0yn0+B5Hp9mZyHY7ficiGYpw+Au7wZF+c57esV4PA6Hw4HQQgiOJgemP05JB/e0i7F4DC3NLcjFvuCQdRde/JiRiJbGLV1cga+n66y4GF2EVbDind8P3s5jLjmH3fucYvR7FMJ2Acn5BQw2uHHbeQP7Y9x7VKoSDVnznTrZLYYyIZi3mRHwT8HFtiI8LUHYISCjZVDvqEc2EIZX8GB47wA2b7Xh+HxdCtd/DdPO+KYPbyYnwTQzCD6bwVDjadxx3TRy8mUQrI1F7nXYOHtbz6FYKGDpawaKqho/yByOctkT7W6MPnqCkZ19uOa6DNZiMbKqqhid+Bsn72ZZC+SqanwAo6igrzov4kpbL7kzKpAqJAi2Fs4wZr2D5RFgqqpqahAElMvLE2Yo11k4zgKiIzRGVmTzt1wOiiKvI1u9/q13QHSGwc9CuY4Mxf8YkCcQnWFQLFUSl7qO3Fv139iOougEYf4Bcqrs2xS8EXQAAAAASUVORK5CYII=
+    </icon>
     <properties>
         <property key="series" type="object" isList="true">
             <caption>Series</caption>
