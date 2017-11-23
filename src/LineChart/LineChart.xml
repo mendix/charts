@@ -18,7 +18,7 @@
                         <translation lang="nl_NL">Serie naam</translation>
                     </translations>
                 </property>
-                <property key="dataEntity" type="entity">
+                <property key="dataEntity" type="entity" allowNonPersistableEntities="true">
                     <caption>Entity</caption>
                     <category>Data source</category>
                     <description>The entity from which the data values will be retrieved</description>

@@ -68,6 +68,12 @@ export const validateSeriesProps = <T extends Partial<SeriesProps>>(dataSeries: 
                     errorMessage.push(`Invalid sample data JSON for ${identifier}: ${error}`);
                 }
             }
+            if (series.dataEntity) {
+                const dataEntityMeta = mx.meta.getEntity(series.dataEntity);
+                if (series.dataSourceType === "XPath" && !dataEntityMeta.isPersistable()) {
+                    errorMessage.push(`Entity ${series.dataEntity} should be persistable when using Data source 'Database'`);
+                }
+            }
         });
         if (layoutOptions && layoutOptions.trim()) {
             const error = validateAdvancedOptions(layoutOptions.trim());
