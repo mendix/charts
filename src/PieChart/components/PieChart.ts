@@ -112,6 +112,10 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 : {};
             const traces = this.getTraces(props.data);
 
+            const arrayMerge = (_destinationArray: any[], sourceArray: any[]) => {
+                return sourceArray;
+            };
+
             return [ deepMerge.all([ {
                 hole: this.props.chartType === "donut" ? 0.4 : 0,
                 hoverinfo: this.props.tooltipForm ? "none" : "label",
@@ -120,7 +124,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 type: "pie",
                 values: traces.values,
                 sort: false
-            }, advancedOptions ]) ];
+            }, advancedOptions ], { arrayMerge }) ];
         }
 
         return props.defaultData || [];
