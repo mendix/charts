@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<widget id="com.mendix.widget.custom.PieChart.PieChart" needsEntityContext="true" offlineCapable="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
+    <name>Pie chart</name>
+    <description>Renders a pie or doughnut chart</description>
+    <icon>
+        iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPCAYAAAA71pVKAAAAAXNSR0IArs4c6QAAArBJREFUKBVVk01ME1EUhc/8gZTSCh1aShBjS2MVtEEIhOACTcREIC6ILpCVG92o0YVxaWDDxsjShDUmAiYGYWGCglExAQQCIWILiElrgVJakMK0M53xTrFFzmLmvNz3vXvv+2Hwn8aBnATQoAFNDOBqAK7e6MM7jYGPpg0zGsb6b2I/jbBpMwI4JKDHWFDUXdF4rT0JWPSYqsJSV36l3WIs6k4q6GnthSPN8LrRQYbhXpRV1Vbaz5SL2n4cBKdEACwmm7neYzev/l4qmPNNWFt7lbuvb2GF7aNSZaDD6amuLBSLxWj/RyRW1zKwSvDe3h6CwSCKxVKxwlFdKcvooHZyWCP1aDKLNbaTTnFnbBaKRFkVJQOTpdJVKGRCoRBK7Q4x32Sr2f2DBpayNpU43dbY3BJkHYSKJC2tpsum+nU4vUA0GkXZidNWVUYTTzFXbq7RIC36CKR9JiVlBbRoSkoCwcEPg9/+DQ9/Glw8TTrOgeFlSSL0AJ7yTnsX7O47CC7i/T20HBJHHU8tRXe3IooqcIIal7GILe+E/VRb5/WncUbANE3PPYpkRiE9sy8c3qzNOyaY5+Nr3hm7o62z+Ylks1sGztdXuxMJujYkTTuoymAwYGtjMzY1Ov5Z73l4JRxs1DhmfZLArsZHkmgtHHBdKHf7/f4UlAZZlkVJSQl8MwthVZbf8NvAWEKOvVwyO98+IzDfWtjvrKpwh8PhIyDDMDCZTPi18CMSDaxPQjKN0BVOiUFL19mcQmvvuabLHok2Tz9X/Xh0cRyH7KwsbP70RwJzi/NJVb6NV/eXuVRU/5RezFO2djzbgaCBz87muCyB5QSBVeMJZW9tI+b/MhkIzX7/pMX2H2Do8bKOpDPrHqh7mAOZvwQt2UyjMorm0+lFyC+B4YYgKKP4+jzzqv4C8CI5R6Ex7v8AAAAASUVORK5CYII=
+    </icon>
+    <properties>
+        <property key="dataEntity" type="entity" allowNonPersistableEntities="true">
+            <caption>Entity</caption>
+            <category>Data source</category>
+            <description>The entity from which the data values will be retrieved</description>
+        </property>
+        <property key="dataSourceType" type="enumeration" defaultValue="XPath">
+            <caption>Data source</caption>
+            <category>Data source</category>
+            <description/>
+            <enumerationValues>
+                <enumerationValue key="XPath">Database</enumerationValue>
+                <enumerationValue key="microflow">Microflow</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="entityConstraint" type="entityConstraint" entityProperty="dataEntity" required="false">
+            <caption>XPath constraint</caption>
+            <category>Data source</category>
+            <description>Constraint on the data from the data entity (used when data source is Database)</description>
+        </property>
+        <property key="dataSourceMicroflow" type="microflow" required="false">
+            <caption>Microflow</caption>
+            <category>Data source</category>
+            <description>Returns a list of data values</description>
+            <returnType type="Object" entityProperty="dataEntity" isList="true"/>
+        </property>
+        <property key="nameAttribute" type="attribute" entityProperty="dataEntity">
+            <caption>Name attribute</caption>
+            <category>Data points</category>
+            <description/>
+            <attributeTypes>
+                <attributeType name="String"/>
+            </attributeTypes>
+        </property>
+        <property key="valueAttribute" type="attribute" entityProperty="dataEntity">
+            <caption>Value attribute</caption>
+            <category>Data points</category>
+            <description/>
+            <attributeTypes>
+                <attributeType name="Integer"/>
+                <attributeType name="Decimal"/>
+                <attributeType name="Long"/>
+            </attributeTypes>
+        </property>
+        <property key="sortAttribute" type="attribute" entityProperty="dataEntity" required="false">
+            <caption>Sort attribute</caption>
+            <category>Data points</category>
+            <description>Attribute to use for sorting the data</description>
+            <attributeTypes>
+                <attributeType name="Decimal"/>
+                <attributeType name="Long"/>
+                <attributeType name="Integer"/>
+                <attributeType name="String"/>
+                <attributeType name="AutoNumber"/>
+                <attributeType name="DateTime"/>
+            </attributeTypes>
+        </property>
+        <property key="sortOrder" type="enumeration" defaultValue="asc">
+            <caption>Sort order</caption>
+            <category>Data points</category>
+            <description/>
+            <enumerationValues>
+                <enumerationValue key="asc">Ascending</enumerationValue>
+                <enumerationValue key="desc">Descending</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="chartType" type="enumeration" defaultValue="pie">
+            <caption>Chart type</caption>
+            <category>Chart properties</category>
+            <description/>
+            <enumerationValues>
+                <enumerationValue key="pie">Pie</enumerationValue>
+                <enumerationValue key="donut">Doughnut</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="showLegend" type="boolean" defaultValue="true">
+            <caption>Show legend</caption>
+            <category>Chart properties</category>
+            <description/>
+        </property>
+        <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
+            <caption>On click</caption>
+            <category>Events</category>
+            <description/>
+            <enumerationValues>
+                <enumerationValue key="doNothing">Do nothing</enumerationValue>
+                <enumerationValue key="showPage">Show a page</enumerationValue>
+                <enumerationValue key="callMicroflow">Call a microflow</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="onClickPage" type="form" required="false">
+            <caption>On click page</caption>
+            <category>Events</category>
+            <description>The page that will be opened on click</description>
+        </property>
+        <property key="onClickMicroflow" type="microflow" required="false" entityProperty="dataEntity">
+            <caption>On click microflow</caption>
+            <category>Events</category>
+            <description>The microflow that will be executed on click</description>
+            <returnType type="Void"/>
+        </property>
+        <property key="tooltipForm" type="form" required="false">
+            <caption>Tooltip form</caption>
+            <category>Events</category>
+            <description>The form to show when a user hovers over a chart plot point</description>
+        </property>
+        <property key="widthUnit" type="enumeration" defaultValue="percentage">
+            <caption>Width unit</caption>
+            <category>Appearance</category>
+            <description/>
+            <enumerationValues>
+                <enumerationValue key="percentage">Percentage</enumerationValue>
+                <enumerationValue key="pixels">Pixels</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="width" type="integer" defaultValue="100">
+            <caption>Width</caption>
+            <category>Appearance</category>
+            <description/>
+        </property>
+        <property key="heightUnit" type="enumeration" defaultValue="percentageOfWidth">
+            <caption>Height unit</caption>
+            <category>Appearance</category>
+            <description>'Percentage of width' is the aspect ratio, 'Pixels' is absolute. Warning: When using 'Percentage of parent' the parent container must have an absolute height, else nothing is displayed.</description>
+            <enumerationValues>
+                <enumerationValue key="percentageOfWidth">Percentage of width</enumerationValue>
+                <enumerationValue key="pixels">Pixels</enumerationValue>
+                <enumerationValue key="percentageOfParent">Percentage of parent</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="height" type="integer" defaultValue="75">
+            <caption>Height</caption>
+            <category>Appearance</category>
+            <description/>
+        </property>
+        <property key="devMode" type="enumeration" defaultValue="basic">
+            <caption>Mode</caption>
+            <category>Advanced</category>
+            <description>The developer option adds a button to the charts when running the app which can be used to toggle a live editor for the advanced configuration options.</description>
+            <enumerationValues>
+                <enumerationValue key="basic">Basic</enumerationValue>
+                <enumerationValue key="advanced">Advanced</enumerationValue>
+                <enumerationValue key="developer">Developer</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="layoutOptions" type="string" required="false" multiline="true">
+            <caption>Layout options</caption>
+            <category>Advanced</category>
+            <description>The JSON containing the Plotly layout options</description>
+        </property>
+        <property key="dataOptions" type="string" multiline="true" required="false">
+            <caption>Data options</caption>
+            <category>Advanced</category>
+            <description>The Plotly data options as JSON</description>
+        </property>
+    </properties>
+</widget>
