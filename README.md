@@ -3,13 +3,11 @@ Plot and compare your data across different charts.
 
 ### Available charts
 * `Column Chart`
-* `Bar Chart`
 * `Line Chart`
-* `Area Chart`
 * `Pie Chart`
 
 ## Dependencies
-* Mendix 7.6.0
+* Mendix 7.8.0
 
 ## Demo projects
 [https://charts102.mxapps.io](https://charts102.mxapps.io)
@@ -29,14 +27,10 @@ Below are the properties for configuring series data:
 * `Y-axis data attribute`[required] - The attribute that contains the data point Y value.
 * `X-axis sort attribute` - The attribute to use for sorting the x-axis data.
 
-### Area chart
-The area chart has data properties identical to those of the line chart.
-
-### Bar chart
-The bar chart has data properties identical to those of the line chart.
+NB: The line chart's x-axis provides support for dates and thus the line chart can be configured as a time series.
 
 ### Column chart
-The bar chart has data properties identical to those of the bar chart.
+The bar chart has data properties identical to those of the line chart but for one distinction: no support for Date data type
 
 ### Pie chart
 Unlike the chart types above, the pie chart requires no series.
@@ -52,6 +46,9 @@ Below are the properties for configuring pie chart data:
 The charts in this widget are based on the [https://github.com/mendixlabs/charts/issues](Plotly) library.
 As such, the widget provides support for advanced users to extend or overwrite the basic settings by adding the chart properties as JSON.
 
+To enable this feature, go to the "mode" option in the "Advanced" tab. 
+For the line & column charts, each series has its own advanced tab for its own specialised configurations.
+
 Below are the available advanced options and their usage:
 
 ### Layout options (all charts)
@@ -63,7 +60,7 @@ Layout options control the general appearance of the chart. Common options inclu
     }
     
 ### Data options (pie chart)
-On the pie chart, the data options control the appearance of the pie circle beyond the general layout options. Options include hole, name, marker etc
+On the pie chart, the data options control the appearance of the pie circle beyond the general layout options. Options include hole, name, marker e.t.c
 
     {
         "name": "May Pie',
@@ -71,6 +68,11 @@ On the pie chart, the data options control the appearance of the pie circle beyo
         "hoverinfo": "label+percent+name",
         "textinfo": "none"
     }
+
+### Series options (line & column charts)
+The series options control the appearance of a specific series on the line or column chart. Options include line color, line shape e.t.c
+
+Full Plotly API reference: [https://plot.ly/javascript/reference/](https://plot.ly/javascript/reference/)
 
 ## Issues, suggestions and feature requests
 We are actively maintaining this widget, please report any issues or suggestion for improvement at [https://github.com/mendixlabs/charts/issues](https://github.com/mendixlabs/charts/issues)
