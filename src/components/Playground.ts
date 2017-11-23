@@ -317,8 +317,12 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
             clearTimeout(this.timeoutId);
         }
         this.timeoutId = setTimeout(() => {
-            if (this.isValid) {
-                this.updateChart(source, value);
+            try {
+                if (this.isValid && JSON.parse(value)) {
+                    this.updateChart(source, value);
+                }
+            } catch {
+                this.isValid = false;
             }
         }, 1000);
     }
