@@ -6,7 +6,7 @@ import * as elementResize from "element-resize-detector";
 import { Config, Data, Layout, PieData, PieHoverData, ScatterData, ScatterHoverData } from "plotly.js";
 import { newPlot, purge } from "../PlotlyCustom";
 
-interface PlotlyChartProps {
+export interface PlotlyChartProps {
     type: "line" | "bar" | "pie";
     layout: Partial<Layout>;
     data: ScatterData[] | PieData[];
