@@ -8,7 +8,9 @@ const widgetName = require("./package").widgetName;
 const webpackConfig = {
     entry: {
         ColumnChart: "./src/ColumnChart/components/ColumnChartContainer.ts",
+        BarChart: "./src/BarChart/components/BarChartContainer.ts",
         LineChart: "./src/LineChart/components/LineChartContainer.ts",
+        AreaChart: "./src/AreaChart/components/AreaChartContainer.ts",
         PieChart: "./src/PieChart/components/PieChartContainer.ts"
     },
     output: {
@@ -53,10 +55,7 @@ const webpackConfig = {
     plugins: [
         new CopyWebpackPlugin([
             { from: "src/**/*.js" },
-            { from: "src/*.xml" },
-            { from: "src/LineChart/*.xml" },
-            { from: "src/ColumnChart/*.xml" },
-            { from: "src/PieChart/*.xml" },
+            { from: "src/**/*.xml" },
             { from: "src/**/*.png", to: `src/com/mendix/widget/custom/[name]/` }
         ], {
             copyUnmodified: true

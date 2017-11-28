@@ -5,7 +5,7 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 
 const widgetName = require("./package").widgetName;
 
-const chartNames = [ "ColumnChart", "LineChart", "PieChart" ];
+const chartNames = [ "ColumnChart", "BarChart", "LineChart", "AreaChart", "PieChart" ];
 const createConfig = (chartName) => {
     return {
         entry: `./src/${chartName}/components/${chartName}Container.ts`,
@@ -54,7 +54,7 @@ const createConfig = (chartName) => {
             ], {
                 copyUnmodified: true
             }),
-            new ExtractTextPlugin({ filename: `./src/com/mendix/widget/custom/${chartName.toLowerCase()}/ui/[name].css` }),
+            new ExtractTextPlugin({ filename: `./src/com/mendix/widget/custom/${chartName.toLowerCase()}/ui/${chartName}.css` }),
             new webpack.LoaderOptionsPlugin({
                 debug: true
             }),
@@ -80,7 +80,9 @@ const plotlyCustomConfig = {
 const previewConfig = {
     entry: {
         ColumnChart: "./src/ColumnChart/ColumnChart.webmodeler.ts",
+        BarChart: "./src/BarChart/BarChart.webmodeler.ts",
         LineChart: "./src/LineChart/LineChart.webmodeler.ts",
+        AreaChart: "./src/AreaChart/AreaChart.webmodeler.ts",
         PieChart: "./src/PieChart/PieChart.webmodeler.ts"
     },
     output: {
