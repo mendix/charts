@@ -52,11 +52,53 @@ describe("PlotlyChart", () => {
         expect(resizeListenerSpy).toHaveBeenCalled();
     });
 
+    it("purges and re-renders the chart on resize", (done) => {
+        // since we cannot simulate element resize, we shall only test for the expected behaviour of the onResize function
+        const renderChartSpy = spyOn(PlotlyChart.prototype, "renderChart" as any).and.callThrough();
+        const purgeSpy = spyOn(Plotly, "purge" as any).and.callThrough();
+        const chart = renderFullPlotlyChart(defaultProps);
+        (chart.instance() as any).onResize();
+
+        setTimeout(() => {
+            expect(purgeSpy).toHaveBeenCalled();
+            expect(renderChartSpy).toHaveBeenCalledTimes(2);
+
+            done();
+        }, 1000);
+    });
+
     it("re-renders the chart on update", () => {
         const renderChartSpy = spyOn(PlotlyChart.prototype, "renderChart" as any).and.callThrough();
         const chart = renderFullPlotlyChart(defaultProps);
         chart.setProps({ onClick: createSpy("onClick") });
 
         expect(renderChartSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it("destroys the chart on unmount", () => {
+        const purgeSpy = spyOn(Plotly, "purge" as any).and.callThrough();
+        const chart = renderFullPlotlyChart(defaultProps);
+        chart.unmount();
+
+        expect(purgeSpy).toHaveBeenCalled();
+    });
+
+    it("passes a reference of the tooltip node to the parent component", () => {
+        defaultProps.getTooltipNode = createSpy("getTooltip");
+        renderFullPlotlyChart(defaultProps);
+
+        expect(defaultProps.getTooltipNode).toHaveBeenCalled();
+    });
+
+    it("hides the tooltip when a hover event is undone", () => {
+        // since we cannot simulate plotly unhover, we shall only test for the expected behaviour of the clearTooltip function
+        const chart = renderFullPlotlyChart(defaultProps);
+        const chartInstance: any = chart.instance();
+        chartInstance.tooltipNode.innerHTML = "I am a tooltip";
+        chartInstance.tooltipNode.style.opacity = "1";
+        chartInstance.clearTooltip();
+
+        expect(chartInstance.tooltipNode.innerHTML).toEqual("");
+        expect(chartInstance.tooltipNode.style.opacity).toEqual("0");
     });
 });
