@@ -58,23 +58,11 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
         return this.renderChart();
     }
 
-    componentDidMount() {
-        if (!this.props.loading) {
-            this.renderChart();
-        }
-    }
-
     componentWillReceiveProps(newProps: BarChartProps) {
         this.setState({
             layoutOptions: newProps.layoutOptions,
             data: newProps.data
         });
-    }
-
-    componentDidUpdate() {
-        if (!this.props.loading) {
-            this.renderChart();
-        }
     }
 
     private getTooltipNodeRef(node: HTMLDivElement) {
@@ -172,7 +160,22 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
         this.setState({ layoutOptions, data });
     }
 
-    private static defaultLayoutConfigs(props: BarChartProps): Partial<Layout> {
+    private static getConfigOptions(): Partial<Config> {
+        return { displayModeBar: false, doubleClick: false };
+    }
+
+    private static getDefaultSeriesOptions(series: SeriesProps, props: BarChartProps): Partial<ScatterData> {
+        const hoverinfo = (props.orientation === "bar" ? "x" : "y") as any;
+
+        return {
+            name: series.name,
+            type: "bar",
+            hoverinfo: series.tooltipForm ? "text" : hoverinfo, // typings don't have a hoverinfo value of "y"
+            orientation: props.orientation === "bar" ? "h" : "v"
+        };
+    }
+
+    public static defaultLayoutConfigs(props: BarChartProps): Partial<Layout> {
         return {
             font: {
                 family: "Open Sans, sans-serif",
@@ -212,21 +215,6 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                 t: 10,
                 pad: 10
             }
-        };
-    }
-
-    private static getConfigOptions(): Partial<Config> {
-        return { displayModeBar: false, doubleClick: false };
-    }
-
-    private static getDefaultSeriesOptions(series: SeriesProps, props: BarChartProps): Partial<ScatterData> {
-        const hoverinfo = (props.orientation === "bar" ? "x" : "y") as any;
-
-        return {
-            name: series.name,
-            type: "bar",
-            hoverinfo: series.tooltipForm ? "text" : hoverinfo, // typings don't have a hoverinfo value of "y"
-            orientation: props.orientation === "bar" ? "h" : "v"
         };
     }
 }

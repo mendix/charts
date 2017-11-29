@@ -6,7 +6,6 @@ import { ScatterData } from "plotly.js";
 import * as Plotly from "../PlotlyCustom";
 
 import { PlotlyChart, PlotlyChartProps } from "../components/PlotlyChart";
-import createSpy = jasmine.createSpy;
 
 describe("PlotlyChart", () => {
     const renderShallowPlotlyChart = (props: PlotlyChartProps) => shallow(createElement(PlotlyChart, props));
@@ -70,7 +69,7 @@ describe("PlotlyChart", () => {
     it("re-renders the chart on update", () => {
         const renderChartSpy = spyOn(PlotlyChart.prototype, "renderChart" as any).and.callThrough();
         const chart = renderFullPlotlyChart(defaultProps);
-        chart.setProps({ onClick: createSpy("onClick") });
+        chart.setProps({ onClick: jasmine.createSpy("onClick") });
 
         expect(renderChartSpy).toHaveBeenCalledTimes(2);
     });
@@ -84,7 +83,7 @@ describe("PlotlyChart", () => {
     });
 
     it("passes a reference of the tooltip node to the parent component", () => {
-        defaultProps.getTooltipNode = createSpy("getTooltip");
+        defaultProps.getTooltipNode = jasmine.createSpy("getTooltip");
         renderFullPlotlyChart(defaultProps);
 
         expect(defaultProps.getTooltipNode).toHaveBeenCalled();

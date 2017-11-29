@@ -17,12 +17,12 @@ export class preview extends Component<BarChartContainerProps, {}> {
             ),
             createElement(BarChart, {
                 ...this.props as BarChartContainerProps,
-                defaultData: this.getData(this.props)
+                defaultData: preview.getData(this.props)
             })
         );
     }
 
-    private getData(props: BarChartContainerProps): ScatterData[] {
+    static getData(props: BarChartContainerProps): ScatterData[] {
         if (props.series) {
             return props.series.map(series => {
                 const seriesOptions = series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
@@ -50,7 +50,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
         ];
     }
 
-    private static getSampleTraces(): { x: (string | number)[], y: (string | number)[] } {
+    static getSampleTraces(): { x: (string | number)[], y: (string | number)[] } {
         return {
             x: getRandomNumbers(4, 100),
             y: [ "Sample 1", "Sample 2", "Sample 3", "Sample 4" ]

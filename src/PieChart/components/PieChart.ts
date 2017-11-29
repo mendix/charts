@@ -73,18 +73,6 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         return this.renderChart();
     }
 
-    componentDidMount() {
-        if (!this.props.loading) {
-            this.renderChart();
-        }
-    }
-
-    componentDidUpdate() {
-        if (!this.props.loading) {
-            this.renderChart();
-        }
-    }
-
     private getTooltipNodeRef(node: HTMLDivElement) {
         this.tooltipNode = node;
     }
