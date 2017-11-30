@@ -157,7 +157,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         this.setState({ layoutOptions, data });
     }
 
-    private static defaultLayoutConfigs(props: LineChartProps): Partial<Layout> {
+    public static defaultLayoutConfigs(props: LineChartProps): Partial<Layout> {
         return {
             font: {
                 family: "Open Sans, sans-serif",
@@ -199,11 +199,11 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         };
     }
 
-    private static getConfigOptions(): Partial<Config> {
+    public static getConfigOptions(): Partial<Config> {
         return { displayModeBar: false, doubleClick: false };
     }
 
-    private static getDefaultSeriesOptions(series: LineSeriesProps, props: LineChartProps): Partial<ScatterData> {
+    public static getDefaultSeriesOptions(series: LineSeriesProps, props: LineChartProps): Partial<ScatterData> {
         return {
             connectgaps: true,
             hoveron: "points",
@@ -219,7 +219,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         };
     }
 
-    private static getStackedArea(traces: ScatterData[]) {
+    public static getStackedArea(traces: ScatterData[]) {
         for (let i = 1; i < traces.length; i++) {
             for (let j = 0; j < (Math.min(traces[i].y.length, traces[i - 1].y.length)); j++) {
                 (traces[i].y[j] as any) += traces[i - 1].y[j];

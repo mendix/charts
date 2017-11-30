@@ -7,7 +7,6 @@ export interface DataSourceProps {
     dataSourceType: "XPath" | "microflow";
     entityConstraint: string;
     dataEntity: string;
-    sampleData: string;
 }
 
 export interface SeriesDataSourceProps extends DataSourceProps {
@@ -60,12 +59,6 @@ export const validateSeriesProps = <T extends Partial<SeriesProps>>(dataSeries: 
                 const error = validateAdvancedOptions(series.seriesOptions.trim());
                 if (error) {
                     errorMessage.push(`Invalid options JSON for ${identifier}: ${error}`);
-                }
-            }
-            if (series.sampleData && series.sampleData.trim()) {
-                const error = validateAdvancedOptions(series.sampleData.trim());
-                if (error) {
-                    errorMessage.push(`Invalid sample data JSON for ${identifier}: ${error}`);
                 }
             }
             if (series.dataEntity) {
