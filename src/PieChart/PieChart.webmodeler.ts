@@ -4,18 +4,11 @@ import { Alert } from "../components/Alert";
 import { PieChart } from "./components/PieChart";
 import { PieChartContainerProps } from "./components/PieChartContainer";
 
-import deepMerge from "deepmerge";
 import { PieData } from "plotly.js";
 import { validateSeriesProps } from "../utils/data";
 
 // tslint:disable-next-line class-name
 export class preview extends Component<PieChartContainerProps, {}> {
-    private sampleTraces = {
-        labels: [ "US", "China", "European Union" ],
-        name: "GHG Emissions",
-        values: [ 16, 15, 12 ]
-    };
-
     render() {
         return createElement("div", {},
             createElement(Alert, { className: `widget-${this.props.chartType}-chart-alert` },
@@ -23,35 +16,20 @@ export class preview extends Component<PieChartContainerProps, {}> {
             ),
             createElement(PieChart, {
                 ...this.props as PieChartContainerProps,
-                defaultData: this.getData(this.props)
+                defaultData: preview.getData(this.props)
             })
         );
     }
 
-    private getData(props: PieChartContainerProps): PieData[] {
-        if (props.sampleData) {
-            const advancedOptions = props.dataOptions ? JSON.parse(props.dataOptions) : {};
-            const sampleData = props.sampleData && props.sampleData.trim()
-                ? JSON.parse(props.sampleData.trim())
-                : this.sampleTraces;
-
-            return [ deepMerge.all([ {
-                hole: props.chartType === "donut" ? 0.4 : 0,
-                hoverinfo: props.tooltipForm ? "none" : "label",
-                labels: sampleData.labels,
-                type: "pie",
-                values: sampleData.values,
-                sort: false
-            }, advancedOptions ]) ];
-        }
-
+    static getData(props: PieChartContainerProps): PieData[] {
         return [
             {
                 hole: props.chartType === "donut" ? 0.4 : 0,
                 hoverinfo: "label+name",
                 name: "GHG Emissions",
                 type: "pie",
-                ...this.sampleTraces
+                labels: [ "US", "China", "European Union" ],
+                values: [ 16, 15, 12 ]
             }
         ];
     }
@@ -71,7 +49,6 @@ export function getVisibleProperties(valueMap: PieChartContainerProps, visibilit
         visibilityMap.entityConstraint = false;
     }
     visibilityMap.layoutOptions = false;
-    visibilityMap.sampleData = false;
     visibilityMap.devMode = false;
 
     return visibilityMap;

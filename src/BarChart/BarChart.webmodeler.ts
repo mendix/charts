@@ -26,9 +26,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
         if (props.series) {
             return props.series.map(series => {
                 const seriesOptions = series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
-                const sampleData = series.sampleData && series.sampleData.trim()
-                    ? JSON.parse(series.sampleData.trim())
-                    : preview.getSampleTraces();
+                const sampleData = preview.getSampleTraces();
 
                 return deepMerge.all([ {
                     name: series.name,
