@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<widget id="com.mendix.widget.custom.AnyChart.AnyChart" needsEntityContext="true" offlineCapable="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
+    <name>Any chart</name>
+    <description>Create any chart</description>
+    <icon>iVBORw0KGgoAAAANSUhEUgAAABAAAAAPCAYAAADtc08vAAAAAXNSR0IArs4c6QAAAk1JREFUKBWVUktoE1EUPTOZOJOSTsUxDTatuipUjZ+MVEUrrtpIxFr8tLRKjRSLdCuI+6xciC4qCkXBUhCpiAsx4qIWrUXIIJSktIlJJF9D8UOMScjMZJw3pRRNofUu3n3vvHPOvY93KWwknjY+ADSxlkpJTC24BqJoz4nBUKdXLJVKBsFkMuHx2wnQNfTxLW6MCwGQvBL9S37oJmOvHkoMwyCfz6NYLAKq9o/BmC6S4fN2Dookg5xJkKxoPX0dF8RUKgWO42B0ImswrRTBfZ2kwTfg7hcjkQiOHTjaFIyE2uDhbAA1cqajW0yn0+B5Hp9mZyHY7ficiGYpw+Au7wZF+c57esV4PA6Hw4HQQgiOJgemP05JB/e0i7F4DC3NLcjFvuCQdRde/JiRiJbGLV1cga+n66y4GF2EVbDind8P3s5jLjmH3fucYvR7FMJ2Acn5BQw2uHHbeQP7Y9x7VKoSDVnznTrZLYYyIZi3mRHwT8HFtiI8LUHYISCjZVDvqEc2EIZX8GB47wA2b7Xh+HxdCtd/DdPO+KYPbyYnwTQzCD6bwVDjadxx3TRy8mUQrI1F7nXYOHtbz6FYKGDpawaKqho/yByOctkT7W6MPnqCkZ19uOa6DNZiMbKqqhid+Bsn72ZZC+SqanwAo6igrzov4kpbL7kzKpAqJAi2Fs4wZr2D5RFgqqpqahAElMvLE2Yo11k4zgKiIzRGVmTzt1wOiiKvI1u9/q13QHSGwc9CuY4Mxf8YkCcQnWFQLFUSl7qO3Fv139iOougEYf4Bcqrs2xS8EXQAAAAASUVORK5CYII=</icon>
+    <properties>
+        <property key="dataStatic" type="string" required="false" multiline="true">
+            <caption>Static</caption>
+            <category>Data</category>
+            <description>JSON Array based on https://plot.ly/javascript/reference/</description>
+        </property>
+        <property key="dataAttribute" type="attribute" required="false">
+            <caption>Source attribute</caption>
+            <category>Data</category>
+            <description>Attribute data will merge and overwrite static data</description>
+            <attributeTypes>
+                <attributeType name="String"/>
+            </attributeTypes>
+        </property>
+        <property key="layoutStatic" type="string" required="false" multiline="true">
+            <caption>Static </caption>
+            <category>Layout options</category>
+            <description>JSON object based on https://plot.ly/javascript/reference/</description>
+        </property>
+        <property key="layoutAttribute" type="attribute" required="false">
+            <caption>Source attribute </caption>
+            <category>Layout options</category>
+            <description>Attribute layout will merge and overwrite static layout options</description>
+            <attributeTypes>
+                <attributeType name="String"/>
+            </attributeTypes>
+        </property>
+        <property key="widthUnit" type="enumeration" defaultValue="percentage">
+            <caption>Width unit</caption>
+            <category>Appearance</category>
+            <description/>
+            <enumerationValues>
+                <enumerationValue key="percentage">Percentage</enumerationValue>
+                <enumerationValue key="pixels">Pixels</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="width" type="integer" defaultValue="100">
+            <caption>Width</caption>
+            <category>Appearance</category>
+            <description/>
+        </property>
+        <property key="heightUnit" type="enumeration" defaultValue="percentageOfWidth">
+            <caption>Height unit</caption>
+            <category>Appearance</category>
+            <description>'Percentage of width' is the aspect ratio, 'Pixels' is absolute. Warning: When using 'Percentage of parent' the parent container must have an absolute height, else nothing is displayed.</description>
+            <enumerationValues>
+                <enumerationValue key="percentageOfWidth">Percentage of width</enumerationValue>
+                <enumerationValue key="pixels">Pixels</enumerationValue>
+                <enumerationValue key="percentageOfParent">Percentage of parent</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="height" type="integer" defaultValue="75">
+            <caption>Height</caption>
+            <category>Appearance</category>
+            <description/>
+        </property>
+        <property key="devMode" type="enumeration" defaultValue="advanced">
+            <caption>Mode</caption>
+            <category>Appearance</category>
+            <description>The development mode adds a button to the charts when running the app which can be used to toggle a live editor for the advanced configuration options.</description>
+            <enumerationValues>
+                <enumerationValue key="advanced">Production</enumerationValue>
+                <enumerationValue key="developer">Development</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="eventEntity" type="entity" allowNonPersistableEntities="true" required="false">
+            <caption>Event entity</caption>
+            <category>Events</category>
+            <description>The entity used to pass the event data to the server</description>
+        </property>
+        <property key="eventDataAttribute" type="attribute" required="false" entityProperty="eventEntity">
+            <caption>Event data attribute</caption>
+            <category>Events</category>
+            <description>The attribute to store received raw data from the chart event. https://plot.ly/javascript/plotlyjs-events/#event-data</description>
+            <attributeTypes>
+                <attributeType name="String"/>
+            </attributeTypes>
+        </property>
+        <property key="onClickMicroflow" type="microflow" required="false" entityProperty="eventEntity">
+            <caption>On click microflow</caption>
+            <category>Events</category>
+            <description>The microflow that will be executed on click</description>
+            <returnType type="Void" />
+        </property>
+        <property key="tooltipEntity" type="entity" allowNonPersistableEntities="true" required="false">
+            <caption>Tooltip form entity</caption>
+            <category>Events</category>
+            <description>The entity that will be returned by tooltip microflow, to be used in the tooltip form</description>
+        </property>
+        <property key="tooltipMicroflow" type="microflow" required="false" entityProperty="eventEntity">
+            <caption>Tooltip microflow</caption>
+            <category>Events</category>
+            <description>The microflow called on hover, returning the tooltip object for the tooltip form</description>
+            <returnType type="Object" entityProperty="tooltipEntity" />
+        </property>
+        <property key="tooltipForm" type="form" required="false">
+            <caption>Tooltip form</caption>
+            <category>Events</category>
+            <description>The form to show when a user hovers over a chart plot point, context uses 'Tooltip entity'</description>
+        </property>
+    </properties>
+</widget>
