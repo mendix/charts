@@ -9,11 +9,11 @@
             <widgetFile path="PieChart/PieChart.xml"/>
         </widgetFiles>
         <files>
-            <file path="com/mendix/widget/custom/columnchart"/>
-            <file path="com/mendix/widget/custom/barchart"/>
-            <file path="com/mendix/widget/custom/linechart"/>
-            <file path="com/mendix/widget/custom/areachart"/>
-            <file path="com/mendix/widget/custom/piechart"/>
+            <file path="com/mendix/widget/custom/ColumnChart"/>
+            <file path="com/mendix/widget/custom/BarChart"/>
+            <file path="com/mendix/widget/custom/LineChart"/>
+            <file path="com/mendix/widget/custom/AreaChart"/>
+            <file path="com/mendix/widget/custom/PieChart"/>
         </files>
     </clientModule>
 </package>

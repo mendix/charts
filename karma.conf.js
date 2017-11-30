@@ -1,5 +1,16 @@
-const webpackConfig = require("./karma-webpack.conf");
+const webpack = require("webpack");
+const webpackConfig = require("./webpack.config")[0];
 const path = require("path");
+
+webpackConfig.plugins[webpackConfig.plugins.length - 1] = new webpack.SourceMapDevToolPlugin();
+Object.assign(webpackConfig, {
+    externals: [
+        "react/lib/ExecutionEnvironment",
+        "react/lib/ReactContext",
+        "react/addons",
+        "jsdom"
+    ]
+});
 
 module.exports = function(config) {
     if (config.codeCoverage) {
