@@ -5,7 +5,6 @@ declare module "plotly.js" {
     export type BarMode = "group" | "stack";
     export interface Layout {
         barmode: BarMode;
-        hoverlabel: HoverLabel;
     }
 
     export interface Margin {
@@ -42,19 +41,6 @@ declare module "plotly.js" {
         family: string[];
         size: number;
         color: string;
-    }
-
-    interface HoverLabel {
-        bgcolor: string;
-        bordercolor: string;
-        font: {
-            color: string;
-        };
-    }
-
-    interface Axis {
-        zerolinecolor: string;
-        gridcolor: string;
     }
 
     export interface PieHoverData {
