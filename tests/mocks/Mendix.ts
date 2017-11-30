@@ -93,7 +93,7 @@ class MxObjectMock implements mendix.lib.MxObject {
     addReferences(_attr: string, _guids: string[] | number[]): boolean { return false; }
     compare(_mxobj: mendix.lib.MxObject): boolean { return false; }
     fetch(_path: string, _callback: Function): void { /* */ }
-    get(_attr: string): string | number | boolean { return ""; } //add external big
+    get(_attr: string): string | number | boolean { return "10"; } //add external big
     getAttributes(): string[] { return ["fakeAttribute"]; }
     getEntity(): string { return "fakeEntity" }
     getEnumCaption(_attr: string, _value: string): string { return "fakeCaption"; }

@@ -4,16 +4,16 @@ import { LineSeriesProps, SeriesData } from "../utils/data";
 import { mockMendix } from "../../tests/mocks/Mendix";
 
 import { Alert } from "../components/Alert";
-import { LineChart, LineChartProps } from "../LineChart/components/LineChart";
 import { ChartLoading } from "../components/ChartLoading";
+import { LineChart, LineChartProps } from "../LineChart/components/LineChart";
+import { preview } from "../LineChart/LineChart.webmodeler";
 import { Playground } from "../components/Playground";
 import { PlotlyChart } from "../components/PlotlyChart";
-import { preview } from "../LineChart/LineChart.webmodeler";
 import { ScatterHoverData } from "plotly.js";
 
 describe("LineChart", () => {
-    const renderShallowBarChart = (props: LineChartProps) => shallow(createElement(LineChart, props));
-    const renderFullBarChart = (props: LineChartProps) => mount(createElement(LineChart, props));
+    const renderShallowChart = (props: LineChartProps) => shallow(createElement(LineChart, props));
+    const renderFullChart = (props: LineChartProps) => mount(createElement(LineChart, props));
     let defaultProps: Partial<LineChartProps>;
     const sampleSeries: Partial<LineSeriesProps>[] = [
         {
@@ -46,7 +46,7 @@ describe("LineChart", () => {
 
     it("with an alert message renders an alert", () => {
         defaultProps.alertMessage = "alert message";
-        const chart = renderShallowBarChart(defaultProps as LineChartProps);
+        const chart = renderShallowChart(defaultProps as LineChartProps);
 
         expect(chart).toBeElement(
             createElement(Alert, { className: "widget-charts-line-alert" }, defaultProps.alertMessage)
@@ -55,7 +55,7 @@ describe("LineChart", () => {
 
     it("that is loading data renders a loading indicator", () => {
         defaultProps.loading = true;
-        const chart = renderShallowBarChart(defaultProps as LineChartProps);
+        const chart = renderShallowChart(defaultProps as LineChartProps);
 
         expect(chart).toBeElement(createElement(ChartLoading, { text: "Loading" }));
     });
@@ -63,7 +63,7 @@ describe("LineChart", () => {
     it("whose dev mode is developer renders the playground", () => {
         defaultProps.devMode = "developer";
         defaultProps.data = [];
-        const chart = renderShallowBarChart(defaultProps as LineChartProps);
+        const chart = renderShallowChart(defaultProps as LineChartProps);
 
         expect(chart).toBeElement(
             createElement(Playground, {
@@ -93,7 +93,7 @@ describe("LineChart", () => {
 
     it("with no alert message, isn't loading and whose dev mode isn't set to developer renders the chart correctly", () => {
         defaultProps.data = [];
-        const chart = renderShallowBarChart(defaultProps as LineChartProps);
+        const chart = renderShallowChart(defaultProps as LineChartProps);
 
         expect(chart).toBeElement(
             createElement(PlotlyChart,
@@ -112,7 +112,7 @@ describe("LineChart", () => {
     });
 
     it("updates the data & layout options when the props are updated", () => {
-        const chart = renderShallowBarChart(defaultProps as LineChartProps);
+        const chart = renderShallowChart(defaultProps as LineChartProps);
 
         expect(chart.state().layoutOptions).toEqual("{}");
         expect(chart.state().data).toEqual(mockData);
@@ -127,7 +127,7 @@ describe("LineChart", () => {
     it("renders the default data when no data has been provided", () => {
         defaultProps.data = undefined;
         defaultProps.defaultData = preview.getData(defaultProps as LineChartProps);
-        const chart = renderShallowBarChart(defaultProps as LineChartProps);
+        const chart = renderShallowChart(defaultProps as LineChartProps);
 
         expect((chart.instance() as any).getData(defaultProps)).toBe(defaultProps.defaultData);
     });
@@ -159,7 +159,7 @@ describe("LineChart", () => {
 
         it("#onClick() calls the parent onClick handler", () => {
             defaultProps.onClick = jasmine.createSpy("onClick");
-            const chart = renderShallowBarChart(defaultProps as LineChartProps);
+            const chart = renderShallowChart(defaultProps as LineChartProps);
             (chart.instance() as any).onClick(plotlyEventData);
 
             expect(defaultProps.onClick)
@@ -168,7 +168,7 @@ describe("LineChart", () => {
 
         it("#onHover() calls the parent onClick handler", () => {
             defaultProps.onHover = jasmine.createSpy("onHover");
-            const chart = renderFullBarChart(defaultProps as LineChartProps);
+            const chart = renderFullChart(defaultProps as LineChartProps);
             const instance = chart.instance() as any;
             instance.onHover(plotlyEventData);
 
@@ -179,7 +179,7 @@ describe("LineChart", () => {
 
     it("saves a reference of the tooltip node", () => {
         const tooltipNodeSpy = spyOn(LineChart.prototype, "getTooltipNodeRef" as any).and.callThrough();
-        const chart = renderFullBarChart(defaultProps as LineChartProps);
+        const chart = renderFullChart(defaultProps as LineChartProps);
         const instance: any = chart.instance();
 
         expect(tooltipNodeSpy).toHaveBeenCalled();

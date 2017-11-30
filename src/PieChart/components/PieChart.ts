@@ -161,7 +161,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         return { displayModeBar: false, doubleClick: false };
     }
 
-    private static getDefaultLayoutOptions(props: PieChartProps): Partial<Layout> {
+    public static getDefaultLayoutOptions(props: PieChartProps): Partial<Layout> {
         return {
             font: {
                 family: "Open Sans, sans-serif",
@@ -192,7 +192,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         };
     }
 
-    private static getDefaultDataOptions(props: PieChartProps): Partial<PieData> {
+    public static getDefaultDataOptions(props: PieChartProps): Partial<PieData> {
         return {
             hole: props.chartType === "donut" ? 0.4 : 0,
             hoverinfo: props.tooltipForm ? "none" : "label",
