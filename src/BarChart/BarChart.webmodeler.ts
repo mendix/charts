@@ -72,7 +72,6 @@ export function getVisibleProperties(valueMap: BarChartContainerProps, visibilit
                 visibilityMap.series[index].entityConstraint = false;
             }
             visibilityMap.series[index].seriesOptions = false;
-            visibilityMap.series[index].sampleData = false;
         });
     }
     visibilityMap.layoutOptions = false;

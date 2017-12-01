@@ -52,8 +52,7 @@ const widgetConfig = {
     plugins: [
         new CopyWebpackPlugin([
             { from: "src/**/*.js" },
-            { from: "src/**/*.xml" },
-            { from: "src/**/*.png", to: `src/com/mendix/widget/custom/[name]/` }
+            { from: "src/**/*.xml" }
         ], {
             copyUnmodified: true
         }),
@@ -71,11 +70,14 @@ const plotlyCustomConfig = {
     entry: "./src/PlotlyCustom.ts",
     output: {
         path: path.resolve(__dirname, "dist/tmp/src"),
-        filename: "com/mendix/widget/custom/charts/PlotlyCustom.js",
+        filename: `com/mendix/widget/custom/${widgetName.toLowerCase()}/PlotlyCustom.js`,
         libraryTarget: "amd",
     },
     plugins: [
-        new webpack.LoaderOptionsPlugin({ debug: true })
+        new webpack.LoaderOptionsPlugin({ debug: true }),
+        new webpack.SourceMapDevToolPlugin({
+            filename: `./src/com/mendix/widget/custom/${widgetName.toLowerCase()}/PlotlyCustom.js.map`
+        })
     ]
 };
 

@@ -79,7 +79,6 @@ export function getVisibleProperties(valueMap: LineChartContainerProps, visibili
                 visibilityMap.series[index].entityConstraint = false;
             }
             visibilityMap.series[index].seriesOptions = false;
-            visibilityMap.series[index].sampleData = false;
         });
     }
     visibilityMap.devMode = false;
