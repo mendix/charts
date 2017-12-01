@@ -103,10 +103,8 @@ const previewConfig = {
     module: {
         rules: [
             { test: /\.ts$/, loader: "ts-loader", options: {
-                compilerOptions: {
-                    "module": "CommonJS",
-                }
-            }},
+                configFile: "tsconfig.preview.json"
+            } },
             { test: /\.css$/, use: "raw-loader" },
             { test: /\.scss$/, use: [
                 { loader: "raw-loader" },
