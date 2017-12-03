@@ -61,8 +61,8 @@ export const validateSeriesProps = <T extends Partial<SeriesProps>>(dataSeries: 
                     errorMessage.push(`Invalid options JSON for ${identifier}: ${error}`);
                 }
             }
-            if (series.dataEntity) {
-                const dataEntityMeta = mx.meta.getEntity(series.dataEntity);
+            if (series.dataEntity && window.mx) {
+                const dataEntityMeta = window.mx.meta.getEntity(series.dataEntity);
                 if (series.dataSourceType === "XPath" && !dataEntityMeta.isPersistable()) {
                     errorMessage.push(`Entity ${series.dataEntity} should be persistable when using Data source 'Database'`);
                 }
