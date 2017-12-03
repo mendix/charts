@@ -1,5 +1,6 @@
 import { SFC, createElement } from "react";
 import * as classNames from "classnames";
+import { IconButton } from "./IconButton";
 
 type BootstrapStyle = "default" | "primary" | "success" | "info" | "warning" | "danger";
 
@@ -16,7 +17,7 @@ export const MendixButton: SFC<MendixButtonProps> = ({ style, className, disable
             className: classNames(`mx-button btn btn-${style}`, className, { disabled }),
             onClick
         },
-        glyphIcon ? createElement("span", { className: `glyphicon glyphicon-${glyphIcon}` }) : null,
+        glyphIcon ? createElement(IconButton, { type: "span", glyphIcon }) : null,
         children
     );
 

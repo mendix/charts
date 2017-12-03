@@ -1,10 +1,9 @@
-import { Component, ReactElement, SyntheticEvent, createElement } from "react";
+import { Component, SyntheticEvent, createElement } from "react";
 import AceEditor, { Marker, Mode } from "react-ace";
 import * as classNames from "classnames";
 import { Operation, compare } from "fast-json-patch";
 import * as jsonMap from "json-source-map";
 
-import { Alert } from "./Alert";
 import { InfoTooltip } from "./InfoTooltip";
 import { MendixButton } from "./MendixButton";
 import { Panel } from "./Panel";
@@ -12,12 +11,16 @@ import { Sidebar } from "./Sidebar";
 
 import { ScatterTrace, SeriesData, SeriesProps } from "../utils/data";
 import { PieTraces } from "../PieChart/components/PieChart";
+import { PlaygroundContentSwitcher } from "./PlaygroundContentSwitcher";
 import { PieData, ScatterData } from "plotly.js";
+import { SidebarHeader } from "./SidebarHeader";
+import { SidebarContent } from "./SidebarContent";
 
 import "brace";
 import "brace/mode/json";
 import "brace/theme/github";
 import "../ui/Playground.scss";
+import { PlaygroundInfo } from "./PlaygroundInfo";
 
 interface PlaygroundProps {
     pie?: PiePlaygroundOptions;
@@ -40,7 +43,7 @@ interface PiePlaygroundOptions {
     onChange?: (layout: string, data: string) => void;
 }
 
-interface SeriesPlaygroundOptions {
+export interface SeriesPlaygroundOptions {
     modelerSeriesConfigs?: string[];
     rawData?: SeriesData[];
     chartData?: Partial<ScatterData>[];
@@ -91,25 +94,17 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
                 {
                     open: this.state.showEditor,
                     onBlur: this.closeEditor,
-                    onClick: this.closeTooltip
+                    onClick: this.closeTooltip,
+                    onClose: this.toggleShowEditor
                 },
-                createElement("div", { className: "sidebar-content", onClick: this.closeTooltip },
-                    createElement("div", { className: "sidebar-content-header row" },
-                        createElement("div", { className: "col-sm-9 col-xs-9" }, this.renderOptions()),
-                        createElement("div", { className: "col-sm-3 col-xs-3" },
-                            createElement("em", {
-                                className: "pull-right remove glyphicon glyphicon-remove",
-                                onClick: this.toggleShowEditor
-                            })
-                        )
+                createElement(SidebarHeader, { className: "row" },
+                    createElement(PlaygroundContentSwitcher, { onChange: this.updateView, series: this.props.series })
+                ),
+                createElement(SidebarContent, {},
+                    createElement(InfoTooltip, { show: this.state.showTooltip, onClick: this.toggleTooltip },
+                        createElement(PlaygroundInfo)
                     ),
-                    createElement("div", { className: "sidebar-content-body" },
-                        createElement(InfoTooltip, {
-                            show: this.state.showTooltip,
-                            onClick: this.toggleTooltip
-                        }, this.renderHelpContent()),
-                        this.renderSidebarContent()
-                    )
+                    this.renderSidebarContent()
                 )
             ),
             createElement("div", { className: "widget-charts-playground-toggle" },
@@ -117,30 +112,6 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
             ),
             this.props.children
         );
-    }
-
-    private renderOptions(): ReactElement<any> {
-        if (this.props.pie) {
-            return createElement("select", { className: "form-control", onChange: this.updateView },
-                createElement("option", { value: "layout" }, "Layout"),
-                createElement("option", { value: "data" }, "Data")
-            );
-        }
-
-        return createElement("select", { className: "form-control", onChange: this.updateView },
-            createElement("option", { value: "layout" }, "Layout"),
-            this.renderSeriesSelectOptions()
-        );
-    }
-
-    private renderSeriesSelectOptions() {
-        if (this.props.series && this.props.series.rawData) {
-            return this.props.series.rawData.map(({ series }, index) =>
-                createElement("option", { value: index, key: `series-option-${index}` }, series.name)
-            );
-        }
-
-        return [];
     }
 
     private renderSidebarContent() {
@@ -249,25 +220,6 @@ export class Playground extends Component<PlaygroundProps, PlaygroundState> {
         }
 
         return null;
-    }
-
-    private renderHelpContent() {
-        return createElement(Alert, { key: 0, bootstrapStyle: "info" },
-            createElement("p", {},
-                createElement("strong", {},
-                    "  Changes made in this editor are only for preview purposes."
-                )
-            ),
-            createElement("p", {},
-                "The JSON can be copied and pasted into the widgets properties in the desktop modeler"
-            ),
-            createElement("p", {},
-                "Check out the chart options here: ",
-                createElement("a", { href: "https://plot.ly/javascript/reference/", target: "_BLANK" },
-                    "https://plot.ly/javascript/reference/"
-                )
-            )
-        );
     }
 
     private renderAceEditor(value: string, onChange?: (value: string) => void, readOnly = false, mode: Mode = "json", overwriteValue?: string) {
