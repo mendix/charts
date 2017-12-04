@@ -2,21 +2,13 @@ import { Component, ReactChild, createElement } from "react";
 
 import { AnyChart, AnyChartProps } from "./AnyChart";
 import { validateAdvancedOptions } from "../../utils/data";
-import { Dimensions } from "../../utils/style";
-import { WrapperProps } from "../../utils/types";
+import { AnyChartContainerPropsBase } from "./interfaces";
+import { RuntimeProps } from "../../utils/types";
+import { AnyPlayground } from "./AnyPlayground";
 
-export interface AnyChartContainerProps extends WrapperProps, Dimensions {
-    dataStatic: string;
-    dataAttribute: string;
-    layoutStatic: string;
-    layoutAttribute: string;
+// tslint:disable no-empty-interface
+export interface AnyChartContainerProps extends AnyChartContainerPropsBase, RuntimeProps {
     devMode: "advanced" | "developer";
-    eventEntity: string;
-    eventDataAttribute: string;
-    onClickMicroflow: string;
-    tooltipEntity: string;
-    tooltipMicroflow: string;
-    tooltipForm: string;
 }
 
 interface AnyChartContainerState {
@@ -51,16 +43,16 @@ export default class AnyChartContainer extends Component<AnyChartContainerProps,
             attributeLayout: this.state.attributeLayout,
             onClick: this.onClick,
             onHover: this.onHover,
-            devMode: this.props.devMode,
-            mxform: this.props.mxform,
-            readOnly: this.props.readOnly,
-            friendlyId: this.props.friendlyId,
             width: this.props.width,
             widthUnit: this.props.widthUnit,
             height: this.props.height,
             heightUnit: this.props.heightUnit
         };
-        return createElement("div", {}, createElement(AnyChart, anyProps));
+        return createElement("div", {},
+            this.props.devMode === "developer"
+                ? createElement(AnyPlayground, anyProps)
+                : createElement(AnyChart, anyProps)
+        );
     }
 
     componentWillReceiveProps(newProps: AnyChartContainerProps) {

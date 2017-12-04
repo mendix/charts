@@ -1,8 +1,7 @@
-import { Component, ReactChild, ReactElement, createElement } from "react";
+import { Component, ReactChild, /*ReactElement, */createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
-import { Playground } from "../../components/Playground";
 import { PlotlyChart } from "./AnyPlotlyChart";
 
 import deepMerge from "deepmerge";
@@ -16,7 +15,6 @@ import "../../ui/Charts.scss";
 export interface AnyChartProps extends WrapperProps, Dimensions {
     alertMessage?: ReactChild;
     loading?: boolean;
-    devMode: "advanced" | "developer";
     dataStatic: string;
     layoutStatic: string;
     attributeData: string;
@@ -25,14 +23,7 @@ export interface AnyChartProps extends WrapperProps, Dimensions {
     onHover?: (data: any, node: HTMLDivElement) => void;
 }
 
-interface AnyChartState {
-    dataStatic: string;
-    layoutStatic: string;
-    attributeData: string;
-    attributeLayout: string;
-}
-
-export class AnyChart extends Component<AnyChartProps, AnyChartState> {
+export class AnyChart extends Component<AnyChartProps> {
     private tooltipNode: HTMLDivElement;
 
     constructor(props: AnyChartProps) {
@@ -41,7 +32,6 @@ export class AnyChart extends Component<AnyChartProps, AnyChartState> {
         this.getTooltipNodeRef = this.getTooltipNodeRef.bind(this);
         this.onClick = this.onClick.bind(this);
         this.onHover = this.onHover.bind(this);
-        this.onRuntimeUpdate = this.onRuntimeUpdate.bind(this);
 
         this.state = {
             layoutStatic: props.layoutStatic,
@@ -60,31 +50,8 @@ export class AnyChart extends Component<AnyChartProps, AnyChartState> {
         if (this.props.loading) {
             return createElement(ChartLoading, { text: "Loading" });
         }
-        if (this.props.devMode === "developer") {
-            return this.renderPlayground();
-        }
 
         return this.renderChart();
-    }
-
-    private renderPlayground(): ReactElement<any> {
-        // const layout = JSON.stringify(this.getLayoutOptions(this.props));
-        // const data = JSON.stringify(this.getData(this.props));
-        return createElement(Playground, {
-            any: {
-                layoutStatic: this.state.layoutStatic,
-                dataStatic: this.state.dataStatic,
-                layoutDynamic: this.state.attributeLayout,
-                dataDynamic: this.state.attributeData,
-                onChange: this.onRuntimeUpdate
-            },
-            layoutOptions: "{\n\n}",
-            modelerLayoutConfigs: "{\n\n}"
-        }, this.renderChart());
-    }
-
-    private onRuntimeUpdate(dataStatic: string, layoutStatic: string, attributeData: string, attributeLayout: string) {
-        this.setState({ dataStatic, layoutStatic, attributeData, attributeLayout });
     }
 
     componentDidMount() {
@@ -104,7 +71,6 @@ export class AnyChart extends Component<AnyChartProps, AnyChartState> {
     }
 
     private renderChart() {
-        // TODO use state combined with props to support Playground
         const layout = this.getLayoutOptions(this.props);
         const data = this.getData(this.props);
         // logger.error("renderChart", layout, data);
@@ -133,7 +99,8 @@ export class AnyChart extends Component<AnyChartProps, AnyChartState> {
                 }
                 return staticData;
             } catch (error) {
-                logger.error("Failed convert data into JSON: ", props.dataStatic, props.attributeData, error);
+                // tslint:disable no-console
+                console.error("Failed convert data into JSON: ", props.dataStatic, props.attributeData, error);
                 return {} as any;
             }
     }
@@ -152,7 +119,7 @@ export class AnyChart extends Component<AnyChartProps, AnyChartState> {
             return staticLayout;
 
         } catch (error) {
-            logger.error("Failed convert layout to JSON: ", this.state.dataStatic, this.state.attributeData, error);
+            console.error("Failed convert layout to JSON: ", props.dataStatic, props.attributeData, error);
             return {} as any;
         }
     }
@@ -184,6 +151,7 @@ export class AnyChart extends Component<AnyChartProps, AnyChartState> {
             } else {
                 // TODO when if there is event? 3D charts?
                 // https://plot.ly/javascript/3d-scatter-plots/
+                // https://codepen.io/anon/pen/rYoaRV
             }
 
             this.tooltipNode.style.opacity = "1";

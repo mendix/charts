@@ -33,11 +33,47 @@ export interface RenderAceEditorOptions {
     overwriteValue?: string;
 }
 
+<<<<<<< HEAD
 export class Playground extends Component<{}, PlaygroundState> {
     state = {
         showEditor: false,
         showTooltip: false
     };
+=======
+type PlaygroundSeriesTrace = ({ name: string } & ScatterTrace);
+
+export class Playground extends Component<PlaygroundProps, PlaygroundState> {
+    private newSeriesOptions: { layout: string, data: SeriesData[] };
+    private newPieOptions: { layout: string, data: string };
+    private newAnyOptions: { [index: string]: string, layoutStatic: string, dataStatic: string, layoutDynamic: string, dataDynamic: string };
+    private timeoutId: number;
+    private isValid: boolean;
+
+    constructor(props: PlaygroundProps) {
+        super(props);
+
+        this.updateChart = this.updateChart.bind(this);
+        this.onValidate = this.onValidate.bind(this);
+        this.toggleShowEditor = this.toggleShowEditor.bind(this);
+        this.closeEditor = this.closeEditor.bind(this);
+        this.closeTooltip = this.closeTooltip.bind(this);
+        this.toggleTooltip = this.toggleTooltip.bind(this);
+        this.updateView = this.updateView.bind(this);
+        this.state = {
+            showEditor: false,
+            showTooltip: false,
+            activeOption: "layout"
+        };
+        this.newSeriesOptions = {
+            layout: props.layoutOptions || "{}",
+            data: props.series && props.series.rawData || []
+        };
+        this.newPieOptions = {
+            layout: props.layoutOptions || "{}",
+            data: props.pie && props.pie.dataOptions || "{\n\n}"
+        };
+    }
+>>>>>>> Move Playground to AnyContainer
 
     render() {
         return createElement("div", {
@@ -87,14 +123,65 @@ export class Playground extends Component<{}, PlaygroundState> {
         }
     }
 
+<<<<<<< HEAD
     private closeTooltip = () => {
         if (this.state.showTooltip) {
             this.setState({ showTooltip: false });
+=======
+    private renderAnyDataPanes() {
+        if (this.props.any) {
+            const { dataDynamic, dataStatic } = this.props.any;
+            return [
+                createElement(Panel,
+                    {
+                        key: "dataDynamic",
+                        heading: "Dynamic data",
+                        headingClass: "item-header"
+                    },
+                    this.renderAceEditor(`${dataDynamic}`, value => this.onUpdate("dataDynamic", value))
+                ),
+                createElement(Panel,
+                    {
+                        key: "dataStatic",
+                        heading: "Static data",
+                        headingClass: "item-header"
+                    },
+                    this.renderAceEditor(`${dataStatic}`, value => this.onUpdate("dataStatic", value), false, "json", dataDynamic)
+                )
+            ];
+>>>>>>> Move Playground to AnyContainer
         }
     }
 
+<<<<<<< HEAD
     private toggleTooltip = () => {
         this.setState({ showTooltip: !this.state.showTooltip });
+=======
+    private renderAnyLayoutPanes() {
+        if (this.props.any) {
+            const { layoutStatic, layoutDynamic } = this.props.any;
+            return [
+                createElement(Panel,
+                    {
+                        key: "layoutDynamic",
+                        heading: "Dynamic layout",
+                        headingClass: "item-header"
+                    },
+                    this.renderAceEditor(`${layoutDynamic}`, value => this.onUpdate("layoutDynamic", value))
+                ),
+                createElement(Panel,
+                    {
+                        key: "layoutStatic",
+                        heading: "Static layout",
+                        headingClass: "item-header"
+                    },
+                    this.renderAceEditor(`${layoutStatic}`, value => this.onUpdate("layoutStatic", value), false, "json", layoutDynamic)
+                )
+            ];
+        }
+
+        return null;
+>>>>>>> Move Playground to AnyContainer
     }
 
     public static removeTrailingNewLine(value: string): string {
@@ -125,7 +212,83 @@ export class Playground extends Component<{}, PlaygroundState> {
         });
     }
 
+<<<<<<< HEAD
     private static getMarker(left: string, right?: string): Marker[] {
+=======
+    private updateView({ currentTarget }: SyntheticEvent<HTMLSelectElement>) {
+        this.setState({ activeOption: currentTarget.value });
+    }
+
+    private toggleShowEditor() {
+        this.setState({ showEditor: !this.state.showEditor });
+    }
+
+    private closeEditor() {
+        if (this.state.showEditor) {
+            this.setState({ showEditor: false });
+        }
+    }
+
+    private closeTooltip() {
+        if (this.state.showTooltip) {
+            this.setState({ showTooltip: false });
+        }
+    }
+
+    private toggleTooltip() {
+        this.setState({ showTooltip: !this.state.showTooltip });
+    }
+
+    private onUpdate(source: string, value: string) {
+        if (this.timeoutId) {
+            clearTimeout(this.timeoutId);
+        }
+        this.timeoutId = setTimeout(() => {
+            try {
+                if (this.isValid && JSON.parse(value)) {
+                    this.updateChart(source, value);
+                }
+            } catch {
+                this.isValid = false;
+            }
+        }, 1000);
+    }
+
+    private onValidate(annotations: object[]) {
+        this.isValid = !annotations.length;
+    }
+
+    private updateChart(source: string, value: string) {
+        const cleanValue = Playground.removeTrailingNewLine(value);
+        if (source === "layout") {
+            this.newSeriesOptions.layout = cleanValue;
+        }
+        if (source.indexOf("series") > -1) {
+            const index = source.split("-")[ 1 ];
+            (this.newSeriesOptions.data[ parseInt(index, 10) ] as SeriesData).series.seriesOptions = cleanValue;
+        } else if (source.indexOf("data") > -1) {
+            this.newPieOptions.data = cleanValue;
+        }
+        if (this.props.series && this.props.series.onChange) {
+            this.props.series.onChange(this.newSeriesOptions.layout, this.newSeriesOptions.data);
+        }
+        if (this.props.pie && this.props.pie.onChange) {
+            this.props.pie.onChange(this.newSeriesOptions.layout, this.newPieOptions.data);
+        }
+        if (this.props.any && this.props.any.onChange) {
+            this.newAnyOptions = {
+                layoutStatic: this.props.any.layoutStatic || "{}",
+                dataStatic: this.props.any.dataStatic || "[]",
+                layoutDynamic: this.props.any.layoutDynamic || "{}",
+                dataDynamic: this.props.any.dataDynamic || "[]"
+            };
+            this.newAnyOptions[source] = value;
+            this.props.any.onChange(this.newAnyOptions.layoutStatic, this.newAnyOptions.dataStatic, this.newAnyOptions.layoutDynamic, this.newAnyOptions.dataDynamic);
+        }
+    }
+
+    private getMarker(left: string, right?: string): Marker[] {
+>>>>>>> Move Playground to AnyContainer
         const markers: Marker[] = [];
         if (right) {
             const diffs = compare(JSON.parse(left), JSON.parse(right));
