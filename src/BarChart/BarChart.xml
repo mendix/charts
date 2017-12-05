@@ -25,8 +25,8 @@
                     <category>Data source</category>
                     <description/>
                     <translations>
-                        <translation lang="en_US">Series name</translation>
-                        <translation lang="nl_NL">Serie naam</translation>
+                        <translation lang="en_US">Series</translation>
+                        <translation lang="nl_NL">Serie</translation>
                     </translations>
                 </property>
                 <property key="dataEntity" type="entity" allowNonPersistableEntities="true">
@@ -136,8 +136,8 @@
             <category>Chart properties</category>
             <description/>
             <translations>
-                <translation lang="en_US">X-axis</translation>
-                <translation lang="nl_NL">X-as</translation>
+                <translation lang="en_US"></translation>
+                <translation lang="nl_NL"></translation>
             </translations>
         </property>
         <property key="yAxisLabel" type="translatableString" required="false">
@@ -145,8 +145,8 @@
             <category>Chart properties</category>
             <description/>
             <translations>
-                <translation lang="en_US">Y-axis</translation>
-                <translation lang="nl_NL">Y-as</translation>
+                <translation lang="en_US"></translation>
+                <translation lang="nl_NL"></translation>
             </translations>
         </property>
         <property key="showLegend" type="boolean" defaultValue="true">
