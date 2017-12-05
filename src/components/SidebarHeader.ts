@@ -21,9 +21,9 @@ export class SidebarHeader extends Component<SidebarHeaderProps> {
     private renderHeaderContent() {
         this.contentSize = this.props.onClose ? this.contentSize : 12;
 
-        return createElement("div", { className: `col-sm-${this.contentSize} col-xs-${this.contentSize}` },
-            this.props.children
-        );
+        return createElement("div", {
+            className: `header-content col-sm-${this.contentSize} col-xs-${this.contentSize}`
+        }, this.props.children);
     }
 
     private renderCloser() {

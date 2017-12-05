@@ -39,9 +39,13 @@ export class Sidebar extends Component<SidebarProps, {}> {
     private getSidebarElement(type: "HEADER" | "CONTENT") {
         if (this.props.children) {
             if (Array.isArray(this.props.children)) {
-                 return this.props.children.find(child =>
+                 const element = this.props.children.find(child =>
                      isValidElement(child) && child.type === (type === "HEADER" ? SidebarHeader : SidebarContent)
                  );
+
+                 return type === "HEADER"
+                     ? cloneElement(element as ReactElement<any>, { onClose: this.props.onClose })
+                     : element;
             } else if (isValidElement(this.props.children)) {
                 return this.props.children.type === (type === "HEADER" ? SidebarHeader : SidebarContent)
                     ? cloneElement(this.props.children as ReactElement<any>, { onClose: this.props.onClose })

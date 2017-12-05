@@ -40,6 +40,7 @@
         .sidebar-content-header {
             padding: 8px;
             border-bottom: 1px solid #DDD;
+            background: #f5f5f5;
 
             .remove {
                 font-size: 20px;
@@ -50,8 +51,6 @@
 
             select {
                 &.form-control {
-                    background-color: #EEE;
-
                     option {
                         background-color: #FFF;
                     }
