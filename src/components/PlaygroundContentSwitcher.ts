@@ -1,4 +1,4 @@
-import { Component, SyntheticEvent, createElement } from "react";
+import { Component, ReactElement, SyntheticEvent, createElement } from "react";
 import { SeriesPlaygroundOptions } from "./Playground";
 
 interface PlaygroundContentSwitcherProps {
@@ -21,13 +21,13 @@ export class PlaygroundContentSwitcher extends Component<PlaygroundContentSwitch
         );
     }
 
-    private renderSeriesSelectOptions() {
+    private renderSeriesSelectOptions(): ReactElement<any>[] | null {
         if (this.props.series && this.props.series.rawData) {
             return this.props.series.rawData.map(({ series }, index) =>
                 createElement("option", { value: index, key: `series-option-${index}` }, series.name)
             );
         }
 
-        return [];
+        return null;
     }
 }

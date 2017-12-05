@@ -1,7 +1,7 @@
 import { Component, SyntheticEvent, createElement } from "react";
 import "../ui/InfoTooltip.scss";
 
-interface InfoTooltipProps {
+export interface InfoTooltipProps {
     show?: boolean;
     onClick: () => void;
 }

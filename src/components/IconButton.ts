@@ -1,7 +1,7 @@
 import { SFC, createElement } from "react";
 import * as classNames from "classnames";
 
-interface IconButtonProps {
+export interface IconButtonProps {
     className?: string;
     glyphIcon: string;
     type?: "span" | "i" | "em";

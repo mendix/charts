@@ -7,22 +7,22 @@ import * as jsonMap from "json-source-map";
 import { InfoTooltip } from "./InfoTooltip";
 import { MendixButton } from "./MendixButton";
 import { Panel } from "./Panel";
+import { PlaygroundContentSwitcher } from "./PlaygroundContentSwitcher";
 import { Sidebar } from "./Sidebar";
+import { SidebarHeader } from "./SidebarHeader";
+import { SidebarContent } from "./SidebarContent";
 
 import { ScatterTrace, SeriesData, SeriesProps } from "../utils/data";
 import { PieTraces } from "../PieChart/components/PieChart";
-import { PlaygroundContentSwitcher } from "./PlaygroundContentSwitcher";
+import { PlaygroundInfo } from "./PlaygroundInfo";
 import { PieData, ScatterData } from "plotly.js";
-import { SidebarHeader } from "./SidebarHeader";
-import { SidebarContent } from "./SidebarContent";
 
 import "brace";
 import "brace/mode/json";
 import "brace/theme/github";
 import "../ui/Playground.scss";
-import { PlaygroundInfo } from "./PlaygroundInfo";
 
-interface PlaygroundProps {
+export interface PlaygroundProps {
     pie?: PiePlaygroundOptions;
     series?: SeriesPlaygroundOptions;
     layoutOptions: string;
