@@ -55,6 +55,13 @@ export function getVisibleProperties(valueMap: PieChartContainerProps, visibilit
     }
     visibilityMap.layoutOptions = false;
     visibilityMap.devMode = false;
+    if (valueMap.onClickEvent === "doNothing") {
+        visibilityMap.onClickPage = visibilityMap.onClickMicroflow = false;
+    } else if (valueMap.onClickEvent === "callMicroflow") {
+        visibilityMap.onClickPage = false;
+    } else if (valueMap.onClickEvent === "showPage") {
+        visibilityMap.onClickMicroflow = false;
+    }
 
     return visibilityMap;
 }
