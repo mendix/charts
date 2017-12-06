@@ -89,7 +89,7 @@
                         <enumerationValue key="desc">Descending</enumerationValue>
                     </enumerationValues>
                 </property>
-                <property key="mode" type="enumeration" defaultValue="linesXmarkers">
+                <property key="mode" type="enumeration" defaultValue="lines">
                     <caption>Border</caption>
                     <category>Appearance</category>
                     <description/>
