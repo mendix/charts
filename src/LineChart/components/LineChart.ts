@@ -26,11 +26,13 @@ export interface LineChartProps extends LineChartContainerProps {
 interface LineChartState {
     layoutOptions: string;
     data?: SeriesData[];
+    playgroundLoaded: boolean;
 }
 
 export class LineChart extends Component<LineChartProps, LineChartState> {
     private tooltipNode: HTMLDivElement;
     private defaultColors: string[] = [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ];
+    private Playground: typeof Playground;
 
     constructor(props: LineChartProps) {
         super(props);
@@ -41,7 +43,8 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         this.getTooltipNodeRef = this.getTooltipNodeRef.bind(this);
         this.state = {
             layoutOptions: props.layoutOptions,
-            data: props.data
+            data: props.data,
+            playgroundLoaded: false
         };
     }
 
@@ -52,7 +55,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         if (this.props.loading) {
             return createElement(ChartLoading, { text: "Loading" });
         }
-        if (this.props.devMode === "developer") {
+        if (this.props.devMode === "developer" && this.state.playgroundLoaded) {
             return this.renderPlayground();
         }
 
@@ -64,6 +67,15 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             layoutOptions: newProps.layoutOptions,
             data: newProps.data
         });
+        if (newProps.devMode === "developer" && !this.state.playgroundLoaded) {
+            this.loadPlaygroundComponent();
+        }
+    }
+
+    private async loadPlaygroundComponent() {
+        const { Playground: PlaygroundImport } = await import("../../components/Playground");
+        this.Playground = PlaygroundImport;
+        this.setState({ playgroundLoaded: true });
     }
 
     private renderLineChart(): ReactElement<any> {
@@ -83,7 +95,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     private renderPlayground(): ReactElement<any> {
-        return createElement(Playground, {
+        return createElement(this.Playground, {
             series: {
                 rawData: this.state.data,
                 chartData: this.getData(this.props),

@@ -1,4 +1,4 @@
-import { Component, ReactChild, createElement } from "react";
+import { Component, ReactChild, ReactElement, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
@@ -24,6 +24,7 @@ export interface PieChartProps extends PieChartContainerProps {
 interface PieChartState {
     layoutOptions: string;
     dataOptions: string;
+    playgroundLoaded: boolean;
 }
 
 export interface PieTraces {
@@ -33,6 +34,7 @@ export interface PieTraces {
 
 export class PieChart extends Component<PieChartProps, PieChartState> {
     private tooltipNode: HTMLDivElement;
+    private Playground: typeof Playground;
 
     constructor(props: PieChartProps) {
         super(props);
@@ -43,7 +45,8 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         this.onRuntimeUpdate = this.onRuntimeUpdate.bind(this);
         this.state = {
             layoutOptions: props.layoutOptions,
-            dataOptions: props.dataOptions
+            dataOptions: props.dataOptions,
+            playgroundLoaded: false
         };
     }
 
@@ -56,21 +59,23 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         if (this.props.loading) {
             return createElement(ChartLoading, { text: "Loading" });
         }
-        if (this.props.devMode === "developer") {
-            return createElement(Playground, {
-                pie: {
-                    dataOptions: this.state.dataOptions || "{\n\n}",
-                    modelerDataConfigs: JSON.stringify(PieChart.getDefaultDataOptions(this.props), null, 4),
-                    chartData: this.getData(this.props),
-                    traces: this.getTraces(this.props.data),
-                    onChange: this.onRuntimeUpdate
-                },
-                layoutOptions: this.state.layoutOptions || "{\n\n}",
-                modelerLayoutConfigs: JSON.stringify(PieChart.getDefaultLayoutOptions(this.props), null, 4)
-            }, this.renderChart());
+        if (this.props.devMode === "developer" && this.state.playgroundLoaded) {
+            return this.renderPlayground();
         }
 
         return this.renderChart();
+    }
+
+    componentWillReceiveProps(newProps: PieChartProps) {
+        if (newProps.devMode === "developer" && !this.state.playgroundLoaded) {
+            this.loadPlaygroundComponent();
+        }
+    }
+
+    private async loadPlaygroundComponent() {
+        const { Playground: PlaygroundImport } = await import("../../components/Playground");
+        this.Playground = PlaygroundImport;
+        this.setState({ playgroundLoaded: true });
     }
 
     private getTooltipNodeRef(node: HTMLDivElement) {
@@ -116,6 +121,20 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         }
 
         return props.defaultData || [];
+    }
+
+    private renderPlayground(): ReactElement<any> {
+        return createElement(this.Playground, {
+            pie: {
+                dataOptions: this.state.dataOptions || "{\n\n}",
+                modelerDataConfigs: JSON.stringify(PieChart.getDefaultDataOptions(this.props), null, 4),
+                chartData: this.getData(this.props),
+                traces: this.getTraces(this.props.data),
+                onChange: this.onRuntimeUpdate
+            },
+            layoutOptions: this.state.layoutOptions || "{\n\n}",
+            modelerLayoutConfigs: JSON.stringify(PieChart.getDefaultLayoutOptions(this.props), null, 4)
+        }, this.renderChart());
     }
 
     private getLayoutOptions(props: PieChartProps): Partial<Layout> {

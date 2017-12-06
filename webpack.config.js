@@ -14,10 +14,11 @@ const widgetConfig = {
         PieChart: "./src/PieChart/components/PieChartContainer.ts"
     },
     output: {
-        path: path.resolve(__dirname, "dist/tmp"),
-        filename: "src/com/mendix/widget/custom/[name]/[name].js",
-        chunkFilename: `src/com/mendix/widget/custom/${widgetName}[id].js`,
-        libraryTarget: "umd"
+        path: path.resolve(__dirname, "dist/tmp/src"),
+        filename: "com/mendix/widget/custom/[name]/[name].js",
+        chunkFilename: `com/mendix/widget/custom/${widgetName}/chunk[id].js`,
+        libraryTarget: "umd",
+        publicPath: "widgets/"
     },
     resolve: {
         extensions: [ ".ts", ".js" ],
@@ -46,22 +47,27 @@ const widgetConfig = {
             }
         ]
     },
-    externals: [ "react", "react-dom", {
-        [/PlotlyCustom/]: "widgets/com/mendix/widget/custom/charts/PlotlyCustom.js"
-    } ],
+    externals: [ "react", "react-dom",
+        function(context, request, callback) {
+            if (/PlotlyCustom$/.test(request)) {
+                return callback(null, "widgets/com/mendix/widget/custom/charts/PlotlyCustom.js");
+            }
+            callback();
+        }
+    ],
     plugins: [
         new CopyWebpackPlugin([
-            { from: "src/**/*.js" },
-            { from: "src/**/*.xml" }
+            { from: "src/**/*.js", to: "../" },
+            { from: "src/**/*.xml", to: "../" }
         ], {
             copyUnmodified: true
         }),
-        new ExtractTextPlugin({ filename: `./src/com/mendix/widget/custom/[name]/ui/[name].css` }),
+        new ExtractTextPlugin({ filename: `./com/mendix/widget/custom/[name]/ui/[name].css` }),
         new webpack.LoaderOptionsPlugin({
             debug: true
         }),
         new webpack.SourceMapDevToolPlugin({
-            filename: './src/com/mendix/widget/custom/[name]/[name].js.map'
+            filename: "./com/mendix/widget/custom/[name]/[name].js.map"
         })
     ]
 };
@@ -76,7 +82,7 @@ const plotlyCustomConfig = {
     plugins: [
         new webpack.LoaderOptionsPlugin({ debug: true }),
         new webpack.SourceMapDevToolPlugin({
-            filename: `./src/com/mendix/widget/custom/${widgetName.toLowerCase()}/PlotlyCustom.js.map`
+            filename: `./com/mendix/widget/custom/${widgetName.toLowerCase()}/PlotlyCustom.js.map`
         })
     ]
 };
@@ -113,7 +119,7 @@ const previewConfig = {
     },
     externals: [ "react", "react-dom" ],
     plugins: [ new webpack.SourceMapDevToolPlugin({
-        filename: './src/[name]/[name].webmodeler.js.map',
+        filename: "./src/[name]/[name].webmodeler.js.map",
     }) ]
 };
 
