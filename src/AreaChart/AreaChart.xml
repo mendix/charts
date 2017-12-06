@@ -90,28 +90,33 @@
                     </enumerationValues>
                 </property>
                 <property key="mode" type="enumeration" defaultValue="linesXmarkers">
-                    <caption>Line mode</caption>
+                    <caption>Border</caption>
                     <category>Appearance</category>
                     <description/>
                     <enumerationValues>
-                        <enumerationValue key="none">No lines</enumerationValue>
-                        <enumerationValue key="lines">Lines</enumerationValue>
-                        <enumerationValue key="linesXmarkers">Lines with markers</enumerationValue>
+                        <enumerationValue key="none">No</enumerationValue>
+                        <enumerationValue key="lines">Yes</enumerationValue>
+                        <enumerationValue key="linesXmarkers">Yes with markers</enumerationValue>
                     </enumerationValues>
                 </property>
                 <property key="lineStyle" type="enumeration" defaultValue="linear">
-                    <caption>Line style</caption>
+                    <caption>Border style</caption>
                     <category>Appearance</category>
-                    <description>Applicable only if the mode is either lines or lines with markers</description>
+                    <description/>
                     <enumerationValues>
-                        <enumerationValue key="linear">Straight line</enumerationValue>
-                        <enumerationValue key="spline">Curved line (spline)</enumerationValue>
+                        <enumerationValue key="linear">Straight</enumerationValue>
+                        <enumerationValue key="spline">Curved</enumerationValue>
                     </enumerationValues>
                 </property>
                 <property key="lineColor" type="string" required="false">
-                    <caption>Line color</caption>
+                    <caption>Border color</caption>
                     <category>Appearance</category>
                     <description/>
+                </property>
+                <property key="fillColor" type="string" required="false">
+                    <caption>Area color</caption>
+                    <category>Appearance</category>
+                    <description>By default, the border color with transparency is used</description>
                 </property>
                 <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
                     <caption>On click</caption>
@@ -146,13 +151,13 @@
                 </property>
             </properties>
         </property>
-        <property key="area" type="enumeration" defaultValue="separate">
+        <property key="area" type="enumeration" defaultValue="stacked">
             <caption>Area</caption>
             <category>Chart properties</category>
             <description/>
             <enumerationValues>
-                <enumerationValue key="separate">Separate</enumerationValue>
                 <enumerationValue key="stacked">Stacked</enumerationValue>
+                <enumerationValue key="separate">Separate</enumerationValue>
             </enumerationValues>
         </property>
         <property key="xAxisLabel" type="translatableString" required="false">
@@ -160,8 +165,8 @@
             <category>Chart properties</category>
             <description/>
             <translations>
-                <translation lang="en_US"></translation>
-                <translation lang="nl_NL"></translation>
+                <translation lang="en_US"/>
+                <translation lang="nl_NL"/>
             </translations>
         </property>
         <property key="yAxisLabel" type="translatableString" required="false">
@@ -169,8 +174,8 @@
             <category>Chart properties</category>
             <description/>
             <translations>
-                <translation lang="en_US"></translation>
-                <translation lang="nl_NL"></translation>
+                <translation lang="en_US"/>
+                <translation lang="nl_NL"/>
             </translations>
         </property>
         <property key="showLegend" type="boolean" defaultValue="true">

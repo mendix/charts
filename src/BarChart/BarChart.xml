@@ -55,7 +55,7 @@
                     <returnType type="Object" entityProperty="dataEntity" isList="true"/>
                 </property>
                 <property key="xValueAttribute" type="attribute" entityProperty="dataEntity">
-                    <caption>X-axis data attribute</caption>
+                    <caption>X axis data attribute</caption>
                     <category>Data points</category>
                     <description/>
                     <attributeTypes>
@@ -67,7 +67,7 @@
                     </attributeTypes>
                 </property>
                 <property key="yValueAttribute" type="attribute" entityProperty="dataEntity">
-                    <caption>Y-axis data attribute</caption>
+                    <caption>Y axis data attribute</caption>
                     <category>Data points</category>
                     <description/>
                     <attributeTypes>
@@ -77,9 +77,9 @@
                     </attributeTypes>
                 </property>
                 <property key="xValueSortAttribute" type="attribute" entityProperty="dataEntity" required="false">
-                    <caption>X-axis sort attribute</caption>
+                    <caption>Y axis sort attribute</caption>
                     <category>Data points</category>
-                    <description>Attribute to use for sorting the x-axis data</description>
+                    <description>Attribute to use for sorting the y axis data</description>
                     <attributeTypes>
                         <attributeType name="Decimal"/>
                         <attributeType name="Long"/>
@@ -136,8 +136,8 @@
             <category>Chart properties</category>
             <description/>
             <translations>
-                <translation lang="en_US"></translation>
-                <translation lang="nl_NL"></translation>
+                <translation lang="en_US"/>
+                <translation lang="nl_NL"/>
             </translations>
         </property>
         <property key="yAxisLabel" type="translatableString" required="false">
@@ -145,8 +145,8 @@
             <category>Chart properties</category>
             <description/>
             <translations>
-                <translation lang="en_US"></translation>
-                <translation lang="nl_NL"></translation>
+                <translation lang="en_US"/>
+                <translation lang="nl_NL"/>
             </translations>
         </property>
         <property key="showLegend" type="boolean" defaultValue="true">

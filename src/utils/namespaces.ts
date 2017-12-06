@@ -28,6 +28,7 @@ export namespace Container {
 
     export interface LineLayoutProps extends LayoutProps {
         fill: boolean;
+        fillColor?: string;
         area?: "separate" | "stacked";
     }
 

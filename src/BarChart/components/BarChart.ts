@@ -201,6 +201,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
             showlegend: props.showLegend,
             xaxis: {
                 gridcolor: "#eaeaea",
+                zerolinecolor: props.orientation === "bar" ? "#eaeaea" : undefined,
                 title: props.xAxisLabel,
                 showgrid: props.grid === "vertical" || props.grid === "both",
                 fixedrange: true

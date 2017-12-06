@@ -151,8 +151,8 @@
             <category>Chart properties</category>
             <description/>
             <translations>
-                <translation lang="en_US"></translation>
-                <translation lang="nl_NL"></translation>
+                <translation lang="en_US"/>
+                <translation lang="nl_NL"/>
             </translations>
         </property>
         <property key="yAxisLabel" type="translatableString" required="false">
@@ -160,8 +160,8 @@
             <category>Chart properties</category>
             <description/>
             <translations>
-                <translation lang="en_US"></translation>
-                <translation lang="nl_NL"></translation>
+                <translation lang="en_US"/>
+                <translation lang="nl_NL"/>
             </translations>
         </property>
         <property key="showLegend" type="boolean" defaultValue="true">
