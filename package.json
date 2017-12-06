@@ -6,10 +6,12 @@
   "copyright": "Mendix BV",
   "scripts": {
     "start": "nodemon --watch webpack.config.js --watch Gruntfile.js --exec grunt",
-    "pretest": "tsc",
+    "pretest": "tsc && npm run lint && npm run build",
+    "test": "npm run test:unit",
     "lint": "tslint -c tslint.json '**/*.ts' --exclude '**/node_modules/**'",
     "test:dev": "karma start",
-    "test:unit": "karma start --single-run --codeCoverage && node tests/remap.js"
+    "test:unit": "karma start --single-run --codeCoverage && node tests/remap.js",
+    "build": "grunt release"
   },
   "pre-commit": [
     "pretest",
