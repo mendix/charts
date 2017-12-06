@@ -1,7 +1,10 @@
 import { Component, ReactChild, ReactElement, cloneElement, createElement, isValidElement } from "react";
 
 import { Alert } from "./Alert";
-import { SeriesData, SeriesProps, fetchSeriesData, handleOnClick } from "../utils/data";
+import { fetchSeriesData, handleOnClick } from "../utils/data";
+import { Data } from "../utils/namespaces";
+import SeriesProps = Data.SeriesProps;
+import SeriesData = Data.SeriesData;
 
 export interface ChartContainerProps {
     mxObject?: mendix.lib.MxObject;

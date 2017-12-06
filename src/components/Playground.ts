@@ -12,10 +12,13 @@ import { Sidebar } from "./Sidebar";
 import { SidebarHeader } from "./SidebarHeader";
 import { SidebarContent } from "./SidebarContent";
 
-import { ScatterTrace, SeriesData, SeriesProps } from "../utils/data";
+import { Data } from "../utils/namespaces";
 import { PieTraces } from "../PieChart/components/PieChart";
 import { PlaygroundInfo } from "./PlaygroundInfo";
 import { PieData, ScatterData } from "plotly.js";
+import ScatterTrace = Data.ScatterTrace;
+import SeriesData = Data.SeriesData;
+import SeriesProps = Data.SeriesProps;
 
 import "brace";
 import "brace/mode/json";

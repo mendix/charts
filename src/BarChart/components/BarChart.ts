@@ -1,30 +1,30 @@
 import { Component, ReactChild, ReactElement, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
-import { BarChartContainerProps } from "./BarChartContainer";
 import { ChartLoading } from "../../components/ChartLoading";
 import { Playground } from "../../components/Playground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
-import { SeriesData, SeriesProps, getRuntimeTraces, getSeriesTraces } from "../../utils/data";
+import { getRuntimeTraces, getSeriesTraces } from "../../utils/data";
 import deepMerge from "deepmerge";
+import { Container, Data } from "../../utils/namespaces";
 import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
 import { getDimensions, parseStyle } from "../../utils/style";
 
 import "../../ui/Charts.scss";
 
-export interface BarChartProps extends BarChartContainerProps {
+export interface BarChartProps extends Container.BarChartContainerProps {
     alertMessage?: ReactChild;
     loading?: boolean;
-    data?: SeriesData[];
+    data?: Data.SeriesData[];
     defaultData?: ScatterData[];
-    onClick?: (series: SeriesProps, dataObject: mendix.lib.MxObject) => void;
+    onClick?: (series: Data.SeriesProps, dataObject: mendix.lib.MxObject) => void;
     onHover?: (node: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) => void;
 }
 
 interface BarChartState {
     layoutOptions: string;
-    data?: SeriesData[];
+    data?: Data.SeriesData[];
     playgroundLoaded: boolean;
 }
 
@@ -169,7 +169,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
         }
     }
 
-    private onRuntimeUpdate(layoutOptions: string, data: SeriesData[]) {
+    private onRuntimeUpdate(layoutOptions: string, data: Data.SeriesData[]) {
         this.setState({ layoutOptions, data });
     }
 
@@ -177,7 +177,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
         return { displayModeBar: false, doubleClick: false };
     }
 
-    private static getDefaultSeriesOptions(series: SeriesProps, props: BarChartProps): Partial<ScatterData> {
+    private static getDefaultSeriesOptions(series: Data.SeriesProps, props: BarChartProps): Partial<ScatterData> {
         const hoverinfo = (props.orientation === "bar" ? "x" : "y") as any;
 
         return {

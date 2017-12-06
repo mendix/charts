@@ -1,5 +1,7 @@
 import { SFC, createElement } from "react";
-import BarChartContainer, { BarChartContainerProps } from "../../BarChart/components/BarChartContainer";
+import BarChartContainer from "../../BarChart/components/BarChartContainer";
+import { Container } from "../../utils/namespaces";
+import BarChartContainerProps = Container.BarChartContainerProps;
 
 const ColumnChartContainer: SFC<BarChartContainerProps> = (props) =>
     createElement(BarChartContainer, { ...props as BarChartContainerProps, orientation: "column" });

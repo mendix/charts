@@ -2,12 +2,12 @@ import { Component, createElement } from "react";
 
 import { Alert } from "../components/Alert";
 import { LineChart } from "../LineChart/components/LineChart";
-import { LineChartContainerProps } from "../LineChart/components/LineChartContainer";
 
 import { getRandomNumbers, validateSeriesProps } from "../utils/data";
 import deepMerge from "deepmerge";
+import { Container } from "../utils/namespaces";
 import { ScatterData } from "plotly.js";
-import { LineMode } from "../utils/types";
+import LineChartContainerProps = Container.LineChartContainerProps;
 
 // tslint:disable-next-line class-name
 export class preview extends Component<LineChartContainerProps, {}> {
@@ -37,7 +37,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                         color: series.lineColor,
                         shape: series.lineStyle
                     },
-                    mode: series.mode ? series.mode.replace("X", "+") as LineMode : "lines",
+                    mode: series.mode ? series.mode.replace("X", "+") as Container.LineMode : "lines",
                     name: series.name,
                     type: "scatter",
                     fill: "tonexty",

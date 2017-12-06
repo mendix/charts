@@ -1,6 +1,5 @@
 import { createElement } from "react";
 import { mount, shallow } from "enzyme";
-import { SeriesData, SeriesProps } from "../utils/data";
 import { ScatterHoverData } from "plotly.js";
 
 import { Alert } from "../components/Alert";
@@ -11,6 +10,9 @@ import { PlotlyChart } from "../components/PlotlyChart";
 import { preview } from "../BarChart/BarChart.webmodeler";
 
 import { mockMendix } from "tests/mocks/Mendix";
+import { Data } from "../utils/namespaces";
+import SeriesProps = Data.SeriesProps;
+import SeriesData = Data.SeriesData;
 
 describe("BarChart", () => {
     const renderShallowBarChart = (props: BarChartProps) => shallow(createElement(BarChart, props));

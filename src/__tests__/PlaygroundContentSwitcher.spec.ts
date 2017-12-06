@@ -1,7 +1,9 @@
 import { shallow } from "enzyme";
 import { createElement } from "react";
 import { PlaygroundContentSwitcher } from "../components/PlaygroundContentSwitcher";
-import { SeriesData, SeriesProps } from "../utils/data";
+import { Data } from "../utils/namespaces";
+import SeriesData = Data.SeriesData;
+import SeriesProps = Data.SeriesProps;
 
 describe("PlaygroundContentSwitcher", () => {
     describe("without a series", () => {

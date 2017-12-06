@@ -2,10 +2,11 @@ import { Component, createElement } from "react";
 
 import { Alert } from "../components/Alert";
 import { PieChart } from "./components/PieChart";
-import { PieChartContainerProps } from "./components/PieChartContainer";
 
+import { Container } from "../utils/namespaces";
 import { PieData } from "plotly.js";
 import { validateSeriesProps } from "../utils/data";
+import PieChartContainerProps = Container.PieChartContainerProps;
 
 // tslint:disable-next-line class-name
 export class preview extends Component<PieChartContainerProps, {}> {

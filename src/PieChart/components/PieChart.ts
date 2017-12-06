@@ -2,13 +2,14 @@ import { Component, ReactChild, ReactElement, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
-import { PieChartContainerProps } from "./PieChartContainer";
 import { Playground } from "../../components/Playground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
 import deepMerge from "deepmerge";
+import { Container } from "../../utils/namespaces";
 import { Config, Layout, PieData, PieHoverData, ScatterHoverData } from "plotly.js";
 import { getDimensions, parseStyle } from "../../utils/style";
+import PieChartContainerProps = Container.PieChartContainerProps;
 
 import "../../ui/Charts.scss";
 

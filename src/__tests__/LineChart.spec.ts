@@ -1,15 +1,17 @@
 import { createElement } from "react";
 import { mount, shallow } from "enzyme";
-import { LineSeriesProps, SeriesData } from "../utils/data";
 import { mockMendix } from "../../tests/mocks/Mendix";
 
 import { Alert } from "../components/Alert";
 import { ChartLoading } from "../components/ChartLoading";
 import { LineChart, LineChartProps } from "../LineChart/components/LineChart";
 import { preview } from "../LineChart/LineChart.webmodeler";
+import { Data } from "../utils/namespaces";
 import { Playground } from "../components/Playground";
 import { PlotlyChart } from "../components/PlotlyChart";
 import { ScatterHoverData } from "plotly.js";
+import LineSeriesProps = Data.LineSeriesProps;
+import SeriesData = Data.SeriesData;
 
 describe("LineChart", () => {
     const renderShallowChart = (props: LineChartProps) => shallow(createElement(LineChart, props));

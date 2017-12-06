@@ -2,11 +2,12 @@ import { Component, createElement } from "react";
 
 import { Alert } from "../components/Alert";
 import { BarChart } from "../BarChart/components/BarChart";
-import { BarChartContainerProps } from "../BarChart/components/BarChartContainer";
 
 import { getRandomNumbers, validateSeriesProps } from "../utils/data";
 import deepMerge from "deepmerge";
 import { ScatterData } from "plotly.js";
+import { Container } from "../utils/namespaces";
+import BarChartContainerProps = Container.BarChartContainerProps;
 
 // tslint:disable-next-line class-name
 export class preview extends Component<BarChartContainerProps, {}> {

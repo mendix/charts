@@ -1,18 +1,11 @@
-import { Component, ReactChild, createElement } from "react";
+import { Component, createElement } from "react";
 
 import { ChartContainer } from "../../components/ChartContainer";
-import { LineSeriesProps, validateSeriesProps } from "../../utils/data";
+import { validateSeriesProps } from "../../utils/data";
 import { LineChart } from "./LineChart";
-import { Dimensions } from "../../utils/style";
-import { LineLayoutProps, WrapperProps } from "../../utils/types";
-
-export interface LineChartContainerProps extends WrapperProps, Dimensions, LineLayoutProps {
-    series: LineSeriesProps[];
-}
-
-interface LineChartContainerState {
-    alertMessage?: ReactChild;
-}
+import { Container } from "../../utils/namespaces";
+import LineChartContainerProps = Container.LineChartContainerProps;
+import LineChartContainerState = Container.LineChartContainerState;
 
 export default class LineChartContainer extends Component<LineChartContainerProps, LineChartContainerState> {
     static defaultProps: Partial<LineChartContainerProps> = { fill: false };

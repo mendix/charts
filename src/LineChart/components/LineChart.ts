@@ -2,15 +2,20 @@ import { Component, ReactChild, ReactElement, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
-import { LineChartContainerProps } from "./LineChartContainer";
 import { Playground } from "../../components/Playground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
-import { LineSeriesProps, SeriesData, SeriesProps, getRuntimeTraces, getSeriesTraces } from "../../utils/data";
+import { getRuntimeTraces, getSeriesTraces } from "../../utils/data";
 import deepMerge from "deepmerge";
+import { Container, Data } from "../../utils/namespaces";
 import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
 import { getDimensions, parseStyle } from "../../utils/style";
-import { LineMode } from "../../utils/types";
+
+import SeriesData = Data.SeriesData;
+import LineChartContainerProps = Container.LineChartContainerProps;
+import SeriesProps = Data.SeriesProps;
+import LineMode = Container.LineMode;
+import LineSeriesProps = Data.LineSeriesProps;
 
 import "../../ui/Charts.scss";
 

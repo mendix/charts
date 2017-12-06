@@ -2,12 +2,13 @@ import { Component, createElement } from "react";
 
 import { Alert } from "../components/Alert";
 import { LineChart } from "./components/LineChart";
-import { LineChartContainerProps } from "./components/LineChartContainer";
 
 import { getRandomNumbers, validateSeriesProps } from "../utils/data";
 import deepMerge from "deepmerge";
 import { ScatterData } from "plotly.js";
-import { LineMode } from "../utils/types";
+import { Container } from "../utils/namespaces";
+import LineChartContainerProps = Container.LineChartContainerProps;
+import LineMode = Container.LineMode;
 
 // tslint:disable-next-line class-name
 export class preview extends Component<LineChartContainerProps, {}> {
