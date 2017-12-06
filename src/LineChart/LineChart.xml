@@ -150,19 +150,11 @@
             <caption>X-axis label</caption>
             <category>Chart properties</category>
             <description/>
-            <translations>
-                <translation lang="en_US"/>
-                <translation lang="nl_NL"/>
-            </translations>
         </property>
         <property key="yAxisLabel" type="translatableString" required="false">
             <caption>Y-axis label</caption>
             <category>Chart properties</category>
             <description/>
-            <translations>
-                <translation lang="en_US"/>
-                <translation lang="nl_NL"/>
-            </translations>
         </property>
         <property key="showLegend" type="boolean" defaultValue="true">
             <caption>Show legend</caption>
