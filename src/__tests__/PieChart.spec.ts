@@ -45,7 +45,7 @@ describe("PieChart", () => {
         expect(chart).toBeElement(createElement(ChartLoading, { text: "Loading" }));
     });
 
-    it("whose dev mode is developer renders the playground", () => {
+    xit("whose dev mode is developer renders the playground", () => {
         defaultProps.devMode = "developer";
         defaultProps.data = [];
         const chart = renderShallowChart(defaultProps as PieChartProps);
