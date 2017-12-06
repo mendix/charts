@@ -9,7 +9,7 @@ describe("SidebarHeader", () => {
 
         expect(sidebarHeader).toBeElement(
             createElement("div", { className: "sidebar-content-header" },
-                createElement("div", { className: "col-sm-12 col-xs-12" }, "My Child")
+                createElement("div", { className: "header-content col-sm-12 col-xs-12" }, "My Child")
             )
         );
     });
@@ -19,7 +19,7 @@ describe("SidebarHeader", () => {
 
         expect(sidebarHeader).toBeElement(
             createElement("div", { className: "sidebar-content-header" },
-                createElement("div", { className: "col-sm-9 col-xs-9" }),
+                createElement("div", { className: "header-content col-sm-9 col-xs-9" }),
                 createElement("div", { className: "col-sm-3 col-xs-3" },
                     createElement(IconButton, {
                         className: "pull-right remove",
