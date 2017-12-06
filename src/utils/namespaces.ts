@@ -2,6 +2,8 @@ import { BarMode, Datum, ScatterData } from "plotly.js";
 import { ReactChild } from "react";
 
 export namespace Container {
+    import SeriesProps = Data.SeriesProps;
+
     export interface WrapperProps {
         "class"?: string;
         mxform: mxui.lib.form._FormBase;
@@ -28,7 +30,6 @@ export namespace Container {
 
     export interface LineLayoutProps extends LayoutProps {
         fill: boolean;
-        fillColor?: string;
         area?: "separate" | "stacked";
     }
 
@@ -40,7 +41,7 @@ export namespace Container {
 
     export interface BarChartContainerState {
         alertMessage?: ReactChild;
-        data?: Data.SeriesData[];
+        data?: Data.SeriesData<SeriesProps>[];
         loading?: boolean;
     }
 
@@ -101,11 +102,12 @@ export namespace Data {
         mode?: Container.LineMode;
         lineColor: string;
         lineStyle: "linear" | "spline";
+        fillColor?: string;
     }
 
-    export interface SeriesData {
+    export interface SeriesData<T extends SeriesProps = SeriesProps> {
         data: mendix.lib.MxObject[];
-        series: SeriesProps;
+        series: T;
     }
 
     export interface ScatterTrace {

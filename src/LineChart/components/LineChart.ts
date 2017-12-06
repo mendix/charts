@@ -20,7 +20,7 @@ import LineSeriesProps = Data.LineSeriesProps;
 import "../../ui/Charts.scss";
 
 export interface LineChartProps extends LineChartContainerProps {
-    data?: SeriesData[];
+    data?: SeriesData<LineSeriesProps>[];
     defaultData?: ScatterData[];
     loading?: boolean;
     alertMessage?: ReactChild;
@@ -30,7 +30,7 @@ export interface LineChartProps extends LineChartContainerProps {
 
 interface LineChartState {
     layoutOptions: string;
-    data?: SeriesData[];
+    data?: SeriesData<LineSeriesProps>[];
     playgroundLoaded: boolean;
 }
 
@@ -137,6 +137,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 const configOptions: Partial<ScatterData> = {
                     series,
                     marker: index < this.defaultColors.length ? { color: this.defaultColors[index] } : undefined,
+                    fillcolor: series.fillColor,
                     ... LineChart.getDefaultSeriesOptions(series as LineSeriesProps, props),
                     ... getSeriesTraces({ data, series })
                 };
@@ -170,7 +171,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         }
     }
 
-    private onRuntimeUpdate(layoutOptions: string, data: SeriesData[]) {
+    private onRuntimeUpdate(layoutOptions: string, data: SeriesData<LineSeriesProps>[]) {
         this.setState({ layoutOptions, data });
     }
 
@@ -232,8 +233,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             mode: series.mode ? series.mode.replace("X", "+") as LineMode : "lines",
             name: series.name,
             type: "scatter",
-            fill: props.fill ? "tonexty" : "none",
-            fillcolor: props.fillColor
+            fill: props.fill ? "tonexty" : "none"
         };
     }
 

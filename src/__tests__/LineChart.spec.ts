@@ -24,7 +24,7 @@ describe("LineChart", () => {
             tooltipForm: "myTooltipForm.xml"
         }
     ];
-    const mockData: SeriesData[] = [
+    const mockData: SeriesData<LineSeriesProps>[] = [
         {
             data: [ mockMendix.lib.MxObject() ] as any,
             series: sampleSeries[0] as LineSeriesProps
