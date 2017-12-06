@@ -5,6 +5,8 @@ Plot and compare your data across different charts.
 * `Column Chart`
 * `Line Chart`
 * `Pie Chart`
+* `Area Chart`
+* `Bar Chart`
 
 ## Dependencies
 * Mendix 7.8.0
@@ -29,8 +31,14 @@ Below are the properties for configuring series data:
 
 NB: The line chart's x-axis provides support for dates and thus the line chart can be configured as a time series.
 
+### Area chart
+The area chart has data properties identical to those of the line chart.
+
 ### Column chart
-The bar chart has data properties identical to those of the line chart but for one distinction: no support for Date data type
+The column chart has data properties identical to those of the line chart but for one distinction: no support for Date data type
+
+### Bar chart
+The bar chart configuration is identical to that of the column chart.
 
 ### Pie chart
 Unlike the chart types above, the pie chart requires no series.
