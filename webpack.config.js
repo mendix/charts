@@ -26,6 +26,7 @@ const widgetConfig = {
             "tests": path.resolve(__dirname, "./tests")
         }
     },
+    devtool: "source-map",
     module: {
         rules: [
             {
@@ -65,9 +66,6 @@ const widgetConfig = {
         new ExtractTextPlugin({ filename: `./com/mendix/widget/custom/[name]/ui/[name].css` }),
         new webpack.LoaderOptionsPlugin({
             debug: true
-        }),
-        new webpack.SourceMapDevToolPlugin({
-            filename: "./com/mendix/widget/custom/[name]/[name].js.map"
         })
     ]
 };
@@ -79,11 +77,9 @@ const plotlyCustomConfig = {
         filename: `com/mendix/widget/custom/${widgetName.toLowerCase()}/PlotlyCustom.js`,
         libraryTarget: "amd",
     },
+    devtool: "source-map",
     plugins: [
-        new webpack.LoaderOptionsPlugin({ debug: true }),
-        new webpack.SourceMapDevToolPlugin({
-            filename: `./com/mendix/widget/custom/${widgetName.toLowerCase()}/PlotlyCustom.js.map`
-        })
+        new webpack.LoaderOptionsPlugin({ debug: true })
     ]
 };
 
@@ -103,6 +99,7 @@ const previewConfig = {
     resolve: {
         extensions: [ ".ts", ".js" ]
     },
+    devtool: "source-map",
     module: {
         rules: [
             { test: /\.ts$/, loader: "ts-loader", options: {
@@ -117,10 +114,7 @@ const previewConfig = {
             ] }
         ]
     },
-    externals: [ "react", "react-dom" ],
-    plugins: [ new webpack.SourceMapDevToolPlugin({
-        filename: "./src/[name]/[name].webmodeler.js.map",
-    }) ]
+    externals: [ "react", "react-dom" ]
 };
 
 module.exports = [ widgetConfig, plotlyCustomConfig, previewConfig ];
