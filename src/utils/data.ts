@@ -99,7 +99,7 @@ export const fetchByMicroflow = (actionname: string, guid: string): Promise<mend
         });
     });
 
-export const handleOnClick = <T extends EventProps>(options: T, mxObject?: mendix.lib.MxObject) => {
+export const handleOnClick = <T extends EventProps>(options: T, mxObject?: mendix.lib.MxObject, mxform?: mxui.lib.form._FormBase) => {
     if (!mxObject || options.onClickEvent === "doNothing") {
         return;
     }
@@ -109,7 +109,8 @@ export const handleOnClick = <T extends EventProps>(options: T, mxObject?: mendi
             params: {
                 applyto: "selection",
                 guids: [ mxObject.getGuid() ]
-            }
+            },
+            origin: mxform
         });
     } else if (options.onClickEvent === "showPage" && options.onClickPage) {
         const context = new mendix.lib.MxContext();

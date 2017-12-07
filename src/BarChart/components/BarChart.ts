@@ -18,7 +18,7 @@ export interface BarChartProps extends Container.BarChartContainerProps {
     loading?: boolean;
     data?: Data.SeriesData[];
     defaultData?: ScatterData[];
-    onClick?: (series: Data.SeriesProps, dataObject: mendix.lib.MxObject) => void;
+    onClick?: (series: Data.SeriesProps, dataObject: mendix.lib.MxObject, mxform: mxui.lib.form._FormBase) => void;
     onHover?: (node: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) => void;
 }
 
@@ -151,7 +151,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     private onClick(data: ScatterHoverData<mendix.lib.MxObject>) {
         const pointClicked = data.points[0];
         if (this.props.onClick) {
-            this.props.onClick(pointClicked.data.series, pointClicked.customdata);
+            this.props.onClick(pointClicked.data.series, pointClicked.customdata, this.props.mxform);
         }
     }
 

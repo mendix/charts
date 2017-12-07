@@ -18,7 +18,7 @@ export interface PieChartProps extends PieChartContainerProps {
     defaultData?: PieData[];
     alertMessage?: ReactChild;
     loading?: boolean;
-    onClick?: (props: PieChartProps, dataObject: mendix.lib.MxObject) => void;
+    onClick?: (props: PieChartProps, dataObject: mendix.lib.MxObject, mxform: mxui.lib.form._FormBase) => void;
     onHover?: (node: HTMLDivElement, dataObject: mendix.lib.MxObject) => void;
 }
 
@@ -159,7 +159,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
 
     private onClick({ points }: ScatterHoverData<any> | PieHoverData) {
         if (this.props.onClick && this.props.data) {
-            this.props.onClick(this.props, this.props.data[points[0].pointNumber]);
+            this.props.onClick(this.props, this.props.data[points[0].pointNumber], this.props.mxform);
         }
     }
 

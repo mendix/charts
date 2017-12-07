@@ -24,7 +24,7 @@ export interface LineChartProps extends LineChartContainerProps {
     defaultData?: ScatterData[];
     loading?: boolean;
     alertMessage?: ReactChild;
-    onClick?: (series: SeriesProps, dataObject: mendix.lib.MxObject) => void;
+    onClick?: (series: SeriesProps, dataObject: mendix.lib.MxObject, mxform: mxui.lib.form._FormBase) => void;
     onHover?: (node: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) => void;
 }
 
@@ -155,7 +155,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
 
     private onClick({ points }: ScatterHoverData<mendix.lib.MxObject>) {
         if (this.props.onClick) {
-            this.props.onClick(points[0].data.series, points[0].customdata);
+            this.props.onClick(points[0].data.series, points[0].customdata, this.props.mxform);
         }
     }
 
