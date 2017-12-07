@@ -2,7 +2,7 @@
     "extends": "./tsconfig",
     "compilerOptions": {
         "module": "CommonJS",
-        "types": [ ]
+        "types": [ "mendix-client" ]
     },
     "exclude": [
         "**/*Container.ts",

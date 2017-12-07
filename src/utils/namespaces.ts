@@ -119,6 +119,29 @@ export namespace Container {
         valuePercentage: number;
         colour: number;
     }
+    export interface AnyChartContainerPropsBase extends WrapperProps, Style.Dimensions {
+        dataStatic: string;
+        dataAttribute: string;
+        layoutStatic: string;
+        layoutAttribute: string;
+        eventEntity: string;
+        eventDataAttribute: string;
+        onClickMicroflow: string;
+        tooltipEntity: string;
+        tooltipMicroflow: string;
+        tooltipForm: string;
+    }
+
+    export interface AnyChartContainerProps extends AnyChartContainerPropsBase {
+        devMode: "advanced" | "developer";
+    }
+
+    export interface AnyChartContainerState {
+        alertMessage?: ReactChild;
+        loading: boolean;
+        attributeData: string;
+        attributeLayout: string;
+    }
 }
 
 export namespace Data {

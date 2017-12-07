@@ -2,21 +2,15 @@ import { Component, ReactChild, createElement } from "react";
 
 import { AnyChart, AnyChartProps } from "./AnyChart";
 import { validateAdvancedOptions } from "../../utils/data";
-import { AnyChartContainerPropsBase } from "./interfaces";
-import { RuntimeProps } from "../../utils/types";
+// import { AnyChartContainerPropsBase } from "./interfaces";
+// import { RuntimeProps } from "../../utils/types";
 import { AnyPlayground } from "./AnyPlayground";
 
-// tslint:disable no-empty-interface
-export interface AnyChartContainerProps extends AnyChartContainerPropsBase, RuntimeProps {
-    devMode: "advanced" | "developer";
-}
+import { Container } from "../../utils/namespaces";
+import AnyChartContainerProps = Container.AnyChartContainerProps;
+import AnyChartContainerState = Container.AnyChartContainerState;
 
-interface AnyChartContainerState {
-    alertMessage?: ReactChild;
-    loading: boolean;
-    attributeData: string;
-    attributeLayout: string;
-}
+// tslint:disable no-empty-interface
 
 export default class AnyChartContainer extends Component<AnyChartContainerProps, AnyChartContainerState> {
     private subscriptionHandles: number[] = [];

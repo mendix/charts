@@ -6,11 +6,18 @@ import { PlotlyChart } from "./AnyPlotlyChart";
 
 import deepMerge from "deepmerge";
 import { Layout } from "plotly.js";
-import { Dimensions, getDimensions, parseStyle } from "../../utils/style";
+import { getDimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
 import "../../ui/Charts.scss";
 // TODO improve typing by replace explicit any types
+
+interface Dimensions {
+    width: number;
+    height: number;
+    widthUnit: "percentage" | "pixels";
+    heightUnit: "percentageOfWidth" | "pixels" | "percentageOfParent";
+}
 
 export interface AnyChartProps extends WrapperProps, Dimensions {
     alertMessage?: ReactChild;
@@ -88,14 +95,14 @@ export class AnyChart extends Component<AnyChartProps> {
     }
 
     private getData(props: AnyChartProps): any[] {
-            const arrayMerge = (_destinationArray: any[], sourceArray: any[]) => {
-                return sourceArray;
-            };
+            // const arrayMerge = (_destinationArray: any[], sourceArray: any[]) => {
+            //     return sourceArray;
+            // };
             try {
                 const staticData = JSON.parse(props.dataStatic || "[]");
                 if (props.attributeData) {
                     const attributeData = JSON.parse(props.attributeData);
-                    return deepMerge.all([ staticData, attributeData ], { arrayMerge });
+                    return deepMerge.all([ staticData, attributeData ] /* , { arrayMerge } */);
                 }
                 return staticData;
             } catch (error) {
