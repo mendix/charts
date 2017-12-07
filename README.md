@@ -1,3 +1,9 @@
+[![Build Status](https://travis-ci.org/mendixlabs/charts.svg?branch=master)](https://travis-ci.org/mendixlabs/charts)
+[![Dependency Status](https://david-dm.org/mendixlabs/charts.svg)](https://david-dm.org/mendixlabs/charts)
+[![Dev Dependency Status](https://david-dm.org/mendixlabs/charts.svg#info=devDependencies)](https://david-dm.org/mendixlabs/charts#info=devDependencies)
+[![codecov](https://codecov.io/gh/mendixlabs/charts/branch/master/graph/badge.svg)](https://codecov.io/gh/mendixlabs/charts)
+![badge](https://img.shields.io/badge/mendix-7.7.1-green.svg)
+
 # Charts
 Plot and compare your data across different charts.
 
