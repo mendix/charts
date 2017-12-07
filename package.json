@@ -1,7 +1,7 @@
 {
   "name": "charts",
   "widgetName": "Charts",
-  "version": "1.1.0-beta",
+  "version": "1.0.0-beta2",
   "description": "Create charts based on the Plotly library",
   "copyright": "Mendix BV",
   "scripts": {
