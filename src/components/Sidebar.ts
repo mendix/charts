@@ -1,6 +1,8 @@
-import { Component, createElement } from "react";
+import { Component, ReactElement, cloneElement, createElement, isValidElement } from "react";
 import * as classNames from "classnames";
 
+import { SidebarContent } from "./SidebarContent";
+import { SidebarHeader } from "./SidebarHeader";
 import "../ui/Sidebar.scss";
 
 interface SidebarProps {
@@ -8,6 +10,7 @@ interface SidebarProps {
     open: boolean;
     onClick?: () => void;
     onBlur?: () => void;
+    onClose?: () => void;
 }
 
 export class Sidebar extends Component<SidebarProps, {}> {
@@ -26,8 +29,31 @@ export class Sidebar extends Component<SidebarProps, {}> {
                 onClick: this.props.onClick
             },
             createElement("div", { className: "overlay", onClick: this.overlayClicked }),
-            this.props.children
+            createElement("div", { className: "sidebar-content" },
+                this.getSidebarElement("HEADER"),
+                this.getSidebarElement("CONTENT")
+            )
         );
+    }
+
+    private getSidebarElement(type: "HEADER" | "CONTENT") {
+        if (this.props.children) {
+            if (Array.isArray(this.props.children)) {
+                 const element = this.props.children.find(child =>
+                     isValidElement(child) && child.type === (type === "HEADER" ? SidebarHeader : SidebarContent)
+                 );
+
+                 return type === "HEADER"
+                     ? cloneElement(element as ReactElement<any>, { onClose: this.props.onClose })
+                     : element;
+            } else if (isValidElement(this.props.children)) {
+                return this.props.children.type === (type === "HEADER" ? SidebarHeader : SidebarContent)
+                    ? cloneElement(this.props.children as ReactElement<any>, { onClose: this.props.onClose })
+                    : null;
+            }
+        }
+
+        return null;
     }
 
     private overlayClicked() {

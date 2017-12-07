@@ -3,8 +3,7 @@
     <name>Area chart</name>
     <description>Create an area chart</description>
     <icon>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAPCAYAAADtc08vAAAAAXNSR0IArs4c6QAAAk1JREFUKBWVUktoE1EUPTOZOJOSTsUxDTatuipUjZ+MVEUrrtpIxFr8tLRKjRSLdCuI+6xciC4qCkXBUhCpiAsx4qIWrUXIIJSktIlJJF9D8UOMScjMZJw3pRRNofUu3n3vvHPOvY93KWwknjY+ADSxlkpJTC24BqJoz4nBUKdXLJVKBsFkMuHx2wnQNfTxLW6MCwGQvBL9S37oJmOvHkoMwyCfz6NYLAKq9o/BmC6S4fN2Dookg5xJkKxoPX0dF8RUKgWO42B0ImswrRTBfZ2kwTfg7hcjkQiOHTjaFIyE2uDhbAA1cqajW0yn0+B5Hp9mZyHY7ficiGYpw+Au7wZF+c57esV4PA6Hw4HQQgiOJgemP05JB/e0i7F4DC3NLcjFvuCQdRde/JiRiJbGLV1cga+n66y4GF2EVbDind8P3s5jLjmH3fucYvR7FMJ2Acn5BQw2uHHbeQP7Y9x7VKoSDVnznTrZLYYyIZi3mRHwT8HFtiI8LUHYISCjZVDvqEc2EIZX8GB47wA2b7Xh+HxdCtd/DdPO+KYPbyYnwTQzCD6bwVDjadxx3TRy8mUQrI1F7nXYOHtbz6FYKGDpawaKqho/yByOctkT7W6MPnqCkZ19uOa6DNZiMbKqqhid+Bsn72ZZC+SqanwAo6igrzov4kpbL7kzKpAqJAi2Fs4wZr2D5RFgqqpqahAElMvLE2Yo11k4zgKiIzRGVmTzt1wOiiKvI1u9/q13QHSGwc9CuY4Mxf8YkCcQnWFQLFUSl7qO3Fv139iOougEYf4Bcqrs2xS8EXQAAAAASUVORK5CYII=
-    </icon>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAPCAYAAAGadH+5AAAAAXNSR0IArs4c6QAAAqZJREFUKBWFU01IVFEU/u7Mmww1dX78CyemFEpFgnn9qlCg4MZFRIvASQkNk4iEaFFGC8lahLiLimxjiyAwwk0/hot+NJ2xFELLDEdH1Gmcsfd0/t6bd3v3yZspEjpwON/5zrmHc869F9Dlxpsfy3kvFKr51Q+X3Nztt3PUnJ7YTLg5EaMlVz/0dAyHKel8Oem1Wcy79LNEB+wcw2T3tfeus6f4PlmmkCQFpHRIoY0mHwgoFCk8x13MXGSJmgYjCWOyhrN72sVqjF/e99jZ/a2nob64PRKlINaWZ662lro+v7AOcSMKSU6oqqDKbsJ6NO4jXYNf5q05WfbNGViNlAR/iV5OkuTISiD0M0WnEDFySrIHna7uXb4PSnnNJ8Rj0APOnhlt0HfNBa1hcR01+218WBB5jiWUXB9xV5bm8YJqmc/w2NgUhNUwDLmtA+4qZzHvGZ9AfmEGz5ThE0dsEPwBjyE/B7zn4wia6vZA9HkhLng1TNXN+R/Ut5J7Hh9VhVX+SwghOM8XEY7Ftognkzl/ILjlDvSMf/agB/60h+96XUZC2k/X2fl4fDNiNAJPBxdSe2J0WednV8WtSfedKYkyy3zGi4EQxNAaBFGC3x9BNCohGIxpnNZB0aVXLmIwtjc3VPJLSxFYrSZ8nw3AZt2GgdfTntpqB7/oW0NBYQ58vlUc5wvx6PnMeELdjnHHmSfuc021F2Rr3s55BZgdHkW5Iwujn2awWOCAoPJCWgbic7M4VpGLg3styE43obTIGOtvO1ROuoa+zhu47fbefjeaTx6AJcMEYjCAKgqCGxJCMQJzGk3ybCSDegUrgVVvR02Zg4MsUZs5G1caj7KYJpSqrajDWTJNquosuy6VV4VCfWKUauNzcjyqAaJ9k1Ty/5Asx7V3+BtqcCOAaPnTrgAAAABJRU5ErkJggg==    </icon>
     <properties>
         <property key="series" type="object" isList="true">
             <caption>Series</caption>
@@ -16,8 +15,8 @@
                     <category>Data source</category>
                     <description/>
                     <translations>
-                        <translation lang="en_US">Series name</translation>
-                        <translation lang="nl_NL">Serie naam</translation>
+                        <translation lang="en_US">Series</translation>
+                        <translation lang="nl_NL">Serie</translation>
                     </translations>
                 </property>
                 <property key="dataEntity" type="entity" allowNonPersistableEntities="true">
@@ -89,29 +88,34 @@
                         <enumerationValue key="desc">Descending</enumerationValue>
                     </enumerationValues>
                 </property>
-                <property key="mode" type="enumeration" defaultValue="linesXmarkers">
-                    <caption>Line mode</caption>
+                <property key="mode" type="enumeration" defaultValue="lines">
+                    <caption>Border</caption>
                     <category>Appearance</category>
                     <description/>
                     <enumerationValues>
-                        <enumerationValue key="none">No lines</enumerationValue>
-                        <enumerationValue key="lines">Lines</enumerationValue>
-                        <enumerationValue key="linesXmarkers">Lines with markers</enumerationValue>
+                        <enumerationValue key="none">No</enumerationValue>
+                        <enumerationValue key="lines">Yes</enumerationValue>
+                        <enumerationValue key="linesXmarkers">Yes with markers</enumerationValue>
                     </enumerationValues>
                 </property>
                 <property key="lineStyle" type="enumeration" defaultValue="linear">
-                    <caption>Line style</caption>
+                    <caption>Border style</caption>
                     <category>Appearance</category>
-                    <description>Applicable only if the mode is either lines or lines with markers</description>
+                    <description/>
                     <enumerationValues>
-                        <enumerationValue key="linear">Straight line</enumerationValue>
-                        <enumerationValue key="spline">Curved line (spline)</enumerationValue>
+                        <enumerationValue key="linear">Straight</enumerationValue>
+                        <enumerationValue key="spline">Curved</enumerationValue>
                     </enumerationValues>
                 </property>
                 <property key="lineColor" type="string" required="false">
-                    <caption>Line color</caption>
+                    <caption>Border color</caption>
                     <category>Appearance</category>
                     <description/>
+                </property>
+                <property key="fillColor" type="string" required="false">
+                    <caption>Area color</caption>
+                    <category>Appearance</category>
+                    <description>By default, the border color with transparency is used</description>
                 </property>
                 <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
                     <caption>On click</caption>
@@ -146,21 +150,21 @@
                 </property>
             </properties>
         </property>
-        <property key="area" type="enumeration" defaultValue="separate">
+        <property key="area" type="enumeration" defaultValue="stacked">
             <caption>Area</caption>
             <category>Chart properties</category>
             <description/>
             <enumerationValues>
-                <enumerationValue key="separate">Separate</enumerationValue>
                 <enumerationValue key="stacked">Stacked</enumerationValue>
+                <enumerationValue key="separate">Separate</enumerationValue>
             </enumerationValues>
         </property>
-        <property key="xAxisLabel" type="string" required="false">
+        <property key="xAxisLabel" type="translatableString" required="false">
             <caption>X-axis label</caption>
             <category>Chart properties</category>
             <description/>
         </property>
-        <property key="yAxisLabel" type="string" required="false">
+        <property key="yAxisLabel" type="translatableString" required="false">
             <caption>Y-axis label</caption>
             <category>Chart properties</category>
             <description/>

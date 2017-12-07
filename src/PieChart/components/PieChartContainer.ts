@@ -1,26 +1,9 @@
 import { Component, ReactChild, createElement } from "react";
 
 import { PieChart } from "./PieChart";
-import {
-    DataSourceProps, EventProps, SortOrder, fetchByMicroflow, fetchByXPath, handleOnClick, validateSeriesProps
-} from "../../utils/data";
-import { Dimensions } from "../../utils/style";
-import { WrapperProps } from "../../utils/types";
-
-export type ChartType = "pie" | "donut";
-
-export interface PieChartContainerProps extends DataSourceProps, Dimensions, EventProps, WrapperProps {
-    nameAttribute: string;
-    valueAttribute: string;
-    sortAttribute: string;
-    sortOrder: SortOrder;
-    chartType: ChartType;
-    showLegend: boolean;
-    tooltipForm: string;
-    layoutOptions: string;
-    dataOptions: string;
-    devMode: "basic" | "advanced" | "developer";
-}
+import { fetchByMicroflow, fetchByXPath, handleOnClick, validateSeriesProps } from "../../utils/data";
+import { Container } from "../../utils/namespaces";
+import PieChartContainerProps = Container.PieChartContainerProps;
 
 interface PieChartContainerState {
     alertMessage?: ReactChild;

@@ -1,52 +1,11 @@
 import { ReactChild, createElement } from "react";
 import { Datum } from "plotly.js";
-import { LineMode } from "./types";
-
-export interface DataSourceProps {
-    dataSourceMicroflow: string;
-    dataSourceType: "XPath" | "microflow";
-    entityConstraint: string;
-    dataEntity: string;
-    sampleData: string;
-}
-
-export interface SeriesDataSourceProps extends DataSourceProps {
-    xValueAttribute: string;
-    xValueSortAttribute: string;
-    sortOrder: SortOrder;
-    yValueAttribute: string;
-}
-
-export type MxObject = mendix.lib.MxObject;
-export type SortOrder = "asc" | "desc";
-
-export interface EventProps {
-    onClickEvent: "doNothing" | "showPage" | "callMicroflow";
-    onClickPage: string;
-    onClickMicroflow: string;
-    tooltipForm: string;
-}
-
-export interface SeriesProps extends SeriesDataSourceProps, EventProps {
-    name: string;
-    seriesOptions: string;
-}
-
-export interface LineSeriesProps extends SeriesProps {
-    mode?: LineMode;
-    lineColor: string;
-    lineStyle: "linear" | "spline";
-}
-
-export interface SeriesData {
-    data: mendix.lib.MxObject[];
-    series: SeriesProps;
-}
-
-export interface ScatterTrace {
-    x: Datum[];
-    y: number[] | Datum[];
-}
+import { Data } from "./namespaces";
+import SeriesProps = Data.SeriesProps;
+import SeriesData = Data.SeriesData;
+import SortOrder = Data.SortOrder;
+import EventProps = Data.EventProps;
+import ScatterTrace = Data.ScatterTrace;
 
 export const validateSeriesProps = <T extends Partial<SeriesProps>>(dataSeries: T[], widgetId: string, layoutOptions: string): ReactChild => { // tslint:disable-line max-line-length
     if (dataSeries && dataSeries.length) {
@@ -62,14 +21,8 @@ export const validateSeriesProps = <T extends Partial<SeriesProps>>(dataSeries: 
                     errorMessage.push(`Invalid options JSON for ${identifier}: ${error}`);
                 }
             }
-            if (series.sampleData && series.sampleData.trim()) {
-                const error = validateAdvancedOptions(series.sampleData.trim());
-                if (error) {
-                    errorMessage.push(`Invalid sample data JSON for ${identifier}: ${error}`);
-                }
-            }
-            if (series.dataEntity) {
-                const dataEntityMeta = mx.meta.getEntity(series.dataEntity);
+            if (series.dataEntity && window.mx) {
+                const dataEntityMeta = window.mx.meta.getEntity(series.dataEntity);
                 if (series.dataSourceType === "XPath" && !dataEntityMeta.isPersistable()) {
                     errorMessage.push(`Entity ${series.dataEntity} should be persistable when using Data source 'Database'`);
                 }
@@ -104,7 +57,7 @@ export const validateAdvancedOptions = (rawData: string): string => {
     return "";
 };
 
-export const fetchSeriesData = (mxObject: MxObject, series: SeriesProps): Promise<SeriesData> =>
+export const fetchSeriesData = (mxObject: mendix.lib.MxObject, series: SeriesProps): Promise<SeriesData> =>
     new Promise<SeriesData>((resolve, reject) => {
         if (series.dataEntity) {
             if (series.dataSourceType === "XPath") {
@@ -121,7 +74,7 @@ export const fetchSeriesData = (mxObject: MxObject, series: SeriesProps): Promis
         }
     });
 
-export const fetchByXPath = (guid: string, entity: string, constraint: string, sortBy?: string, sortOrder: SortOrder = "asc"): Promise<MxObject[]> =>
+export const fetchByXPath = (guid: string, entity: string, constraint: string, sortBy?: string, sortOrder: SortOrder = "asc"): Promise<mendix.lib.MxObject[]> =>
     new Promise((resolve, reject) => {
         const entityPath = entity.split("/");
         const entityName = entityPath.length > 1 ? entityPath[entityPath.length - 1] : entity;
@@ -136,17 +89,17 @@ export const fetchByXPath = (guid: string, entity: string, constraint: string, s
         });
     });
 
-export const fetchByMicroflow = (actionname: string, guid: string): Promise<MxObject[]> =>
+export const fetchByMicroflow = (actionname: string, guid: string): Promise<mendix.lib.MxObject[]> =>
     new Promise((resolve, reject) => {
         const errorMessage = `An error occurred while retrieving data by microflow (${actionname}): `;
         window.mx.ui.action(actionname, {
-            callback: (mxObjects: MxObject[]) => resolve(mxObjects),
+            callback: (mxObjects: mendix.lib.MxObject[]) => resolve(mxObjects),
             error: error => reject(`${errorMessage} ${error.message}`),
             params: { applyto: "selection", guids: [ guid ] }
         });
     });
 
-export const handleOnClick = <T extends EventProps>(options: T, mxObject?: MxObject) => {
+export const handleOnClick = <T extends EventProps>(options: T, mxObject?: mendix.lib.MxObject, mxform?: mxui.lib.form._FormBase) => {
     if (!mxObject || options.onClickEvent === "doNothing") {
         return;
     }
@@ -156,7 +109,8 @@ export const handleOnClick = <T extends EventProps>(options: T, mxObject?: MxObj
             params: {
                 applyto: "selection",
                 guids: [ mxObject.getGuid() ]
-            }
+            },
+            origin: mxform
         });
     } else if (options.onClickEvent === "showPage" && options.onClickPage) {
         const context = new mendix.lib.MxContext();

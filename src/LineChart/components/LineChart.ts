@@ -2,35 +2,42 @@ import { Component, ReactChild, ReactElement, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
-import { LineChartContainerProps } from "./LineChartContainer";
 import { Playground } from "../../components/Playground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
-import { LineSeriesProps, SeriesData, SeriesProps, getRuntimeTraces, getSeriesTraces } from "../../utils/data";
+import { getRuntimeTraces, getSeriesTraces } from "../../utils/data";
 import deepMerge from "deepmerge";
+import { Container, Data } from "../../utils/namespaces";
 import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
 import { getDimensions, parseStyle } from "../../utils/style";
-import { LineMode } from "../../utils/types";
+
+import SeriesData = Data.SeriesData;
+import LineChartContainerProps = Container.LineChartContainerProps;
+import SeriesProps = Data.SeriesProps;
+import LineMode = Container.LineMode;
+import LineSeriesProps = Data.LineSeriesProps;
 
 import "../../ui/Charts.scss";
 
 export interface LineChartProps extends LineChartContainerProps {
-    data?: SeriesData[];
+    data?: SeriesData<LineSeriesProps>[];
     defaultData?: ScatterData[];
     loading?: boolean;
     alertMessage?: ReactChild;
-    onClick?: (series: SeriesProps, dataObject: mendix.lib.MxObject) => void;
+    onClick?: (series: SeriesProps, dataObject: mendix.lib.MxObject, mxform: mxui.lib.form._FormBase) => void;
     onHover?: (node: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) => void;
 }
 
 interface LineChartState {
     layoutOptions: string;
-    data?: SeriesData[];
+    data?: SeriesData<LineSeriesProps>[];
+    playgroundLoaded: boolean;
 }
 
 export class LineChart extends Component<LineChartProps, LineChartState> {
     private tooltipNode: HTMLDivElement;
     private defaultColors: string[] = [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ];
+    private Playground: typeof Playground;
 
     constructor(props: LineChartProps) {
         super(props);
@@ -41,7 +48,8 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         this.getTooltipNodeRef = this.getTooltipNodeRef.bind(this);
         this.state = {
             layoutOptions: props.layoutOptions,
-            data: props.data
+            data: props.data,
+            playgroundLoaded: false
         };
     }
 
@@ -49,10 +57,10 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         if (this.props.alertMessage) {
             return createElement(Alert, { className: "widget-charts-line-alert" }, this.props.alertMessage);
         }
-        if (this.props.loading) {
+        if (this.props.loading || (this.props.devMode === "developer" && !this.state.playgroundLoaded)) {
             return createElement(ChartLoading, { text: "Loading" });
         }
-        if (this.props.devMode === "developer") {
+        if (this.props.devMode === "developer" && this.state.playgroundLoaded) {
             return this.renderPlayground();
         }
 
@@ -64,6 +72,15 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             layoutOptions: newProps.layoutOptions,
             data: newProps.data
         });
+        if (newProps.devMode === "developer" && !this.state.playgroundLoaded) {
+            this.loadPlaygroundComponent();
+        }
+    }
+
+    private async loadPlaygroundComponent() {
+        const { Playground: PlaygroundImport } = await import("../../components/Playground");
+        this.Playground = PlaygroundImport;
+        this.setState({ playgroundLoaded: true });
     }
 
     private renderLineChart(): ReactElement<any> {
@@ -83,7 +100,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     private renderPlayground(): ReactElement<any> {
-        return createElement(Playground, {
+        return createElement(this.Playground, {
             series: {
                 rawData: this.state.data,
                 chartData: this.getData(this.props),
@@ -120,6 +137,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 const configOptions: Partial<ScatterData> = {
                     series,
                     marker: index < this.defaultColors.length ? { color: this.defaultColors[index] } : undefined,
+                    fillcolor: series.fillColor,
                     ... LineChart.getDefaultSeriesOptions(series as LineSeriesProps, props),
                     ... getSeriesTraces({ data, series })
                 };
@@ -137,7 +155,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
 
     private onClick({ points }: ScatterHoverData<mendix.lib.MxObject>) {
         if (this.props.onClick) {
-            this.props.onClick(points[0].data.series, points[0].customdata);
+            this.props.onClick(points[0].data.series, points[0].customdata, this.props.mxform);
         }
     }
 
@@ -153,11 +171,11 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         }
     }
 
-    private onRuntimeUpdate(layoutOptions: string, data: SeriesData[]) {
+    private onRuntimeUpdate(layoutOptions: string, data: SeriesData<LineSeriesProps>[]) {
         this.setState({ layoutOptions, data });
     }
 
-    private static defaultLayoutConfigs(props: LineChartProps): Partial<Layout> {
+    public static defaultLayoutConfigs(props: LineChartProps): Partial<Layout> {
         return {
             font: {
                 family: "Open Sans, sans-serif",
@@ -199,11 +217,11 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         };
     }
 
-    private static getConfigOptions(): Partial<Config> {
+    public static getConfigOptions(): Partial<Config> {
         return { displayModeBar: false, doubleClick: false };
     }
 
-    private static getDefaultSeriesOptions(series: LineSeriesProps, props: LineChartProps): Partial<ScatterData> {
+    public static getDefaultSeriesOptions(series: LineSeriesProps, props: LineChartProps): Partial<ScatterData> {
         return {
             connectgaps: true,
             hoveron: "points",
@@ -219,7 +237,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         };
     }
 
-    private static getStackedArea(traces: ScatterData[]) {
+    public static getStackedArea(traces: ScatterData[]) {
         for (let i = 1; i < traces.length; i++) {
             for (let j = 0; j < (Math.min(traces[i].y.length, traces[i - 1].y.length)); j++) {
                 (traces[i].y[j] as any) += traces[i - 1].y[j];

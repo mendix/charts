@@ -2,11 +2,12 @@ import { Component, createElement } from "react";
 
 import { Alert } from "../components/Alert";
 import { BarChart } from "./components/BarChart";
-import { BarChartContainerProps } from "./components/BarChartContainer";
 
 import { getRandomNumbers, validateSeriesProps } from "../utils/data";
 import deepMerge from "deepmerge";
 import { ScatterData } from "plotly.js";
+import { Container } from "../utils/namespaces";
+import BarChartContainerProps = Container.BarChartContainerProps;
 
 // tslint:disable-next-line class-name
 export class preview extends Component<BarChartContainerProps, {}> {
@@ -17,18 +18,16 @@ export class preview extends Component<BarChartContainerProps, {}> {
             ),
             createElement(BarChart, {
                 ...this.props as BarChartContainerProps,
-                defaultData: this.getData(this.props)
+                defaultData: preview.getData(this.props)
             })
         );
     }
 
-    private getData(props: BarChartContainerProps): ScatterData[] {
+    static getData(props: BarChartContainerProps): ScatterData[] {
         if (props.series) {
             return props.series.map(series => {
                 const seriesOptions = series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
-                const sampleData = series.sampleData && series.sampleData.trim()
-                    ? JSON.parse(series.sampleData.trim())
-                    : preview.getSampleTraces();
+                const sampleData = preview.getSampleTraces();
 
                 return deepMerge.all([ {
                     name: series.name,
@@ -50,7 +49,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
         ];
     }
 
-    private static getSampleTraces(): { x: (string | number)[], y: (string | number)[] } {
+    static getSampleTraces(): { x: (string | number)[], y: (string | number)[] } {
         return {
             x: getRandomNumbers(4, 100),
             y: [ "Sample 1", "Sample 2", "Sample 3", "Sample 4" ]
@@ -61,7 +60,12 @@ export class preview extends Component<BarChartContainerProps, {}> {
 export function getPreviewCss() {
     return (
         require("../ui/Charts.scss") +
-        require("../ui/ChartsLoading.scss")
+        require("../ui/ChartsLoading.scss") +
+        require("../ui/Sidebar.scss") +
+        require("../ui/Playground.scss") +
+        require("../ui/Panel.scss") +
+        require("../ui/InfoTooltip.scss") +
+        require("plotly.js/src/css/style.scss")
     );
 }
 
@@ -74,7 +78,13 @@ export function getVisibleProperties(valueMap: BarChartContainerProps, visibilit
                 visibilityMap.series[index].entityConstraint = false;
             }
             visibilityMap.series[index].seriesOptions = false;
-            visibilityMap.series[index].sampleData = false;
+            if (series.onClickEvent === "doNothing") {
+                visibilityMap.series[index].onClickPage = visibilityMap.series[index].onClickMicroflow = false;
+            } else if (series.onClickEvent === "callMicroflow") {
+                visibilityMap.series[index].onClickPage = false;
+            } else if (series.onClickEvent === "showPage") {
+                visibilityMap.series[index].onClickMicroflow = false;
+            }
         });
     }
     visibilityMap.layoutOptions = false;

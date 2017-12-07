@@ -6,7 +6,7 @@ import * as elementResize from "element-resize-detector";
 import { Config, Data, Layout, PieData, PieHoverData, ScatterData, ScatterHoverData } from "plotly.js";
 import { newPlot, purge } from "../PlotlyCustom";
 
-interface PlotlyChartProps {
+export interface PlotlyChartProps {
     type: "line" | "bar" | "pie";
     layout: Partial<Layout>;
     data: ScatterData[] | PieData[];
@@ -29,7 +29,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, {}> {
 
         this.getPlotlyNodeRef = this.getPlotlyNodeRef.bind(this);
         this.getTooltipNodeRef = this.getTooltipNodeRef.bind(this);
-        this.clearToolTip = this.clearToolTip.bind(this);
+        this.clearTooltip = this.clearTooltip.bind(this);
         this.onResize = this.onResize.bind(this);
     }
 
@@ -88,7 +88,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, {}> {
                 .then(myPlot => {
                     myPlot.on("plotly_click", onClick as any);
                     myPlot.on("plotly_hover", onHover as any);
-                    myPlot.on("plotly_unhover", this.clearToolTip);
+                    myPlot.on("plotly_unhover", this.clearTooltip);
                 });
         }
     }
@@ -100,7 +100,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, {}> {
         }
     }
 
-    private clearToolTip() {
+    private clearTooltip() {
         this.tooltipNode.innerHTML = "";
         this.tooltipNode.style.opacity = "0";
     }

@@ -1,12 +1,5 @@
-// tslint:disable no-console
+import { Style } from "./namespaces";
 import { CSSProperties } from "react";
-
-export interface Dimensions {
-    width: number;
-    height: number;
-    widthUnit: "percentage" | "pixels";
-    heightUnit: "percentageOfWidth" | "pixels" | "percentageOfParent";
-}
 
 export const parseStyle = (style = ""): {[key: string]: string} => { // Doesn't support a few stuff.
     try {
@@ -19,13 +12,13 @@ export const parseStyle = (style = ""): {[key: string]: string} => { // Doesn't 
             return styleObject;
         }, {});
     } catch (error) {
-        window.console.log("Failed to parse style", style, error);
+        window.console.log("Failed to parse style", style, error); // tslint:disable-line no-console
     }
 
     return {};
 };
 
-export const getDimensions = <T extends Dimensions>(props: T): CSSProperties => {
+export const getDimensions = <T extends Style.Dimensions>(props: T): CSSProperties => {
     const style: CSSProperties = {
         width: props.widthUnit === "percentage" ? `${props.width}%` : `${props.width}px`
     };

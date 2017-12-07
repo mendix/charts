@@ -2,12 +2,12 @@ import { Component, createElement } from "react";
 
 import { Alert } from "../components/Alert";
 import { LineChart } from "../LineChart/components/LineChart";
-import { LineChartContainerProps } from "../LineChart/components/LineChartContainer";
 
 import { getRandomNumbers, validateSeriesProps } from "../utils/data";
 import deepMerge from "deepmerge";
+import { Container } from "../utils/namespaces";
 import { ScatterData } from "plotly.js";
-import { LineMode } from "../utils/types";
+import LineChartContainerProps = Container.LineChartContainerProps;
 
 // tslint:disable-next-line class-name
 export class preview extends Component<LineChartContainerProps, {}> {
@@ -28,9 +28,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
         if (props.series) {
             return props.series.map(series => {
                 const seriesOptions = series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
-                const sampleData = series.sampleData.trim()
-                    ? JSON.parse(series.sampleData.trim())
-                    : preview.getSampleTraces();
+                const sampleData = preview.getSampleTraces();
 
                 return deepMerge.all([ seriesOptions, {
                     connectgaps: true,
@@ -39,7 +37,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                         color: series.lineColor,
                         shape: series.lineStyle
                     },
-                    mode: series.mode ? series.mode.replace("X", "+") as LineMode : "lines",
+                    mode: series.mode ? series.mode.replace("X", "+") as Container.LineMode : "lines",
                     name: series.name,
                     type: "scatter",
                     fill: "tonexty",
@@ -69,7 +67,12 @@ export class preview extends Component<LineChartContainerProps, {}> {
 export function getPreviewCss() {
     return (
         require("../ui/Charts.scss") +
-        require("../ui/ChartsLoading.scss")
+        require("../ui/ChartsLoading.scss") +
+        require("../ui/Sidebar.scss") +
+        require("../ui/Playground.scss") +
+        require("../ui/Panel.scss") +
+        require("../ui/InfoTooltip.scss") +
+        require("plotly.js/src/css/style.scss")
     );
 }
 
@@ -82,7 +85,13 @@ export function getVisibleProperties(valueMap: LineChartContainerProps, visibili
                 visibilityMap.series[index].entityConstraint = false;
             }
             visibilityMap.series[index].seriesOptions = false;
-            visibilityMap.series[index].sampleData = false;
+            if (series.onClickEvent === "doNothing") {
+                visibilityMap.series[index].onClickPage = visibilityMap.series[index].onClickMicroflow = false;
+            } else if (series.onClickEvent === "callMicroflow") {
+                visibilityMap.series[index].onClickPage = false;
+            } else if (series.onClickEvent === "showPage") {
+                visibilityMap.series[index].onClickMicroflow = false;
+            }
         });
     }
     visibilityMap.layoutOptions = false;
