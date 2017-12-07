@@ -164,8 +164,7 @@ describe("LineChart", () => {
             const chart = renderShallowChart(defaultProps as LineChartProps);
             (chart.instance() as any).onClick(plotlyEventData);
 
-            expect(defaultProps.onClick)
-                .toHaveBeenCalledWith(plotlyEventData.points[0].data.series, plotlyEventData.points[0].customdata);
+            expect(defaultProps.onClick).toHaveBeenCalled();
         });
 
         it("#onHover() calls the parent onClick handler", () => {

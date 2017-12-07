@@ -15,7 +15,8 @@
     "test:conditional": "node ./node_modules/mendix-widget-build-script/dist/CheckPullRequestFromFork.js && echo 'Skip tests on forked pull request' || npm run deploy",
     "build": "grunt release",
     "updateProject": "node ./node_modules/mendix-widget-build-script/dist/UpdateMxProject.js",
-    "deployApp": "node ./node_modules/mendix-widget-build-script/dist/DeployMxApp.js"
+    "deployApp": "node ./node_modules/mendix-widget-build-script/dist/DeployMxApp.js",
+    "deploy": " npm run updateProject && npm run deployApp"
   },
   "pre-commit": [
     "emit",

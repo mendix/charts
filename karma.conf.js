@@ -2,8 +2,8 @@ const webpack = require("webpack");
 const webpackConfig = require("./webpack.config")[0];
 const path = require("path");
 
-webpackConfig.plugins[webpackConfig.plugins.length - 1] = new webpack.SourceMapDevToolPlugin();
 Object.assign(webpackConfig, {
+    devtool: "inline-source-map",
     externals: [
         "react/lib/ExecutionEnvironment",
         "react/lib/ReactContext",
