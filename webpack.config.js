@@ -99,7 +99,7 @@ const previewConfig = {
     resolve: {
         extensions: [ ".ts", ".js" ]
     },
-    devtool: "source-map",
+    devtool: "inline-source-map",
     module: {
         rules: [
             { test: /\.ts$/, loader: "ts-loader", options: {
