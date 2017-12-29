@@ -24,7 +24,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
     }
 
     static getData(props: BarChartContainerProps): ScatterData[] {
-        if (props.series) {
+        if (props.series.length) {
             return props.series.map(series => {
                 const seriesOptions = series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
                 const sampleData = preview.getSampleTraces();
@@ -39,14 +39,12 @@ export class preview extends Component<BarChartContainerProps, {}> {
             });
         }
 
-        return [
-            {
+        return [ {
                 type: "bar",
                 orientation: "h",
                 name: "Sample",
                 ...preview.getSampleTraces()
-            } as ScatterData
-        ];
+            } ] as ScatterData[];
     }
 
     static getSampleTraces(): { x: (string | number)[], y: (string | number)[] } {

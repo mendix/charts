@@ -25,7 +25,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
     }
 
     private getData(props: LineChartContainerProps): ScatterData[] {
-        if (props.series) {
+        if (props.series.length) {
             return props.series.map(series => {
                 const seriesOptions = series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
                 const sampleData = preview.getSampleTraces();
@@ -52,6 +52,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
             hoveron: "points",
             name: "Sample",
             type: "scatter",
+            fill: "tonexty",
             ...preview.getSampleTraces()
         } as ScatterData ];
     }
