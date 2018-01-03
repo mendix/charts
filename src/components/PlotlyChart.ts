@@ -127,7 +127,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         }
     }
 
-    private renderChart({ config, data, layout, onClick, onHover }: PlotlyChartProps) {
+    private async renderChart({ config, data, layout, onClick, onHover }: PlotlyChartProps) {
         if (this.chartNode) {
             const style = window.getComputedStyle(this.chartNode);
 

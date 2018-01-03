@@ -7,7 +7,7 @@
         <property key="dataStatic" type="string" required="false" multiline="true">
             <caption>Static</caption>
             <category>Data</category>
-            <description>JSON Array based on https://plot.ly/javascript/reference/</description>
+            <description>JSON array based on https://plot.ly/javascript/reference/</description>
         </property>
         <property key="dataAttribute" type="attribute" required="false">
             <caption>Source attribute</caption>

@@ -1,13 +1,10 @@
 import { Component, createElement } from "react";
 
-import { AnyChart } from "../AnyChart/components/AnyChart";
-// import { AnyChartContainerPropsBase } from "./components/interfaces";
+import { AnyChart } from "./components/AnyChart";
 import { Container } from "../utils/namespaces";
-import AnyChartContainerProps = Container.AnyChartContainerProps;
-// import AnyChartContainerState = Container.AnyChartContainerState;
 
 // tslint:disable-next-line class-name
-export class preview extends Component<AnyChartContainerProps, {}> {
+export class preview extends Component<Container.AnyChartContainerProps, {}> {
     render() {
         return createElement("div", {},
             createElement(AnyChart, this.props as any)
@@ -18,6 +15,11 @@ export class preview extends Component<AnyChartContainerProps, {}> {
 export function getPreviewCss() {
     return (
         require("../ui/Charts.scss") +
-        require("../ui/ChartsLoading.scss")
+        require("../ui/ChartsLoading.scss") +
+        require("../ui/Sidebar.scss") +
+        require("../ui/Playground.scss") +
+        require("../ui/Panel.scss") +
+        require("../ui/InfoTooltip.scss") +
+        require("plotly.js/src/css/style.scss")
     );
 }

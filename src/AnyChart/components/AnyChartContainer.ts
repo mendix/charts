@@ -1,16 +1,15 @@
+let __webpack_public_path__;
 import { Component, ReactChild, createElement } from "react";
 
 import { AnyChart, AnyChartProps } from "./AnyChart";
-import { validateAdvancedOptions } from "../../utils/data";
-// import { AnyChartContainerPropsBase } from "./interfaces";
-// import { RuntimeProps } from "../../utils/types";
 import { AnyPlayground } from "./AnyPlayground";
+import { validateAdvancedOptions } from "../../utils/data";
 
 import { Container } from "../../utils/namespaces";
 import AnyChartContainerProps = Container.AnyChartContainerProps;
 import AnyChartContainerState = Container.AnyChartContainerState;
 
-// tslint:disable no-empty-interface
+__webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
 export default class AnyChartContainer extends Component<AnyChartContainerProps, AnyChartContainerState> {
     private subscriptionHandles: number[] = [];
@@ -42,45 +41,33 @@ export default class AnyChartContainer extends Component<AnyChartContainerProps,
             height: this.props.height,
             heightUnit: this.props.heightUnit
         };
+
         return createElement("div", {},
-            this.props.devMode === "developer"
-                ? createElement(AnyPlayground, anyProps)
-                : createElement(AnyChart, anyProps)
+                createElement(this.props.devMode === "developer" ? AnyPlayground : AnyChart, anyProps)
         );
     }
 
     componentWillReceiveProps(newProps: AnyChartContainerProps) {
         this.resetSubscriptions(newProps.mxObject);
-        if (!this.state.loading) {
-            this.setState({ loading: true });
-        }
+        this.setState({ loading: true });
         this.fetchData(newProps.mxObject);
     }
 
     private fetchData(mxObject?: mendix.lib.MxObject) {
         const { dataAttribute, layoutAttribute, friendlyId } = this.props;
-        let attributeData = "[]";
-        let attributeLayout = "{}";
+        const attributeData = mxObject && dataAttribute ? mxObject.get(dataAttribute) as string : "[]";
+        const attributeLayout = mxObject && layoutAttribute ? mxObject.get(layoutAttribute) as string : "{}";
         const errorMessages: string[] = [];
-        if (mxObject) {
-            if (dataAttribute) {
-                attributeData = mxObject.get(dataAttribute) ? mxObject.get(dataAttribute) as string : "[]";
-                const error = validateAdvancedOptions(attributeData);
-                if (error) {
-                    errorMessages.push(error);
-                }
-            }
-            if (layoutAttribute) {
-                attributeLayout = mxObject.get(layoutAttribute) ? mxObject.get(layoutAttribute) as string : "{}";
-                const error = validateAdvancedOptions(attributeLayout);
-                if (error) {
-                    errorMessages.push(error);
-                }
-            }
+        let error = validateAdvancedOptions(attributeData);
+        if (error) {
+            errorMessages.push(error);
         }
-        const alertMessage = this.renderError(friendlyId, errorMessages);
+        error = validateAdvancedOptions(attributeLayout);
+        if (error) {
+            errorMessages.push(error);
+        }
         this.setState({
-            alertMessage,
+            alertMessage: this.renderError(friendlyId, errorMessages),
             loading: false,
             attributeData,
             attributeLayout
@@ -120,7 +107,6 @@ export default class AnyChartContainer extends Component<AnyChartContainerProps,
                 callback: object => {
                     object.set(eventDataAttribute, JSON.stringify(data));
                     mx.ui.action(onClickMicroflow, {
-                        callback: () => { /* */ },
                         params: { applyto: "selection", guids: [ object.getGuid() ] },
                         error: error => window.mx.ui.error(`Error executing on click microflow ${onClickMicroflow} : ${error.message}`)
                     });

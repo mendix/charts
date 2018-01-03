@@ -1,10 +1,13 @@
-import { Component, ReactChild, /*ReactElement, */createElement } from "react";
+
+// tslint:disable no-console
+import { Component, ReactChild, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
-import { PlotlyChart } from "./AnyPlotlyChart";
+import { PlotlyChart } from "../../components/PlotlyChart";
 
 import deepMerge from "deepmerge";
+import { Style } from "../../utils/namespaces";
 import { Layout } from "plotly.js";
 import { getDimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
@@ -12,14 +15,7 @@ import { WrapperProps } from "../../utils/types";
 import "../../ui/Charts.scss";
 // TODO improve typing by replace explicit any types
 
-interface Dimensions {
-    width: number;
-    height: number;
-    widthUnit: "percentage" | "pixels";
-    heightUnit: "percentageOfWidth" | "pixels" | "percentageOfParent";
-}
-
-export interface AnyChartProps extends WrapperProps, Dimensions {
+export interface AnyChartProps extends WrapperProps, Style.Dimensions {
     alertMessage?: ReactChild;
     loading?: boolean;
     dataStatic: string;
@@ -31,7 +27,7 @@ export interface AnyChartProps extends WrapperProps, Dimensions {
 }
 
 export class AnyChart extends Component<AnyChartProps> {
-    private tooltipNode: HTMLDivElement;
+    private tooltipNode?: HTMLDivElement;
 
     constructor(props: AnyChartProps) {
         super(props);
@@ -74,19 +70,18 @@ export class AnyChart extends Component<AnyChartProps> {
     }
 
     private getTooltipNodeRef(node: HTMLDivElement) {
-        this.tooltipNode = node;
+        if (node) {
+            this.tooltipNode = node;
+        }
     }
 
     private renderChart() {
-        const layout = this.getLayoutOptions(this.props);
-        const data = this.getData(this.props);
-        // logger.error("renderChart", layout, data);
         return createElement(PlotlyChart, {
-            type: "any",
+            type: "full",
             className: this.props.class,
             style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
-            layout,
-            data,
+            layout: this.getLayoutOptions(this.props),
+            data: this.getData(this.props),
             config: {},
             onClick: this.onClick,
             onHover: this.onHover,
@@ -95,55 +90,43 @@ export class AnyChart extends Component<AnyChartProps> {
     }
 
     private getData(props: AnyChartProps): any[] {
-            // const arrayMerge = (_destinationArray: any[], sourceArray: any[]) => {
-            //     return sourceArray;
-            // };
             try {
                 const staticData = JSON.parse(props.dataStatic || "[]");
-                if (props.attributeData) {
-                    const attributeData = JSON.parse(props.attributeData);
-                    return deepMerge.all([ staticData, attributeData ] /* , { arrayMerge } */);
-                }
-                return staticData;
+
+                return props.attributeData
+                    ? deepMerge.all([ staticData, JSON.parse(props.attributeData) ])
+                    : staticData;
             } catch (error) {
-                // tslint:disable no-console
                 console.error("Failed convert data into JSON: ", props.dataStatic, props.attributeData, error);
-                return {} as any;
+
+                return [];
             }
     }
 
     private getLayoutOptions(props: AnyChartProps): Partial<Layout> {
-        const arrayMerge = (_destinationArray: any[], sourceArray: any[]) => {
-            return sourceArray;
-        };
+        const arrayMerge = (_destinationArray: any[], sourceArray: any[]) => sourceArray;
         try {
             const staticLayout = JSON.parse(props.layoutStatic || "{}");
-            if (props.attributeData) {
-                const attributeLayout = JSON.parse(props.attributeLayout);
-                return deepMerge.all([ staticLayout, attributeLayout ], { arrayMerge }) as Partial<Layout>;
-            }
 
-            return staticLayout;
+            return props.attributeData
+                ? deepMerge.all([ staticLayout, JSON.parse(props.attributeLayout) ], { arrayMerge }) as Partial<Layout>
+                : staticLayout;
 
         } catch (error) {
             console.error("Failed convert layout to JSON: ", props.dataStatic, props.attributeData, error);
-            return {} as any;
+
+            return {};
         }
     }
 
     private onClick({ points }: any) {
-        // tslint:disable no-console
-        console.log("implement click", arguments);
         if (this.props.onClick) {
-            const result = this.copyPoints(points);
-            this.props.onClick(result);
+            this.props.onClick(this.copyPoints(points));
         }
     }
 
     private onHover({ points, event }: any) {
-        // logger.error("implement hover", arguments);
-        console.log("implement hover", arguments[0]);
-        if (this.props.onHover) {
+        if (this.props.onHover && this.tooltipNode) {
             const { x, xaxis, y, yaxis } = points[0];
             this.tooltipNode.innerHTML = "";
             if (xaxis && yaxis) {
@@ -162,8 +145,7 @@ export class AnyChart extends Component<AnyChartProps> {
             }
 
             this.tooltipNode.style.opacity = "1";
-            const result = this.copyPoints(points);
-            this.props.onHover(result, this.tooltipNode);
+            this.props.onHover(this.copyPoints(points), this.tooltipNode);
         }
     }
 
@@ -175,6 +157,7 @@ export class AnyChart extends Component<AnyChartProps> {
                     result[key] = point[key];
                 }
             }
+
             return result;
         });
     }
