@@ -125,7 +125,7 @@ export const handleOnClick = <T extends EventProps>(options: T, mxObject?: mendi
 export const getSeriesTraces = ({ data, series }: SeriesData): ScatterTrace =>
     ({
         x: data ? data.map(mxObject => getXValue(mxObject, series)) : [],
-        y: data ? data.map(mxObject => parseInt(mxObject.get(series.yValueAttribute) as string, 10)) : []
+        y: data ? data.map(mxObject => parseFloat(mxObject.get(series.yValueAttribute) as string)) : []
     });
 
 export const getRuntimeTraces = ({ data, series }: SeriesData): ({ name: string } & ScatterTrace) =>
