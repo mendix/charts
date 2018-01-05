@@ -1,4 +1,4 @@
-import { BarMode, Datum, ScatterData } from "plotly.js";
+import { AxisType, BarMode, Datum, ScatterData } from "plotly.js";
 import { ReactChild } from "react";
 
 export namespace Container {
@@ -31,6 +31,8 @@ export namespace Container {
     export interface LineLayoutProps extends LayoutProps {
         fill: boolean;
         area?: "separate" | "stacked";
+        showRangeSlider: boolean;
+        xAxisType?: AxisType;
     }
 
     export type LineMode = "lines" | "markers" | "lines+markers" | "none";
