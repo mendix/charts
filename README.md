@@ -77,8 +77,8 @@ Layout options control the general appearance of the chart. Common options inclu
 On the pie chart, the data options control the appearance of the pie circle beyond the general layout options. Options include hole, name, marker e.t.c
 
     {
-        "name": "May Pie',
-        "hole": 0.4
+        "name": "My Pie",
+        "hole": 0.4,
         "hoverinfo": "label+percent+name",
         "textinfo": "none"
     }
