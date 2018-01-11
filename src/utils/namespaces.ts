@@ -104,6 +104,7 @@ export namespace Data {
         mode?: Container.LineMode;
         lineColor: string;
         lineStyle: "linear" | "spline";
+        fill?: boolean;
         fillColor?: string;
     }
 

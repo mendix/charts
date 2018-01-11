@@ -235,7 +235,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             mode: series.mode ? series.mode.replace("X", "+") as LineMode : "lines",
             name: series.name,
             type: "scatter",
-            fill: props.fill ? "tonexty" : "none"
+            fill: props.fill || series.fill ? "tonexty" : "none"
         };
     }
 

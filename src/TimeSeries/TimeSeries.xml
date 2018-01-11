@@ -2,7 +2,7 @@
 <widget id="com.mendix.widget.custom.TimeSeries.TimeSeries" needsEntityContext="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
     <name>Time series</name>
     <description>Renders a time series chart</description>
-    <icon>iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAZdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuMTM0A1t6AAABHElEQVQ4T2MAgv+kAPI0/PoO5REBGFgYGf5XSPz/8BwqQAiAbVhdAEI4wO+//1ff/p9z8L/N2v88MyEagMYXC2Ba8vnn/4pj/yXm/XdY97/73P/DT0EiYA1AsLbk/4yA/39+g1WCwPHn/xUW/i849P/xZ6gIBMA0AJXODgEhsJ72M/9l5v/f/QgkgwZgGoAArOdPu/HiaX1h8y49/wIVRgNIGv6DbE+bc2hPc/SfanmQr6Z4/N9U8//6bqg0GCA0bL4P8l/NCVCwgMDn1/8vbQZp6LX532bw/8J6sChYA9D2mF3/VRaDwgE7uLn/f7/D/w4TYEgyMDCxaCwBGfwdEUI4wLZmYBSDbACGLrHgwnqQBiiHOADSQAJgYAAAseFsUHNH1EQAAAAASUVORK5CYII=</icon>
+    <icon>iVBORw0KGgoAAAANSUhEUgAAABAAAAAPCAYAAADtc08vAAAAAXNSR0IArs4c6QAAAk1JREFUKBWVUktoE1EUPTOZOJOSTsUxDTatuipUjZ+MVEUrrtpIxFr8tLRKjRSLdCuI+6xciC4qCkXBUhCpiAsx4qIWrUXIIJSktIlJJF9D8UOMScjMZJw3pRRNofUu3n3vvHPOvY93KWwknjY+ADSxlkpJTC24BqJoz4nBUKdXLJVKBsFkMuHx2wnQNfTxLW6MCwGQvBL9S37oJmOvHkoMwyCfz6NYLAKq9o/BmC6S4fN2Dookg5xJkKxoPX0dF8RUKgWO42B0ImswrRTBfZ2kwTfg7hcjkQiOHTjaFIyE2uDhbAA1cqajW0yn0+B5Hp9mZyHY7ficiGYpw+Au7wZF+c57esV4PA6Hw4HQQgiOJgemP05JB/e0i7F4DC3NLcjFvuCQdRde/JiRiJbGLV1cga+n66y4GF2EVbDind8P3s5jLjmH3fucYvR7FMJ2Acn5BQw2uHHbeQP7Y9x7VKoSDVnznTrZLYYyIZi3mRHwT8HFtiI8LUHYISCjZVDvqEc2EIZX8GB47wA2b7Xh+HxdCtd/DdPO+KYPbyYnwTQzCD6bwVDjadxx3TRy8mUQrI1F7nXYOHtbz6FYKGDpawaKqho/yByOctkT7W6MPnqCkZ19uOa6DNZiMbKqqhid+Bsn72ZZC+SqanwAo6igrzov4kpbL7kzKpAqJAi2Fs4wZr2D5RFgqqpqahAElMvLE2Yo11k4zgKiIzRGVmTzt1wOiiKvI1u9/q13QHSGwc9CuY4Mxf8YkCcQnWFQLFUSl7qO3Fv139iOougEYf4Bcqrs2xS8EXQAAAAASUVORK5CYII=</icon>
     <properties>
         <property key="series" type="object" isList="true">
             <caption>Series</caption>
@@ -61,19 +61,6 @@
                         <attributeType name="Integer"/>
                     </attributeTypes>
                 </property>
-                <property key="xValueSortAttribute" type="attribute" entityProperty="dataEntity" required="false">
-                    <caption>X-axis sort attribute</caption>
-                    <category>Data points</category>
-                    <description>Attribute to use for sorting the x-axis data (ascending)</description>
-                    <attributeTypes>
-                        <attributeType name="Decimal"/>
-                        <attributeType name="Long"/>
-                        <attributeType name="Integer"/>
-                        <attributeType name="String"/>
-                        <attributeType name="AutoNumber"/>
-                        <attributeType name="DateTime"/>
-                    </attributeTypes>
-                </property>
                 <property key="sortOrder" type="enumeration" defaultValue="asc">
                     <caption>Sort order</caption>
                     <category>Data points</category>
@@ -106,6 +93,16 @@
                     <caption>Line color</caption>
                     <category>Appearance</category>
                     <description/>
+                </property>
+                <property key="fill" type="boolean" defaultValue="true">
+                    <caption>Fill area</caption>
+                    <category>Appearance</category>
+                    <description>Fill area between data point and x-axis</description>
+                </property>
+                <property key="fillColor" type="string" required="false">
+                    <caption>Area color</caption>
+                    <category>Appearance</category>
+                    <description>By default, the border color with transparency is used</description>
                 </property>
                 <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
                     <caption>On click</caption>
@@ -165,11 +162,6 @@
                 <enumerationValue key="vertical">Vertical</enumerationValue>
                 <enumerationValue key="both">Horizontal and vertical</enumerationValue>
             </enumerationValues>
-        </property>
-        <property key="fill" type="boolean" defaultValue="true">
-            <caption>Fill area</caption>
-            <category>Chart properties</category>
-            <description>Fill area between data point and x-axis</description>
         </property>
         <property key="showRangeSlider" type="boolean" defaultValue="false">
             <caption>Show range slider</caption>
