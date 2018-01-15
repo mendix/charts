@@ -132,7 +132,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                     x: props.orientation === "bar" ? traces.y : traces.x,
                     y: props.orientation === "bar" ? traces.x : traces.y,
                     series,
-                    marker: index < this.defaultColors.length ? { color: this.defaultColors[index] } : undefined,
+                    marker: index < this.defaultColors.length ? { color: this.defaultColors[index] } : {},
                     ... BarChart.getDefaultSeriesOptions(series, props)
                 };
 

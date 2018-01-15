@@ -136,7 +136,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                     : {};
                 const configOptions: Partial<ScatterData> = {
                     series,
-                    marker: index < this.defaultColors.length ? { color: this.defaultColors[index] } : undefined,
+                    marker: index < this.defaultColors.length ? { color: this.defaultColors[index] } : {},
                     fillcolor: series.fillColor,
                     ... LineChart.getDefaultSeriesOptions(series as LineSeriesProps, props),
                     ... getSeriesTraces({ data, series })
