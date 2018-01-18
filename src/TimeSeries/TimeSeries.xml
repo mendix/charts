@@ -61,15 +61,6 @@
                         <attributeType name="Integer"/>
                     </attributeTypes>
                 </property>
-                <property key="sortOrder" type="enumeration" defaultValue="asc">
-                    <caption>Sort order</caption>
-                    <category>Data points</category>
-                    <description/>
-                    <enumerationValues>
-                        <enumerationValue key="asc">Ascending</enumerationValue>
-                        <enumerationValue key="desc">Descending</enumerationValue>
-                    </enumerationValues>
-                </property>
                 <property key="mode" type="enumeration" defaultValue="lines">
                     <caption>Border</caption>
                     <category>Appearance</category>

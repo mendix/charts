@@ -78,7 +78,7 @@
                 <property key="xValueSortAttribute" type="attribute" entityProperty="dataEntity" required="false">
                     <caption>Y axis sort attribute</caption>
                     <category>Data points</category>
-                    <description>Attribute to use for sorting the y axis data</description>
+                    <description>Attribute to use for sorting the y axis data. Sorting can only be used when data soure is ‘Database’.  For data source ‘Microflow’, the sorting should be done within the microflow.</description>
                     <attributeTypes>
                         <attributeType name="Decimal"/>
                         <attributeType name="Long"/>
