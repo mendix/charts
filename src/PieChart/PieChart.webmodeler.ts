@@ -53,6 +53,8 @@ export function getVisibleProperties(valueMap: PieChartContainerProps, visibilit
         visibilityMap.dataSourceMicroflow = false;
     } else if (valueMap.dataSourceType === "microflow") {
         visibilityMap.entityConstraint = false;
+        visibilityMap.sortAttribute = false;
+        visibilityMap.sortOrder = false;
     }
     visibilityMap.layoutOptions = false;
     visibilityMap.devMode = false;

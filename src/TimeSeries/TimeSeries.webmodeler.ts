@@ -83,6 +83,7 @@ export function getVisibleProperties(valueMap: LineChartContainerProps, visibili
                 visibilityMap.series[index].dataSourceMicroflow = false;
             } else if (series.dataSourceType === "microflow") {
                 visibilityMap.series[index].entityConstraint = false;
+                visibilityMap.series[index].xValueSortAttribute = false;
             }
             visibilityMap.series[index].seriesOptions = false;
             if (series.onClickEvent === "doNothing") {
