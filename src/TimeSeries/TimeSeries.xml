@@ -1,20 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
-<widget id="com.mendix.widget.custom.ColumnChart.ColumnChart" needsEntityContext="true" offlineCapable="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
-    <name>Column chart</name>
-    <description>Create a column chart</description>
-    <icon>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAPCAYAAADtc08vAAAAAXNSR0IArs4c6QAAAjdJREFUKBWdk81rU0EUxc97mZe0qZrvVKooFClI3UVx23/AhRu3gouCIOrGlSBFcO1GcO2fINS9uLPRRdBNi4su2jRtmk/SvI+ZO+OdSYzGnT6Y4cKbc+5vzn3Pe3Fv/Q60WcH/PL7XFIbMpa13H9+Slv9kkfIDbN3feCgMjNc63AfRvMGjr8D3ccaZ3sjGeFOb90+lAlit0Jr8YvUipAznTnwbDXDz1kT1pV5Hvpybex8Ei7BaIZXx280DqL8IjM6g2+2i3+9jvbCNV40PzqDqXcHd6lMIJrBaoQ38fKWKJJknMDTkDhrGGGgi1GoTmp2dOi4Ui0inmYC1QitigkNHMHzwHF5jD6nrq9Cbr52BNSHS6HQ6joYU18fHjsBqBWmTypcriJmg19jF7WebDvWx2sd7ujYhkIpNyBmSJJwvFJBhAqsVipig1YRSEopzHX1qIPy8C/Vy7bdI0axWXHdPTiBEwNQ2RE2pXKmMOA5xygYyTiDB3STv3NUta8BL81UUE5zL55HJLMJqmQD+aevIEUg2SOIYCTRkGM66El9BEV9DE2RC6LXbUwIbIlmCEqIoxJE1iCI24I7xhMCGqP7IQCUKS7kcFhZ4Cqzl70AGNlWbge08ISCocTgboyX4FaIlGPBEzjgDqxX9UZQtLS87gx9sYISAKOWhwgi+7/NdMwiHY3ie5+qzYQR73oZotd7GavDEGL1mZ1fp6ctuhrw1sytoLk1/0qAJpHlNn6sD/8CWnufv/QQta4dIziei0AAAAABJRU5ErkJggg==
-    </icon>
+<?xml version="1.0" encoding="utf-8" ?>
+<widget id="com.mendix.widget.custom.TimeSeries.TimeSeries" needsEntityContext="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
+    <name>Time series</name>
+    <description>Renders a time series chart</description>
+    <icon>iVBORw0KGgoAAAANSUhEUgAAABAAAAAPCAYAAADtc08vAAAAAXNSR0IArs4c6QAAAk1JREFUKBWVUktoE1EUPTOZOJOSTsUxDTatuipUjZ+MVEUrrtpIxFr8tLRKjRSLdCuI+6xciC4qCkXBUhCpiAsx4qIWrUXIIJSktIlJJF9D8UOMScjMZJw3pRRNofUu3n3vvHPOvY93KWwknjY+ADSxlkpJTC24BqJoz4nBUKdXLJVKBsFkMuHx2wnQNfTxLW6MCwGQvBL9S37oJmOvHkoMwyCfz6NYLAKq9o/BmC6S4fN2Dookg5xJkKxoPX0dF8RUKgWO42B0ImswrRTBfZ2kwTfg7hcjkQiOHTjaFIyE2uDhbAA1cqajW0yn0+B5Hp9mZyHY7ficiGYpw+Au7wZF+c57esV4PA6Hw4HQQgiOJgemP05JB/e0i7F4DC3NLcjFvuCQdRde/JiRiJbGLV1cga+n66y4GF2EVbDind8P3s5jLjmH3fucYvR7FMJ2Acn5BQw2uHHbeQP7Y9x7VKoSDVnznTrZLYYyIZi3mRHwT8HFtiI8LUHYISCjZVDvqEc2EIZX8GB47wA2b7Xh+HxdCtd/DdPO+KYPbyYnwTQzCD6bwVDjadxx3TRy8mUQrI1F7nXYOHtbz6FYKGDpawaKqho/yByOctkT7W6MPnqCkZ19uOa6DNZiMbKqqhid+Bsn72ZZC+SqanwAo6igrzov4kpbL7kzKpAqJAi2Fs4wZr2D5RFgqqpqahAElMvLE2Yo11k4zgKiIzRGVmTzt1wOiiKvI1u9/q13QHSGwc9CuY4Mxf8YkCcQnWFQLFUSl7qO3Fv139iOougEYf4Bcqrs2xS8EXQAAAAASUVORK5CYII=</icon>
     <properties>
-        <property key="barMode" type="enumeration" defaultValue="group">
-            <caption>Bar mode</caption>
-            <category>Chart properties</category>
-            <description>The format the bar chart should appear in</description>
-            <enumerationValues>
-                <enumerationValue key="group">Grouped</enumerationValue>
-                <enumerationValue key="stack">Stacked</enumerationValue>
-            </enumerationValues>
-        </property>
         <property key="series" type="object" isList="true">
             <caption>Series</caption>
             <category>Chart properties</category>
@@ -59,44 +48,52 @@
                     <category>Data points</category>
                     <description/>
                     <attributeTypes>
-                        <attributeType name="String"/>
-                        <attributeType name="Decimal"/>
-                        <attributeType name="Long"/>
-                        <attributeType name="Integer"/>
-                        <attributeType name="Enum"/>
-                    </attributeTypes>
-                </property>
-                <property key="yValueAttribute" type="attribute" entityProperty="dataEntity">
-                    <caption>Y axis data attribute</caption>
-                    <category>Data points</category>
-                    <description/>
-                    <attributeTypes>
-                        <attributeType name="Decimal"/>
-                        <attributeType name="Long"/>
-                        <attributeType name="Integer"/>
-                    </attributeTypes>
-                </property>
-                <property key="xValueSortAttribute" type="attribute" entityProperty="dataEntity" required="false">
-                    <caption>X axis sort attribute</caption>
-                    <category>Data points</category>
-                    <description>Attribute to use for sorting the x axis data. Sorting can only be used when data soure is ‘Database’.  For data source ‘Microflow’, the sorting should be done within the microflow.</description>
-                    <attributeTypes>
-                        <attributeType name="Decimal"/>
-                        <attributeType name="Long"/>
-                        <attributeType name="Integer"/>
-                        <attributeType name="String"/>
-                        <attributeType name="AutoNumber"/>
                         <attributeType name="DateTime"/>
                     </attributeTypes>
                 </property>
-                <property key="sortOrder" type="enumeration" defaultValue="asc">
-                    <caption>Sort order</caption>
+                <property key="yValueAttribute" type="attribute" entityProperty="dataEntity">
+                    <caption>Y-axis data attribute</caption>
                     <category>Data points</category>
                     <description/>
+                    <attributeTypes>
+                        <attributeType name="Decimal"/>
+                        <attributeType name="Long"/>
+                        <attributeType name="Integer"/>
+                    </attributeTypes>
+                </property>
+                <property key="mode" type="enumeration" defaultValue="lines">
+                    <caption>Border</caption>
+                    <category>Appearance</category>
+                    <description/>
                     <enumerationValues>
-                        <enumerationValue key="asc">Ascending</enumerationValue>
-                        <enumerationValue key="desc">Descending</enumerationValue>
+                        <enumerationValue key="none">No</enumerationValue>
+                        <enumerationValue key="lines">Yes</enumerationValue>
+                        <enumerationValue key="linesXmarkers">Yes with markers</enumerationValue>
                     </enumerationValues>
+                </property>
+                <property key="lineStyle" type="enumeration" defaultValue="linear">
+                    <caption>Border style</caption>
+                    <category>Appearance</category>
+                    <description/>
+                    <enumerationValues>
+                        <enumerationValue key="linear">Straight</enumerationValue>
+                        <enumerationValue key="spline">Curved</enumerationValue>
+                    </enumerationValues>
+                </property>
+                <property key="lineColor" type="string" required="false">
+                    <caption>Line color</caption>
+                    <category>Appearance</category>
+                    <description/>
+                </property>
+                <property key="fill" type="boolean" defaultValue="true">
+                    <caption>Fill area</caption>
+                    <category>Appearance</category>
+                    <description>Fill area between data point and x-axis</description>
+                </property>
+                <property key="fillColor" type="string" required="false">
+                    <caption>Area color</caption>
+                    <category>Appearance</category>
+                    <description>By default, the border color with transparency is used</description>
                 </property>
                 <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
                     <caption>On click</caption>
@@ -131,12 +128,12 @@
                 </property>
             </properties>
         </property>
-        <property key="xAxisLabel" type="translatableString" required="false">
+        <property key="xAxisLabel" type="string" required="false">
             <caption>X-axis label</caption>
             <category>Chart properties</category>
             <description/>
         </property>
-        <property key="yAxisLabel" type="translatableString" required="false">
+        <property key="yAxisLabel" type="string" required="false">
             <caption>Y-axis label</caption>
             <category>Chart properties</category>
             <description/>
@@ -156,6 +153,11 @@
                 <enumerationValue key="vertical">Vertical</enumerationValue>
                 <enumerationValue key="both">Horizontal and vertical</enumerationValue>
             </enumerationValues>
+        </property>
+        <property key="showRangeSlider" type="boolean" defaultValue="false">
+            <caption>Show range slider</caption>
+            <category>Chart properties</category>
+            <description/>
         </property>
         <property key="widthUnit" type="enumeration" defaultValue="percentage">
             <caption>Width unit</caption>
@@ -178,7 +180,7 @@
             <enumerationValues>
                 <enumerationValue key="percentageOfWidth">Percentage of width</enumerationValue>
                 <enumerationValue key="pixels">Pixels</enumerationValue>
-                <enumerationValue key="percentageOfParent">Percentage of Parent</enumerationValue>
+                <enumerationValue key="percentageOfParent">Percentage of parent</enumerationValue>
             </enumerationValues>
         </property>
         <property key="height" type="integer" defaultValue="75">

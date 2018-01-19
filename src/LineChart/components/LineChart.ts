@@ -136,7 +136,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                     : {};
                 const configOptions: Partial<ScatterData> = {
                     series,
-                    marker: index < this.defaultColors.length ? { color: this.defaultColors[index] } : undefined,
+                    marker: index < this.defaultColors.length ? { color: this.defaultColors[index] } : {},
                     fillcolor: series.fillColor,
                     ... LineChart.getDefaultSeriesOptions(series as LineSeriesProps, props),
                     ... getSeriesTraces({ data, series })
@@ -189,7 +189,9 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 gridcolor: "#eaeaea",
                 title: props.xAxisLabel,
                 showgrid: props.grid === "vertical" || props.grid === "both",
-                fixedrange: true
+                fixedrange: props.xAxisType !== "date",
+                type: props.xAxisType,
+                rangeslider: { visible: props.showRangeSlider }
             },
             yaxis: {
                 rangemode: "tozero",
@@ -233,7 +235,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             mode: series.mode ? series.mode.replace("X", "+") as LineMode : "lines",
             name: series.name,
             type: "scatter",
-            fill: props.fill ? "tonexty" : "none"
+            fill: props.fill || series.fill ? "tonexty" : "none"
         };
     }
 

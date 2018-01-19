@@ -31,7 +31,6 @@ interface BarChartState {
 export class BarChart extends Component<BarChartProps, BarChartState> {
     private tooltipNode: HTMLDivElement;
     private defaultColors: string[] = [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ];
-
     private Playground: typeof Playground;
 
     constructor(props: BarChartProps) {
@@ -133,7 +132,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                     x: props.orientation === "bar" ? traces.y : traces.x,
                     y: props.orientation === "bar" ? traces.x : traces.y,
                     series,
-                    marker: index < this.defaultColors.length ? { color: this.defaultColors[index] } : undefined,
+                    marker: index < this.defaultColors.length ? { color: this.defaultColors[index] } : {},
                     ... BarChart.getDefaultSeriesOptions(series, props)
                 };
 

@@ -13,6 +13,7 @@ Plot and compare your data across different charts.
 * `Pie Chart`
 * `Area Chart`
 * `Bar Chart`
+* `Time Series Chart`
 
 ## Dependencies
 * Mendix 7.8.0
@@ -56,6 +57,9 @@ Below are the properties for configuring pie chart data:
 * `Color attribute`[required] - The attribute that contains the data point colors.
 * `Sort attribute` - The attribute to use for sorting the x-axis data.
 
+### Time series chart
+The time series chart is a specialised version of the line chart, focusing on the X-axis dates. It therefore has data properties identical to those of the line chart.
+
 ## Advanced configuration
 The charts in this widget are based on the [https://github.com/mendixlabs/charts/issues](Plotly) library.
 As such, the widget provides support for advanced users to extend or overwrite the basic settings by adding the chart properties as JSON.
@@ -77,8 +81,8 @@ Layout options control the general appearance of the chart. Common options inclu
 On the pie chart, the data options control the appearance of the pie circle beyond the general layout options. Options include hole, name, marker e.t.c
 
     {
-        "name": "May Pie',
-        "hole": 0.4
+        "name": "My Pie",
+        "hole": 0.4,
         "hoverinfo": "label+percent+name",
         "textinfo": "none"
     }

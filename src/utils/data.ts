@@ -61,7 +61,8 @@ export const fetchSeriesData = (mxObject: mendix.lib.MxObject, series: SeriesPro
     new Promise<SeriesData>((resolve, reject) => {
         if (series.dataEntity) {
             if (series.dataSourceType === "XPath") {
-                fetchByXPath(mxObject.getGuid(), series.dataEntity, series.entityConstraint, series.xValueSortAttribute, series.sortOrder)
+                const sortAttribute = series.xValueSortAttribute || series.xValueAttribute;
+                fetchByXPath(mxObject.getGuid(), series.dataEntity, series.entityConstraint, sortAttribute, series.sortOrder || "asc")
                     .then(mxObjects => resolve({ data: mxObjects, series }))
                     .catch(reject);
             } else if (series.dataSourceType === "microflow" && series.dataSourceMicroflow) {
@@ -125,7 +126,7 @@ export const handleOnClick = <T extends EventProps>(options: T, mxObject?: mendi
 export const getSeriesTraces = ({ data, series }: SeriesData): ScatterTrace =>
     ({
         x: data ? data.map(mxObject => getXValue(mxObject, series)) : [],
-        y: data ? data.map(mxObject => parseInt(mxObject.get(series.yValueAttribute) as string, 10)) : []
+        y: data ? data.map(mxObject => parseFloat(mxObject.get(series.yValueAttribute) as string)) : []
     });
 
 export const getRuntimeTraces = ({ data, series }: SeriesData): ({ name: string } & ScatterTrace) =>

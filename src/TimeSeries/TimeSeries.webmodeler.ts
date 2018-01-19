@@ -1,56 +1,65 @@
 import { Component, createElement } from "react";
 
 import { Alert } from "../components/Alert";
-import { BarChart } from "./components/BarChart";
+import { LineChart } from "../LineChart/components/LineChart";
 
 import { getRandomNumbers, validateSeriesProps } from "../utils/data";
 import deepMerge from "deepmerge";
 import { ScatterData } from "plotly.js";
 import { Container } from "../utils/namespaces";
-import BarChartContainerProps = Container.BarChartContainerProps;
+import LineChartContainerProps = Container.LineChartContainerProps;
 
 // tslint:disable-next-line class-name
-export class preview extends Component<BarChartContainerProps, {}> {
+export class preview extends Component<LineChartContainerProps, {}> {
     render() {
         return createElement("div", {},
-            createElement(Alert, { className: "widget-charts-bar-alert" },
+            createElement(Alert, { className: "widget-charts-area-alert" },
                 validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions)
             ),
-            createElement(BarChart, {
-                ...this.props as BarChartContainerProps,
-                defaultData: preview.getData(this.props)
+            createElement(LineChart, {
+                ...this.props as LineChartContainerProps,
+                fill: false,
+                defaultData: this.getData(this.props)
             })
         );
     }
 
-    static getData(props: BarChartContainerProps): ScatterData[] {
+    private getData(props: LineChartContainerProps): ScatterData[] {
         if (props.series.length) {
             return props.series.map(series => {
                 const seriesOptions = series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
                 const sampleData = preview.getSampleTraces();
 
-                return deepMerge.all([ {
+                return deepMerge.all([ seriesOptions, {
+                    connectgaps: true,
+                    hoveron: "points",
+                    line: {
+                        color: series.lineColor,
+                        shape: series.lineStyle
+                    },
+                    mode: series.mode ? series.mode.replace("X", "+") as Container.LineMode : "lines",
                     name: series.name,
-                    type: "bar",
-                    orientation: "h",
+                    type: "scatter",
+                    fill: "tonexty",
                     x: sampleData.x || [],
                     y: sampleData.y || []
-                }, seriesOptions ]);
+                } ]);
             });
         }
 
         return [ {
-                type: "bar",
-                orientation: "h",
-                name: "Sample",
-                ...preview.getSampleTraces()
-            } ] as ScatterData[];
+            connectgaps: true,
+            hoveron: "points",
+            name: "Sample",
+            type: "scatter",
+            ...preview.getSampleTraces()
+        } as ScatterData ];
     }
 
-    static getSampleTraces(): { x: (string | number)[], y: (string | number)[] } {
+    private static getSampleTraces(): { x: (string | number)[], y: (string | number)[] } {
         return {
-            x: getRandomNumbers(4, 100),
-            y: [ "Sample 1", "Sample 2", "Sample 3", "Sample 4" ]
+            x: [ "2017-10-04 22:23:00", "2017-11-04 22:23:00", "2017-12-04 22:23:00" ],
+            y: getRandomNumbers(4, 100)
         };
     }
 }
@@ -67,7 +76,7 @@ export function getPreviewCss() {
     );
 }
 
-export function getVisibleProperties(valueMap: BarChartContainerProps, visibilityMap: VisibilityMap<BarChartContainerProps>) { // tslint:disable-line max-line-length
+export function getVisibleProperties(valueMap: LineChartContainerProps, visibilityMap: VisibilityMap<LineChartContainerProps>) { // tslint:disable-line max-line-length
     if (valueMap.series && Array.isArray(valueMap.series)) {
         valueMap.series.forEach((series, index) => {
             if (series.dataSourceType === "XPath") {
@@ -75,7 +84,6 @@ export function getVisibleProperties(valueMap: BarChartContainerProps, visibilit
             } else if (series.dataSourceType === "microflow") {
                 visibilityMap.series[index].entityConstraint = false;
                 visibilityMap.series[index].xValueSortAttribute = false;
-                visibilityMap.series[index].sortOrder = false;
             }
             visibilityMap.series[index].seriesOptions = false;
             if (series.onClickEvent === "doNothing") {

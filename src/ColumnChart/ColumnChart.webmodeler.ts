@@ -24,7 +24,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
     }
 
     private getData(props: BarChartContainerProps): ScatterData[] {
-        if (props.series) {
+        if (props.series.length) {
             return props.series.map(series => {
                 const seriesOptions = series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
                 const sampleData = preview.getSampleTraces();
@@ -76,6 +76,8 @@ export function getVisibleProperties(valueMap: BarChartContainerProps, visibilit
                 visibilityMap.series[index].dataSourceMicroflow = false;
             } else if (series.dataSourceType === "microflow") {
                 visibilityMap.series[index].entityConstraint = false;
+                visibilityMap.series[index].xValueSortAttribute = false;
+                visibilityMap.series[index].sortOrder = false;
             }
             visibilityMap.series[index].seriesOptions = false;
             if (series.onClickEvent === "doNothing") {
