@@ -8,6 +8,7 @@
             <widgetFile path="AreaChart/AreaChart.xml"/>
             <widgetFile path="PieChart/PieChart.xml"/>
             <widgetFile path="TimeSeries/TimeSeries.xml"/>
+            <widgetFile path="HeatMap/HeatMap.xml"/>
         </widgetFiles>
         <files>
             <file path="com/mendix/widget/custom/ColumnChart"/>
@@ -16,6 +17,7 @@
             <file path="com/mendix/widget/custom/AreaChart"/>
             <file path="com/mendix/widget/custom/PieChart"/>
             <file path="com/mendix/widget/custom/TimeSeries"/>
+            <file path="com/mendix/widget/custom/HeatMap"/>
         </files>
     </clientModule>
 </package>

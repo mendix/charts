@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="utf-8"?>
+<widget id="com.mendix.widget.custom.HeatMap.HeatMap" needsEntityContext="true" offlineCapable="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
+    <name>Heat map</name>
+    <description>Renders a heat map chart</description>
+    <icon></icon>
+    <properties>
+        <property key="dataEntity" type="entity" allowNonPersistableEntities="true">
+            <caption>Entity</caption>
+            <category>Data source</category>
+            <description>The entity from which the data values will be retrieved</description>
+        </property>
+        <property key="dataSourceType" type="enumeration" defaultValue="XPath">
+            <caption>Data source</caption>
+            <category>Data source</category>
+            <description/>
+            <enumerationValues>
+                <enumerationValue key="XPath">Database</enumerationValue>
+                <enumerationValue key="microflow">Microflow</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="entityConstraint" type="entityConstraint" entityProperty="dataEntity" required="false">
+            <caption>XPath constraint</caption>
+            <category>Data source</category>
+            <description>Constraint on the data from the data entity (used when data source is Database)</description>
+        </property>
+        <property key="dataSourceMicroflow" type="microflow" required="false">
+            <caption>Microflow</caption>
+            <category>Data source</category>
+            <description>Returns a list of data values</description>
+            <returnType type="Object" entityProperty="dataEntity" isList="true"/>
+        </property>
+        <property key="valueAttribute" type="attribute" entityProperty="dataEntity">
+            <caption>Value attribute</caption>
+            <category>Data points</category>
+            <description/>
+            <attributeTypes>
+                <attributeType name="Integer"/>
+                <attributeType name="Decimal"/>
+                <attributeType name="Long"/>
+            </attributeTypes>
+        </property>
+        <property key="horizontalNameAttribute" type="attribute" entityProperty="dataEntity">
+            <caption>Horizontal name attribute</caption>
+            <category>Data points</category>
+            <description/>
+            <attributeTypes>
+                <attributeType name="String"/>
+            </attributeTypes>
+        </property>
+        <property key="horizontalSortAttribute" type="attribute" entityProperty="dataEntity" required="false">
+            <caption>Horizontal sort attribute</caption>
+            <category>Data points</category>
+            <description>Attribute to use for sorting the data. Sorting can only be used when data source is ‘Database’.  For data source ‘Microflow’, the sorting should be done within the microflow.</description>
+            <attributeTypes>
+                <attributeType name="Decimal"/>
+                <attributeType name="Long"/>
+                <attributeType name="Integer"/>
+                <attributeType name="String"/>
+                <attributeType name="AutoNumber"/>
+                <attributeType name="DateTime"/>
+            </attributeTypes>
+        </property>
+        <property key="horizontalSortOrder" type="enumeration" defaultValue="asc">
+            <caption>Horizontal sort order</caption>
+            <category>Data points</category>
+            <description/>
+            <enumerationValues>
+                <enumerationValue key="asc">Ascending</enumerationValue>
+                <enumerationValue key="desc">Descending</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="verticalNameAttribute" type="attribute" entityProperty="dataEntity">
+            <caption>Vertical name attribute</caption>
+            <category>Data points</category>
+            <description/>
+            <attributeTypes>
+                <attributeType name="String"/>
+            </attributeTypes>
+        </property>
+        <property key="verticalSortAttribute" type="attribute" entityProperty="dataEntity" required="false">
+            <caption>Vertical sort attribute</caption>
+            <category>Data points</category>
+            <description>Attribute to use for sorting the data. Sorting can only be used when data source is ‘Database’.  For data source ‘Microflow’, the sorting should be done within the microflow.</description>
+            <attributeTypes>
+                <attributeType name="Decimal"/>
+                <attributeType name="Long"/>
+                <attributeType name="Integer"/>
+                <attributeType name="String"/>
+                <attributeType name="AutoNumber"/>
+                <attributeType name="DateTime"/>
+            </attributeTypes>
+        </property>
+        <property key="verticalSortOrder" type="enumeration" defaultValue="asc">
+            <caption>Vertical sort order</caption>
+            <category>Data points</category>
+            <description/>
+            <enumerationValues>
+                <enumerationValue key="asc">Ascending</enumerationValue>
+                <enumerationValue key="desc">Descending</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="showLegend" type="boolean" defaultValue="true">
+            <caption>Show scale</caption>
+            <category>Scale</category>
+            <description/>
+        </property>
+        <property key="scaleColors" type="object" isList="true">
+            <caption>Colors</caption>
+            <category>Scale</category>
+            <description>Default color is 0 = blue and 1 = red</description>
+            <properties>
+                <property key="valuePercentage" type="integer" defaultValue="0">
+                    <caption>Value percentage</caption>
+                    <category>Color</category>
+                    <description>Value minimum 0 and maximum 100</description>
+                </property>
+                <property key="colour" type="string" >
+                    <caption>Colour</caption>
+                    <category>Color</category>
+                    <description>CSS values</description>
+                </property>
+            </properties>
+        </property>
+        <property key="showValues" type="boolean" defaultValue="false">
+            <caption>Show values</caption>
+            <category>Scale</category>
+            <description/>
+        </property>
+        <property key="valuesColor" type="string" defaultValue="#000000">
+            <caption>Font value color</caption>
+            <category>Scale</category>
+            <description/>
+        </property>
+        <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
+            <caption>On click</caption>
+            <category>Events</category>
+            <description/>
+            <enumerationValues>
+                <enumerationValue key="doNothing">Do nothing</enumerationValue>
+                <enumerationValue key="showPage">Show a page</enumerationValue>
+                <enumerationValue key="callMicroflow">Call a microflow</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="onClickPage" type="form" required="false">
+            <caption>On click page</caption>
+            <category>Events</category>
+            <description>The page that will be opened on click</description>
+        </property>
+        <property key="onClickMicroflow" type="microflow" required="false" entityProperty="dataEntity">
+            <caption>On click microflow</caption>
+            <category>Events</category>
+            <description>The microflow that will be executed on click</description>
+            <returnType type="Void"/>
+        </property>
+        <property key="tooltipForm" type="form" required="false">
+            <caption>Tooltip form</caption>
+            <category>Events</category>
+            <description>The form to show when a user hovers over a chart plot point</description>
+        </property>
+        <property key="widthUnit" type="enumeration" defaultValue="percentage">
+            <caption>Width unit</caption>
+            <category>Appearance</category>
+            <description/>
+            <enumerationValues>
+                <enumerationValue key="percentage">Percentage</enumerationValue>
+                <enumerationValue key="pixels">Pixels</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="width" type="integer" defaultValue="100">
+            <caption>Width</caption>
+            <category>Appearance</category>
+            <description/>
+        </property>
+        <property key="heightUnit" type="enumeration" defaultValue="percentageOfWidth">
+            <caption>Height unit</caption>
+            <category>Appearance</category>
+            <description>'Percentage of width' is the aspect ratio, 'Pixels' is absolute. Warning: When using 'Percentage of parent' the parent container must have an absolute height, else nothing is displayed.</description>
+            <enumerationValues>
+                <enumerationValue key="percentageOfWidth">Percentage of width</enumerationValue>
+                <enumerationValue key="pixels">Pixels</enumerationValue>
+                <enumerationValue key="percentageOfParent">Percentage of parent</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="height" type="integer" defaultValue="75">
+            <caption>Height</caption>
+            <category>Appearance</category>
+            <description/>
+        </property>
+        <property key="devMode" type="enumeration" defaultValue="basic">
+            <caption>Mode</caption>
+            <category>Advanced</category>
+            <description>The developer option adds a button to the charts when running the app which can be used to toggle a live editor for the advanced configuration options.</description>
+            <enumerationValues>
+                <enumerationValue key="basic">Basic</enumerationValue>
+                <enumerationValue key="advanced">Advanced</enumerationValue>
+                <enumerationValue key="developer">Developer</enumerationValue>
+            </enumerationValues>
+        </property>
+        <property key="layoutOptions" type="string" required="false" multiline="true">
+            <caption>Layout options</caption>
+            <category>Advanced</category>
+            <description>The JSON containing the Plotly layout options</description>
+        </property>
+        <property key="dataOptions" type="string" multiline="true" required="false">
+            <caption>Data options</caption>
+            <category>Advanced</category>
+            <description>The Plotly data options as JSON</description>
+        </property>
+    </properties>
+</widget>

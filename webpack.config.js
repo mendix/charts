@@ -12,7 +12,8 @@ const widgetConfig = {
         LineChart: "./src/LineChart/components/LineChartContainer.ts",
         AreaChart: "./src/AreaChart/components/AreaChartContainer.ts",
         PieChart: "./src/PieChart/components/PieChartContainer.ts",
-        TimeSeries: "./src/TimeSeries/components/TimeSeriesContainer.ts"
+        TimeSeries: "./src/TimeSeries/components/TimeSeriesContainer.ts",
+        HeatMap: "./src/HeatMap/components/HeatMapContainer.ts"
     },
     output: {
         path: path.resolve(__dirname, "dist/tmp/src"),
@@ -91,7 +92,8 @@ const previewConfig = {
         LineChart: "./src/LineChart/LineChart.webmodeler.ts",
         AreaChart: "./src/AreaChart/AreaChart.webmodeler.ts",
         PieChart: "./src/PieChart/PieChart.webmodeler.ts",
-        TimeSeries: "./src/TimeSeries/TimeSeries.webmodeler.ts"
+        TimeSeries: "./src/TimeSeries/TimeSeries.webmodeler.ts",
+        HeatMap:  "./src/HeatMap/HeatMap.webmodeler.ts"
     },
     output: {
         path: path.resolve(__dirname, "dist/tmp"),
