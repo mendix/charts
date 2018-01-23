@@ -104,7 +104,7 @@
             <category>Scale</category>
             <description/>
         </property>
-        <property key="scaleColors" type="object" isList="true">
+        <property key="scaleColors" type="object" isList="true" required="false">
             <caption>Colors</caption>
             <category>Scale</category>
             <description>Default color is 0 = blue and 1 = red</description>

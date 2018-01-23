@@ -7,5 +7,8 @@ type VisibilityMap<T> = {
 declare module "plotly.js/dist/plotly-basic" {
     export = Plotly;
 }
+declare module "plotly.js/dist/plotly" {
+    export = Plotly;
+}
 
 declare module "*.json";

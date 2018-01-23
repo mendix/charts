@@ -6,33 +6,27 @@ import { HeatMap } from "./components/HeatMap";
 import { Container } from "../utils/namespaces";
 import { PieData } from "plotly.js";
 import { validateSeriesProps } from "../utils/data";
-import PieChartContainerProps = Container.PieChartContainerProps;
+import HeatMapContainerProps = Container.HeatMapContainerProps;
 
 // tslint:disable-next-line class-name
-export class preview extends Component<PieChartContainerProps, {}> {
+export class preview extends Component<HeatMapContainerProps, {}> {
     render() {
         return createElement("div", {},
-            createElement(Alert, { className: `widget-${this.props.chartType}-chart-alert` },
+            createElement(Alert, { className: `widget-heat-map-alert` },
                 validateSeriesProps([ { ...this.props, seriesOptions: this.props.dataOptions } ], this.props.friendlyId, this.props.layoutOptions)
             ),
             createElement(HeatMap, {
-                ...this.props as PieChartContainerProps,
+                ...this.props as HeatMapContainerProps,
+                data: [ [ 1, 20, 30, 50, 1 ], [ 20, 1, 60, 80, 30 ], [ 30, 60, 1, -10, 20 ] ],
+                horizontalValues: [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" ],
+                verticalValues: [ "Morning", "Afternoon", "Evening" ],
                 defaultData: preview.getData(this.props)
             })
         );
     }
 
-    static getData(props: PieChartContainerProps): PieData[] {
-        return [
-            {
-                hole: props.chartType === "donut" ? 0.4 : 0,
-                hoverinfo: "label+name",
-                name: "GHG Emissions",
-                type: "pie",
-                labels: [ "US", "China", "European Union" ],
-                values: [ 16, 15, 12 ]
-            }
-        ];
+    static getData(props: HeatMapContainerProps): PieData[] {
+        return [];
     }
 }
 
@@ -48,13 +42,11 @@ export function getPreviewCss() {
     );
 }
 
-export function getVisibleProperties(valueMap: PieChartContainerProps, visibilityMap: VisibilityMap<PieChartContainerProps>) { // tslint:disable-line max-line-length
+export function getVisibleProperties(valueMap: HeatMapContainerProps, visibilityMap: VisibilityMap<HeatMapContainerProps>) { // tslint:disable-line max-line-length
     if (valueMap.dataSourceType === "XPath") {
         visibilityMap.dataSourceMicroflow = false;
     } else if (valueMap.dataSourceType === "microflow") {
         visibilityMap.entityConstraint = false;
-        visibilityMap.sortAttribute = false;
-        visibilityMap.sortOrder = false;
     }
     visibilityMap.layoutOptions = false;
     visibilityMap.devMode = false;

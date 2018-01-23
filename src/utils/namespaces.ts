@@ -64,7 +64,26 @@ export namespace Container {
         sortOrder: Data.SortOrder;
         chartType: PieChartType;
         showLegend: boolean;
-        tooltipForm: string;
+        layoutOptions: string;
+        dataOptions: string;
+        devMode: "basic" | "advanced" | "developer";
+    }
+
+    export interface HeatMapContainerProps extends Data.DataSourceProps, Style.Dimensions, Data.EventProps, WrapperProps {
+        valueAttribute: string;
+        horizontalNameAttribute: string;
+        horizontalSortAttribute: string;
+        verticalNameAttribute: string;
+        verticalSortAttribute: string;
+        horizontalSortOrder: Data.SortOrder;
+        verticalSortOrder: Data.SortOrder;
+        showLegend: boolean;
+        scaleColors: {
+            valuePercentage: number;
+            color: number;
+        }[];
+        showValues: boolean;
+        valuesColor: string;
         layoutOptions: string;
         dataOptions: string;
         devMode: "basic" | "advanced" | "developer";
