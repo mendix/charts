@@ -3,12 +3,12 @@ import * as classNames from "classnames";
 
 import deepMerge from "deepmerge";
 import * as elementResize from "element-resize-detector";
-import { Config, Data, Layout, PieData, PieHoverData, ScatterData, ScatterHoverData } from "plotly.js";
+import { Config, Data, HeatMapData, Layout, PieData, PieHoverData, ScatterData, ScatterHoverData } from "plotly.js";
 
 export interface PlotlyChartProps {
     type: "line" | "bar" | "pie" | "any";
     layout: Partial<Layout>;
-    data: ScatterData[] | PieData[];
+    data: ScatterData[] | PieData[] | HeatMapData[];
     config: Partial<Config>;
     className?: string;
     style?: CSSProperties;

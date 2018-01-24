@@ -1,20 +1,15 @@
 import { Component, ReactChild, createElement } from "react";
 
 import { fetchByMicroflow, fetchByXPath, handleOnClick, validateSeriesProps } from "../../utils/data";
-import { Container } from "../../utils/namespaces";
 import { HeatMap } from "./HeatMap";
+import { Container } from "../../utils/namespaces";
+import { HeatMapData } from "plotly.js";
 import HeatMapContainerProps = Container.HeatMapContainerProps;
 
 interface HeatMapContainerState {
     alertMessage?: ReactChild;
-    horizontalValues: string[];
-    verticalValues: string[];
-    data: number[][];
-    loading: {
-        vertical: boolean;
-        horizontal: boolean;
-        data: boolean;
-    };
+    data?: HeatMapData;
+    loading: boolean;
 }
 
 export default class HeatMapContainer extends Component<HeatMapContainerProps, HeatMapContainerState> {
@@ -24,15 +19,8 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
         super(props);
 
         this.state = {
-            data: [],
             alertMessage: validateSeriesProps([ { ...props, seriesOptions: props.dataOptions } ], props.friendlyId, props.layoutOptions),
-            horizontalValues: [],
-            verticalValues: [],
-            loading: {
-                vertical: true,
-                horizontal: true,
-                data: true
-            }
+            loading: true
         };
         this.fetchData = this.fetchData.bind(this);
         this.openTooltipForm = this.openTooltipForm.bind(this);
@@ -59,10 +47,8 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
         return createElement(HeatMap, {
             ...this.props as HeatMapContainerProps,
             alertMessage: this.state.alertMessage,
-            loading: this.state.loading.data && this.state.loading.vertical && this.state.loading.horizontal,
+            loading: this.state.loading,
             data: this.state.data,
-            verticalValues: this.state.verticalValues,
-            horizontalValues: this.state.horizontalValues,
             onClick: handleOnClick,
             onHover: this.props.tooltipForm ? this.openTooltipForm : undefined
         });
@@ -82,8 +68,8 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
     }
 
     private fetchData(mxObject?: mendix.lib.MxObject) {
-        if (!this.state.loading.vertical || !this.state.loading.horizontal || !this.state.loading.data) {
-            this.setState({ loading: { vertical: true, horizontal: true, data: true } });
+        if (!this.state.loading) {
+            this.setState({ loading: true });
         }
         const { dataEntity, dataSourceMicroflow, dataSourceType } = this.props;
         if (mxObject && dataEntity) {
@@ -95,19 +81,23 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
                         const horizontalValues = this.getValues(data, this.props.horizontalNameAttribute);
                         const verticalValues = this.getValues(data, this.props.verticalNameAttribute);
                         this.setState({
-                            data: this.processZData(data, verticalValues, horizontalValues),
-                            loading: { vertical: false, horizontal: false, data: false },
-                            horizontalValues,
-                            verticalValues
+                            data: {
+                                x: horizontalValues,
+                                y: verticalValues,
+                                z: this.processZData(data, verticalValues, horizontalValues),
+                                colorscale: this.processColorScale(),
+                                showscale: this.props.showScale
+                            },
+                            loading: false
                         });
                     })
                     .catch(reason => {
                         window.mx.ui.error(`An error occurred while retrieving chart data: ${reason}`);
-                        this.setState({ data: [], loading: { vertical: false, horizontal: false, data: false } });
+                        this.setState({ data: undefined, loading: false });
                     });
             }
         } else {
-            this.setState({ loading: { vertical: false, horizontal: false, data: false }, data: [] });
+            this.setState({ loading: false, data: undefined });
         }
     }
 
@@ -120,19 +110,22 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
                 fetchByXPath(mxObject.getGuid(), dataEntity, entityConstraint, verticalSortAttribute, verticalSortOrder)
                     .then(verticalData => {
                         const verticalValues = this.getValues(verticalData, this.props.verticalNameAttribute);
-                        const data = this.processZData(verticalData, verticalValues, horizontalValues);
                         this.setState({
-                            loading: { data: false, horizontal: false, vertical: false },
-                            data,
-                            horizontalValues,
-                            verticalValues
+                            loading: false,
+                            data: {
+                                x: horizontalValues,
+                                y: verticalValues,
+                                z: this.processZData(verticalData, verticalValues, horizontalValues),
+                                colorscale: this.processColorScale(),
+                                showscale: this.props.showScale
+                            }
                         });
                     });
 
             })
             .catch(reason => {
                 window.mx.ui.error(`An error occurred while retrieving sorted chart data: ${reason}`);
-                this.setState({ data: [], loading: { vertical: false, horizontal: false, data: false } });
+                this.setState({ data: undefined, loading: false });
             });
     }
 
@@ -145,6 +138,12 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
 
                 return zData ? Number(zData.get(this.props.valueAttribute)) : 0;
             }));
+    }
+
+    private processColorScale(): (string | number)[][] {
+        return this.props.scaleColors.length > 1
+            ? this.props.scaleColors.map(colors => [ Math.abs(colors.valuePercentage / 100), colors.colour ])
+            : [ [ 0, "blue" ], [ 1, "red" ] ];
     }
 
     private getValues(data: mendix.lib.MxObject[], attribute: string): string[] {

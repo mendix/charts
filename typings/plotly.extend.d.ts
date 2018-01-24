@@ -76,6 +76,14 @@ declare module "plotly.js" {
         sort?: boolean; // default: true
     }
 
+    export interface HeatMapData {
+        x: string[];
+        y: string[];
+        z: number[][];
+        colorscale: (string | number)[][];
+        showscale: boolean;
+    }
+
     export interface PlotlyHTMLElement extends HTMLElement {
         on(event: "plotly_hover" | "plotly_click", callback: (data: PieHoverData) => void): void;
     }

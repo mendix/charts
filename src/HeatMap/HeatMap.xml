@@ -99,7 +99,7 @@
                 <enumerationValue key="desc">Descending</enumerationValue>
             </enumerationValues>
         </property>
-        <property key="showLegend" type="boolean" defaultValue="true">
+        <property key="showScale" type="boolean" defaultValue="true">
             <caption>Show scale</caption>
             <category>Scale</category>
             <description/>
@@ -107,7 +107,7 @@
         <property key="scaleColors" type="object" isList="true" required="false">
             <caption>Colors</caption>
             <category>Scale</category>
-            <description>Default color is 0 = blue and 1 = red</description>
+            <description>Default color is 0 = blue and 100 = red. Options must be at least 2 or the default values shall be used</description>
             <properties>
                 <property key="valuePercentage" type="integer" defaultValue="0">
                     <caption>Value percentage</caption>

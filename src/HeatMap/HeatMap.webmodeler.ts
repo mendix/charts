@@ -2,10 +2,10 @@ import { Component, createElement } from "react";
 
 import { Alert } from "../components/Alert";
 import { HeatMap } from "./components/HeatMap";
+import { HeatMapData } from "plotly.js";
 
-import { Container } from "../utils/namespaces";
-import { PieData } from "plotly.js";
 import { validateSeriesProps } from "../utils/data";
+import { Container } from "../utils/namespaces";
 import HeatMapContainerProps = Container.HeatMapContainerProps;
 
 // tslint:disable-next-line class-name
@@ -17,16 +17,19 @@ export class preview extends Component<HeatMapContainerProps, {}> {
             ),
             createElement(HeatMap, {
                 ...this.props as HeatMapContainerProps,
-                data: [ [ 1, 20, 30, 50, 1 ], [ 20, 1, 60, 80, 30 ], [ 30, 60, 1, -10, 20 ] ],
-                horizontalValues: [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" ],
-                verticalValues: [ "Morning", "Afternoon", "Evening" ],
                 defaultData: preview.getData(this.props)
             })
         );
     }
 
-    static getData(props: HeatMapContainerProps): PieData[] {
-        return [];
+    static getData(props: HeatMapContainerProps): HeatMapData {
+        return {
+            x: [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" ],
+            y: [ "Morning", "Afternoon", "Evening" ],
+            z: [ [ 1, 20, 30, 50, 1 ], [ 20, 1, 60, 80, 30 ], [ 30, 60, 1, -10, 20 ] ],
+            colorscale: [],
+            showscale: true
+        };
     }
 }
 

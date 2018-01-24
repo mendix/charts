@@ -77,10 +77,10 @@ export namespace Container {
         verticalSortAttribute: string;
         horizontalSortOrder: Data.SortOrder;
         verticalSortOrder: Data.SortOrder;
-        showLegend: boolean;
+        showScale: boolean;
         scaleColors: {
             valuePercentage: number;
-            color: number;
+            colour: number;
         }[];
         showValues: boolean;
         valuesColor: string;
