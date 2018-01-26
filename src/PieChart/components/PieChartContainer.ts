@@ -71,10 +71,10 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         if (!this.state.loading) {
             this.setState({ loading: true });
         }
-        const { dataEntity, dataSourceMicroflow, dataSourceType, entityConstraint, sortAttribute } = this.props;
+        const { dataEntity, dataSourceMicroflow, dataSourceType, entityConstraint, sortAttribute, sortOrder } = this.props;
         if (mxObject && dataEntity) {
             if (dataSourceType === "XPath") {
-                fetchByXPath(mxObject.getGuid(), dataEntity, entityConstraint, sortAttribute)
+                fetchByXPath(mxObject.getGuid(), dataEntity, entityConstraint, sortAttribute, sortOrder)
                     .then(data => this.setState({ data, loading: false }))
                     .catch(reason => {
                         window.mx.ui.error(`An error occurred while retrieving chart data: ${reason}`);
