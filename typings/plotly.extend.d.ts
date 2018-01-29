@@ -20,7 +20,8 @@ declare module "plotly.js" {
         event: MouseEvent;
         points: Array<{
             x: string | number;
-            y: number;
+            y: string | number;
+            z?: number;
             pointNumber: number;
             curveNumber: number;
             data: ScatterData;

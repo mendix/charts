@@ -14,6 +14,7 @@ interface HeatMapContainerState {
 
 export default class HeatMapContainer extends Component<HeatMapContainerProps, HeatMapContainerState> {
     private subscriptionHandle: number;
+    private rawData: mendix.lib.MxObject[];
 
     constructor(props: HeatMapContainerProps) {
         super(props);
@@ -22,8 +23,6 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
             alertMessage: validateSeriesProps([ { ...props, seriesOptions: props.dataOptions } ], props.friendlyId, props.layoutOptions),
             loading: true
         };
-        this.fetchData = this.fetchData.bind(this);
-        this.openTooltipForm = this.openTooltipForm.bind(this);
     }
 
     render() {
@@ -49,7 +48,7 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
             alertMessage: this.state.alertMessage,
             loading: this.state.loading,
             data: this.state.data,
-            onClick: handleOnClick,
+            onClick: this.handleOnClick,
             onHover: this.props.tooltipForm ? this.openTooltipForm : undefined
         });
     }
@@ -67,7 +66,7 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
         }
     }
 
-    private fetchData(mxObject?: mendix.lib.MxObject) {
+    private fetchData = (mxObject?: mendix.lib.MxObject) => {
         if (!this.state.loading) {
             this.setState({ loading: true });
         }
@@ -78,6 +77,7 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
             } else if (dataSourceType === "microflow" && dataSourceMicroflow) {
                 fetchByMicroflow(dataSourceMicroflow, mxObject.getGuid())
                     .then(data => {
+                        this.rawData = data;
                         const horizontalValues = this.getValues(data, this.props.horizontalNameAttribute);
                         const verticalValues = this.getValues(data, this.props.verticalNameAttribute);
                         this.setState({
@@ -105,6 +105,7 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
         const { dataEntity, entityConstraint, horizontalSortAttribute, horizontalSortOrder } = this.props;
         fetchByXPath(mxObject.getGuid(), dataEntity, entityConstraint, horizontalSortAttribute, horizontalSortOrder)
             .then(horizontalData => {
+                this.rawData = horizontalData;
                 const horizontalValues = this.getValues(horizontalData, this.props.horizontalNameAttribute);
                 const { verticalSortAttribute, verticalSortOrder } = this.props;
                 fetchByXPath(mxObject.getGuid(), dataEntity, entityConstraint, verticalSortAttribute, verticalSortOrder)
@@ -160,9 +161,31 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
         return values;
     }
 
-    private openTooltipForm(domNode: HTMLDivElement, dataObject: mendix.lib.MxObject) {
-        const context = new mendix.lib.MxContext();
-        context.setContext(dataObject.getEntity(), dataObject.getGuid());
-        window.mx.ui.openForm(this.props.tooltipForm, { domNode, context });
+    private handleOnClick = (x: string, y: string, z: number) => {
+        const object = this.findSourceObject(x, y, z);
+        if (object) {
+            handleOnClick(this.props, object, this.props.mxform);
+        } else {
+            console.log("Couldn't find matching object"); // tslint:disable-line
+        }
+    }
+
+    private findSourceObject(x: string, y: string, z: number): mendix.lib.MxObject | undefined {
+        return this.rawData.find(data =>
+            data.get(this.props.horizontalNameAttribute) === x &&
+            data.get(this.props.verticalNameAttribute) === y &&
+            Number(data.get(this.props.valueAttribute)) === z
+        );
+    }
+
+    private openTooltipForm = (domNode: HTMLDivElement, x: string, y: string, z: number) => {
+        const dataObject = this.findSourceObject(x, y, z);
+        if (dataObject) {
+            const context = new mendix.lib.MxContext();
+            context.setContext(dataObject.getEntity(), dataObject.getGuid());
+            window.mx.ui.openForm(this.props.tooltipForm, { domNode, context });
+        } else {
+            console.log("Failed to open tooltip: couldn't find matching object"); // tslint:disable-line
+        }
     }
 }

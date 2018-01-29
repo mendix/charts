@@ -2,7 +2,7 @@
 <widget id="com.mendix.widget.custom.HeatMap.HeatMap" needsEntityContext="true" offlineCapable="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
     <name>Heat map</name>
     <description>Renders a heat map chart</description>
-    <icon></icon>
+    <icon/>
     <properties>
         <property key="dataEntity" type="entity" allowNonPersistableEntities="true">
             <caption>Entity</caption>
@@ -115,7 +115,7 @@
                     <description>Value minimum 0 and maximum 100</description>
                 </property>
                 <property key="colour" type="string" >
-                    <caption>Colour</caption>
+                    <caption>Color</caption>
                     <category>Color</category>
                     <description>CSS values</description>
                 </property>

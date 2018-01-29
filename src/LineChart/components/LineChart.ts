@@ -162,7 +162,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     private onHover({ points }: ScatterHoverData<mendix.lib.MxObject>) {
         const { customdata, data, x, xaxis, y, yaxis } = points[0];
         if (this.props.onHover && data.series.tooltipForm) {
-            const positionYaxis = yaxis.l2p(y) + yaxis._offset;
+            const positionYaxis = yaxis.l2p(y as number) + yaxis._offset;
             const positionXaxis = xaxis.d2p(x) + xaxis._offset;
             this.tooltipNode.style.top = `${positionYaxis}px`;
             this.tooltipNode.style.left = `${positionXaxis}px`;
