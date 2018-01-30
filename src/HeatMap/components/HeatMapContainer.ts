@@ -166,7 +166,7 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
         if (object) {
             handleOnClick(this.props, object, this.props.mxform);
         } else {
-            console.log("Couldn't find matching object"); // tslint:disable-line
+            console.log("Couldn't find matching a object for the chart values"); // tslint:disable-line
         }
     }
 
@@ -185,7 +185,7 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
             context.setContext(dataObject.getEntity(), dataObject.getGuid());
             window.mx.ui.openForm(this.props.tooltipForm, { domNode, context });
         } else {
-            console.log("Failed to open tooltip: couldn't find matching object"); // tslint:disable-line
+            console.log("Failed to open tooltip: couldn't find matching object for the chart values"); // tslint:disable-line
         }
     }
 }
