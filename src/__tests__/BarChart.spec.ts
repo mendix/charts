@@ -9,7 +9,7 @@ import { Playground } from "../components/Playground";
 import { PlotlyChart } from "../components/PlotlyChart";
 import { preview } from "../BarChart/BarChart.webmodeler";
 
-import { mockMendix } from "tests/mocks/Mendix";
+import { mockMendix } from "../../tests/mocks/Mendix";
 import { Data } from "../utils/namespaces";
 import SeriesProps = Data.SeriesProps;
 import SeriesData = Data.SeriesData;
@@ -70,18 +70,8 @@ describe("BarChart", () => {
         const chart = renderShallowBarChart(defaultProps as BarChartProps);
 
         expect(chart).toBeElement(
-            createElement(Playground, {
-                series: {
-                    rawData: [],
-                    chartData: [],
-                    modelerSeriesConfigs: [],
-                    traces: [],
-                    onChange: jasmine.any(Function)
-                },
-                layoutOptions: "{}",
-                modelerLayoutConfigs: JSON.stringify(BarChart.defaultLayoutConfigs(defaultProps as BarChartProps), null, 4)
-            }, createElement(PlotlyChart,
-                {
+            createElement(Playground, {},
+                createElement(PlotlyChart, {
                     type: "bar",
                     style: { width: "100%", height: "100px" },
                     layout: BarChart.defaultLayoutConfigs(defaultProps as BarChartProps),
@@ -90,8 +80,8 @@ describe("BarChart", () => {
                     onClick: jasmine.any(Function),
                     onHover: jasmine.any(Function),
                     getTooltipNode: jasmine.any(Function)
-                }
-            ))
+                })
+            )
         );
     });
 

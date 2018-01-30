@@ -28,7 +28,7 @@ const widgetConfig = {
             "tests": path.resolve(__dirname, "./tests")
         }
     },
-    devtool: "eval-source-map",
+    devtool: "source-map",
     module: {
         rules: [
             {
@@ -77,7 +77,7 @@ const plotlyCustomConfig = {
         filename: `com/mendix/widget/custom/${widgetName.toLowerCase()}/PlotlyCustom.js`,
         libraryTarget: "amd",
     },
-    devtool: "eval-source-map",
+    devtool: "source-map",
     plugins: [
         new webpack.LoaderOptionsPlugin({ debug: true })
     ]
@@ -101,7 +101,7 @@ const previewConfig = {
     resolve: {
         extensions: [ ".ts", ".js" ]
     },
-    devtool: "cheap-eval-source-map",
+    devtool: "inline-source-map",
     module: {
         rules: [
             { test: /\.ts$/, loader: "ts-loader", options: {

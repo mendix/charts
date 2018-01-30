@@ -2,7 +2,6 @@ import { Component, ReactChild, ReactElement, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
-import { Playground } from "../../components/Playground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
 import deepMerge from "deepmerge";
@@ -12,6 +11,7 @@ import { getDimensions, parseStyle } from "../../utils/style";
 import PieChartContainerProps = Container.PieChartContainerProps;
 
 import "../../ui/Charts.scss";
+import { PiePlayground } from "./PiePlayground";
 
 export interface PieChartProps extends PieChartContainerProps {
     data?: mendix.lib.MxObject[];
@@ -35,7 +35,7 @@ export interface PieTraces {
 
 export class PieChart extends Component<PieChartProps, PieChartState> {
     private tooltipNode: HTMLDivElement;
-    private Playground: typeof Playground;
+    private Playground: typeof PiePlayground;
 
     constructor(props: PieChartProps) {
         super(props);
@@ -74,7 +74,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
     }
 
     private async loadPlaygroundComponent() {
-        const { Playground: PlaygroundImport } = await import("../../components/Playground");
+        const { PiePlayground: PlaygroundImport } = await import("./PiePlayground");
         this.Playground = PlaygroundImport;
         this.setState({ playgroundLoaded: true });
     }
@@ -126,13 +126,11 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
 
     private renderPlayground(): ReactElement<any> {
         return createElement(this.Playground, {
-            pie: {
-                dataOptions: this.state.dataOptions || "{\n\n}",
-                modelerDataConfigs: JSON.stringify(PieChart.getDefaultDataOptions(this.props), null, 4),
-                chartData: this.getData(this.props),
-                traces: this.getTraces(this.props.data),
-                onChange: this.onRuntimeUpdate
-            },
+            dataOptions: this.state.dataOptions || "{\n\n}",
+            modelerDataConfigs: JSON.stringify(PieChart.getDefaultDataOptions(this.props), null, 4),
+            chartData: this.getData(this.props),
+            traces: this.getTraces(this.props.data),
+            onChange: this.onRuntimeUpdate,
             layoutOptions: this.state.layoutOptions || "{\n\n}",
             modelerLayoutConfigs: JSON.stringify(PieChart.getDefaultLayoutOptions(this.props), null, 4)
         }, this.renderChart());

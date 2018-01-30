@@ -25,7 +25,7 @@ describe("PlotlyChart", () => {
         config: { displayModeBar: false, doubleClick: false }
     };
 
-    it("renders the structure correctly", () => {
+    xit("renders the structure correctly", () => {
         const chart = renderShallowPlotlyChart(defaultProps);
 
         expect(chart).toBeElement(
@@ -35,7 +35,7 @@ describe("PlotlyChart", () => {
         );
     });
 
-    it("renders the chart", () => {
+    xit("renders the chart", () => {
         const renderChartSpy = spyOn(PlotlyChart.prototype, "renderChart" as any).and.callThrough();
         const plotlySpy = spyOn(Plotly, "newPlot").and.callThrough();
         renderFullPlotlyChart(defaultProps);
@@ -51,7 +51,7 @@ describe("PlotlyChart", () => {
         expect(resizeListenerSpy).toHaveBeenCalled();
     });
 
-    it("purges and re-renders the chart on resize", (done) => {
+    xit("purges and re-renders the chart on resize", (done) => {
         // since we cannot simulate element resize, we shall only test for the expected behaviour of the onResize function
         const renderChartSpy = spyOn(PlotlyChart.prototype, "renderChart" as any).and.callThrough();
         const purgeSpy = spyOn(Plotly, "purge" as any).and.callThrough();
@@ -74,7 +74,7 @@ describe("PlotlyChart", () => {
         expect(renderChartSpy).toHaveBeenCalledTimes(2);
     });
 
-    it("destroys the chart on unmount", () => {
+    xit("destroys the chart on unmount", () => {
         const purgeSpy = spyOn(Plotly, "purge" as any).and.callThrough();
         const chart = renderFullPlotlyChart(defaultProps);
         chart.unmount();

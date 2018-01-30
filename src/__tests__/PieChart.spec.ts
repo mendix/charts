@@ -62,21 +62,8 @@ describe("PieChart", () => {
         ] as any;
 
         expect(chart).toBeElement(
-            createElement(Playground, {
-                pie: {
-                    dataOptions: "{\n\n}",
-                    modelerDataConfigs: JSON.stringify(PieChart.getDefaultDataOptions(defaultProps as PieChartProps), null, 4),
-                    chartData: data,
-                    traces: {
-                        labels: [],
-                        values: []
-                    },
-                    onChange: jasmine.any(Function)
-                },
-                layoutOptions: "{}",
-                modelerLayoutConfigs: JSON.stringify(PieChart.getDefaultLayoutOptions(defaultProps as PieChartProps), null, 4)
-            }, createElement(PlotlyChart,
-                {
+            createElement(Playground, {},
+                createElement(PlotlyChart, {
                     type: "pie",
                     style: { width: "100%", height: "100px" },
                     layout: PieChart.getDefaultLayoutOptions(defaultProps as PieChartProps),
@@ -85,8 +72,8 @@ describe("PieChart", () => {
                     onClick: jasmine.any(Function),
                     onHover: jasmine.any(Function),
                     getTooltipNode: jasmine.any(Function)
-                }
-            ))
+                })
+            )
         );
     });
 

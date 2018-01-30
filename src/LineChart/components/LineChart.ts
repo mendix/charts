@@ -2,7 +2,7 @@ import { Component, ReactChild, ReactElement, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
-import { Playground } from "../../components/Playground";
+import { SeriesPlayground } from "../../components/SeriesPlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
 import { getRuntimeTraces, getSeriesTraces } from "../../utils/data";
@@ -37,7 +37,7 @@ interface LineChartState {
 export class LineChart extends Component<LineChartProps, LineChartState> {
     private tooltipNode: HTMLDivElement;
     private defaultColors: string[] = [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ];
-    private Playground: typeof Playground;
+    private Playground: typeof SeriesPlayground;
 
     constructor(props: LineChartProps) {
         super(props);
@@ -78,7 +78,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     private async loadPlaygroundComponent() {
-        const { Playground: PlaygroundImport } = await import("../../components/Playground");
+        const { SeriesPlayground: PlaygroundImport } = await import("../../components/SeriesPlayground");
         this.Playground = PlaygroundImport;
         this.setState({ playgroundLoaded: true });
     }
@@ -101,15 +101,13 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
 
     private renderPlayground(): ReactElement<any> {
         return createElement(this.Playground, {
-            series: {
-                rawData: this.state.data,
-                chartData: this.getData(this.props),
-                modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
-                    JSON.stringify(LineChart.getDefaultSeriesOptions(series as LineSeriesProps, this.props), null, 4)
-                ),
-                traces: this.state.data && this.state.data.map(getRuntimeTraces),
-                onChange: this.onRuntimeUpdate
-            },
+            rawData: this.state.data,
+            chartData: this.getData(this.props),
+            modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
+                JSON.stringify(LineChart.getDefaultSeriesOptions(series as LineSeriesProps, this.props), null, 4)
+            ),
+            traces: this.state.data && this.state.data.map(getRuntimeTraces),
+            onChange: this.onRuntimeUpdate,
             layoutOptions: this.state.layoutOptions || "{\n\n}",
             modelerLayoutConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 4)
         }, this.renderLineChart());

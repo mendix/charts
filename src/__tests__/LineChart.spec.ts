@@ -68,18 +68,8 @@ describe("LineChart", () => {
         const chart = renderShallowChart(defaultProps as LineChartProps);
 
         expect(chart).toBeElement(
-            createElement(Playground, {
-                series: {
-                    rawData: [],
-                    chartData: [],
-                    modelerSeriesConfigs: [],
-                    traces: [],
-                    onChange: jasmine.any(Function)
-                },
-                layoutOptions: "{}",
-                modelerLayoutConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(defaultProps as LineChartProps), null, 4)
-            }, createElement(PlotlyChart,
-                {
+            createElement(Playground, {},
+                createElement(PlotlyChart, {
                     type: "line",
                     style: { width: "100%", height: "100px" },
                     layout: LineChart.defaultLayoutConfigs(defaultProps as LineChartProps),
@@ -88,8 +78,8 @@ describe("LineChart", () => {
                     onClick: jasmine.any(Function),
                     onHover: jasmine.any(Function),
                     getTooltipNode: jasmine.any(Function)
-                }
-            ))
+                })
+            )
         );
     });
 
