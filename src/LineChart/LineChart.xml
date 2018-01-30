@@ -45,7 +45,7 @@
                     <description>Returns a list of data values</description>
                     <returnType type="Object" entityProperty="dataEntity" isList="true"/>
                 </property>
-                <property key="xValueAttribute" type="attribute" entityProperty="dataEntity">
+                <property key="xValueAttribute" type="attribute" entityProperty="dataEntity" isPath="optional" pathType="reference">
                     <caption>X-axis data attribute</caption>
                     <category>Data points</category>
                     <description/>
