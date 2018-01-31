@@ -6,6 +6,7 @@ import SeriesData = Data.SeriesData;
 import SortOrder = Data.SortOrder;
 import EventProps = Data.EventProps;
 import ScatterTrace = Data.ScatterTrace;
+import ReferencesSpec = Data.ReferencesSpec;
 
 export const validateSeriesProps = <T extends Partial<SeriesProps>>(dataSeries: T[], widgetId: string, layoutOptions: string): ReactChild => { // tslint:disable-line max-line-length
     if (dataSeries && dataSeries.length) {
@@ -61,10 +62,9 @@ export const fetchSeriesData = (mxObject: mendix.lib.MxObject, series: SeriesPro
     new Promise<SeriesData>((resolve, reject) => {
         if (series.dataEntity) {
             if (series.dataSourceType === "XPath") {
-                const attributes = getAttributes(series);
-                const reference = getReferences(series);
+                const references = getReferences(series);
                 const sortAttribute = series.xValueSortAttribute || series.xValueAttribute;
-                fetchByXPath(mxObject.getGuid(), series.dataEntity, series.entityConstraint, sortAttribute, series.sortOrder || "asc", attributes, reference)
+                fetchByXPath(mxObject.getGuid(), series.dataEntity, series.entityConstraint, sortAttribute, series.sortOrder || "asc", references.attributes, references.references)
                     .then(mxObjects => resolve({ data: mxObjects, series }))
                     .catch(reject);
             } else if (series.dataSourceType === "microflow" && series.dataSourceMicroflow) {
@@ -77,39 +77,43 @@ export const fetchSeriesData = (mxObject: mendix.lib.MxObject, series: SeriesPro
         }
     });
 
-const getAttributes = (series: SeriesProps): string[] => {
-    const attributes = [];
-    if (series.xValueAttribute && series.xValueAttribute.indexOf("/") === -1) {
-        attributes.push(series.xValueAttribute);
-    }
-    if (series.yValueAttribute && series.yValueAttribute.indexOf("/") === -1) {
-        attributes.push(series.yValueAttribute);
-    }
-    return attributes;
-};
-
-interface ReferencesSpec {
-    [index: string]: {
-        attributes?: string[],
-        amount?: number,
-        sort?: [ string, "desc" | "asc" ][]
-    };
-}
-
 const getReferences = (series: SeriesProps): ReferencesSpec => {
-    // TODO make recursive support multiple levels deep.
-    // TODO check impact on sorting, might need to be added too.
-    const references: ReferencesSpec = {};
-    if (series.xValueAttribute && series.xValueAttribute.indexOf("/") !== -1) {
-        const path = series.xValueAttribute.split("/");
-        references[path[0]] = { attributes: [ path[2] ] };
-    }
-    if (series.yValueAttribute && series.yValueAttribute.indexOf("/") !== -1) {
-        const path = series.yValueAttribute.split("/");
-        references[path[0]] = { attributes: [ path[2] ] };
-    }
+    let references: ReferencesSpec = { attributes: [] };
+    references = addPathReference(references, series.xValueAttribute);
+    references = addPathReference(references, series.yValueAttribute);
+    references = addPathReference(references, series.xValueSortAttribute);
     return references;
 };
+
+const addPathReference = (references: ReferencesSpec, path: string): ReferencesSpec =>
+    path.split("/").reduce((referenceSet, part, index, pathParts) => {
+        let parent = referenceSet;
+        // Use relations, skip entities sample: "module.relation_X_Y/module.entity_Y/attribute"
+        if (index % 2 === 0) {
+            for (let i = 0; i < index; i += 2) {
+                if (parent.references) {
+                    parent = parent.references[pathParts[i]];
+                }
+            }
+            if (pathParts.length - 1 === index) {
+                // Skip empty attributes
+                if (part) {
+                    if (parent.attributes) {
+                        parent.attributes.push(part);
+                    } else {
+                        parent.attributes = [ part ];
+                    }
+                }
+            } else {
+                if (!parent.references) {
+                    parent.references = { [part]: { } };
+                } else if (!parent.references[part]) {
+                    parent.references[part] = {};
+                }
+            }
+        }
+        return referenceSet;
+    }, references);
 
 export const fetchByXPath = (guid: string, entity: string, constraint: string, sortBy?: string, sortOrder: SortOrder = "asc", attributes?: string[], references?: any /* ReferencesSpec */): Promise<mendix.lib.MxObject[]> =>
     new Promise((resolve, reject) => {
@@ -121,7 +125,7 @@ export const fetchByXPath = (guid: string, entity: string, constraint: string, s
             error: error => reject(`An error occurred while retrieving data via XPath (${xpath}): ${error.message}`),
             xpath,
             filter: {
-                sort: sortBy ? [ [ sortBy, sortOrder ] ] : [],
+                sort: sortBy && !sortBy.indexOf("/") ? [ [ sortBy, sortOrder ] ] : [],
                 references,
                 attributes
             }
@@ -161,36 +165,81 @@ export const handleOnClick = <T extends EventProps>(options: T, mxObject?: mendi
     }
 };
 
-export const getSeriesTraces = ({ data, series }: SeriesData): ScatterTrace =>
-    ({
-        x: data ? data.map(mxObject => getXValue(mxObject, series)) : [],
-        y: data ? data.map(mxObject => parseFloat(mxObject.get(series.yValueAttribute) as string)) : []
+export const getSeriesTraces = ({ data, series }: SeriesData): ScatterTrace => {
+    const xData = data ? data.map(mxObject => getAttributeValue(mxObject, series.xValueAttribute)) : [];
+    const yData = data ? data.map(mxObject => parseFloat(mxObject.get(series.yValueAttribute) as string)) : [];
+    const sortData = data && series.xValueSortAttribute ? data.map(mxObject => getAttributeValue(mxObject, series.xValueSortAttribute)) : [];
+    if (!series.xValueSortAttribute || xData.length !== yData.length || xData.length !== sortData.length) {
+        return {
+            x: xData,
+            y: yData
+        };
+    }
+    const unsorted = sortData.map((value, index) => {
+        return {
+            x: xData[index],
+            y: yData[index],
+            sort: value
+        };
     });
+    const sorted = unsorted.sort((a, b) => {
+        if (series.sortOrder === "asc") {
+            if (a.sort < b.sort) {
+                return -1;
+            }
+            if (a.sort > b.sort) {
+                return 1;
+            }
+        }
+        // desc
+        if (a.sort > b.sort) {
+            return -1;
+        }
+        if (a.sort < b.sort) {
+            return 1;
+        }
+        return 0;
+    });
+    const sortedXData = sorted.map(value => value.x);
+    const sortedYData = sorted.map(value => value.y);
+    return {
+        x: sortedXData,
+        y: sortedYData
+    };
+};
 
 export const getRuntimeTraces = ({ data, series }: SeriesData): ({ name: string } & ScatterTrace) =>
     ({ name: series.name, ...getSeriesTraces({ data, series }) });
 
-export const getXValue = (mxObject: mendix.lib.MxObject, series: SeriesProps): Datum => {
-    // TODO support multiple levels deep.s
-    const path = series.xValueAttribute.split("/");
-    if (path.length > 2) {
-        const x = mxObject.getChildren(path[0]);
-        return x[0].get(path[2]) as string;
+export const getAttributeValue = (mxObject: mendix.lib.MxObject, attribute: string): Datum => {
+    let valueObject = mxObject;
+    const path = attribute.split("/");
+    const attributeName = path[path.length - 1];
+    // Use relations only, skip entity and attribute sample: "module.relation_X_Y/module.entity_Y/attribute"
+    for (let i = 0; i < path.length - 1; i += 2) {
+        // Know issue; Mendix will return max 1 level deep
+        valueObject = valueObject.getChildren(path[i])[0];
+        if (!valueObject) {
+            return "";
+        }
     }
-    if (mxObject.isDate(series.xValueAttribute)) {
-        const timestamp = mxObject.get(series.xValueAttribute) as number;
+    if (valueObject.isDate(attributeName)) {
+        const timestamp = valueObject.get(attributeName) as number;
         const date = new Date(timestamp);
 
         return `${parseDate(date)} ${parseTime(date)}`;
     }
-    if (mxObject.isEnum(series.xValueAttribute)) {
-        const enumValue = mxObject.get(series.xValueAttribute) as string;
+    if (valueObject.isEnum(attributeName)) {
+        const enumValue = valueObject.get(attributeName) as string;
 
-        return mxObject.getEnumCaption(series.xValueAttribute, enumValue);
+        return valueObject.getEnumCaption(attributeName, enumValue);
     }
-    const value = mxObject.get(series.xValueAttribute);
+    if (valueObject.isNumeric(attributeName)) {
+        return parseFloat(valueObject.get(attributeName) as any);
+    }
+    const value = valueObject.get(attributeName) as string;
 
-    return value !== null ? value.toString() : "";
+    return value !== null ? value : "";
 };
 
 export const parseDate = (date: Date): string => `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;

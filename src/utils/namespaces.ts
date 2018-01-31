@@ -117,6 +117,15 @@ export namespace Data {
         x: Datum[];
         y: number[] | Datum[];
     }
+
+    export interface ReferencesSpec {
+            attributes?: string[];
+            amount?: number;
+            sort?: [ string, "desc" | "asc" ][];
+            references?: {
+                [index: string]: ReferencesSpec;
+            };
+    }
 }
 
 export namespace Style {
