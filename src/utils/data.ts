@@ -13,8 +13,23 @@ export const validateSeriesProps = <T extends Partial<SeriesProps>>(dataSeries: 
         const errorMessage: string[] = [];
         dataSeries.forEach(series => {
             const identifier = series.name ? `series "${series.name}"` : "the widget";
-            if (series.dataSourceType === "microflow" && !series.dataSourceMicroflow) {
-                errorMessage.push(`\n'Data source type' in ${identifier} is set to 'Microflow' but no microflow is specified.`); // tslint:disable-line max-line-length
+            if (series.dataSourceType === "microflow") {
+                if (!series.dataSourceMicroflow) {
+                    errorMessage.push(`'Data source type' in ${identifier} is set to 'Microflow' but no microflow is specified.`); // tslint:disable-line max-line-length
+                }
+                if (series.xValueAttribute && series.xValueAttribute.split("/").length > 1) {
+                    errorMessage.push(`'X-axis data attribute' in ${identifier} does not support references for data source 'Microflow'`);
+                }
+                if (series.xValueSortAttribute && series.xValueSortAttribute.split("/").length > 1) {
+                    errorMessage.push(`'X-axis sort attribute' in ${identifier} does not support references for data source 'Microflow'`);
+                }
+            } else {
+                if (series.xValueAttribute && series.xValueAttribute.split("/").length > 3) {
+                    errorMessage.push(`'X-axis data attribute' in ${identifier} supports maximal one level deep reference`);
+                }
+                if (series.xValueSortAttribute && series.xValueSortAttribute.split("/").length > 3) {
+                    errorMessage.push(`'X-axis sort attribute' in ${identifier} supports maximal one level deep reference`);
+                }
             }
             if (series.seriesOptions && series.seriesOptions.trim()) {
                 const error = validateAdvancedOptions(series.seriesOptions.trim());
@@ -89,6 +104,7 @@ const addPathReference = (references: ReferencesSpec, path: string): ReferencesS
     path.split("/").reduce((referenceSet, part, index, pathParts) => {
         let parent = referenceSet;
         // Use relations, skip entities sample: "module.relation_X_Y/module.entity_Y/attribute"
+        // At the moment Mendix support only 1 level deep.
         if (index % 2 === 0) {
             for (let i = 0; i < index; i += 2) {
                 if (parent.references) {
@@ -169,7 +185,9 @@ export const getSeriesTraces = ({ data, series }: SeriesData): ScatterTrace => {
     const xData = data ? data.map(mxObject => getAttributeValue(mxObject, series.xValueAttribute)) : [];
     const yData = data ? data.map(mxObject => parseFloat(mxObject.get(series.yValueAttribute) as string)) : [];
     const sortData = data && series.xValueSortAttribute ? data.map(mxObject => getAttributeValue(mxObject, series.xValueSortAttribute)) : [];
-    if (!series.xValueSortAttribute || xData.length !== yData.length || xData.length !== sortData.length) {
+    const sortDataError = xData.length !== yData.length || xData.length !== sortData.length;
+    const alreadySorted = series.dataSourceType === "XPath" && series.xValueSortAttribute && series.xValueSortAttribute.split("/").length === 0;
+    if (!series.xValueSortAttribute || alreadySorted || sortDataError) {
         return {
             x: xData,
             y: yData
@@ -191,7 +209,7 @@ export const getSeriesTraces = ({ data, series }: SeriesData): ScatterTrace => {
                 return 1;
             }
         }
-        // desc
+        // Sort order "desc"
         if (a.sort > b.sort) {
             return -1;
         }
