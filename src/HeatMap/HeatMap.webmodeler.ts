@@ -28,7 +28,8 @@ export class preview extends Component<HeatMapContainerProps, {}> {
             y: [ "Morning", "Afternoon", "Evening" ],
             z: [ [ 1, 20, 30, 50, 1 ], [ 20, 1, 60, 80, 30 ], [ 30, 60, 1, -10, 20 ] ],
             colorscale: [],
-            showscale: true
+            showscale: true,
+            type: "heatmap"
         };
     }
 }
@@ -50,6 +51,10 @@ export function getVisibleProperties(valueMap: HeatMapContainerProps, visibility
         visibilityMap.dataSourceMicroflow = false;
     } else if (valueMap.dataSourceType === "microflow") {
         visibilityMap.entityConstraint = false;
+        visibilityMap.horizontalSortAttribute = false;
+        visibilityMap.verticalSortAttribute = false;
+        visibilityMap.horizontalSortOrder = false;
+        visibilityMap.verticalSortOrder = false;
     }
     visibilityMap.layoutOptions = false;
     visibilityMap.devMode = false;

@@ -86,7 +86,8 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
                                 y: verticalValues,
                                 z: this.processZData(data, verticalValues, horizontalValues),
                                 colorscale: this.processColorScale(),
-                                showscale: this.props.showScale
+                                showscale: this.props.showScale,
+                                type: "heatmap"
                             },
                             loading: false
                         });
@@ -118,7 +119,8 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
                                 y: verticalValues,
                                 z: this.processZData(verticalData, verticalValues, horizontalValues),
                                 colorscale: this.processColorScale(),
-                                showscale: this.props.showScale
+                                showscale: this.props.showScale,
+                                type: "heatmap"
                             }
                         });
                     });
@@ -144,7 +146,7 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
     private processColorScale(): (string | number)[][] {
         return this.props.scaleColors.length > 1
             ? this.props.scaleColors.map(colors => [ Math.abs(colors.valuePercentage / 100), colors.colour ])
-            : [ [ 0, "blue" ], [ 1, "red" ] ];
+            : [ [ 0, "#17347B" ], [ 0.5, "#48B0F7" ], [ 1, "#76CA02" ] ];
     }
 
     private getValues(data: mendix.lib.MxObject[], attribute: string): string[] {

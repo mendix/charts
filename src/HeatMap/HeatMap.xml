@@ -99,27 +99,27 @@
                 <enumerationValue key="desc">Descending</enumerationValue>
             </enumerationValues>
         </property>
-        <property key="showScale" type="boolean" defaultValue="true">
-            <caption>Show scale</caption>
-            <category>Scale</category>
-            <description/>
-        </property>
         <property key="scaleColors" type="object" isList="true" required="false">
             <caption>Colors</caption>
             <category>Scale</category>
-            <description>Default color is 0 = blue and 100 = red. Options must be at least 2 or the default values shall be used</description>
+            <description>The percentages with the colors that should be applied. At least two values needs to be specified, else the default colors are used.</description>
             <properties>
                 <property key="valuePercentage" type="integer" defaultValue="0">
-                    <caption>Value percentage</caption>
+                    <caption>Percentage</caption>
                     <category>Color</category>
-                    <description>Value minimum 0 and maximum 100</description>
+                    <description>The percentage at which the color should be applied. This value must be between 0 and 100</description>
                 </property>
                 <property key="colour" type="string" >
                     <caption>Color</caption>
                     <category>Color</category>
-                    <description>CSS values</description>
+                    <description>The CSS value e.g. blue, #48B0F7 or rgb(0,0,0)</description>
                 </property>
             </properties>
+        </property>
+        <property key="showScale" type="boolean" defaultValue="true">
+            <caption>Show scale</caption>
+            <category>Scale</category>
+            <description/>
         </property>
         <property key="showValues" type="boolean" defaultValue="false">
             <caption>Show values</caption>

@@ -81,8 +81,10 @@ declare module "plotly.js" {
         x: string[];
         y: string[];
         z: number[][];
-        colorscale: (string | number)[][];
-        showscale: boolean;
+        type: "heatmap";
+        hoverinfo?: "label" | "percent" | "name" | "label+percent" | "label+name" | "percent+name" | "label+percent+name" | "skip" | "none";
+        colorscale?: (string | number)[][];
+        showscale?: boolean;
     }
 
     export interface PlotlyHTMLElement extends HTMLElement {

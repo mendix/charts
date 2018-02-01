@@ -94,28 +94,26 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
     private renderPlayground(): ReactElement<any> {
         return createElement(this.Playground, {
             dataOptions: this.state.dataOptions || "{\n\n}",
-            modelerDataConfigs: this.props.data
-                ? JSON.stringify(
-                {
-                    colorscale: this.props.data.colorscale,
-                    showscale: this.props.data.showscale,
-                    type: "heatmap"
-                }, null, 4)
-                : "",
+            modelerDataConfigs: JSON.stringify(HeatMap.getDefaultDataOptions(this.props), null, 4),
             onChange: this.onRuntimeUpdate,
             layoutOptions: this.state.layoutOptions || "{\n\n}",
             modelerLayoutConfigs: JSON.stringify(HeatMap.getDefaultLayoutOptions(this.props), null, 4)
         }, this.renderChart());
     }
 
-    private getData(props: HeatMapProps): (HeatMapData & { type: "heatmap" })[] {
+    private getData(props: HeatMapProps): HeatMapData[] {
         if (this.props.data) {
             const advancedOptions = props.devMode !== "basic" && this.state.dataOptions
                 ? JSON.parse(this.state.dataOptions)
                 : {};
 
-            const data: (HeatMapData & { type: "heatmap" }) = deepMerge.all([
-                { ...this.props.data, type: "heatmap" },
+            const data: HeatMapData = deepMerge.all([
+                {
+                    ...HeatMap.getDefaultDataOptions(props),
+                    x: this.props.data.x,
+                    y: this.props.data.y,
+                    z: this.props.data.z
+                },
                 advancedOptions
             ]);
             data.colorscale = advancedOptions.colorscale || data.colorscale;
@@ -151,11 +149,7 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
                         x: this.props.data.x[ j ],
                         y: this.props.data.y[ i ],
                         text: this.props.data.z[ i ][ j ],
-                        font: {
-                            family: "Arial",
-                            size: 12,
-                            color: textColor
-                        },
+                        font: { color: textColor },
                         showarrow: false
                     };
                     annotations.push(result);
@@ -196,6 +190,13 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
             showarrow: false,
             xaxis: { fixedrange: true },
             yaxis: { fixedrange: true },
+            hoverlabel: {
+                bgcolor: "#888",
+                bordercolor: "#888",
+                font: {
+                    color: "#FFF"
+                }
+            },
             margin: {
                 l: 80,
                 r: 60,
@@ -203,6 +204,15 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
                 t: 10,
                 pad: 10
             }
+        };
+    }
+
+    public static getDefaultDataOptions(props: HeatMapProps): Partial<HeatMapData> {
+        return {
+            type: "heatmap",
+            hoverinfo: props.tooltipForm ? "none" : "label",
+            showscale: props.data && props.data.showscale,
+            colorscale: props.data && props.data.colorscale
         };
     }
 }
