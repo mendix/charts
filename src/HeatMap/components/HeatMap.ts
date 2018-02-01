@@ -1,4 +1,4 @@
-import { Component, ReactChild, createElement } from "react";
+import { Component, ReactChild, ReactElement, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
@@ -7,7 +7,7 @@ import { Container } from "../../utils/namespaces";
 import HeatMapContainerProps = Container.HeatMapContainerProps;
 
 import deepMerge from "deepmerge";
-import { Playground } from "../../components/Playground";
+import { PiePlayground } from "../../PieChart/components/PiePlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 import { HeatMapData, Layout, ScatterHoverData } from "plotly.js";
 import { getDimensions, parseStyle } from "../../utils/style";
@@ -35,18 +35,13 @@ export interface PieTraces {
 }
 
 export class HeatMap extends Component<HeatMapProps, HeatMapState> {
+    state = {
+        layoutOptions: this.props.layoutOptions,
+        dataOptions: this.props.dataOptions,
+        playgroundLoaded: false
+    };
     private tooltipNode: HTMLDivElement;
-    private Playground: typeof Playground;
-
-    constructor(props: HeatMapProps) {
-        super(props);
-
-        this.state = {
-            layoutOptions: props.layoutOptions,
-            dataOptions: props.dataOptions,
-            playgroundLoaded: false
-        };
-    }
+    private Playground: typeof PiePlayground;
 
     render() {
         if (this.props.alertMessage) {
@@ -58,7 +53,7 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
             return createElement(ChartLoading, { text: "Loading" });
         }
         if (this.props.devMode === "developer" && this.state.playgroundLoaded) {
-            return null;
+            return this.renderPlayground();
         }
 
         return this.renderChart();
@@ -75,9 +70,8 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
     }
 
     private async loadPlaygroundComponent() {
-        const { Playground: PlaygroundImport } = await import("../../components/Playground");
+        const { PiePlayground: PlaygroundImport } = await import("../../PieChart/components/PiePlayground");
         this.Playground = PlaygroundImport;
-        console.log(this.Playground); // tslint:disable-line
         this.setState({ playgroundLoaded: true });
     }
 
@@ -97,18 +91,36 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
         );
     }
 
+    private renderPlayground(): ReactElement<any> {
+        return createElement(this.Playground, {
+            dataOptions: this.state.dataOptions || "{\n\n}",
+            modelerDataConfigs: this.props.data
+                ? JSON.stringify(
+                {
+                    colorscale: this.props.data.colorscale,
+                    showscale: this.props.data.showscale,
+                    type: "heatmap"
+                }, null, 4)
+                : "",
+            onChange: this.onRuntimeUpdate,
+            layoutOptions: this.state.layoutOptions || "{\n\n}",
+            modelerLayoutConfigs: JSON.stringify(HeatMap.getDefaultLayoutOptions(this.props), null, 4)
+        }, this.renderChart());
+    }
+
     private getData(props: HeatMapProps): (HeatMapData & { type: "heatmap" })[] {
         if (this.props.data) {
             const advancedOptions = props.devMode !== "basic" && this.state.dataOptions
                 ? JSON.parse(this.state.dataOptions)
                 : {};
 
-            return [ deepMerge.all([
-                {
-                    ...this.props.data,
-                    type: "heatmap"
-                }, advancedOptions ])
-            ];
+            const data: (HeatMapData & { type: "heatmap" }) = deepMerge.all([
+                { ...this.props.data, type: "heatmap" },
+                advancedOptions
+            ]);
+            data.colorscale = advancedOptions.colorscale || data.colorscale;
+
+            return [ data ];
         }
 
         return this.props.defaultData ? [ { ...this.props.defaultData, type: "heatmap" } ] : [];
@@ -174,12 +186,23 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
         }
     }
 
+    private onRuntimeUpdate = (layoutOptions: string, dataOptions: string) => {
+        this.setState({ layoutOptions, dataOptions });
+    }
+
     public static getDefaultLayoutOptions(props: HeatMapProps): Partial<Layout> {
         return {
             autosize: true,
             showarrow: false,
             xaxis: { fixedrange: true },
-            yaxis: { fixedrange: true }
+            yaxis: { fixedrange: true },
+            margin: {
+                l: 80,
+                r: 60,
+                b: 60,
+                t: 10,
+                pad: 10
+            }
         };
     }
 }

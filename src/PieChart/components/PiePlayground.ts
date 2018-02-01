@@ -1,16 +1,12 @@
 import { Component, ReactElement, createElement } from "react";
 
-import { PieTraces } from "./PieChart";
 import { Playground } from "../../components/Playground";
-import { PieData } from "plotly.js";
 import { Panel, PanelProps } from "../../components/Panel";
 import { Select, SelectProps } from "../../components/Select";
 
 interface PiePlaygroundProps {
     dataOptions: string;
     modelerDataConfigs: string;
-    chartData: Partial<PieData>[];
-    traces: PieTraces;
     layoutOptions: string;
     modelerLayoutConfigs: string;
     onChange?: (layout: string, data: string) => void;
@@ -119,18 +115,6 @@ export class PiePlayground extends Component<PiePlaygroundProps, PiePlaygroundSt
         });
     }
 
-    private updateChart = (source: string, value: string) => {
-        const cleanValue = Playground.removeTrailingNewLine(value);
-        if (source === "layout") {
-            this.newPieOptions.layout = cleanValue;
-        } else {
-            this.newPieOptions.data = cleanValue;
-        }
-        if (this.props.onChange) {
-            this.props.onChange(this.newPieOptions.layout, this.newPieOptions.data);
-        }
-    }
-
     private onValidate = (annotations: object[]) => {
         this.isValid = !annotations.length;
     }
@@ -144,10 +128,23 @@ export class PiePlayground extends Component<PiePlaygroundProps, PiePlaygroundSt
                 if (this.isValid && JSON.parse(value)) {
                     this.updateChart(source, value);
                 }
-            } catch {
+            } catch (error) {
                 this.isValid = false;
+                console.error("An error occured while updating the playground chart", error); // tslint:disable-line
             }
         }, 1000);
+    }
+
+    private updateChart = (source: string, value: string) => {
+        const cleanValue = Playground.removeTrailingNewLine(value);
+        if (source === "layout") {
+            this.newPieOptions.layout = cleanValue;
+        } else {
+            this.newPieOptions.data = cleanValue;
+        }
+        if (this.props.onChange) {
+            this.props.onChange(this.newPieOptions.layout, this.newPieOptions.data);
+        }
     }
 
     private updateView = (activeOption: string) => {
