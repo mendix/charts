@@ -29,9 +29,9 @@ interface BarChartState {
 }
 
 export class BarChart extends Component<BarChartProps, BarChartState> {
-    private tooltipNode: HTMLDivElement;
+    private tooltipNode?: HTMLDivElement;
     private defaultColors: string[] = [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ];
-    private Playground: typeof SeriesPlayground;
+    private Playground?: typeof SeriesPlayground;
 
     constructor(props: BarChartProps) {
         super(props);
@@ -97,18 +97,22 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
         );
     }
 
-    private renderPlayground(): ReactElement<any> {
-        return createElement(this.Playground, {
-            rawData: this.state.data,
-            chartData: this.getData(this.props),
-            modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
-                JSON.stringify(BarChart.getDefaultSeriesOptions(series, this.props), null, 4)
-            ),
-            traces: this.state.data && this.state.data.map(getRuntimeTraces),
-            onChange: this.onRuntimeUpdate,
-            layoutOptions: this.state.layoutOptions || "{\n\n}",
-            modelerLayoutConfigs: JSON.stringify(BarChart.defaultLayoutConfigs(this.props), null, 4)
-        }, this.renderChart());
+    private renderPlayground(): ReactElement<any> | null {
+        if (this.Playground) {
+            return createElement(this.Playground, {
+                rawData: this.state.data,
+                chartData: this.getData(this.props),
+                modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
+                    JSON.stringify(BarChart.getDefaultSeriesOptions(series, this.props), null, 4)
+                ),
+                traces: this.state.data && this.state.data.map(getRuntimeTraces),
+                onChange: this.onRuntimeUpdate,
+                layoutOptions: this.state.layoutOptions || "{\n\n}",
+                modelerLayoutConfigs: JSON.stringify(BarChart.defaultLayoutConfigs(this.props), null, 4)
+            }, this.renderChart());
+        }
+
+        return null;
     }
 
     private getLayoutOptions(props: BarChartProps): Partial<Layout> {
@@ -154,7 +158,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
 
     private onHover({ points }: ScatterHoverData<mendix.lib.MxObject>) {
         const { customdata, data, x, xaxis, y, yaxis } = points[0];
-        if (this.props.onHover && data.series.tooltipForm) {
+        if (this.props.onHover && data.series.tooltipForm && this.tooltipNode) {
             const yAxisPixels = typeof y === "number" ? yaxis.l2p(y) : yaxis.d2p(y);
             const xAxisPixels = typeof x === "number" ? xaxis.l2p(x as number) : xaxis.d2p(x);
             const positionYaxis = yAxisPixels + yaxis._offset;

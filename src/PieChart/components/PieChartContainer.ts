@@ -12,7 +12,7 @@ interface PieChartContainerState {
 }
 
 export default class PieChartContainer extends Component<PieChartContainerProps, PieChartContainerState> {
-    private subscriptionHandle: number;
+    private subscriptionHandle?: number;
 
     constructor(props: PieChartContainerProps) {
         super(props);

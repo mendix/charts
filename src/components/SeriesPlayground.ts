@@ -30,8 +30,8 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
         layout: this.props.layoutOptions || "{}",
         data: this.props.rawData || []
     };
-    private timeoutId: number;
-    private isValid: boolean;
+    private timeoutId?: number;
+    private isValid = false;
 
     render() {
         return createElement(Playground, {},

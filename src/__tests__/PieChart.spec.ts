@@ -5,7 +5,7 @@ import { mockMendix } from "../../tests/mocks/Mendix";
 import { Alert } from "../components/Alert";
 import { ChartLoading } from "../components/ChartLoading";
 import { PieChart, PieChartProps } from "../PieChart/components/PieChart";
-import { Playground } from "../components/Playground";
+import "../PieChart/components/PiePlayground";
 import { PlotlyChart } from "../components/PlotlyChart";
 import { ScatterHoverData } from "plotly.js";
 
@@ -45,36 +45,17 @@ describe("PieChart", () => {
         expect(chart).toBeElement(createElement(ChartLoading, { text: "Loading" }));
     });
 
-    xit("whose dev mode is developer renders the playground", () => {
-        defaultProps.devMode = "developer";
+    it("whose dev mode is developer renders the playground", (done) => {
         defaultProps.data = [];
+        const renderPlaygroundSpy = spyOn(PieChart.prototype, "renderPlayground" as any).and.callThrough();
         const chart = renderShallowChart(defaultProps as PieChartProps);
-        const data = [
-            {
-                hole: 0,
-                hoverinfo: "label",
-                labels: [],
-                marker: { colors: [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ] },
-                type: "pie",
-                values: [],
-                sort: false
-            }
-        ] as any;
+        chart.setProps({ devMode: "developer" });
 
-        expect(chart).toBeElement(
-            createElement(Playground, {},
-                createElement(PlotlyChart, {
-                    type: "pie",
-                    style: { width: "100%", height: "100px" },
-                    layout: PieChart.getDefaultLayoutOptions(defaultProps as PieChartProps),
-                    data,
-                    config: { displayModeBar: false, doubleClick: false },
-                    onClick: jasmine.any(Function),
-                    onHover: jasmine.any(Function),
-                    getTooltipNode: jasmine.any(Function)
-                })
-            )
-        );
+        window.setTimeout(() => {
+            expect(renderPlaygroundSpy).toHaveBeenCalled();
+
+            done();
+        });
     });
 
     it("with no alert message, isn't loading and whose dev mode isn't set to developer renders the chart correctly", () => {

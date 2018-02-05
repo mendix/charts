@@ -39,8 +39,8 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         dataOptions: this.props.dataOptions,
         playgroundLoaded: false
     };
-    private tooltipNode: HTMLDivElement;
-    private Playground: typeof PiePlayground;
+    private tooltipNode?: HTMLDivElement;
+    private Playground?: typeof PiePlayground;
 
     render() {
         if (this.props.alertMessage) {
@@ -109,14 +109,18 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         return props.defaultData || [];
     }
 
-    private renderPlayground(): ReactElement<any> {
-        return createElement(this.Playground, {
-            dataOptions: this.state.dataOptions || "{\n\n}",
-            modelerDataConfigs: JSON.stringify(PieChart.getDefaultDataOptions(this.props), null, 4),
-            onChange: this.onRuntimeUpdate,
-            layoutOptions: this.state.layoutOptions || "{\n\n}",
-            modelerLayoutConfigs: JSON.stringify(PieChart.getDefaultLayoutOptions(this.props), null, 4)
-        }, this.renderChart());
+    private renderPlayground(): ReactElement<any> | null {
+        if (this.Playground) {
+            return createElement(this.Playground, {
+                dataOptions: this.state.dataOptions || "{\n\n}",
+                modelerDataConfigs: JSON.stringify(PieChart.getDefaultDataOptions(this.props), null, 4),
+                onChange: this.onRuntimeUpdate,
+                layoutOptions: this.state.layoutOptions || "{\n\n}",
+                modelerLayoutConfigs: JSON.stringify(PieChart.getDefaultLayoutOptions(this.props), null, 4)
+            }, this.renderChart());
+        }
+
+        return null;
     }
 
     private getLayoutOptions(props: PieChartProps): Partial<Layout> {
@@ -145,7 +149,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
     }
 
     private onHover = ({ event, points }: ScatterHoverData<any> | PieHoverData) => {
-        if (this.props.onHover && this.props.data) {
+        if (this.props.onHover && this.props.data && this.tooltipNode) {
             this.tooltipNode.innerHTML = "";
             this.tooltipNode.style.top = `${event.clientY - 100}px`;
             this.tooltipNode.style.left = `${event.clientX}px`;

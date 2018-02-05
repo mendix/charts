@@ -23,7 +23,6 @@ import "../ui/Playground.scss";
 interface PlaygroundState {
     showEditor: boolean;
     showTooltip: boolean;
-    activeOption: string;
 }
 
 interface RenderAceEditorOptions {
@@ -37,8 +36,7 @@ interface RenderAceEditorOptions {
 export class Playground extends Component<{}, PlaygroundState> {
     state = {
         showEditor: false,
-        showTooltip: false,
-        activeOption: "layout"
+        showTooltip: false
     };
 
     render() {

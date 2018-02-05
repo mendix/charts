@@ -13,8 +13,8 @@ interface HeatMapContainerState {
 }
 
 export default class HeatMapContainer extends Component<HeatMapContainerProps, HeatMapContainerState> {
-    private subscriptionHandle: number;
-    private rawData: mendix.lib.MxObject[];
+    private subscriptionHandle?: number;
+    private rawData: mendix.lib.MxObject[] = [];
 
     constructor(props: HeatMapContainerProps) {
         super(props);

@@ -3,7 +3,10 @@ import * as classNames from "classnames";
 
 import deepMerge from "deepmerge";
 import * as elementResize from "element-resize-detector";
-import { Config, Data, HeatMapData, Layout, PieData, PieHoverData, ScatterData, ScatterHoverData } from "plotly.js";
+import {
+    Config, Data, HeatMapData, Layout, PieData, PieHoverData,
+    PlotlyHTMLElement, Root, ScatterData, ScatterHoverData
+} from "plotly.js";
 
 export interface PlotlyChartProps {
     type: "line" | "bar" | "pie" | "any";
@@ -20,8 +23,10 @@ export interface PlotlyChartProps {
 export class PlotlyChart extends Component<PlotlyChartProps, {}> {
     private chartNode?: HTMLDivElement;
     private tooltipNode?: HTMLDivElement;
-    private timeoutId: number;
+    private timeoutId?: number;
     private resizeDetector = elementResize({ strategy: "scroll" });
+    private newPlot?: (root: Root, data: Data[], layout?: Partial<Layout>, config?: Partial<Config>) => Promise<PlotlyHTMLElement>;
+    private purge?: (root: Root) => void;
 
     constructor(props: PlotlyChartProps) {
         super(props);
@@ -56,11 +61,9 @@ export class PlotlyChart extends Component<PlotlyChartProps, {}> {
     }
 
     componentWillUnmount() {
-        import(this.props.type === "any" ? "plotly.js/dist/plotly" : "../PlotlyCustom").then(({ purge }) => {
-            if (this.chartNode) {
-                purge(this.chartNode);
-            }
-        });
+        if (this.chartNode && this.purge) {
+            this.purge(this.chartNode);
+        }
     }
 
     private getPlotlyNodeRef(node: HTMLDivElement) {
@@ -74,7 +77,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, {}> {
         }
     }
 
-    private async renderChart({ config, data, layout, onClick, onHover }: PlotlyChartProps) {
+    private renderChart({ config, data, layout, onClick, onHover }: PlotlyChartProps) {
         if (this.chartNode) {
             const style = window.getComputedStyle(this.chartNode);
 
@@ -85,19 +88,31 @@ export class PlotlyChart extends Component<PlotlyChartProps, {}> {
                     height: parseFloat(style.getPropertyValue("height").split("px")[0])
                 }
             ]);
-            const { newPlot } = this.props.type === "any"
-                ? await import("plotly.js/dist/plotly")
-                : await import("../PlotlyCustom");
-            newPlot(this.chartNode, data as Data[], layoutOptions, config)
-                .then(myPlot => {
-                    if (onClick) {
-                        myPlot.on("plotly_click", onClick as any);
-                    }
-                    if (onHover) {
-                        myPlot.on("plotly_hover", onHover as any);
-                        myPlot.on("plotly_unhover", this.clearTooltip);
+            this.loadPlotlyAPI()
+                .then(() => {
+                    if (this.newPlot && this.chartNode) {
+                        this.newPlot(this.chartNode, data as Data[], layoutOptions, config)
+                            .then(myPlot => {
+                                if (onClick) {
+                                    myPlot.on("plotly_click", onClick as any);
+                                }
+                                if (onHover) {
+                                    myPlot.on("plotly_hover", onHover as any);
+                                    myPlot.on("plotly_unhover", this.clearTooltip);
+                                }
+                            });
                     }
                 });
+        }
+    }
+
+    private async loadPlotlyAPI() {
+        if (!this.newPlot || this.purge) {
+            const { newPlot, purge } = this.props.type === "any"
+                    ? await import("plotly.js/dist/plotly")
+                    : await import("../PlotlyCustom");
+            this.newPlot = newPlot;
+            this.purge = purge;
         }
     }
 
@@ -115,18 +130,16 @@ export class PlotlyChart extends Component<PlotlyChartProps, {}> {
         }
     }
 
-    private onResize() {
+    private async onResize() {
         if (this.timeoutId) {
             clearTimeout(this.timeoutId);
         }
         this.timeoutId = setTimeout(() => {
-            import(this.props.type === "any" ? "plotly.js/dist/plotly" : "../PlotlyCustom").then(({ purge }) => {
-                if (this.chartNode) {
-                    purge(this.chartNode);
-                    this.renderChart(this.props);
-                }
-                this.timeoutId = 0;
-            });
+            if (this.chartNode && this.purge) {
+                this.purge(this.chartNode);
+                this.renderChart(this.props);
+            }
+            this.timeoutId = 0;
         }, 100);
     }
 }

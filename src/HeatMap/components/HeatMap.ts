@@ -40,8 +40,8 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
         dataOptions: this.props.dataOptions,
         playgroundLoaded: false
     };
-    private tooltipNode: HTMLDivElement;
-    private Playground: typeof PiePlayground;
+    private tooltipNode?: HTMLDivElement;
+    private Playground?: typeof PiePlayground;
 
     render() {
         if (this.props.alertMessage) {
@@ -91,14 +91,18 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
         );
     }
 
-    private renderPlayground(): ReactElement<any> {
-        return createElement(this.Playground, {
-            dataOptions: this.state.dataOptions || "{\n\n}",
-            modelerDataConfigs: JSON.stringify(HeatMap.getDefaultDataOptions(this.props), null, 4),
-            onChange: this.onRuntimeUpdate,
-            layoutOptions: this.state.layoutOptions || "{\n\n}",
-            modelerLayoutConfigs: JSON.stringify(HeatMap.getDefaultLayoutOptions(this.props), null, 4)
-        }, this.renderChart());
+    private renderPlayground(): ReactElement<any> | null {
+        if (this.Playground) {
+            return createElement(this.Playground, {
+                dataOptions: this.state.dataOptions || "{\n\n}",
+                modelerDataConfigs: JSON.stringify(HeatMap.getDefaultDataOptions(this.props), null, 4),
+                onChange: this.onRuntimeUpdate,
+                layoutOptions: this.state.layoutOptions || "{\n\n}",
+                modelerLayoutConfigs: JSON.stringify(HeatMap.getDefaultLayoutOptions(this.props), null, 4)
+            }, this.renderChart());
+        }
+
+        return null;
     }
 
     private getData(props: HeatMapProps): HeatMapData[] {
@@ -168,7 +172,7 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
 
     private onHover = ({ points }: ScatterHoverData<any>) => {
         const { x, xaxis, y, yaxis, z } = points[0];
-        if (this.props.onHover) {
+        if (this.props.onHover && this.tooltipNode) {
             const yAxisPixels = typeof y === "number" ? yaxis.l2p(y) : yaxis.d2p(y);
             const xAxisPixels = typeof x === "number" ? xaxis.l2p(x as number) : xaxis.d2p(x);
             const positionYaxis = yAxisPixels + yaxis._offset;

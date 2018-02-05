@@ -3,25 +3,54 @@ import { createElement } from "react";
 import { Select, SelectProps } from "../components/Select";
 
 describe("Select", () => {
-    const defaultProps: SelectProps = {
-        onChange: jasmine.createSpy("onChange"),
-        options: [ { name: "option", value: "Option 1", isDefaultSelected: false } ]
-    };
+    let defaultProps: SelectProps;
 
-    xit("should render the structure correctly", () => {
+    beforeEach(() => {
+        defaultProps = {
+            onChange: jasmine.createSpy("onChange"),
+            options: [ { name: "Option 1", value: "option", isDefaultSelected: false } ]
+        };
+    });
+
+    it("should render the structure correctly", () => {
         const switcher = shallow(createElement(Select, defaultProps));
 
         expect(switcher).toBeElement(
             createElement("select", { className: "form-control", onChange: jasmine.any(Function) },
-                createElement("option", { value: "layout" }, "Layout"),
-                createElement("option", { value: "data" }, "Data")
+                createElement("option", { value: "option", defaultSelected: false }, "Option 1")
             )
         );
     });
 
-    xit("should respond to changes in selection", () => {
-        const onChangeSpy = defaultProps.onChange = jasmine.createSpy("onChange");
+    it("with no options renders no options", () => {
+        defaultProps.options = [];
         const switcher = shallow(createElement(Select, defaultProps));
+
+        expect(switcher.find("option").length).toBe(0);
+    });
+
+    it("with one option renders one option", () => {
+        const switcher = shallow(createElement(Select, defaultProps));
+
+        expect(switcher.find("option").length).toBe(1);
+    });
+
+    it("with multiple option renders all specified options", () => {
+        defaultProps.options = [
+            { name: "Option 1", value: "option1", isDefaultSelected: false },
+            { name: "Option 2", value: "option2", isDefaultSelected: true },
+            { name: "Option 3", value: "option3", isDefaultSelected: false }
+        ];
+        const switcher = shallow(createElement(Select, defaultProps));
+
+        expect(switcher.find("option").length).toBe(3);
+    });
+
+    xit("should respond to changes in selection", () => {
+        // const onChangeSpy = defaultProps.onChange = jasmine.createSpy("onChange");
+        const switcher = shallow(createElement(Select, defaultProps));
+        const instance = switcher.instance();
+        const onChangeSpy = spyOn(instance, "onChange" as any);
         switcher.simulate("change");
 
         expect(onChangeSpy).toHaveBeenCalled();

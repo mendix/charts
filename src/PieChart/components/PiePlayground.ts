@@ -21,8 +21,8 @@ export class PiePlayground extends Component<PiePlaygroundProps, PiePlaygroundSt
         layout: this.props.layoutOptions || "{}",
         data: this.props.dataOptions || "{\n\n}"
     };
-    private timeoutId: number;
-    private isValid: boolean;
+    private timeoutId?: number;
+    private isValid = false;
 
     render() {
         return createElement(Playground, {},

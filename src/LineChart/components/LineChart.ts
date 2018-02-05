@@ -35,9 +35,9 @@ interface LineChartState {
 }
 
 export class LineChart extends Component<LineChartProps, LineChartState> {
-    private tooltipNode: HTMLDivElement;
+    private tooltipNode?: HTMLDivElement;
     private defaultColors: string[] = [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ];
-    private Playground: typeof SeriesPlayground;
+    private Playground?: typeof SeriesPlayground;
 
     constructor(props: LineChartProps) {
         super(props);
@@ -99,18 +99,22 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         );
     }
 
-    private renderPlayground(): ReactElement<any> {
-        return createElement(this.Playground, {
-            rawData: this.state.data,
-            chartData: this.getData(this.props),
-            modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
-                JSON.stringify(LineChart.getDefaultSeriesOptions(series as LineSeriesProps, this.props), null, 4)
-            ),
-            traces: this.state.data && this.state.data.map(getRuntimeTraces),
-            onChange: this.onRuntimeUpdate,
-            layoutOptions: this.state.layoutOptions || "{\n\n}",
-            modelerLayoutConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 4)
-        }, this.renderLineChart());
+    private renderPlayground(): ReactElement<any> | null {
+        if (this.Playground) {
+            return createElement(this.Playground, {
+                rawData: this.state.data,
+                chartData: this.getData(this.props),
+                modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
+                    JSON.stringify(LineChart.getDefaultSeriesOptions(series as LineSeriesProps, this.props), null, 4)
+                ),
+                traces: this.state.data && this.state.data.map(getRuntimeTraces),
+                onChange: this.onRuntimeUpdate,
+                layoutOptions: this.state.layoutOptions || "{\n\n}",
+                modelerLayoutConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 4)
+            }, this.renderLineChart());
+        }
+
+        return null;
     }
 
     private getTooltipNodeRef(node: HTMLDivElement) {
@@ -159,7 +163,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
 
     private onHover({ points }: ScatterHoverData<mendix.lib.MxObject>) {
         const { customdata, data, x, xaxis, y, yaxis } = points[0];
-        if (this.props.onHover && data.series.tooltipForm) {
+        if (this.props.onHover && data.series.tooltipForm && this.tooltipNode) {
             const positionYaxis = yaxis.l2p(y as number) + yaxis._offset;
             const positionXaxis = xaxis.d2p(x) + xaxis._offset;
             this.tooltipNode.style.top = `${positionYaxis}px`;

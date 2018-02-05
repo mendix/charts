@@ -19,7 +19,7 @@ interface ChartContainerState {
 }
 
 export class ChartContainer extends Component<ChartContainerProps, ChartContainerState> {
-    private subscriptionHandle: number;
+    private subscriptionHandle?: number;
 
     constructor(props: ChartContainerProps) {
         super(props);

@@ -1,58 +1,40 @@
 import { shallow } from "enzyme";
-import { SyntheticEvent, createElement } from "react";
+import { createElement } from "react";
 
 import { InfoTooltip } from "../components/InfoTooltip";
 import { MendixButton } from "../components/MendixButton";
 import { Panel } from "../components/Panel";
 import { Playground } from "../components/Playground";
-import { Select } from "../components/Select";
 import { PlaygroundInfo } from "../components/PlaygroundInfo";
-import AceEditor from "react-ace";
+import { PlotlyChart } from "../components/PlotlyChart";
+import { Select } from "../components/Select";
 import { Sidebar } from "../components/Sidebar";
 import { SidebarContent } from "../components/SidebarContent";
 import { SidebarHeader } from "../components/SidebarHeader";
 
 describe("Playground", () => {
-    xit("should render the structure correctly", () => {
+    it("should render the structure correctly", () => {
         const playground = shallow(createElement(Playground));
 
-        expect(playground.type()).toBe("div");
-        expect(playground).toHaveClass("widget-charts-playground");
-        expect(playground.children().length).toBe(2);
-        expect(playground.childAt(0).type()).toBe(Sidebar);
-
-        const sidebar = playground.find(Sidebar);
-        expect(sidebar.props().open).toBe(false);
-        expect(typeof sidebar.props().onClick).toBe("function");
-        expect(typeof sidebar.props().onBlur).toBe("function");
-        expect(typeof sidebar.props().onClose).toBe("function");
-        expect(sidebar.children().length).toBe(2);
-        expect(sidebar.childAt(0).type()).toBe(SidebarHeader);
-        expect(sidebar.childAt(1).type()).toBe(SidebarContent as any);
-
-        const sidebarHeader = sidebar.find(SidebarHeader);
-        expect(sidebarHeader).toBeElement(
-            createElement(SidebarHeader, { className: "row" },
-                createElement(Select, { onChange: jasmine.any(Function), options: [] })
-            )
-        );
-
-        const sidebarContent = sidebar.find(SidebarContent);
-        expect(sidebarContent.children().length).toBe(3);
-        expect(sidebarContent.childAt(0).type()).toBe(InfoTooltip);
-        expect(sidebarContent.childAt(1).type()).toBe(Panel);
-        expect(sidebarContent.childAt(2).type()).toBe(Panel);
-
-        const infoTooltip = sidebarContent.find(InfoTooltip);
-        expect(infoTooltip.props().show).toBe(false);
-        expect(typeof infoTooltip.props().onClick).toBe("function");
-        expect(infoTooltip.children().length).toBe(1);
-        expect(infoTooltip.childAt(0).type()).toBe(PlaygroundInfo as any);
-
-        const playgroundToggle = playground.childAt(1);
-        expect(playgroundToggle).toBeElement(
-            createElement("div", { className: "widget-charts-playground-toggle" },
-                createElement(MendixButton, { onClick: jasmine.any(Function) }, "Toggle Editor")
+        expect(playground).toBeElement(
+            createElement("div", { className: "widget-charts-playground" },
+                createElement(Sidebar,
+                    {
+                        open: false,
+                        onBlur: jasmine.any(Function),
+                        onClick: jasmine.any(Function),
+                        onClose: jasmine.any(Function)
+                    },
+                    createElement(SidebarHeader, { className: "row" }),
+                    createElement(SidebarContent, {},
+                        createElement(InfoTooltip, { show: false, onClick: jasmine.any(Function) },
+                            createElement(PlaygroundInfo)
+                        )
+                    )
+                ),
+                createElement("div", { className: "widget-charts-playground-toggle" },
+                    createElement(MendixButton, { onClick: jasmine.any(Function) }, "Toggle Editor")
+                )
             )
         );
     });
@@ -69,167 +51,55 @@ describe("Playground", () => {
         expect(playground.state().showTooltip).toBe(false);
     });
 
-    xit("should render the layout options in the sidebar when the active option is layout", () => {
-        const playground = shallow(createElement(Playground, {}));
-        const sidebar = playground.find(Sidebar);
-        const panels = sidebar.find(Panel);
+    it("should render the sidebar header with the playground options", () => {
+        const playground = shallow(createElement(Playground, {}, createElement(Select)));
+        const sidebarHeader = playground.find(SidebarHeader);
+        const select = sidebarHeader.find(Select);
 
-        expect(panels.length).toBe(2);
-
-        panels.forEach(panel => {
-            expect(panel.children().length).toBe(1);
-            expect(panel.childAt(0).type()).toBe(AceEditor);
-        });
-
-        expect(panels.first()).toBeElement(
-            createElement(Panel,
-                { heading: "Custom settings" },
-                createElement(AceEditor, {
-                    mode: "json",
-                    value: `{}\n`,
-                    readOnly: false,
-                    onChange: jasmine.any(Function),
-                    theme: "github",
-                    markers: [],
-                    maxLines: 1000,
-                    onValidate: jasmine.any(Function),
-                    editorProps: { $blockScrolling: Infinity },
-                    setOptions: { showLineNumbers: false, highlightActiveLine: false, highlightGutterLine: true }
-                })
-            )
-        );
-        expect(panels.at(1)).toBeElement(
-            createElement(Panel,
-                { heading: "Settings from the Modeler", headingClass: "read-only" },
-                createElement(AceEditor, {
-                    mode: "json",
-                    value: `{}\n`,
-                    readOnly: true,
-                    theme: "github",
-                    className: "ace-editor-read-only",
-                    markers: [],
-                    maxLines: 1000,
-                    onValidate: jasmine.any(Function),
-                    editorProps: { $blockScrolling: Infinity },
-                    setOptions: { showLineNumbers: false, highlightActiveLine: false, highlightGutterLine: true }
-                })
-            )
-        );
+        expect(select.length).toBe(1);
     });
 
-    describe("with pie properties and active option set to data", () => {
-        xit("should render the pie content in the sidebar", () => {
-            const playground = shallow(createElement(Playground));
-            playground.setState({ activeOption: "data" });
-            const sidebar = playground.find(Sidebar);
-            const panels = sidebar.find(Panel);
+    it("should render the sidebar content panels", () => {
+        const playground = shallow(
+            createElement(Playground, {},
+                createElement(Panel),
+                createElement(Panel)
+            )
+        );
+        const sidebarContent = playground.find(SidebarContent);
+        const panel = sidebarContent.find(Panel);
 
-            expect(panels.first()).toBeElement(
-                createElement(Panel,
-                    { heading: "Custom settings", headingClass: "item-header" },
-                    createElement(AceEditor, {
-                        mode: "json",
-                        value: `{}\n`,
-                        readOnly: false,
-                        onChange: jasmine.any(Function),
-                        theme: "github",
-                        markers: [],
-                        maxLines: 1000,
-                        onValidate: jasmine.any(Function),
-                        editorProps: { $blockScrolling: Infinity },
-                        setOptions: { showLineNumbers: false, highlightActiveLine: false, highlightGutterLine: true }
-                    })
+        expect(panel.length).toBe(2);
+    });
+
+    it("should render the chart", () => {
+        const playground = shallow(createElement(Playground, {}, createElement(PlotlyChart)));
+        const chart = playground.find(PlotlyChart);
+
+        expect(chart.length).toBe(1);
+    });
+
+    describe("with panels, a chart and a content switcher", () => {
+        it("renders all in their respective positions", () => {
+            const playground = shallow(
+                createElement(Playground, {},
+                    createElement(Panel),
+                    createElement(Panel),
+                    createElement(PlotlyChart),
+                    createElement(Select)
                 )
             );
 
-            expect(panels.at(1)).toBeElement(
-                createElement(Panel,
-                    { heading: "Settings from the Modeler", headingClass: "read-only" },
-                    createElement(AceEditor, {
-                        mode: "json",
-                        value: `{}\n`,
-                        readOnly: true,
-                        theme: "github",
-                        className: "ace-editor-read-only",
-                        markers: [],
-                        maxLines: 1000,
-                        onValidate: jasmine.any(Function),
-                        editorProps: { $blockScrolling: Infinity },
-                        setOptions: { showLineNumbers: false, highlightActiveLine: false, highlightGutterLine: true }
-                    })
-                )
-            );
-        });
+            const sidebarHeader = playground.find(SidebarHeader);
+            const select = sidebarHeader.find(Select);
+            expect(select.length).toBe(1);
 
-        it("and no dataOptions should not render any pie content", () => {
-            const playground = shallow(createElement(Playground));
-            playground.setState({ activeOption: "data" });
+            const sidebarContent = playground.find(SidebarContent);
+            const panel = sidebarContent.find(Panel);
+            expect(panel.length).toBe(2);
 
-            expect(playground.find(Panel).length).toBe(0);
-        });
-    });
-
-    describe("with activeOption neither layout nor data", () => {
-        describe("but with series properties", () => {
-            xit("should render the series content", () => {
-                const playground = shallow(createElement(Playground));
-                playground.setState({ activeOption: 0 });
-                const sidebar = playground.find(Sidebar);
-                const panels = sidebar.find(Panel);
-
-                expect(panels.first()).toBeElement(
-                    createElement(Panel,
-                        { heading: "Custom settings" },
-                        createElement(AceEditor, {
-                            mode: "json",
-                            value: `{}\n`,
-                            readOnly: false,
-                            onChange: jasmine.any(Function),
-                            theme: "github",
-                            markers: [],
-                            maxLines: 1000,
-                            onValidate: jasmine.any(Function),
-                            editorProps: { $blockScrolling: Infinity },
-                            setOptions: { showLineNumbers: false, highlightActiveLine: false, highlightGutterLine: true }
-                        })
-                    )
-                );
-            });
-
-            describe("and no JSON series options", () => {
-                xit("should render an ace editor with the default JSON content", () => {
-                    const playground = shallow(createElement(Playground));
-                    playground.setState({ activeOption: 0 });
-                    const sidebar = playground.find(Sidebar);
-                    const panels = sidebar.find(Panel);
-                    const aceEditor = panels.first().find(AceEditor);
-
-                    expect(aceEditor.props().value).toBe("{\n\n}\n");
-                });
-            });
-        });
-
-        describe("and no series properties", () => {
-            it("should render no sidebar content", () => {
-                const playground = shallow(createElement(Playground));
-                playground.setState({ activeOption: 0 });
-
-                expect(playground.find(Panel).length).toBe(0);
-            });
-        });
-    });
-
-    describe("function", () => {
-        xit("#updateView() ", () => {
-            const setStateSpy = spyOn(Playground.prototype, "setState");
-            const playground = shallow(createElement(Playground));
-            const instance: any = playground.instance();
-            const mockEvent = {
-                currentTarget: { value: "data" }
-            } as SyntheticEvent<HTMLSelectElement>;
-            instance.updateView(mockEvent);
-
-            expect(setStateSpy).toHaveBeenCalledWith({ activeOption: "data" });
+            const chart = playground.find(PlotlyChart);
+            expect(chart.length).toBe(1);
         });
     });
 });

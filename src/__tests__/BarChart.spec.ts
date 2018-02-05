@@ -5,12 +5,12 @@ import { ScatterHoverData } from "plotly.js";
 import { Alert } from "../components/Alert";
 import { BarChart, BarChartProps } from "../BarChart/components/BarChart";
 import { ChartLoading } from "../components/ChartLoading";
-import { Playground } from "../components/Playground";
 import { PlotlyChart } from "../components/PlotlyChart";
 import { preview } from "../BarChart/BarChart.webmodeler";
 
 import { mockMendix } from "../../tests/mocks/Mendix";
 import { Data } from "../utils/namespaces";
+import "../components/SeriesPlayground";
 import SeriesProps = Data.SeriesProps;
 import SeriesData = Data.SeriesData;
 
@@ -64,25 +64,16 @@ describe("BarChart", () => {
         expect(chart).toBeElement(createElement(ChartLoading, { text: "Loading" }));
     });
 
-    xit("whose dev mode is developer renders the playground", () => {
-        defaultProps.devMode = "developer";
-        defaultProps.data = [];
+    it("whose dev mode is developer renders the playground", (done) => {
+        const renderPlaygroundSpy = spyOn(BarChart.prototype, "renderPlayground" as any).and.callThrough();
         const chart = renderShallowBarChart(defaultProps as BarChartProps);
+        chart.setProps({ devMode: "developer" });
 
-        expect(chart).toBeElement(
-            createElement(Playground, {},
-                createElement(PlotlyChart, {
-                    type: "bar",
-                    style: { width: "100%", height: "100px" },
-                    layout: BarChart.defaultLayoutConfigs(defaultProps as BarChartProps),
-                    data: [],
-                    config: { displayModeBar: false, doubleClick: false },
-                    onClick: jasmine.any(Function),
-                    onHover: jasmine.any(Function),
-                    getTooltipNode: jasmine.any(Function)
-                })
-            )
-        );
+        window.setTimeout(() => {
+            expect(renderPlaygroundSpy).toHaveBeenCalled();
+
+            done();
+        }, 500);
     });
 
     it("with no alert message, isn't loading and whose dev mode isn't set to developer renders the chart correctly", () => {
@@ -159,7 +150,7 @@ describe("BarChart", () => {
             expect(defaultProps.onClick).toHaveBeenCalled();
         });
 
-        it("#onHover() calls the parent onClick handler", () => {
+        it("#onHover() calls the parent onHover handler", () => {
             defaultProps.onHover = jasmine.createSpy("onHover");
             const chart = renderFullBarChart(defaultProps as BarChartProps);
             const instance = chart.instance() as any;
@@ -176,6 +167,6 @@ describe("BarChart", () => {
         const instance: any = chart.instance();
 
         expect(tooltipNodeSpy).toHaveBeenCalled();
-        expect(instance.tooltipNode).not.toBeUndefined();
+        expect(instance.tooltipNode).toBeDefined();
     });
 });

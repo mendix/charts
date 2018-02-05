@@ -1,19 +1,19 @@
 /* tslint:disable */
 
 class MxMock implements mx.MxInterface {
-    appUrl: string;
-    baseUrl: string;
-    modulePath: string;
-    remoteUrl: string;
+    appUrl: string = "";
+    baseUrl: string = "";
+    modulePath: string = "";
+    remoteUrl: string = "";
     addOnLoad(_callback: Function): void { /* */ }
     login(_username: string, _password: string, _onSuccess: Function, _onError: Function): void { /* */ }
     logout(): void { /* */ }
-    data: mx.data;
-    meta: mx.meta;
-    parser: mx.parser;
-    server: mx.server;
-    session: mx.session;
-    ui: mx.ui;
+    data!: mx.data;
+    meta!: mx.meta;
+    parser!: mx.parser;
+    server!: mx.server;
+    session!: mx.session;
+    ui!: mx.ui;
     onError(_error: Error): void { /* */ }
     isOffline(): boolean { return false; }
 }

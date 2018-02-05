@@ -7,7 +7,7 @@ import { ChartLoading } from "../components/ChartLoading";
 import { LineChart, LineChartProps } from "../LineChart/components/LineChart";
 import { preview } from "../LineChart/LineChart.webmodeler";
 import { Data } from "../utils/namespaces";
-import { Playground } from "../components/Playground";
+import "../components/SeriesPlayground";
 import { PlotlyChart } from "../components/PlotlyChart";
 import { ScatterHoverData } from "plotly.js";
 import LineSeriesProps = Data.LineSeriesProps;
@@ -62,25 +62,17 @@ describe("LineChart", () => {
         expect(chart).toBeElement(createElement(ChartLoading, { text: "Loading" }));
     });
 
-    xit("whose dev mode is developer renders the playground", () => {
-        defaultProps.devMode = "developer";
+    it("whose dev mode is developer renders the playground", (done) => {
         defaultProps.data = [];
+        const renderPlaygroundSpy = spyOn(LineChart.prototype, "renderPlayground" as any).and.callThrough();
         const chart = renderShallowChart(defaultProps as LineChartProps);
+        chart.setProps({ devMode: "developer" });
 
-        expect(chart).toBeElement(
-            createElement(Playground, {},
-                createElement(PlotlyChart, {
-                    type: "line",
-                    style: { width: "100%", height: "100px" },
-                    layout: LineChart.defaultLayoutConfigs(defaultProps as LineChartProps),
-                    data: [],
-                    config: { displayModeBar: false, doubleClick: false },
-                    onClick: jasmine.any(Function),
-                    onHover: jasmine.any(Function),
-                    getTooltipNode: jasmine.any(Function)
-                })
-            )
-        );
+        window.setTimeout(() => {
+            expect(renderPlaygroundSpy).toHaveBeenCalled();
+
+            done();
+        }, 500);
     });
 
     it("with no alert message, isn't loading and whose dev mode isn't set to developer renders the chart correctly", () => {

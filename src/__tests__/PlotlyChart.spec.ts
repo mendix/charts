@@ -25,7 +25,7 @@ describe("PlotlyChart", () => {
         config: { displayModeBar: false, doubleClick: false }
     };
 
-    xit("renders the structure correctly", () => {
+    it("renders the structure correctly", () => {
         const chart = renderShallowPlotlyChart(defaultProps);
 
         expect(chart).toBeElement(
@@ -35,13 +35,17 @@ describe("PlotlyChart", () => {
         );
     });
 
-    xit("renders the chart", () => {
+    it("renders the chart", (done) => {
         const renderChartSpy = spyOn(PlotlyChart.prototype, "renderChart" as any).and.callThrough();
         const plotlySpy = spyOn(Plotly, "newPlot").and.callThrough();
         renderFullPlotlyChart(defaultProps);
 
         expect(renderChartSpy).toHaveBeenCalledWith(defaultProps);
-        expect(plotlySpy).toHaveBeenCalled();
+        window.setTimeout(() => {
+            expect(plotlySpy).toHaveBeenCalled();
+
+            done();
+        }, 1000);
     });
 
     it("listens for resize events", () => {
@@ -51,7 +55,7 @@ describe("PlotlyChart", () => {
         expect(resizeListenerSpy).toHaveBeenCalled();
     });
 
-    xit("purges and re-renders the chart on resize", (done) => {
+    it("purges and re-renders the chart on resize", (done) => {
         // since we cannot simulate element resize, we shall only test for the expected behaviour of the onResize function
         const renderChartSpy = spyOn(PlotlyChart.prototype, "renderChart" as any).and.callThrough();
         const purgeSpy = spyOn(Plotly, "purge" as any).and.callThrough();
@@ -63,7 +67,7 @@ describe("PlotlyChart", () => {
             expect(renderChartSpy).toHaveBeenCalledTimes(2);
 
             done();
-        }, 1000);
+        }, 2000);
     });
 
     it("re-renders the chart on update", () => {
@@ -74,12 +78,17 @@ describe("PlotlyChart", () => {
         expect(renderChartSpy).toHaveBeenCalledTimes(2);
     });
 
-    xit("destroys the chart on unmount", () => {
+    it("destroys the chart on unmount", (done) => {
         const purgeSpy = spyOn(Plotly, "purge" as any).and.callThrough();
         const chart = renderFullPlotlyChart(defaultProps);
-        chart.unmount();
 
-        expect(purgeSpy).toHaveBeenCalled();
+        window.setTimeout(() => {
+            chart.unmount();
+
+            expect(purgeSpy).toHaveBeenCalled();
+
+            done();
+        }, 500);
     });
 
     it("passes a reference of the tooltip node to the parent component", () => {
