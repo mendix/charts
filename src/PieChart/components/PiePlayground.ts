@@ -4,7 +4,7 @@ import { Playground } from "../../components/Playground";
 import { Panel, PanelProps } from "../../components/Panel";
 import { Select, SelectProps } from "../../components/Select";
 
-interface PiePlaygroundProps {
+export interface PiePlaygroundProps {
     dataOptions: string;
     modelerDataConfigs: string;
     layoutOptions: string;
