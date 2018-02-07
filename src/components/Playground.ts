@@ -25,7 +25,7 @@ interface PlaygroundState {
     showTooltip: boolean;
 }
 
-interface RenderAceEditorOptions {
+export interface RenderAceEditorOptions {
     value: string;
     onChange?: (value: string) => void;
     onValidate: (annotations: object[]) => void;
@@ -97,43 +97,6 @@ export class Playground extends Component<{}, PlaygroundState> {
         this.setState({ showTooltip: !this.state.showTooltip });
     }
 
-    private static getMarker(left: string, right?: string): Marker[] {
-        const markers: Marker[] = [];
-        if (right) {
-            const diffs = compare(JSON.parse(left), JSON.parse(right));
-            diffs.forEach(diff => {
-                if (diff.op === "replace") {
-                    const pos = Playground.getStartAndEndPosOfDiff(left, diff);
-                    if (pos) {
-                        markers.push({
-                            startRow: pos.startRow,
-                            startCol: pos.startCol,
-                            endRow: pos.endRow,
-                            endCol: pos.endCol,
-                            type: "text",
-                            className: "replaced-config"
-                        });
-                    }
-                }
-            });
-        }
-
-        return markers;
-    }
-
-    private static getStartAndEndPosOfDiff(textValue: string, diff: Operation) {
-        const result = jsonMap.parse(textValue);
-        const pointer = result.pointers[diff.path];
-        if (pointer && pointer.key && pointer.valueEnd) {
-            return {
-                startRow: pointer.key.line,
-                startCol: pointer.key.column,
-                endRow: pointer.valueEnd.line,
-                endCol: pointer.valueEnd.column
-            };
-        }
-    }
-
     public static removeTrailingNewLine(value: string): string {
         const splitValue = value.split("\n");
         if (splitValue[splitValue.length - 1] === "") {
@@ -160,5 +123,39 @@ export class Playground extends Component<{}, PlaygroundState> {
             editorProps: { $blockScrolling: Infinity },
             setOptions: { showLineNumbers: false, highlightActiveLine: false, highlightGutterLine: true }
         });
+    }
+
+    private static getMarker(left: string, right?: string): Marker[] {
+        const markers: Marker[] = [];
+        if (right) {
+            const diffs = compare(JSON.parse(left), JSON.parse(right));
+            diffs.forEach(diff => {
+                if (diff.op === "replace") {
+                    const pos = Playground.getStartAndEndPosOfDiff(left, diff);
+                    if (pos) {
+                        markers.push(pos);
+                    }
+                }
+            });
+        }
+
+        return markers;
+    }
+
+    private static getStartAndEndPosOfDiff(textValue: string, diff: Operation): Marker | null {
+        const result = jsonMap.parse(textValue);
+        const pointer = result.pointers[diff.path];
+        if (pointer && pointer.key && pointer.valueEnd) {
+            return {
+                startRow: pointer.key.line,
+                startCol: pointer.key.column,
+                endRow: pointer.valueEnd.line,
+                endCol: pointer.valueEnd.column,
+                type: "text",
+                className: "replaced-config"
+            };
+        }
+
+        return null;
     }
 }

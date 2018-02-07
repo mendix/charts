@@ -1,10 +1,11 @@
 import { shallow } from "enzyme";
 import { createElement } from "react";
 
+import AceEditor from "react-ace";
 import { InfoTooltip } from "../components/InfoTooltip";
 import { MendixButton } from "../components/MendixButton";
 import { Panel } from "../components/Panel";
-import { Playground } from "../components/Playground";
+import { Playground, RenderAceEditorOptions } from "../components/Playground";
 import { PlaygroundInfo } from "../components/PlaygroundInfo";
 import { PlotlyChart } from "../components/PlotlyChart";
 import { Select } from "../components/Select";
@@ -100,6 +101,43 @@ describe("Playground", () => {
 
             const chart = playground.find(PlotlyChart);
             expect(chart.length).toBe(1);
+        });
+    });
+
+    describe("#removeTrailingNewLine", () => {
+        it("removes any trailing new lines from the supplied string", () => {
+            const value = "String with blank lines at the end\n\n";
+            const strippedValue = Playground.removeTrailingNewLine(value);
+
+            expect(value).not.toBe(strippedValue);
+            expect(strippedValue).toBe("String with blank lines at the end\n");
+        });
+    });
+
+    describe("#renderAceEditor", () => {
+        it("renders the AceEditor with the specified props", () => {
+            const options: RenderAceEditorOptions = {
+                value: "{ 'x': 1 }",
+                onValidate: () => jasmine.createSpy("onValidate"),
+                onChange: () => jasmine.createSpy("onChange"),
+                readOnly: true
+            };
+
+            expect(Playground.renderAceEditor(options)).toBeElement(
+                createElement(AceEditor, {
+                    mode: "json",
+                    value: `${options.value}\n`,
+                    readOnly: true,
+                    onChange: jasmine.any(Function),
+                    theme: "github",
+                    className: "ace-editor-read-only",
+                    maxLines: 1000,
+                    markers: jasmine.any(Array) as any,
+                    onValidate: jasmine.any(Function),
+                    editorProps: { $blockScrolling: Infinity },
+                    setOptions: { showLineNumbers: false, highlightActiveLine: false, highlightGutterLine: true }
+                })
+            );
         });
     });
 });

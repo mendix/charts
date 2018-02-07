@@ -147,18 +147,6 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
             : [];
     }
 
-    private updateChart = (source: string, value: string) => {
-        const cleanValue = Playground.removeTrailingNewLine(value);
-        if (source === "layout") {
-            this.newSeriesOptions.layout = cleanValue;
-        } else {
-            (this.newSeriesOptions.data[ parseInt(source, 10) ] as SeriesData).series.seriesOptions = cleanValue;
-        }
-        if (this.props.onChange) {
-            this.props.onChange(this.newSeriesOptions.layout, this.newSeriesOptions.data);
-        }
-    }
-
     private onValidate = (annotations: object[]) => {
         this.isValid = !annotations.length;
     }
@@ -176,6 +164,18 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
                 this.isValid = false;
             }
         }, 1000);
+    }
+
+    private updateChart = (source: string, value: string) => {
+        const cleanValue = Playground.removeTrailingNewLine(value);
+        if (source === "layout") {
+            this.newSeriesOptions.layout = cleanValue;
+        } else {
+            (this.newSeriesOptions.data[ parseInt(source, 10) ] as SeriesData).series.seriesOptions = cleanValue;
+        }
+        if (this.props.onChange) {
+            this.props.onChange(this.newSeriesOptions.layout, this.newSeriesOptions.data);
+        }
     }
 
     private updateView = (activeOption: string) => {
