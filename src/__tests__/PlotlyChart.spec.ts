@@ -5,6 +5,7 @@ import { getRandomNumbers } from "../utils/data";
 import { ScatterData } from "plotly.js";
 import * as Plotly from "../PlotlyCustom";
 
+import { ChartLoading } from "../components/ChartLoading";
 import { PlotlyChart, PlotlyChartProps } from "../components/PlotlyChart";
 
 describe("PlotlyChart", () => {
@@ -30,7 +31,8 @@ describe("PlotlyChart", () => {
 
         expect(chart).toBeElement(
             createElement("div", { className: "widget-charts widget-charts-line" },
-                createElement("div", { className: "widget-charts-tooltip" })
+                createElement("div", { className: "widget-charts-tooltip" }),
+                createElement(ChartLoading, { text: "Loading" })
             )
         );
     });
@@ -64,7 +66,7 @@ describe("PlotlyChart", () => {
 
         setTimeout(() => {
             expect(purgeSpy).toHaveBeenCalled();
-            expect(renderChartSpy).toHaveBeenCalledTimes(2);
+            expect(renderChartSpy).toHaveBeenCalledTimes(3);
 
             done();
         }, 2000);

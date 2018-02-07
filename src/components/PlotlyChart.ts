@@ -1,6 +1,7 @@
 import { CSSProperties, Component, createElement } from "react";
 import * as classNames from "classnames";
 
+import { ChartLoading } from "./ChartLoading";
 import deepMerge from "deepmerge";
 import * as elementResize from "element-resize-detector";
 import {
@@ -20,7 +21,8 @@ export interface PlotlyChartProps {
     getTooltipNode?: (node: HTMLDivElement) => void;
 }
 
-export class PlotlyChart extends Component<PlotlyChartProps, {}> {
+export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean }> {
+    state = { loading: true };
     private chartNode?: HTMLDivElement;
     private tooltipNode?: HTMLDivElement;
     private timeoutId?: number;
@@ -44,7 +46,8 @@ export class PlotlyChart extends Component<PlotlyChartProps, {}> {
                 ref: this.getPlotlyNodeRef,
                 style: this.props.style
             },
-            createElement("div", { className: "widget-charts-tooltip", ref: this.getTooltipNodeRef })
+            createElement("div", { className: "widget-charts-tooltip", ref: this.getTooltipNodeRef }),
+            this.state.loading ? createElement(ChartLoading, { text: "Loading" }) : null
         );
     }
 
@@ -90,7 +93,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, {}> {
             ]);
             this.loadPlotlyAPI()
                 .then(() => {
-                    if (this.newPlot && this.chartNode) {
+                    if (!this.state.loading && this.newPlot && this.chartNode) {
                         this.newPlot(this.chartNode, data as Data[], layoutOptions, config)
                             .then(myPlot => {
                                 if (onClick) {
@@ -113,6 +116,9 @@ export class PlotlyChart extends Component<PlotlyChartProps, {}> {
                     : await import("../PlotlyCustom");
             this.newPlot = newPlot;
             this.purge = purge;
+        }
+        if (this.state.loading) {
+            this.setState({ loading: false });
         }
     }
 
