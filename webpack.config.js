@@ -20,7 +20,7 @@ const widgetConfig = {
         filename: "com/mendix/widget/custom/[name]/[name].js",
         chunkFilename: `com/mendix/widget/custom/${widgetName.toLowerCase()}/chunk[id].js`,
         libraryTarget: "umd",
-        publicPath: "widgets/"
+        publicPath: "/widgets/"
     },
     resolve: {
         extensions: [ ".ts", ".js" ],
@@ -50,14 +50,7 @@ const widgetConfig = {
             }
         ]
     },
-    externals: [ "react", "react-dom",
-        function(context, request, callback) {
-            if (/PlotlyCustom$/.test(request)) {
-                return callback(null, "widgets/com/mendix/widget/custom/charts/PlotlyCustom.js");
-            }
-            callback();
-        }
-    ],
+    externals: [ "react", "react-dom" ],
     plugins: [
         new CopyWebpackPlugin([
             { from: "src/**/*.js", to: "../" },
