@@ -10,7 +10,7 @@ import {
 } from "plotly.js";
 
 export interface PlotlyChartProps {
-    type: "line" | "bar" | "pie" | "any";
+    type: "line" | "bar" | "pie" | "heatmap" | "full";
     layout: Partial<Layout>;
     data: ScatterData[] | PieData[] | HeatMapData[];
     config: Partial<Config>;
@@ -111,11 +111,27 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
 
     private async loadPlotlyAPI() {
         if (!this.newPlot || this.purge) {
-            const { newPlot, purge } = this.props.type === "any"
-                    ? await import("plotly.js/dist/plotly")
-                    : await import("../PlotlyCustom");
-            this.newPlot = newPlot;
-            this.purge = purge;
+            if (this.props.type === "full") {
+                const { newPlot, purge } = await import("plotly.js/dist/plotly");
+                this.newPlot = newPlot;
+                this.purge = purge;
+            } else {
+                const { newPlot, purge, register } = await import("../PlotlyCustom");
+                if (this.props.type === "pie") {
+                    register([ await import("plotly.js/lib/pie") ]);
+                }
+                if (this.props.type === "bar") {
+                    register([ await import("plotly.js/lib/bar") ]);
+                }
+                if (this.props.type === "line") {
+                    register([ await import("plotly.js/lib/scatter") ]);
+                }
+                if (this.props.type === "heatmap") {
+                    register([ await import("plotly.js/lib/heatmap") ]);
+                }
+                this.newPlot = newPlot;
+                this.purge = purge;
+            }
         }
         if (this.state.loading) {
             this.setState({ loading: false });

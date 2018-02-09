@@ -96,7 +96,7 @@ const getReferences = (series: SeriesProps): ReferencesSpec => {
     let references: ReferencesSpec = { attributes: [] };
     references = addPathReference(references, series.xValueAttribute);
     references = addPathReference(references, series.yValueAttribute);
-    references = addPathReference(references, series.xValueSortAttribute);
+    references = addPathReference(references, series.xValueSortAttribute || series.xValueAttribute);
     return references;
 };
 

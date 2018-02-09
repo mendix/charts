@@ -65,7 +65,7 @@ describe("HeatMap", () => {
         expect(chart).toBeElement(
             createElement(PlotlyChart,
                 {
-                    type: "any",
+                    type: "full",
                     style: { width: "100%", height: "100px" },
                     layout: jasmine.any(Object) as any,
                     data: jasmine.any(Object) as any,

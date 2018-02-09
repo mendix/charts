@@ -78,7 +78,7 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
     private renderChart() {
         return createElement(PlotlyChart,
             {
-                type: "any",
+                type: "heatmap",
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 data: this.getData(this.props),
