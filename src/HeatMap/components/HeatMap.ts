@@ -135,25 +135,26 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
 
         return deepMerge.all([
             HeatMap.getDefaultLayoutOptions(props),
-            { annotations: this.props.showValues ? this.getTextAnnotations() : undefined },
+            { annotations: props.showValues ? this.getTextAnnotations(props.data || props.defaultData, props.valuesColor) : undefined },
             advancedOptions
         ]);
     }
 
-    private getTextAnnotations() {
+    private getTextAnnotations(data?: HeatMapData, valuesColor = "") {
         const annotations: {}[] = [];
-        if (this.props.data) {
-            for (let i = 0; i < this.props.data.y.length; i++) {
-                for (let j = 0; j < this.props.data.x.length; j++) {
-                    const currentValue = this.props.data.z[ i ][ j ];
+        if (data) {
+            for (let i = 0; i < data.y.length; i++) {
+                for (let j = 0; j < data.x.length; j++) {
+                    const currentValue = data.z[ i ][ j ];
+                    // TODO: use contrast suggestion Andries made
                     const textColor = currentValue !== 0.0 ? "white" : "black";
                     const result = {
                         xref: "x1",
                         yref: "y1",
-                        x: this.props.data.x[ j ],
-                        y: this.props.data.y[ i ],
-                        text: this.props.data.z[ i ][ j ],
-                        font: { color: textColor },
+                        x: data.x[ j ],
+                        y: data.y[ i ],
+                        text: data.z[ i ][ j ],
+                        font: { color: this.props.valuesColor || textColor },
                         showarrow: false
                     };
                     annotations.push(result);

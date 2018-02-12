@@ -85,7 +85,7 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
                                 x: horizontalValues,
                                 y: verticalValues,
                                 z: this.processZData(data, verticalValues, horizontalValues),
-                                colorscale: this.processColorScale(),
+                                colorscale: HeatMapContainer.processColorScale(this.props.scaleColors),
                                 showscale: this.props.showScale,
                                 type: "heatmap"
                             },
@@ -118,7 +118,7 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
                                 x: horizontalValues,
                                 y: verticalValues,
                                 z: this.processZData(verticalData, verticalValues, horizontalValues),
-                                colorscale: this.processColorScale(),
+                                colorscale: HeatMapContainer.processColorScale(this.props.scaleColors),
                                 showscale: this.props.showScale,
                                 type: "heatmap"
                             }
@@ -141,12 +141,6 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
 
                 return zData ? Number(zData.get(this.props.valueAttribute)) : 0;
             }));
-    }
-
-    private processColorScale(): (string | number)[][] {
-        return this.props.scaleColors.length > 1
-            ? this.props.scaleColors.map(colors => [ Math.abs(colors.valuePercentage / 100), colors.colour ])
-            : [ [ 0, "#17347B" ], [ 0.5, "#48B0F7" ], [ 1, "#76CA02" ] ];
     }
 
     private getValues(data: mendix.lib.MxObject[], attribute: string): string[] {
@@ -189,5 +183,11 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
         } else {
             console.log("Failed to open tooltip: couldn't find matching object for the chart values"); // tslint:disable-line
         }
+    }
+
+    public static processColorScale(scaleColors: Container.ScaleColors[]): (string | number)[][] {
+        return scaleColors.length > 1
+            ? scaleColors.map(colors => [ Math.abs(colors.valuePercentage / 100), colors.colour ])
+            : [ [ 0, "#17347B" ], [ 0.5, "#48B0F7" ], [ 1, "#76CA02" ] ];
     }
 }

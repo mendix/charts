@@ -2,6 +2,7 @@ import { Component, createElement } from "react";
 
 import { Alert } from "../components/Alert";
 import { HeatMap } from "./components/HeatMap";
+import HeatMapContainer from "./components/HeatMapContainer";
 import { HeatMapData } from "plotly.js";
 
 import { validateSeriesProps } from "../utils/data";
@@ -27,8 +28,8 @@ export class preview extends Component<HeatMapContainerProps, {}> {
             x: [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" ],
             y: [ "Morning", "Afternoon", "Evening" ],
             z: [ [ 1, 20, 30, 50, 1 ], [ 20, 1, 60, 80, 30 ], [ 30, 60, 1, -10, 20 ] ],
-            colorscale: [],
-            showscale: true,
+            colorscale: HeatMapContainer.processColorScale(props.scaleColors),
+            showscale: props.showScale,
             type: "heatmap"
         };
     }
@@ -58,6 +59,7 @@ export function getVisibleProperties(valueMap: HeatMapContainerProps, visibility
     }
     visibilityMap.layoutOptions = false;
     visibilityMap.devMode = false;
+    visibilityMap.dataOptions = false;
     if (valueMap.onClickEvent === "doNothing") {
         visibilityMap.onClickPage = visibilityMap.onClickMicroflow = false;
     } else if (valueMap.onClickEvent === "callMicroflow") {

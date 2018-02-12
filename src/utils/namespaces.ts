@@ -78,15 +78,17 @@ export namespace Container {
         horizontalSortOrder: Data.SortOrder;
         verticalSortOrder: Data.SortOrder;
         showScale: boolean;
-        scaleColors: {
-            valuePercentage: number;
-            colour: number;
-        }[];
+        scaleColors: ScaleColors[];
         showValues: boolean;
         valuesColor: string;
         layoutOptions: string;
         dataOptions: string;
         devMode: "basic" | "advanced" | "developer";
+    }
+
+    export interface ScaleColors {
+        valuePercentage: number;
+        colour: number;
     }
 }
 
