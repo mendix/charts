@@ -141,7 +141,7 @@ export const fetchByXPath = (guid: string, entity: string, constraint: string, s
             error: error => reject(`An error occurred while retrieving data via XPath (${xpath}): ${error.message}`),
             xpath,
             filter: {
-                sort: sortBy && !sortBy.indexOf("/") ? [ [ sortBy, sortOrder ] ] : [],
+                sort: sortBy && sortBy.indexOf("/") === -1 ? [ [ sortBy, sortOrder ] ] : [],
                 references,
                 attributes
             }
