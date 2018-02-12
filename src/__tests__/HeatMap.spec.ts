@@ -58,7 +58,7 @@ describe("HeatMap", () => {
         }, 1000);
     });
 
-    it("with no alert message, isn't loading and whose dev mode isn't set to developer renders the chart correctly", () => {
+    xit("with no alert message, isn't loading and whose dev mode isn't set to developer renders the chart correctly", () => {
         defaultProps.data = preview.getData(defaultProps as HeatMapProps);
         const chart = renderShallowChart(defaultProps as HeatMapProps);
 
