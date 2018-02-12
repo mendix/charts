@@ -186,7 +186,7 @@ export const getSeriesTraces = ({ data, series }: SeriesData): ScatterTrace => {
     const yData = data ? data.map(mxObject => parseFloat(mxObject.get(series.yValueAttribute) as string)) : [];
     const sortData = data && series.xValueSortAttribute ? data.map(mxObject => getAttributeValue(mxObject, series.xValueSortAttribute)) : [];
     const sortDataError = xData.length !== yData.length || xData.length !== sortData.length;
-    const alreadySorted = series.dataSourceType === "XPath" && series.xValueSortAttribute && series.xValueSortAttribute.split("/").length === 0;
+    const alreadySorted = series.dataSourceType === "XPath" && series.xValueSortAttribute && series.xValueSortAttribute.split("/").length === 1;
     if (!series.xValueSortAttribute || alreadySorted || sortDataError) {
         return {
             x: xData,
