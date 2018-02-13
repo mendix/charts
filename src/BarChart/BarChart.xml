@@ -52,8 +52,18 @@
                     <description>Returns a list of data values</description>
                     <returnType type="Object" entityProperty="dataEntity" isList="true"/>
                 </property>
-                <property key="xValueAttribute" type="attribute" entityProperty="dataEntity" isPath="optional" pathType="reference">
+                <property key="yValueAttribute" type="attribute" entityProperty="dataEntity">
                     <caption>X axis data attribute</caption>
+                    <category>Data points</category>
+                    <description/>
+                    <attributeTypes>
+                        <attributeType name="Decimal"/>
+                        <attributeType name="Long"/>
+                        <attributeType name="Integer"/>
+                    </attributeTypes>
+                </property>
+                <property key="xValueAttribute" type="attribute" entityProperty="dataEntity" isPath="optional" pathType="reference">
+                    <caption>Y axis data attribute</caption>
                     <category>Data points</category>
                     <description>For data source Database, attributes over reference are supported with a maximum of one level deep. For data source Microflow, references are not supported.</description>
                     <attributeTypes>
@@ -62,16 +72,7 @@
                         <attributeType name="Long"/>
                         <attributeType name="Integer"/>
                         <attributeType name="Enum"/>
-                    </attributeTypes>
-                </property>
-                <property key="yValueAttribute" type="attribute" entityProperty="dataEntity">
-                    <caption>Y axis data attribute</caption>
-                    <category>Data points</category>
-                    <description/>
-                    <attributeTypes>
-                        <attributeType name="Decimal"/>
-                        <attributeType name="Long"/>
-                        <attributeType name="Integer"/>
+                        <attributeType name="DateTime"/>
                     </attributeTypes>
                 </property>
                 <property key="xValueSortAttribute" type="attribute" entityProperty="dataEntity" required="false" isPath="optional" pathType="reference">

@@ -62,6 +62,7 @@
                         <attributeType name="Long"/>
                         <attributeType name="Integer"/>
                         <attributeType name="Enum"/>
+                        <attributeType name="DateTime"/>
                     </attributeTypes>
                 </property>
                 <property key="yValueAttribute" type="attribute" entityProperty="dataEntity">
