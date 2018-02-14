@@ -1,13 +1,13 @@
 .widget-charts-loading-wrapper {
-    width: 165px;
-    height: 100px;
-    margin: 0 auto;
+    position: absolute;
+    top: 20%;
+    left: 44%;
 
     .widget-charts-loading {
         padding: 0 10px;
         vertical-align: bottom;
-        width: 100%;
-        height: 100%;
+        width: 165px;
+        height: 100px;
         overflow: hidden;
         position: relative;
         box-sizing: border-box;

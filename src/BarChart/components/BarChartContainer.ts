@@ -4,6 +4,7 @@ import { BarChart } from "./BarChart";
 import { ChartContainer } from "../../components/ChartContainer";
 import { validateSeriesProps } from "../../utils/data";
 import { Container } from "../../utils/namespaces";
+import { getDimensions, parseStyle } from "../../utils/style";
 import BarChartContainerProps = Container.BarChartContainerProps;
 import BarChartContainerState = Container.BarChartContainerState;
 
@@ -22,7 +23,8 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         return createElement(ChartContainer, {
             alertMessage: this.state.alertMessage,
             mxObject: this.props.mxObject,
-            series: this.props.series
+            series: this.props.series,
+            style: { ...getDimensions(this.props), ...parseStyle(this.props.style) }
         }, createElement(BarChart, this.props));
     }
 }

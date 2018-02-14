@@ -3,6 +3,7 @@ import { Component, ReactChild, createElement } from "react";
 import { PieChart } from "./PieChart";
 import { fetchByMicroflow, fetchByXPath, handleOnClick, validateSeriesProps } from "../../utils/data";
 import { Container } from "../../utils/namespaces";
+import { getDimensions, parseStyle } from "../../utils/style";
 import PieChartContainerProps = Container.PieChartContainerProps;
 
 interface PieChartContainerState {
@@ -27,7 +28,9 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
     }
 
     render() {
-        return createElement("div", {}, this.getContent());
+        return createElement("div", {
+            style: this.state.loading ? { ...getDimensions(this.props), ...parseStyle(this.props.style) } : undefined
+        }, this.getContent());
     }
 
     componentWillReceiveProps(newProps: PieChartContainerProps) {

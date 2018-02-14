@@ -4,6 +4,7 @@ import { fetchByMicroflow, fetchByXPath, handleOnClick, validateSeriesProps } fr
 import { HeatMap } from "./HeatMap";
 import { Container } from "../../utils/namespaces";
 import { HeatMapData } from "plotly.js";
+import { getDimensions, parseStyle } from "../../utils/style";
 import HeatMapContainerProps = Container.HeatMapContainerProps;
 
 interface HeatMapContainerState {
@@ -26,7 +27,9 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
     }
 
     render() {
-        return createElement("div", {}, this.getContent());
+        return createElement("div", {
+            style: this.state.loading ? { ...getDimensions(this.props), ...parseStyle(this.props.style) } : undefined
+        }, this.getContent());
     }
 
     componentWillReceiveProps(newProps: HeatMapContainerProps) {

@@ -4,6 +4,7 @@ import { ChartContainer } from "../../components/ChartContainer";
 import { validateSeriesProps } from "../../utils/data";
 import { LineChart } from "./LineChart";
 import { Container } from "../../utils/namespaces";
+import { getDimensions, parseStyle } from "../../utils/style";
 import LineChartContainerProps = Container.LineChartContainerProps;
 import LineChartContainerState = Container.LineChartContainerState;
 
@@ -22,7 +23,8 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         return createElement(ChartContainer, {
             alertMessage: this.state.alertMessage,
             mxObject: this.props.mxObject,
-            series: this.props.series
+            series: this.props.series,
+            style: { ...getDimensions(this.props), ...parseStyle(this.props.style) }
         }, createElement(LineChart, this.props));
     }
 }

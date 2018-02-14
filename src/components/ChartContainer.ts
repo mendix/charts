@@ -1,4 +1,4 @@
-import { Component, ReactChild, ReactElement, cloneElement, createElement, isValidElement } from "react";
+import { CSSProperties, Component, ReactChild, ReactElement, cloneElement, createElement, isValidElement } from "react";
 
 import { Alert } from "./Alert";
 import { fetchSeriesData, handleOnClick } from "../utils/data";
@@ -10,6 +10,7 @@ export interface ChartContainerProps {
     mxObject?: mendix.lib.MxObject;
     series: SeriesProps[];
     alertMessage?: ReactChild;
+    style?: CSSProperties;
 }
 
 interface ChartContainerState {
@@ -33,7 +34,9 @@ export class ChartContainer extends Component<ChartContainerProps, ChartContaine
     }
 
     render() {
-        return createElement("div", {}, this.renderContent());
+        return createElement("div", {
+            style: this.state.loading ? this.props.style : undefined
+        }, this.renderContent());
     }
 
     componentWillReceiveProps(newProps: ChartContainerProps) {
