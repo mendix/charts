@@ -1,3 +1,4 @@
+let __webpack_public_path__;
 import { Component, createElement } from "react";
 
 import { ChartContainer } from "../../components/ChartContainer";
@@ -7,6 +8,7 @@ import { Container } from "../../utils/namespaces";
 import { getDimensions, parseStyle } from "../../utils/style";
 import LineChartContainerProps = Container.LineChartContainerProps;
 import LineChartContainerState = Container.LineChartContainerState;
+__webpack_public_path__ = window.mx.baseUrl + "../widgets/";
 
 export default class LineChartContainer extends Component<LineChartContainerProps, LineChartContainerState> {
     static defaultProps: Partial<LineChartContainerProps> = { fill: false };

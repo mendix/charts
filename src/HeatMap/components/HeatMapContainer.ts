@@ -1,3 +1,4 @@
+let __webpack_public_path__;
 import { Component, ReactChild, createElement } from "react";
 
 import { fetchByMicroflow, fetchByXPath, handleOnClick, validateSeriesProps } from "../../utils/data";
@@ -6,6 +7,7 @@ import { Container } from "../../utils/namespaces";
 import { HeatMapData } from "plotly.js";
 import { getDimensions, parseStyle } from "../../utils/style";
 import HeatMapContainerProps = Container.HeatMapContainerProps;
+__webpack_public_path__ = window.mx.baseUrl + "../widgets/";
 
 interface HeatMapContainerState {
     alertMessage?: ReactChild;

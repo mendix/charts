@@ -1,3 +1,4 @@
+let __webpack_public_path__;
 import { Component, createElement } from "react";
 
 import { BarChart } from "./BarChart";
@@ -7,6 +8,7 @@ import { Container } from "../../utils/namespaces";
 import { getDimensions, parseStyle } from "../../utils/style";
 import BarChartContainerProps = Container.BarChartContainerProps;
 import BarChartContainerState = Container.BarChartContainerState;
+__webpack_public_path__ = window.mx.baseUrl + "../widgets/";
 
 export default class BarChartContainer extends Component<BarChartContainerProps, BarChartContainerState> {
     static defaultProps: Partial<BarChartContainerProps> = { orientation: "bar" };

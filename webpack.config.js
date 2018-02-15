@@ -2,6 +2,7 @@ const webpack = require("webpack");
 const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const DynamicPublicPathPlugin = require("dynamic-public-path-webpack-plugin");
 
 const widgetName = require("./package").widgetName;
 
@@ -20,7 +21,7 @@ const widgetConfig = {
         filename: "com/mendix/widget/custom/[name]/[name].js",
         chunkFilename: `com/mendix/widget/custom/${widgetName.toLowerCase()}/chunk[id].js`,
         libraryTarget: "umd",
-        publicPath: "/widgets/"
+        publicPath: "/"
     },
     resolve: {
         extensions: [ ".ts", ".js" ],
