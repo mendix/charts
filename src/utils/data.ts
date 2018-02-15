@@ -135,7 +135,7 @@ export const fetchByXPath = (guid: string, entity: string, constraint: string, s
     new Promise((resolve, reject) => {
         const entityPath = entity.split("/");
         const entityName = entityPath.length > 1 ? entityPath[entityPath.length - 1] : entity;
-        const xpath = "//" + entityName + constraint.replace("[%CurrentObject%]", guid);
+        const xpath = "//" + entityName + constraint.split("[%CurrentObject%]").join(guid);
         window.mx.data.get({
             callback: resolve,
             error: error => reject(`An error occurred while retrieving data via XPath (${xpath}): ${error.message}`),

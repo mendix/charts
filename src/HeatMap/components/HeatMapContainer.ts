@@ -138,21 +138,31 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
     }
 
     private processZData(data: mendix.lib.MxObject[], verticalValues: string[], horizontalValues: string[]): number[][] {
+        const verticalAttribute = this.getAttributeName(this.props.verticalNameAttribute);
+        const horizontalAttribute = this.getAttributeName(this.props.horizontalNameAttribute);
+
         return verticalValues.map(vertical =>
             horizontalValues.map(horizontal => {
                 const zData = data.find(value =>
-                    value.get(this.props.verticalNameAttribute) === vertical && value.get(this.props.horizontalNameAttribute) === horizontal
+                    value.get(verticalAttribute) === vertical && value.get(horizontalAttribute) === horizontal
                 );
 
                 return zData ? Number(zData.get(this.props.valueAttribute)) : 0;
             }));
     }
 
+    private getAttributeName(attributePath: string): string {
+        const attributeSplit = attributePath.split("/");
+
+        return attributeSplit[attributeSplit.length - 1];
+    }
+
     private getValues(data: mendix.lib.MxObject[], attribute: string): string[] {
         const values: string[] = [];
+        const attributeName = this.getAttributeName(attribute);
         if (data.length) {
             data.forEach(item => {
-                const value = item.get(attribute) as string;
+                const value = item.get(attributeName) as string;
                 if (values.indexOf(value) === -1) {
                     values.push(value);
                 }
@@ -173,8 +183,8 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
 
     private findSourceObject(x: string, y: string, z: number): mendix.lib.MxObject | undefined {
         return this.rawData.find(data =>
-            data.get(this.props.horizontalNameAttribute) === x &&
-            data.get(this.props.verticalNameAttribute) === y &&
+            data.get(this.getAttributeName(this.props.horizontalNameAttribute)) === x &&
+            data.get(this.getAttributeName(this.props.verticalNameAttribute)) === y &&
             Number(data.get(this.props.valueAttribute)) === z
         );
     }
