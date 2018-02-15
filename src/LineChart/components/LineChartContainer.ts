@@ -8,7 +8,8 @@ import { Container } from "../../utils/namespaces";
 import { getDimensions, parseStyle } from "../../utils/style";
 import LineChartContainerProps = Container.LineChartContainerProps;
 import LineChartContainerState = Container.LineChartContainerState;
-__webpack_public_path__ = window.mx.baseUrl + "../widgets/";
+
+__webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
 export default class LineChartContainer extends Component<LineChartContainerProps, LineChartContainerState> {
     static defaultProps: Partial<LineChartContainerProps> = { fill: false };

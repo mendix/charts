@@ -8,7 +8,8 @@ import { Container } from "../../utils/namespaces";
 import { getDimensions, parseStyle } from "../../utils/style";
 import BarChartContainerProps = Container.BarChartContainerProps;
 import BarChartContainerState = Container.BarChartContainerState;
-__webpack_public_path__ = window.mx.baseUrl + "../widgets/";
+
+__webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
 export default class BarChartContainer extends Component<BarChartContainerProps, BarChartContainerState> {
     static defaultProps: Partial<BarChartContainerProps> = { orientation: "bar" };

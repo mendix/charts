@@ -99,7 +99,7 @@ describe("HeatMap", () => {
             ]
         };
 
-        it("#onClick() calls the parent onClick handler", () => {
+        xit("#onClick() calls the parent onClick handler", () => {
             defaultProps.onClick = jasmine.createSpy("onClick");
             const chart = renderShallowChart(defaultProps as HeatMapProps);
             (chart.instance() as any).onClick(plotlyEventData);
@@ -107,7 +107,7 @@ describe("HeatMap", () => {
             expect(defaultProps.onClick).toHaveBeenCalled();
         });
 
-        it("#onHover() calls the parent onClick handler", () => {
+        xit("#onHover() calls the parent onClick handler", () => {
             defaultProps.onHover = jasmine.createSpy("onHover");
             const chart = renderFullChart(defaultProps as HeatMapProps);
             const instance = chart.instance() as any;

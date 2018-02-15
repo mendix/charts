@@ -6,7 +6,8 @@ import { fetchByMicroflow, fetchByXPath, handleOnClick, validateSeriesProps } fr
 import { Container } from "../../utils/namespaces";
 import { getDimensions, parseStyle } from "../../utils/style";
 import PieChartContainerProps = Container.PieChartContainerProps;
-__webpack_public_path__ = window.mx.baseUrl + "../widgets/";
+
+__webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
 interface PieChartContainerState {
     alertMessage?: ReactChild;

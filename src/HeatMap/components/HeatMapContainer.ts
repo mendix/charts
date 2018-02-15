@@ -7,7 +7,8 @@ import { Container } from "../../utils/namespaces";
 import { HeatMapData } from "plotly.js";
 import { getDimensions, parseStyle } from "../../utils/style";
 import HeatMapContainerProps = Container.HeatMapContainerProps;
-__webpack_public_path__ = window.mx.baseUrl + "../widgets/";
+
+__webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
 interface HeatMapContainerState {
     alertMessage?: ReactChild;
