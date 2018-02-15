@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<widget id="com.mendix.widget.custom.BarChart.BarChart" needsEntityContext="true" offlineCapable="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
+<widget id="com.mendix.widget.custom.BarChart.BarChart" needsEntityContext="true" offlineCapable="false" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
     <name>Bar chart</name>
     <description>Create a bar chart</description>
     <icon>iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAAHdbkFIAAAAAXNSR0IArs4c6QAAA45JREFUeAHtWj162zAMjfJlaO6Q7D1K46FfTtG1o30E+wo5Raa6Y+9S3yFbVUEp8DEESYDgj2TXXiiR4MPD0xNF2b65ET4DjH95fRsxbuo4HZ/vH/H8Fg+wnSIf8BhaFuAO2gOA09Pr2+8kAnKZq9jv91SFz0E8H2D2r8/fKfDn8/2Mih35ZSL7KAKyjwbAgHttRA5zFQjnt7vd7r2iqdQnf1B7jhR+xCa4fEMxCBAam/t84f1AEQAmpFioAFIsVAAubZ9NNkCKjZuo8/HhcJjvT0vaO5g0juODLw6CSTXPABAcCoyBIji0BKAJdifiMQGEGGBQqiWAFIMUOAHEglLAwIwApMBYGQQQYxCbiP0EoGXgJyIAfwAzuG0oCQGEBt3JsWMC0DAIgZgfX8MwnLbbLT2sQ+Bn1gfP4aInubFeuog43+IGqwEgJyOQA2Yhi4ViywjUAEVwTcsI5CigSSDFMAIlCljIMwIWkBLSjEAJmCR3aJwRsCgQAtb2MQItFEgVxQikgrVVYZymGEZAMwkT1GgZgZoKaAjSix9scGGPqplUI4Ze0WqAXTGqKAAeKHljtpKgl8R/Boy+cVsTSPPYbZi7Dgy3w+b49dNRShQbJwViAVL/+GcsUo0pkLMQ5aoVKqZYgRBoTh9ToEZVOQSKFZjW8lNOQj+WKZDjAR/Mcl6sgCWpO4cpYPWAdT2opoB1PWAKWDxgVQ0uRTUF3Ouac8wUKKkmJzHGVlPAuh4wBSwewGosbTUFLMlhDlOgtgek9aG5AtL6wBSo6QGNms0VkLzBFNCwlkBzxpsrIK0PTIGaHtAo0VwBiQS9HXf+mnYzvR3P7xKLKDB91f4iKXMdvyrwvyhAqwAW7H5XdoG/S2GZ1LJVyP2i0D2mGRd2wJ6Efn099gbwuHb/ruRzaHnOHNAyWQzb/xNRLK5Fv+iAVnujHs7SCLYKB2iItooRHbCWK9VKgMUdAAsgvDi3KlDCFR3Qag2QiPUaX9wBvQqN5REdsMQa0HNfsEoH9NwXiA7otQYs4TS4LVbpgNj92qJfdMBSV6ZFsSHM1Tmg975AdECvNSB0dXr0rc4BPYp2c4gOOIc1oGTfcBEOKNk3iA5Y6xpQy5kX4QD3ns49Fh1QS+lcYr3iz94BpfsG0QFrXQNqOeTsHVAqxOSgj5/OvxN/TN74LPRLV8gBGwhszKU7PNQ0/dL1rXvia8KVK/AX9wAXHmHn0lwAAAAASUVORK5CYII=</icon>
@@ -96,6 +96,11 @@
                         <enumerationValue key="asc">Ascending</enumerationValue>
                         <enumerationValue key="desc">Descending</enumerationValue>
                     </enumerationValues>
+                </property>
+                <property key="barColor" type="string" required="false">
+                    <caption>Bar color</caption>
+                    <category>Appearance</category>
+                    <description>Color of the bar e.g. green, #00FF00, rgb(0,255,0)</description>
                 </property>
                 <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
                     <caption>On click</caption>

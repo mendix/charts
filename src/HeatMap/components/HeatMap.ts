@@ -116,7 +116,8 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
                     ...HeatMap.getDefaultDataOptions(props),
                     x: this.props.data.x,
                     y: this.props.data.y,
-                    z: this.props.data.z
+                    z: this.props.data.z,
+                    text: this.props.data.z.map((row, i) => row.map((item, j) => `${item}`))
                 },
                 advancedOptions
             ]);
@@ -193,8 +194,14 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
         return {
             autosize: true,
             showarrow: false,
-            xaxis: { fixedrange: true },
-            yaxis: { fixedrange: true },
+            xaxis: {
+                fixedrange: true,
+                title: props.xAxisLabel
+            },
+            yaxis: {
+                fixedrange: true,
+                title: props.yAxisLabel
+            },
             hoverlabel: {
                 bgcolor: "#888",
                 bordercolor: "#888",
@@ -215,7 +222,7 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
     public static getDefaultDataOptions(props: HeatMapProps): Partial<HeatMapData> {
         return {
             type: "heatmap",
-            hoverinfo: props.tooltipForm ? "none" : "label",
+            hoverinfo: props.tooltipForm ? "none" : "text" as any, // typings missing valid "text" value
             showscale: props.data && props.data.showscale,
             colorscale: props.data && props.data.colorscale
         };

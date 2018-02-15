@@ -83,7 +83,7 @@
                 <property key="lineColor" type="string" required="false">
                     <caption>Line color</caption>
                     <category>Appearance</category>
-                    <description/>
+                    <description>Color of the line e.g. green, #00FF00, rgb(0,255,0)</description>
                 </property>
                 <property key="fill" type="boolean" defaultValue="true">
                     <caption>Fill area</caption>

@@ -1,7 +1,17 @@
 .widget-charts-loading-wrapper {
-    position: absolute;
+    position: relative;
     top: 20%;
-    left: 44%;
+    left: 50%;
+
+    @media (min-width: 992px) {
+        left: 44%;
+    }
+    @media (min-width: 768px) {
+        left: 40%;
+    }
+    @media (max-width: 767px) {
+        left: 30%;
+    }
 
     .widget-charts-loading {
         padding: 0 10px;
@@ -19,6 +29,18 @@
         font-size: 80%;
         text-align: center;
         margin-top: 5px;
+        width: 165px;
+        left: 50%;
+
+        @media (min-width: 992px) {
+            left: 44%;
+        }
+        @media (min-width: 768px) {
+            left: 40%;
+        }
+        @media (max-width: 767px) {
+            left: 30%;
+        }
     }
 
     .widget-charts-loading-bar {

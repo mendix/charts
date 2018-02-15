@@ -61,6 +61,7 @@ export namespace Container {
         nameAttribute: string;
         valueAttribute: string;
         sortAttribute: string;
+        colorAttribute: string;
         sortOrder: Data.SortOrder;
         chartType: PieChartType;
         showLegend: boolean;
@@ -81,6 +82,8 @@ export namespace Container {
         scaleColors: ScaleColors[];
         showValues: boolean;
         valuesColor: string;
+        xAxisLabel: string;
+        yAxisLabel: string;
         layoutOptions: string;
         dataOptions: string;
         devMode: "basic" | "advanced" | "developer";
@@ -119,6 +122,7 @@ export namespace Data {
     export interface SeriesProps extends SeriesDataSourceProps, EventProps {
         name: string;
         seriesOptions: string;
+        barColor: string;
     }
 
     export interface LineSeriesProps extends SeriesProps {

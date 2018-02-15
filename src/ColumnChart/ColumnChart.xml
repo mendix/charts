@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<widget id="com.mendix.widget.custom.ColumnChart.ColumnChart" needsEntityContext="true" offlineCapable="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
+<widget id="com.mendix.widget.custom.ColumnChart.ColumnChart" needsEntityContext="true" offlineCapable="false" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
     <name>Column chart</name>
     <description>Create a column chart</description>
     <icon>iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAAHdbkFIAAAAAXNSR0IArs4c6QAAAudJREFUeAHtW8tR40AQRRQHyGHJB3PYIgpSsEOwUyAKigMmH8iBPaFVq+pNtdo9H2k0I8u0Lz2f/rx+GrVGI7i6Kv5rfBEeXr9bmrvmChjkY6oHrth74APcmtq9h/1+38eTk0v3T4Bv3v5tNq/fnxKYI6r9ad+7VP5IyzgPHQebzu27dE393W6nMq3pXtIYWIR0NPMkMckl2lyP2s4BKfiUpBHvOwd80NrGQIwBueCyF5LqQEYJoboJTdIcFTuqZ13p+To+3d1LfRUBVyLjj6e7hgoiH0e7RxCLAmVN9ghiUTRDjEVTgKJPTn58NU3ztd1uT0j1BbJxY+B8GSi+O0GVAAWyJmXfyHDsk1RlaI7qGUlZ04oDoKChX7Scw1jb9iAr6EyRyQDgnIJKMLJPuqngZr0EqUGRDMkBAzmZcKdj2ioDUzIZE5TrqgC4Qum2K0SHw+GzbVt131ECxG99RSvBpfk0BowBY2DtDLiHUalE6CiSb0Sb6+bx+Pf2iHjFH8c8OAXFLrkaAATybXKKMwAAPrk4gMGm1IeSxmOLKWQbmktmILaYQkFCc8kMwAktJrl9z2EnmQEA0GQOO7MAACjfrYZ5Tc4KQAsQGxusgZxrGQvkmx8wkHMtfQFi4wMAUJ5yLWE7VqoAxjrJ0TcAbkNS+e34sXs77jcl7hLUfDXvjtpfctaN2RoDxoAxYAwYA8aAMWAMGAPGwAUw4F6H1pqLPMjQ8uiSVP96i3Td65hmuIYxeZCiYQ7prJ4AmTAd6Iw51Lk4AiQhsf6vJ2BwMhpjK2U+tyilxJhTZ/YVECo4AJ6iA93ScvYVIAGjIMlvKlJvqZUz+wqQiaX2U1ZFik5qPOidDQEABDn2cQa7sfJsCRibyFR9bw1Y6p6cmshUO+8KSLnfUnSmAqtl5yVAAqh1T8q4pfvJBJQGspR/I2Ap5s8l7smBSOXvxFV50P4D6+QW6L5TP5NiVWQVglFOlFuFUBZiVQz8B0VwCne7aTZWAAAAAElFTkSuQmCC</icon>
@@ -96,6 +96,11 @@
                         <enumerationValue key="asc">Ascending</enumerationValue>
                         <enumerationValue key="desc">Descending</enumerationValue>
                     </enumerationValues>
+                </property>
+                <property key="barColor" type="string" required="false">
+                    <caption>Column color</caption>
+                    <category>Appearance</category>
+                    <description>Color of the column e.g. green, #00FF00, rgb(0,255,0)</description>
                 </property>
                 <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
                     <caption>On click</caption>

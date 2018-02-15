@@ -31,6 +31,7 @@ interface PieChartState {
 export interface PieTraces {
     labels: string[];
     values: number[];
+    colors: string[];
 }
 
 export class PieChart extends Component<PieChartProps, PieChartState> {
@@ -100,9 +101,12 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 return sourceArray;
             };
 
+            const traces = this.getTraces(props.data);
             return [ deepMerge.all([ {
                 ...PieChart.getDefaultDataOptions(this.props),
-                ...this.getTraces(props.data)
+                labels: traces.labels,
+                values: traces.values,
+                marker: { colors: traces.colors }
             }, advancedOptions ], { arrayMerge }) ];
         }
 
@@ -135,11 +139,14 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         if (data) {
             return {
                 labels: data.map(mxObject => mxObject.get(this.props.nameAttribute) as string),
+                colors: this.props.colorAttribute
+                    ? data.map(mxObject => mxObject.get(this.props.colorAttribute) as string)
+                    : [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ],
                 values: data.map(mxObject => parseFloat(mxObject.get(this.props.valueAttribute) as string))
             };
         }
 
-        return { labels: [], values: [] };
+        return { labels: [], values: [], colors: [] };
     }
 
     private onClick = ({ points }: ScatterHoverData<any> | PieHoverData) => {
@@ -201,7 +208,6 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         return {
             hole: props.chartType === "donut" ? 0.4 : 0,
             hoverinfo: props.tooltipForm ? "none" : "label",
-            marker: { colors: [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ] },
             type: "pie",
             sort: false
         };

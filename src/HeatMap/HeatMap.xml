@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<widget id="com.mendix.widget.custom.HeatMap.HeatMap" needsEntityContext="true" offlineCapable="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
+<widget id="com.mendix.widget.custom.HeatMap.HeatMap" needsEntityContext="true" offlineCapable="false" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
     <name>Heat map</name>
     <description>Renders a heat map chart</description>
     <icon>iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAAHdbkFIAAAAAXNSR0IArs4c6QAAAuRJREFUeAHtWUtu20AM9aRGAN8hPUIWPUVTr3KKnqCBvQvalQ30BDlFNk27CHoFL7LtJkjuEMBA4IrjvIFMiRlJtE1BMwJsajQkRT6S89No1PT6uXrdEC+nJzEFgeH+ce15OQ0MkqbA8Hf1z/NwGhgkDY46FouF90Bieve5I+nx56tapm+fPrioDWMShe91apppgO/dNfyY/KoTHs3xtHD1C+7bUu9lIXRX/BxyhZQQRrE28flLEypY4BVd3L6EmP+5nLhY++39umTZseD0+iFYsP5+7mLtvVgQlNjeLJfLp64WeBA3m80ZKYglDu8nmWg5EdN7l1qBV26aymoX1Ar2i0GseHg/vV3tglqBGoPO05dz7nk2m330Fgzjj+pJU1NdUdgZ1MtKymNP+TlNeNTW9kPnftIQ2jpQcwPEEABqySltP/SKBpSXFWAmSksOotp+0kGXeQjMDRBDAKi3QFX/tf3QKBpQnnvATJQWfUS1/aSDLvMQmBsghgBQb4Gq/mv7odHHkxq0wMUaFZ2HpPP5PLz7kO/JupsjQDlQLEg675ibv2mXM5ThWwLSjvuol1iG2hVPTB5eBgTw4Ng0G5AREKtAu+iMySPZzUMgIqBd9cbke4OAeQiyAeYIiFWg3XjE5HtTBSIC2p1PTL43CJgnYTbAHAGxCrSbz5h8b6og7FCPfEw7LXbHvwkFkxwojtpvEIJMMwKpIxBGAQBRPisb4HcpuBloZRQqHxSW74PEwG7EmVDyUzr3kfj5DtlanttZyQDOMPR2BmDoEY75lzMghtDQ+1vPAnxUbwuQtTy3N/kSaJ0B0rkvRxZtfkJmLQ+7QJPPgAwAUiFVmjMg1cjD79azAB/VoagptZbndiZfAq0zQPruw5FFm5+QW8vDLtDkMyADgFRIleYMSDXy8Lv1LMBHdShqSq3luZ3Jl0Dly9CRvxPzgBy0Xfelqy4DpsR4UEsMlJNPxZeurwavzq/sNQL/Ab/FSTKnF7aFAAAAAElFTkSuQmCC</icon>
@@ -128,6 +128,16 @@
         </property>
         <property key="valuesColor" type="string" defaultValue="">
             <caption>Font value color</caption>
+            <category>Scale</category>
+            <description/>
+        </property>
+        <property key="xAxisLabel" type="translatableString" required="false">
+            <caption>X-axis label</caption>
+            <category>Scale</category>
+            <description/>
+        </property>
+        <property key="yAxisLabel" type="translatableString" required="false">
+            <caption>Y-axis label</caption>
             <category>Scale</category>
             <description/>
         </property>
