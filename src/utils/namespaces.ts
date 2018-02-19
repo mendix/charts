@@ -61,7 +61,7 @@ export namespace Container {
         nameAttribute: string;
         valueAttribute: string;
         sortAttribute: string;
-        colorAttribute: string;
+        colors: { color: string }[];
         sortOrder: Data.SortOrder;
         chartType: PieChartType;
         showLegend: boolean;

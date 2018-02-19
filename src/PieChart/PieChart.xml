@@ -69,14 +69,6 @@
                 <enumerationValue key="desc">Descending</enumerationValue>
             </enumerationValues>
         </property>
-        <property key="colorAttribute" type="attribute" entityProperty="dataEntity" required="false">
-            <caption>Color attribute</caption>
-            <category>Data points</category>
-            <description>Contains the color of each pie slice e.g. green, #00FF00, rgb(0,255,0)</description>
-            <attributeTypes>
-                <attributeType name="String"/>
-            </attributeTypes>
-        </property>
         <property key="chartType" type="enumeration" defaultValue="pie">
             <caption>Chart type</caption>
             <category>Chart properties</category>
@@ -90,6 +82,18 @@
             <caption>Show legend</caption>
             <category>Chart properties</category>
             <description/>
+        </property>
+        <property key="colors" type="object" isList="true" required="false">
+            <caption>Colors</caption>
+            <category>Chart properties</category>
+            <description>Contains the color of each pie slice e.g. green, #00FF00, rgb(0,255,0)</description>
+            <properties>
+                <property key="color" type="string">
+                    <caption>Color</caption>
+                    <category>Color</category>
+                    <description/>
+                </property>
+            </properties>
         </property>
         <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
             <caption>On click</caption>

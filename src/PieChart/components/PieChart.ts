@@ -139,8 +139,8 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         if (data) {
             return {
                 labels: data.map(mxObject => mxObject.get(this.props.nameAttribute) as string),
-                colors: this.props.colorAttribute
-                    ? data.map(mxObject => mxObject.get(this.props.colorAttribute) as string)
+                colors: this.props.colors && this.props.colors.length
+                    ? this.props.colors.map(color => color.color)
                     : [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ],
                 values: data.map(mxObject => parseFloat(mxObject.get(this.props.valueAttribute) as string))
             };
