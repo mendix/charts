@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<widget id="com.mendix.widget.custom.BarChart.BarChart" needsEntityContext="true" offlineCapable="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
+<widget id="com.mendix.widget.custom.BarChart.BarChart" needsEntityContext="true" offlineCapable="false" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
     <name>Bar chart</name>
     <description>Create a bar chart</description>
-    <icon>
-        iVBORw0KGgoAAAANSUhEUgAAAA8AAAAQCAYAAAG+URWSAAAAAXNSR0IArs4c6QAAAu1JREFUKBVtU0tsTGEU/v7H/e+dznSevdOaqSqNeoUWlSYilESoxw5JCWEhhAXSWCCpqI0FG8FCGhaKhUTShIhFExZCpJNQIt4pYSiddka92jtzr/NPtYnEn3w5597/fOd855x7WdM0Y9/82skc1dMXddVffemxHUuTR5J2cJDNvNjrjY6OAhvCrOvzrMVeDyLe+2f3PNlTDRza349wWRUOAGCbG2PHwwH/sL/E/OXzqT68TszxhhtXeW9773ptG2bvks3tnbAsC+q5wlqiyIW/1yMaKkVNZCZyOseyqeLsyQvX9kgpYRjGBPRzR9vO3dIZqai83tkLMxKEGQziXGkthFKYFyygXqdMx9Pw77wDRS9N08Rhsn19fdibPI2OLgqYkuMf1jqtkB6VcKmEQ0gYEEISnzSsmeM/ZYdLc0oJx2cox1DSMQ2WF1wW2FtqPZ/PF9PrEuOwrADYq6o6zxQCgVAIkZWLkNm3tRigL+X5Jc2wYhFY4SBU0I8z17+BU4svttDlreZt0GMe7ztGWWpqakhOGrKldi845zCVCWUqxONxrM630iUxH3Q/oRX44QuYsHy613dYvUA3Qq28f/nQ045hkFKCQYrHfGts1pdu39+T6e9HrLwcuUwGZRWTyA7ArkggO/AVdiKJ7NcvZCsx+OUzKpLVOLa9abe0h9zKe7VL4QPHJ4IBhgxBErIEUTcDoZsdyBccOM4vFMgWXEeLoRg69bHJyGeyUBB/oZMI2Ac34dGNbh3y3yN77Aa0tF+G67rFqQga1T9Y3gr+lNNdAtHRKFKpYTxvGctFG08j//gofMESCENCErQVkpIQuPYFkSlpz5t1mBsYk6zpEiqNjes/YGRkpFhZ70RwImkC+Rp6aalUCldWbKEBDky0UPzstkZOQE87FI3hRy6HSJmN79ksonYcw0NDiP0sR0P54ARp3GH6By3xqapwwPppSMMheQVS6xpcW+EKzgpcCpczeieZy7lwGZjHBPv4B6KK4+uTEk7aAAAAAElFTkSuQmCC    </icon>
+    <icon>iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAAHdbkFIAAAAAXNSR0IArs4c6QAAA45JREFUeAHtWj162zAMjfJlaO6Q7D1K46FfTtG1o30E+wo5Raa6Y+9S3yFbVUEp8DEESYDgj2TXXiiR4MPD0xNF2b65ET4DjH95fRsxbuo4HZ/vH/H8Fg+wnSIf8BhaFuAO2gOA09Pr2+8kAnKZq9jv91SFz0E8H2D2r8/fKfDn8/2Mih35ZSL7KAKyjwbAgHttRA5zFQjnt7vd7r2iqdQnf1B7jhR+xCa4fEMxCBAam/t84f1AEQAmpFioAFIsVAAubZ9NNkCKjZuo8/HhcJjvT0vaO5g0juODLw6CSTXPABAcCoyBIji0BKAJdifiMQGEGGBQqiWAFIMUOAHEglLAwIwApMBYGQQQYxCbiP0EoGXgJyIAfwAzuG0oCQGEBt3JsWMC0DAIgZgfX8MwnLbbLT2sQ+Bn1gfP4aInubFeuog43+IGqwEgJyOQA2Yhi4ViywjUAEVwTcsI5CigSSDFMAIlCljIMwIWkBLSjEAJmCR3aJwRsCgQAtb2MQItFEgVxQikgrVVYZymGEZAMwkT1GgZgZoKaAjSix9scGGPqplUI4Ze0WqAXTGqKAAeKHljtpKgl8R/Boy+cVsTSPPYbZi7Dgy3w+b49dNRShQbJwViAVL/+GcsUo0pkLMQ5aoVKqZYgRBoTh9ToEZVOQSKFZjW8lNOQj+WKZDjAR/Mcl6sgCWpO4cpYPWAdT2opoB1PWAKWDxgVQ0uRTUF3Ouac8wUKKkmJzHGVlPAuh4wBSwewGosbTUFLMlhDlOgtgek9aG5AtL6wBSo6QGNms0VkLzBFNCwlkBzxpsrIK0PTIGaHtAo0VwBiQS9HXf+mnYzvR3P7xKLKDB91f4iKXMdvyrwvyhAqwAW7H5XdoG/S2GZ1LJVyP2i0D2mGRd2wJ6Efn099gbwuHb/ruRzaHnOHNAyWQzb/xNRLK5Fv+iAVnujHs7SCLYKB2iItooRHbCWK9VKgMUdAAsgvDi3KlDCFR3Qag2QiPUaX9wBvQqN5REdsMQa0HNfsEoH9NwXiA7otQYs4TS4LVbpgNj92qJfdMBSV6ZFsSHM1Tmg975AdECvNSB0dXr0rc4BPYp2c4gOOIc1oGTfcBEOKNk3iA5Y6xpQy5kX4QD3ns49Fh1QS+lcYr3iz94BpfsG0QFrXQNqOeTsHVAqxOSgj5/OvxN/TN74LPRLV8gBGwhszKU7PNQ0/dL1rXvia8KVK/AX9wAXHmHn0lwAAAAASUVORK5CYII=</icon>
     <properties>
         <property key="barMode" type="enumeration" defaultValue="group">
             <caption>Bar mode</caption>
@@ -53,29 +52,30 @@
                     <description>Returns a list of data values</description>
                     <returnType type="Object" entityProperty="dataEntity" isList="true"/>
                 </property>
-                <property key="xValueAttribute" type="attribute" entityProperty="dataEntity">
+                <property key="yValueAttribute" type="attribute" entityProperty="dataEntity">
                     <caption>X axis data attribute</caption>
                     <category>Data points</category>
                     <description/>
+                    <attributeTypes>
+                        <attributeType name="Decimal"/>
+                        <attributeType name="Long"/>
+                        <attributeType name="Integer"/>
+                    </attributeTypes>
+                </property>
+                <property key="xValueAttribute" type="attribute" entityProperty="dataEntity" isPath="optional" pathType="reference">
+                    <caption>Y axis data attribute</caption>
+                    <category>Data points</category>
+                    <description>For data source Database, attributes over reference are supported with a maximum of one level deep. For data source Microflow, references are not supported.</description>
                     <attributeTypes>
                         <attributeType name="String"/>
                         <attributeType name="Decimal"/>
                         <attributeType name="Long"/>
                         <attributeType name="Integer"/>
                         <attributeType name="Enum"/>
+                        <attributeType name="DateTime"/>
                     </attributeTypes>
                 </property>
-                <property key="yValueAttribute" type="attribute" entityProperty="dataEntity">
-                    <caption>Y axis data attribute</caption>
-                    <category>Data points</category>
-                    <description/>
-                    <attributeTypes>
-                        <attributeType name="Decimal"/>
-                        <attributeType name="Long"/>
-                        <attributeType name="Integer"/>
-                    </attributeTypes>
-                </property>
-                <property key="xValueSortAttribute" type="attribute" entityProperty="dataEntity" required="false">
+                <property key="xValueSortAttribute" type="attribute" entityProperty="dataEntity" required="false" isPath="optional" pathType="reference">
                     <caption>Y axis sort attribute</caption>
                     <category>Data points</category>
                     <description>Attribute to use for sorting the y axis data. Sorting can only be used when data soure is ‘Database’.  For data source ‘Microflow’, the sorting should be done within the microflow.</description>
@@ -96,6 +96,11 @@
                         <enumerationValue key="asc">Ascending</enumerationValue>
                         <enumerationValue key="desc">Descending</enumerationValue>
                     </enumerationValues>
+                </property>
+                <property key="barColor" type="string" required="false">
+                    <caption>Bar color</caption>
+                    <category>Appearance</category>
+                    <description>Color of the bar e.g. green, #00FF00, rgb(0,255,0)</description>
                 </property>
                 <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
                     <caption>On click</caption>

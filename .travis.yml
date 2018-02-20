@@ -14,6 +14,7 @@ before_install:
 - sudo apt-get install -y --allow-downgrades subversion=1.7.22-1+WANdisco libsvn1=1.7.22-1+WANdisco
 - svn --version
 - npm --version
+script: travis_wait 30 npm test
 after_success:
 - bash <(curl -s https://codecov.io/bash)
 cache:

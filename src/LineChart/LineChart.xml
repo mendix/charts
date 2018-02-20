@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<widget id="com.mendix.widget.custom.LineChart.LineChart" needsEntityContext="true" offlineCapable="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
+<widget id="com.mendix.widget.custom.LineChart.LineChart" needsEntityContext="true" offlineCapable="false" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
     <name>Line chart</name>
     <description>Create a line chart</description>
-    <icon>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAPCAYAAADtc08vAAAAAXNSR0IArs4c6QAAAk1JREFUKBWVUktoE1EUPTOZOJOSTsUxDTatuipUjZ+MVEUrrtpIxFr8tLRKjRSLdCuI+6xciC4qCkXBUhCpiAsx4qIWrUXIIJSktIlJJF9D8UOMScjMZJw3pRRNofUu3n3vvHPOvY93KWwknjY+ADSxlkpJTC24BqJoz4nBUKdXLJVKBsFkMuHx2wnQNfTxLW6MCwGQvBL9S37oJmOvHkoMwyCfz6NYLAKq9o/BmC6S4fN2Dookg5xJkKxoPX0dF8RUKgWO42B0ImswrRTBfZ2kwTfg7hcjkQiOHTjaFIyE2uDhbAA1cqajW0yn0+B5Hp9mZyHY7ficiGYpw+Au7wZF+c57esV4PA6Hw4HQQgiOJgemP05JB/e0i7F4DC3NLcjFvuCQdRde/JiRiJbGLV1cga+n66y4GF2EVbDind8P3s5jLjmH3fucYvR7FMJ2Acn5BQw2uHHbeQP7Y9x7VKoSDVnznTrZLYYyIZi3mRHwT8HFtiI8LUHYISCjZVDvqEc2EIZX8GB47wA2b7Xh+HxdCtd/DdPO+KYPbyYnwTQzCD6bwVDjadxx3TRy8mUQrI1F7nXYOHtbz6FYKGDpawaKqho/yByOctkT7W6MPnqCkZ19uOa6DNZiMbKqqhid+Bsn72ZZC+SqanwAo6igrzov4kpbL7kzKpAqJAi2Fs4wZr2D5RFgqqpqahAElMvLE2Yo11k4zgKiIzRGVmTzt1wOiiKvI1u9/q13QHSGwc9CuY4Mxf8YkCcQnWFQLFUSl7qO3Fv139iOougEYf4Bcqrs2xS8EXQAAAAASUVORK5CYII=
-    </icon>
+    <icon>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</icon>
     <properties>
         <property key="series" type="object" isList="true">
             <caption>Series</caption>
@@ -45,10 +43,10 @@
                     <description>Returns a list of data values</description>
                     <returnType type="Object" entityProperty="dataEntity" isList="true"/>
                 </property>
-                <property key="xValueAttribute" type="attribute" entityProperty="dataEntity">
+                <property key="xValueAttribute" type="attribute" entityProperty="dataEntity" isPath="optional" pathType="reference">
                     <caption>X-axis data attribute</caption>
                     <category>Data points</category>
-                    <description/>
+                    <description>For data source Database, attributes over reference are supported with a maximum of one level deep. For data source Microflow, references are not supported.</description>
                     <attributeTypes>
                         <attributeType name="String"/>
                         <attributeType name="Decimal"/>
@@ -68,10 +66,10 @@
                         <attributeType name="Integer"/>
                     </attributeTypes>
                 </property>
-                <property key="xValueSortAttribute" type="attribute" entityProperty="dataEntity" required="false">
+                <property key="xValueSortAttribute" type="attribute" entityProperty="dataEntity" required="false" isPath="optional" pathType="reference">
                     <caption>X-axis sort attribute</caption>
                     <category>Data points</category>
-                    <description>Attribute to use for sorting the x-axis data. Sorting can only be used when data soure is ‘Database’.  For data source ‘Microflow’, the sorting should be done within the microflow.</description>
+                    <description>For data source Database, attribute over reference is supported with a maximal of one level deep. For data source Microflow references are not supported</description>
                     <attributeTypes>
                         <attributeType name="Decimal"/>
                         <attributeType name="Long"/>

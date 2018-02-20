@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<widget id="com.mendix.widget.custom.PieChart.PieChart" needsEntityContext="true" offlineCapable="false" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
-    <name>Pie chart</name>
-    <description>Renders a pie or doughnut chart</description>
-    <icon>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</icon>
+<widget id="com.mendix.widget.custom.HeatMap.HeatMap" needsEntityContext="true" offlineCapable="false" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
+    <name>Heat map</name>
+    <description>Renders a heat map chart</description>
+    <icon>iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAAHdbkFIAAAAAXNSR0IArs4c6QAAAuRJREFUeAHtWUtu20AM9aRGAN8hPUIWPUVTr3KKnqCBvQvalQ30BDlFNk27CHoFL7LtJkjuEMBA4IrjvIFMiRlJtE1BMwJsajQkRT6S89No1PT6uXrdEC+nJzEFgeH+ce15OQ0MkqbA8Hf1z/NwGhgkDY46FouF90Bieve5I+nx56tapm+fPrioDWMShe91apppgO/dNfyY/KoTHs3xtHD1C+7bUu9lIXRX/BxyhZQQRrE28flLEypY4BVd3L6EmP+5nLhY++39umTZseD0+iFYsP5+7mLtvVgQlNjeLJfLp64WeBA3m80ZKYglDu8nmWg5EdN7l1qBV26aymoX1Ar2i0GseHg/vV3tglqBGoPO05dz7nk2m330Fgzjj+pJU1NdUdgZ1MtKymNP+TlNeNTW9kPnftIQ2jpQcwPEEABqySltP/SKBpSXFWAmSksOotp+0kGXeQjMDRBDAKi3QFX/tf3QKBpQnnvATJQWfUS1/aSDLvMQmBsghgBQb4Gq/mv7odHHkxq0wMUaFZ2HpPP5PLz7kO/JupsjQDlQLEg675ibv2mXM5ThWwLSjvuol1iG2hVPTB5eBgTw4Ng0G5AREKtAu+iMySPZzUMgIqBd9cbke4OAeQiyAeYIiFWg3XjE5HtTBSIC2p1PTL43CJgnYTbAHAGxCrSbz5h8b6og7FCPfEw7LXbHvwkFkxwojtpvEIJMMwKpIxBGAQBRPisb4HcpuBloZRQqHxSW74PEwG7EmVDyUzr3kfj5DtlanttZyQDOMPR2BmDoEY75lzMghtDQ+1vPAnxUbwuQtTy3N/kSaJ0B0rkvRxZtfkJmLQ+7QJPPgAwAUiFVmjMg1cjD79azAB/VoagptZbndiZfAq0zQPruw5FFm5+QW8vDLtDkMyADgFRIleYMSDXy8Lv1LMBHdShqSq3luZ3Jl0Dly9CRvxPzgBy0Xfelqy4DpsR4UEsMlJNPxZeurwavzq/sNQL/Ab/FSTKnF7aFAAAAAElFTkSuQmCC</icon>
     <properties>
         <property key="dataEntity" type="entity" allowNonPersistableEntities="true">
             <caption>Entity</caption>
@@ -29,14 +29,6 @@
             <description>Returns a list of data values</description>
             <returnType type="Object" entityProperty="dataEntity" isList="true"/>
         </property>
-        <property key="nameAttribute" type="attribute" entityProperty="dataEntity">
-            <caption>Name attribute</caption>
-            <category>Data points</category>
-            <description/>
-            <attributeTypes>
-                <attributeType name="String"/>
-            </attributeTypes>
-        </property>
         <property key="valueAttribute" type="attribute" entityProperty="dataEntity">
             <caption>Value attribute</caption>
             <category>Data points</category>
@@ -47,10 +39,18 @@
                 <attributeType name="Long"/>
             </attributeTypes>
         </property>
-        <property key="sortAttribute" type="attribute" entityProperty="dataEntity" required="false">
-            <caption>Sort attribute</caption>
+        <property key="horizontalNameAttribute" type="attribute" entityProperty="dataEntity" isPath="optional" pathType="reference">
+            <caption>Horizontal name attribute</caption>
             <category>Data points</category>
-            <description>Attribute to use for sorting the data. Sorting can only be used when data soure is ‘Database’.  For data source ‘Microflow’, the sorting should be done within the microflow.</description>
+            <description/>
+            <attributeTypes>
+                <attributeType name="String"/>
+            </attributeTypes>
+        </property>
+        <property key="horizontalSortAttribute" type="attribute" entityProperty="dataEntity" required="false" isPath="optional" pathType="reference">
+            <caption>Horizontal sort attribute</caption>
+            <category>Data points</category>
+            <description>Attribute to use for sorting the data. Sorting can only be used when data source is ‘Database’.  For data source ‘Microflow’, the sorting should be done within the microflow.</description>
             <attributeTypes>
                 <attributeType name="Decimal"/>
                 <attributeType name="Long"/>
@@ -60,8 +60,8 @@
                 <attributeType name="DateTime"/>
             </attributeTypes>
         </property>
-        <property key="sortOrder" type="enumeration" defaultValue="asc">
-            <caption>Sort order</caption>
+        <property key="horizontalSortOrder" type="enumeration" defaultValue="asc">
+            <caption>Horizontal sort order</caption>
             <category>Data points</category>
             <description/>
             <enumerationValues>
@@ -69,31 +69,77 @@
                 <enumerationValue key="desc">Descending</enumerationValue>
             </enumerationValues>
         </property>
-        <property key="chartType" type="enumeration" defaultValue="pie">
-            <caption>Chart type</caption>
-            <category>Chart properties</category>
+        <property key="verticalNameAttribute" type="attribute" entityProperty="dataEntity" isPath="optional" pathType="reference">
+            <caption>Vertical name attribute</caption>
+            <category>Data points</category>
+            <description/>
+            <attributeTypes>
+                <attributeType name="String"/>
+            </attributeTypes>
+        </property>
+        <property key="verticalSortAttribute" type="attribute" entityProperty="dataEntity" required="false" isPath="optional" pathType="reference">
+            <caption>Vertical sort attribute</caption>
+            <category>Data points</category>
+            <description>Attribute to use for sorting the data. Sorting can only be used when data source is ‘Database’.  For data source ‘Microflow’, the sorting should be done within the microflow.</description>
+            <attributeTypes>
+                <attributeType name="Decimal"/>
+                <attributeType name="Long"/>
+                <attributeType name="Integer"/>
+                <attributeType name="String"/>
+                <attributeType name="AutoNumber"/>
+                <attributeType name="DateTime"/>
+            </attributeTypes>
+        </property>
+        <property key="verticalSortOrder" type="enumeration" defaultValue="asc">
+            <caption>Vertical sort order</caption>
+            <category>Data points</category>
             <description/>
             <enumerationValues>
-                <enumerationValue key="pie">Pie</enumerationValue>
-                <enumerationValue key="donut">Doughnut</enumerationValue>
+                <enumerationValue key="asc">Ascending</enumerationValue>
+                <enumerationValue key="desc">Descending</enumerationValue>
             </enumerationValues>
         </property>
-        <property key="showLegend" type="boolean" defaultValue="true">
-            <caption>Show legend</caption>
-            <category>Chart properties</category>
-            <description/>
-        </property>
-        <property key="colors" type="object" isList="true" required="false">
+        <property key="scaleColors" type="object" isList="true" required="false">
             <caption>Colors</caption>
-            <category>Chart properties</category>
-            <description>Contains the color of each pie slice e.g. green, #00FF00, rgb(0,255,0)</description>
+            <category>Scale</category>
+            <description>The percentages with the colors that should be applied. At least two values needs to be specified, else the default colors are used.</description>
             <properties>
-                <property key="color" type="string">
+                <property key="valuePercentage" type="integer" defaultValue="0">
+                    <caption>Percentage</caption>
+                    <category>Color</category>
+                    <description>The percentage at which the color should be applied. This value must be between 0 and 100</description>
+                </property>
+                <property key="colour" type="string" >
                     <caption>Color</caption>
                     <category>Color</category>
-                    <description/>
+                    <description>The CSS value e.g. blue, #48B0F7 or rgb(0,0,0)</description>
                 </property>
             </properties>
+        </property>
+        <property key="showScale" type="boolean" defaultValue="true">
+            <caption>Show scale</caption>
+            <category>Scale</category>
+            <description/>
+        </property>
+        <property key="showValues" type="boolean" defaultValue="false">
+            <caption>Show values</caption>
+            <category>Scale</category>
+            <description/>
+        </property>
+        <property key="valuesColor" type="string" defaultValue="">
+            <caption>Font value color</caption>
+            <category>Scale</category>
+            <description/>
+        </property>
+        <property key="xAxisLabel" type="translatableString" required="false">
+            <caption>X-axis label</caption>
+            <category>Scale</category>
+            <description/>
+        </property>
+        <property key="yAxisLabel" type="translatableString" required="false">
+            <caption>Y-axis label</caption>
+            <category>Scale</category>
+            <description/>
         </property>
         <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
             <caption>On click</caption>

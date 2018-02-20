@@ -2,6 +2,7 @@ const webpack = require("webpack");
 const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const DynamicPublicPathPlugin = require("dynamic-public-path-webpack-plugin");
 
 const widgetName = require("./package").widgetName;
 
@@ -12,14 +13,15 @@ const widgetConfig = {
         LineChart: "./src/LineChart/components/LineChartContainer.ts",
         AreaChart: "./src/AreaChart/components/AreaChartContainer.ts",
         PieChart: "./src/PieChart/components/PieChartContainer.ts",
-        TimeSeries: "./src/TimeSeries/components/TimeSeriesContainer.ts"
+        TimeSeries: "./src/TimeSeries/components/TimeSeriesContainer.ts",
+        HeatMap: "./src/HeatMap/components/HeatMapContainer.ts"
     },
     output: {
         path: path.resolve(__dirname, "dist/tmp/src"),
         filename: "com/mendix/widget/custom/[name]/[name].js",
         chunkFilename: `com/mendix/widget/custom/${widgetName.toLowerCase()}/chunk[id].js`,
         libraryTarget: "umd",
-        publicPath: "widgets/"
+        publicPath: "/"
     },
     resolve: {
         extensions: [ ".ts", ".js" ],
@@ -49,14 +51,7 @@ const widgetConfig = {
             }
         ]
     },
-    externals: [ "react", "react-dom",
-        function(context, request, callback) {
-            if (/PlotlyCustom$/.test(request)) {
-                return callback(null, "widgets/com/mendix/widget/custom/charts/PlotlyCustom.js");
-            }
-            callback();
-        }
-    ],
+    externals: [ "react", "react-dom" ],
     plugins: [
         new CopyWebpackPlugin([
             { from: "src/**/*.js", to: "../" },
@@ -65,9 +60,7 @@ const widgetConfig = {
             copyUnmodified: true
         }),
         new ExtractTextPlugin({ filename: `./com/mendix/widget/custom/[name]/ui/[name].css` }),
-        new webpack.LoaderOptionsPlugin({
-            debug: true
-        })
+        new webpack.LoaderOptionsPlugin({ debug: true })
     ]
 };
 
@@ -91,7 +84,8 @@ const previewConfig = {
         LineChart: "./src/LineChart/LineChart.webmodeler.ts",
         AreaChart: "./src/AreaChart/AreaChart.webmodeler.ts",
         PieChart: "./src/PieChart/PieChart.webmodeler.ts",
-        TimeSeries: "./src/TimeSeries/TimeSeries.webmodeler.ts"
+        TimeSeries: "./src/TimeSeries/TimeSeries.webmodeler.ts",
+        HeatMap:  "./src/HeatMap/HeatMap.webmodeler.ts"
     },
     output: {
         path: path.resolve(__dirname, "dist/tmp"),

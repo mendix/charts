@@ -2,7 +2,6 @@ import { Component, ReactChild, ReactElement, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
-import { Playground } from "../../components/Playground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
 import deepMerge from "deepmerge";
@@ -12,6 +11,7 @@ import { getDimensions, parseStyle } from "../../utils/style";
 import PieChartContainerProps = Container.PieChartContainerProps;
 
 import "../../ui/Charts.scss";
+import { PiePlayground } from "./PiePlayground";
 
 export interface PieChartProps extends PieChartContainerProps {
     data?: mendix.lib.MxObject[];
@@ -31,25 +31,17 @@ interface PieChartState {
 export interface PieTraces {
     labels: string[];
     values: number[];
+    colors: string[];
 }
 
 export class PieChart extends Component<PieChartProps, PieChartState> {
-    private tooltipNode: HTMLDivElement;
-    private Playground: typeof Playground;
-
-    constructor(props: PieChartProps) {
-        super(props);
-
-        this.getTooltipNodeRef = this.getTooltipNodeRef.bind(this);
-        this.onClick = this.onClick.bind(this);
-        this.onHover = this.onHover.bind(this);
-        this.onRuntimeUpdate = this.onRuntimeUpdate.bind(this);
-        this.state = {
-            layoutOptions: props.layoutOptions,
-            dataOptions: props.dataOptions,
-            playgroundLoaded: false
-        };
-    }
+    state = {
+        layoutOptions: this.props.layoutOptions,
+        dataOptions: this.props.dataOptions,
+        playgroundLoaded: false
+    };
+    private tooltipNode?: HTMLDivElement;
+    private Playground?: typeof PiePlayground;
 
     render() {
         if (this.props.alertMessage) {
@@ -74,12 +66,12 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
     }
 
     private async loadPlaygroundComponent() {
-        const { Playground: PlaygroundImport } = await import("../../components/Playground");
+        const { PiePlayground: PlaygroundImport } = await import("./PiePlayground");
         this.Playground = PlaygroundImport;
         this.setState({ playgroundLoaded: true });
     }
 
-    private getTooltipNodeRef(node: HTMLDivElement) {
+    private getTooltipNodeRef = (node: HTMLDivElement) => {
         this.tooltipNode = node;
     }
 
@@ -104,38 +96,35 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
             const advancedOptions = props.devMode !== "basic" && this.state.dataOptions
                 ? JSON.parse(this.state.dataOptions)
                 : {};
-            const traces = this.getTraces(props.data);
 
             const arrayMerge = (_destinationArray: any[], sourceArray: any[]) => {
                 return sourceArray;
             };
 
+            const traces = this.getTraces(props.data);
             return [ deepMerge.all([ {
-                hole: this.props.chartType === "donut" ? 0.4 : 0,
-                hoverinfo: this.props.tooltipForm ? "none" : "label",
+                ...PieChart.getDefaultDataOptions(this.props),
                 labels: traces.labels,
-                marker: { colors: [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ] },
-                type: "pie",
                 values: traces.values,
-                sort: false
+                marker: { colors: traces.colors }
             }, advancedOptions ], { arrayMerge }) ];
         }
 
         return props.defaultData || [];
     }
 
-    private renderPlayground(): ReactElement<any> {
-        return createElement(this.Playground, {
-            pie: {
+    private renderPlayground(): ReactElement<any> | null {
+        if (this.Playground) {
+            return createElement(this.Playground, {
                 dataOptions: this.state.dataOptions || "{\n\n}",
                 modelerDataConfigs: JSON.stringify(PieChart.getDefaultDataOptions(this.props), null, 4),
-                chartData: this.getData(this.props),
-                traces: this.getTraces(this.props.data),
-                onChange: this.onRuntimeUpdate
-            },
-            layoutOptions: this.state.layoutOptions || "{\n\n}",
-            modelerLayoutConfigs: JSON.stringify(PieChart.getDefaultLayoutOptions(this.props), null, 4)
-        }, this.renderChart());
+                onChange: this.onRuntimeUpdate,
+                layoutOptions: this.state.layoutOptions || "{\n\n}",
+                modelerLayoutConfigs: JSON.stringify(PieChart.getDefaultLayoutOptions(this.props), null, 4)
+            }, this.renderChart());
+        }
+
+        return null;
     }
 
     private getLayoutOptions(props: PieChartProps): Partial<Layout> {
@@ -150,21 +139,24 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         if (data) {
             return {
                 labels: data.map(mxObject => mxObject.get(this.props.nameAttribute) as string),
+                colors: this.props.colors && this.props.colors.length
+                    ? this.props.colors.map(color => color.color)
+                    : [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ],
                 values: data.map(mxObject => parseFloat(mxObject.get(this.props.valueAttribute) as string))
             };
         }
 
-        return { labels: [], values: [] };
+        return { labels: [], values: [], colors: [] };
     }
 
-    private onClick({ points }: ScatterHoverData<any> | PieHoverData) {
+    private onClick = ({ points }: ScatterHoverData<any> | PieHoverData) => {
         if (this.props.onClick && this.props.data) {
             this.props.onClick(this.props, this.props.data[points[0].pointNumber], this.props.mxform);
         }
     }
 
-    private onHover({ event, points }: ScatterHoverData<any> | PieHoverData) {
-        if (this.props.onHover && this.props.data) {
+    private onHover = ({ event, points }: ScatterHoverData<any> | PieHoverData) => {
+        if (this.props.onHover && this.props.data && this.tooltipNode) {
             this.tooltipNode.innerHTML = "";
             this.tooltipNode.style.top = `${event.clientY - 100}px`;
             this.tooltipNode.style.left = `${event.clientX}px`;
@@ -173,7 +165,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         }
     }
 
-    private onRuntimeUpdate(layoutOptions: string, dataOptions: string) {
+    private onRuntimeUpdate = (layoutOptions: string, dataOptions: string) => {
         this.setState({ layoutOptions, dataOptions });
     }
 
@@ -216,7 +208,6 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         return {
             hole: props.chartType === "donut" ? 0.4 : 0,
             hoverinfo: props.tooltipForm ? "none" : "label",
-            marker: { colors: [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ] },
             type: "pie",
             sort: false
         };

@@ -2,7 +2,7 @@
 <widget id="com.mendix.widget.custom.TimeSeries.TimeSeries" needsEntityContext="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
     <name>Time series</name>
     <description>Renders a time series chart</description>
-    <icon>iVBORw0KGgoAAAANSUhEUgAAABAAAAAPCAYAAADtc08vAAAAAXNSR0IArs4c6QAAAk1JREFUKBWVUktoE1EUPTOZOJOSTsUxDTatuipUjZ+MVEUrrtpIxFr8tLRKjRSLdCuI+6xciC4qCkXBUhCpiAsx4qIWrUXIIJSktIlJJF9D8UOMScjMZJw3pRRNofUu3n3vvHPOvY93KWwknjY+ADSxlkpJTC24BqJoz4nBUKdXLJVKBsFkMuHx2wnQNfTxLW6MCwGQvBL9S37oJmOvHkoMwyCfz6NYLAKq9o/BmC6S4fN2Dookg5xJkKxoPX0dF8RUKgWO42B0ImswrRTBfZ2kwTfg7hcjkQiOHTjaFIyE2uDhbAA1cqajW0yn0+B5Hp9mZyHY7ficiGYpw+Au7wZF+c57esV4PA6Hw4HQQgiOJgemP05JB/e0i7F4DC3NLcjFvuCQdRde/JiRiJbGLV1cga+n66y4GF2EVbDind8P3s5jLjmH3fucYvR7FMJ2Acn5BQw2uHHbeQP7Y9x7VKoSDVnznTrZLYYyIZi3mRHwT8HFtiI8LUHYISCjZVDvqEc2EIZX8GB47wA2b7Xh+HxdCtd/DdPO+KYPbyYnwTQzCD6bwVDjadxx3TRy8mUQrI1F7nXYOHtbz6FYKGDpawaKqho/yByOctkT7W6MPnqCkZ19uOa6DNZiMbKqqhid+Bsn72ZZC+SqanwAo6igrzov4kpbL7kzKpAqJAi2Fs4wZr2D5RFgqqpqahAElMvLE2Yo11k4zgKiIzRGVmTzt1wOiiKvI1u9/q13QHSGwc9CuY4Mxf8YkCcQnWFQLFUSl7qO3Fv139iOougEYf4Bcqrs2xS8EXQAAAAASUVORK5CYII=</icon>
+    <icon>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</icon>
     <properties>
         <property key="series" type="object" isList="true">
             <caption>Series</caption>
@@ -43,10 +43,10 @@
                     <description>Returns a list of data values</description>
                     <returnType type="Object" entityProperty="dataEntity" isList="true"/>
                 </property>
-                <property key="xValueAttribute" type="attribute" entityProperty="dataEntity">
+                <property key="xValueAttribute" type="attribute" entityProperty="dataEntity" isPath="optional" pathType="reference">
                     <caption>X-axis data attribute</caption>
                     <category>Data points</category>
-                    <description/>
+                    <description>For data source Database, attributes over reference are supported with a maximum of one level deep. For data source Microflow, references are not supported.</description>
                     <attributeTypes>
                         <attributeType name="DateTime"/>
                     </attributeTypes>
@@ -83,7 +83,7 @@
                 <property key="lineColor" type="string" required="false">
                     <caption>Line color</caption>
                     <category>Appearance</category>
-                    <description/>
+                    <description>Color of the line e.g. green, #00FF00, rgb(0,255,0)</description>
                 </property>
                 <property key="fill" type="boolean" defaultValue="true">
                     <caption>Fill area</caption>

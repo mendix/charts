@@ -14,9 +14,10 @@ Plot and compare your data across different charts.
 * `Area Chart`
 * `Bar Chart`
 * `Time Series Chart`
+* `Heat Map`
 
 ## Dependencies
-* Mendix 7.8.0
+* Mendix 7.11.0
 
 ## Demo projects
 [https://charts102.mxapps.io](https://charts102.mxapps.io)
@@ -60,11 +61,18 @@ Below are the properties for configuring pie chart data:
 ### Time series chart
 The time series chart is a specialised version of the line chart, focusing on the X-axis dates. It therefore has data properties identical to those of the line chart.
 
+### Heat map
+The heat map should be configured with a required horizontal, vertical and data attributes.
+
+The sample domain model could be either of the two below.
+
+![Heat Map Sample Domain Model](assets/heatmap_sample_domain_model.png)
+
 ## Advanced configuration
 The charts in this widget are based on the [https://github.com/mendixlabs/charts/issues](Plotly) library.
 As such, the widget provides support for advanced users to extend or overwrite the basic settings by adding the chart properties as JSON.
 
-To enable this feature, go to the "mode" option in the "Advanced" tab. 
+To enable this feature, go to the "mode" option in the "Advanced" tab.
 For the line & column charts, each series has its own advanced tab for its own specialised configurations.
 
 Below are the available advanced options and their usage:
@@ -76,7 +84,7 @@ Layout options control the general appearance of the chart. Common options inclu
         "title": "My Chart"
         "showlegend": true
     }
-    
+
 ### Data options (pie chart)
 On the pie chart, the data options control the appearance of the pie circle beyond the general layout options. Options include hole, name, marker e.t.c
 

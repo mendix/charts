@@ -1,15 +1,18 @@
 import { CSSProperties, Component, createElement } from "react";
 import * as classNames from "classnames";
 
+import { ChartLoading } from "./ChartLoading";
 import deepMerge from "deepmerge";
 import * as elementResize from "element-resize-detector";
-import { Config, Data, Layout, PieData, PieHoverData, ScatterData, ScatterHoverData } from "plotly.js";
-import { newPlot, purge } from "../PlotlyCustom";
+import {
+    Config, Data, HeatMapData, Layout, PieData, PieHoverData,
+    PlotlyHTMLElement, Root, ScatterData, ScatterHoverData
+} from "plotly.js";
 
 export interface PlotlyChartProps {
-    type: "line" | "bar" | "pie";
+    type: "line" | "bar" | "pie" | "heatmap" | "full";
     layout: Partial<Layout>;
-    data: ScatterData[] | PieData[];
+    data: ScatterData[] | PieData[] | HeatMapData[];
     config: Partial<Config>;
     className?: string;
     style?: CSSProperties;
@@ -18,11 +21,14 @@ export interface PlotlyChartProps {
     getTooltipNode?: (node: HTMLDivElement) => void;
 }
 
-export class PlotlyChart extends Component<PlotlyChartProps, {}> {
+export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean }> {
+    state = { loading: true };
     private chartNode?: HTMLDivElement;
-    private tooltipNode: HTMLDivElement;
-    private timeoutId: number;
+    private tooltipNode?: HTMLDivElement;
+    private timeoutId?: number;
     private resizeDetector = elementResize({ strategy: "scroll" });
+    private newPlot?: (root: Root, data: Data[], layout?: Partial<Layout>, config?: Partial<Config>) => Promise<PlotlyHTMLElement>;
+    private purge?: (root: Root) => void;
 
     constructor(props: PlotlyChartProps) {
         super(props);
@@ -40,7 +46,8 @@ export class PlotlyChart extends Component<PlotlyChartProps, {}> {
                 ref: this.getPlotlyNodeRef,
                 style: this.props.style
             },
-            createElement("div", { className: "widget-charts-tooltip", ref: this.getTooltipNodeRef })
+            createElement("div", { className: "widget-charts-tooltip", ref: this.getTooltipNodeRef }),
+            this.state.loading ? createElement(ChartLoading, { text: "Loading" }) : null
         );
     }
 
@@ -57,8 +64,8 @@ export class PlotlyChart extends Component<PlotlyChartProps, {}> {
     }
 
     componentWillUnmount() {
-        if (this.chartNode) {
-            purge(this.chartNode);
+        if (this.chartNode && this.purge) {
+            this.purge(this.chartNode);
         }
     }
 
@@ -84,12 +91,50 @@ export class PlotlyChart extends Component<PlotlyChartProps, {}> {
                     height: parseFloat(style.getPropertyValue("height").split("px")[0])
                 }
             ]);
-            newPlot(this.chartNode, data as Data[], layoutOptions, config)
-                .then(myPlot => {
-                    myPlot.on("plotly_click", onClick as any);
-                    myPlot.on("plotly_hover", onHover as any);
-                    myPlot.on("plotly_unhover", this.clearTooltip);
+            this.loadPlotlyAPI()
+                .then(() => {
+                    if (!this.state.loading && this.newPlot && this.chartNode) {
+                        this.newPlot(this.chartNode, data as Data[], layoutOptions, config)
+                            .then(myPlot => {
+                                if (onClick) {
+                                    myPlot.on("plotly_click", onClick as any);
+                                }
+                                if (onHover) {
+                                    myPlot.on("plotly_hover", onHover as any);
+                                    myPlot.on("plotly_unhover", this.clearTooltip);
+                                }
+                            });
+                    }
                 });
+        }
+    }
+
+    private async loadPlotlyAPI() {
+        if (!this.newPlot || this.purge) {
+            if (this.props.type === "full") {
+                const { newPlot, purge } = await import("plotly.js/dist/plotly");
+                this.newPlot = newPlot;
+                this.purge = purge;
+            } else {
+                const { newPlot, purge, register } = await import("../PlotlyCustom");
+                if (this.props.type === "pie") {
+                    register([ await import("plotly.js/lib/pie") ]);
+                }
+                if (this.props.type === "bar") {
+                    register([ await import("plotly.js/lib/bar") ]);
+                }
+                if (this.props.type === "line") {
+                    register([ await import("plotly.js/lib/scatter") ]);
+                }
+                if (this.props.type === "heatmap") {
+                    register([ await import("plotly.js/lib/heatmap") ]);
+                }
+                this.newPlot = newPlot;
+                this.purge = purge;
+            }
+        }
+        if (this.state.loading) {
+            this.setState({ loading: false });
         }
     }
 
@@ -101,17 +146,19 @@ export class PlotlyChart extends Component<PlotlyChartProps, {}> {
     }
 
     private clearTooltip() {
-        this.tooltipNode.innerHTML = "";
-        this.tooltipNode.style.opacity = "0";
+        if (this.tooltipNode) {
+            this.tooltipNode.innerHTML = "";
+            this.tooltipNode.style.opacity = "0";
+        }
     }
 
-    private onResize() {
+    private async onResize() {
         if (this.timeoutId) {
             clearTimeout(this.timeoutId);
         }
         this.timeoutId = setTimeout(() => {
-            if (this.chartNode) {
-                purge(this.chartNode);
+            if (this.chartNode && this.purge) {
+                this.purge(this.chartNode);
                 this.renderChart(this.props);
             }
             this.timeoutId = 0;

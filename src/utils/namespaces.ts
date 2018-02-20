@@ -61,13 +61,37 @@ export namespace Container {
         nameAttribute: string;
         valueAttribute: string;
         sortAttribute: string;
+        colors: { color: string }[];
         sortOrder: Data.SortOrder;
         chartType: PieChartType;
         showLegend: boolean;
-        tooltipForm: string;
         layoutOptions: string;
         dataOptions: string;
         devMode: "basic" | "advanced" | "developer";
+    }
+
+    export interface HeatMapContainerProps extends Data.DataSourceProps, Style.Dimensions, Data.EventProps, WrapperProps {
+        valueAttribute: string;
+        horizontalNameAttribute: string;
+        horizontalSortAttribute: string;
+        verticalNameAttribute: string;
+        verticalSortAttribute: string;
+        horizontalSortOrder: Data.SortOrder;
+        verticalSortOrder: Data.SortOrder;
+        showScale: boolean;
+        scaleColors: ScaleColors[];
+        showValues: boolean;
+        valuesColor: string;
+        xAxisLabel: string;
+        yAxisLabel: string;
+        layoutOptions: string;
+        dataOptions: string;
+        devMode: "basic" | "advanced" | "developer";
+    }
+
+    export interface ScaleColors {
+        valuePercentage: number;
+        colour: number;
     }
 }
 
@@ -98,6 +122,7 @@ export namespace Data {
     export interface SeriesProps extends SeriesDataSourceProps, EventProps {
         name: string;
         seriesOptions: string;
+        barColor: string;
     }
 
     export interface LineSeriesProps extends SeriesProps {
@@ -116,6 +141,15 @@ export namespace Data {
     export interface ScatterTrace {
         x: Datum[];
         y: number[] | Datum[];
+    }
+
+    export interface ReferencesSpec {
+            attributes?: string[];
+            amount?: number;
+            sort?: [ string, "desc" | "asc" ][];
+            references?: {
+                [index: string]: ReferencesSpec;
+            };
     }
 }
 

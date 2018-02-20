@@ -1,11 +1,15 @@
+let __webpack_public_path__;
 import { Component, createElement } from "react";
 
 import { ChartContainer } from "../../components/ChartContainer";
 import { validateSeriesProps } from "../../utils/data";
 import { LineChart } from "./LineChart";
 import { Container } from "../../utils/namespaces";
+import { getDimensions, parseStyle } from "../../utils/style";
 import LineChartContainerProps = Container.LineChartContainerProps;
 import LineChartContainerState = Container.LineChartContainerState;
+
+__webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
 export default class LineChartContainer extends Component<LineChartContainerProps, LineChartContainerState> {
     static defaultProps: Partial<LineChartContainerProps> = { fill: false };
@@ -22,7 +26,8 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         return createElement(ChartContainer, {
             alertMessage: this.state.alertMessage,
             mxObject: this.props.mxObject,
-            series: this.props.series
+            series: this.props.series,
+            style: { ...getDimensions(this.props), ...parseStyle(this.props.style) }
         }, createElement(LineChart, this.props));
     }
 }

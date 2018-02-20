@@ -14,14 +14,13 @@ export class InfoTooltip extends Component<InfoTooltipProps, InfoTooltipState> {
     static defaultProps: Partial<InfoTooltipProps> = {
         show: false
     };
-    private tooltipNode: HTMLDivElement;
+    state: InfoTooltipState = {};
+    private tooltipNode?: HTMLDivElement;
 
     constructor(props: InfoTooltipProps) {
         super(props);
 
-        this.getRef = this.getRef.bind(this);
         this.onInfoClick = this.onInfoClick.bind(this);
-        this.state = {};
     }
 
     render() {
@@ -40,7 +39,7 @@ export class InfoTooltip extends Component<InfoTooltipProps, InfoTooltipState> {
         }
     }
 
-    private getRef(node: HTMLDivElement) {
+    private getRef = (node: HTMLDivElement) => {
         this.tooltipNode = node;
     }
 

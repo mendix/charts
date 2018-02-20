@@ -6,14 +6,30 @@ import SeriesData = Data.SeriesData;
 import SortOrder = Data.SortOrder;
 import EventProps = Data.EventProps;
 import ScatterTrace = Data.ScatterTrace;
+import ReferencesSpec = Data.ReferencesSpec;
 
 export const validateSeriesProps = <T extends Partial<SeriesProps>>(dataSeries: T[], widgetId: string, layoutOptions: string): ReactChild => { // tslint:disable-line max-line-length
     if (dataSeries && dataSeries.length) {
         const errorMessage: string[] = [];
         dataSeries.forEach(series => {
             const identifier = series.name ? `series "${series.name}"` : "the widget";
-            if (series.dataSourceType === "microflow" && !series.dataSourceMicroflow) {
-                errorMessage.push(`\n'Data source type' in ${identifier} is set to 'Microflow' but no microflow is specified.`); // tslint:disable-line max-line-length
+            if (series.dataSourceType === "microflow") {
+                if (!series.dataSourceMicroflow) {
+                    errorMessage.push(`'Data source type' in ${identifier} is set to 'Microflow' but no microflow is specified.`); // tslint:disable-line max-line-length
+                }
+                if (series.xValueAttribute && series.xValueAttribute.split("/").length > 1) {
+                    errorMessage.push(`'X-axis data attribute' in ${identifier} does not support references for data source 'Microflow'`);
+                }
+                if (series.xValueSortAttribute && series.xValueSortAttribute.split("/").length > 1) {
+                    errorMessage.push(`'X-axis sort attribute' in ${identifier} does not support references for data source 'Microflow'`);
+                }
+            } else {
+                if (series.xValueAttribute && series.xValueAttribute.split("/").length > 3) {
+                    errorMessage.push(`'X-axis data attribute' in ${identifier} supports maximal one level deep reference`);
+                }
+                if (series.xValueSortAttribute && series.xValueSortAttribute.split("/").length > 3) {
+                    errorMessage.push(`'X-axis sort attribute' in ${identifier} supports maximal one level deep reference`);
+                }
             }
             if (series.seriesOptions && series.seriesOptions.trim()) {
                 const error = validateAdvancedOptions(series.seriesOptions.trim());
@@ -61,8 +77,9 @@ export const fetchSeriesData = (mxObject: mendix.lib.MxObject, series: SeriesPro
     new Promise<SeriesData>((resolve, reject) => {
         if (series.dataEntity) {
             if (series.dataSourceType === "XPath") {
+                const references = getReferences(series);
                 const sortAttribute = series.xValueSortAttribute || series.xValueAttribute;
-                fetchByXPath(mxObject.getGuid(), series.dataEntity, series.entityConstraint, sortAttribute, series.sortOrder || "asc")
+                fetchByXPath(mxObject.getGuid(), series.dataEntity, series.entityConstraint, sortAttribute, series.sortOrder || "asc", references.attributes, references.references)
                     .then(mxObjects => resolve({ data: mxObjects, series }))
                     .catch(reject);
             } else if (series.dataSourceType === "microflow" && series.dataSourceMicroflow) {
@@ -75,17 +92,58 @@ export const fetchSeriesData = (mxObject: mendix.lib.MxObject, series: SeriesPro
         }
     });
 
-export const fetchByXPath = (guid: string, entity: string, constraint: string, sortBy?: string, sortOrder: SortOrder = "asc"): Promise<mendix.lib.MxObject[]> =>
+const getReferences = (series: SeriesProps): ReferencesSpec => {
+    let references: ReferencesSpec = { attributes: [] };
+    references = addPathReference(references, series.xValueAttribute);
+    references = addPathReference(references, series.yValueAttribute);
+    references = addPathReference(references, series.xValueSortAttribute || series.xValueAttribute);
+    return references;
+};
+
+const addPathReference = (references: ReferencesSpec, path: string): ReferencesSpec =>
+    path.split("/").reduce((referenceSet, part, index, pathParts) => {
+        let parent = referenceSet;
+        // Use relations, skip entities sample: "module.relation_X_Y/module.entity_Y/attribute"
+        // At the moment Mendix support only 1 level deep.
+        if (index % 2 === 0) {
+            for (let i = 0; i < index; i += 2) {
+                if (parent.references) {
+                    parent = parent.references[pathParts[i]];
+                }
+            }
+            if (pathParts.length - 1 === index) {
+                // Skip empty attributes
+                if (part) {
+                    if (parent.attributes) {
+                        parent.attributes.push(part);
+                    } else {
+                        parent.attributes = [ part ];
+                    }
+                }
+            } else {
+                if (!parent.references) {
+                    parent.references = { [part]: { } };
+                } else if (!parent.references[part]) {
+                    parent.references[part] = {};
+                }
+            }
+        }
+        return referenceSet;
+    }, references);
+
+export const fetchByXPath = (guid: string, entity: string, constraint: string, sortBy?: string, sortOrder: SortOrder = "asc", attributes?: string[], references?: any /* ReferencesSpec */): Promise<mendix.lib.MxObject[]> =>
     new Promise((resolve, reject) => {
         const entityPath = entity.split("/");
         const entityName = entityPath.length > 1 ? entityPath[entityPath.length - 1] : entity;
-        const xpath = "//" + entityName + constraint.replace("[%CurrentObject%]", guid);
+        const xpath = "//" + entityName + constraint.split("[%CurrentObject%]").join(guid);
         window.mx.data.get({
             callback: resolve,
             error: error => reject(`An error occurred while retrieving data via XPath (${xpath}): ${error.message}`),
             xpath,
             filter: {
-                sort: sortBy ? [ [ sortBy, sortOrder ] ] : []
+                sort: sortBy && sortBy.indexOf("/") === -1 ? [ [ sortBy, sortOrder ] ] : [],
+                references,
+                attributes
             }
         });
     });
@@ -123,30 +181,83 @@ export const handleOnClick = <T extends EventProps>(options: T, mxObject?: mendi
     }
 };
 
-export const getSeriesTraces = ({ data, series }: SeriesData): ScatterTrace =>
-    ({
-        x: data ? data.map(mxObject => getXValue(mxObject, series)) : [],
-        y: data ? data.map(mxObject => parseFloat(mxObject.get(series.yValueAttribute) as string)) : []
+export const getSeriesTraces = ({ data, series }: SeriesData): ScatterTrace => {
+    const xData = data ? data.map(mxObject => getAttributeValue(mxObject, series.xValueAttribute)) : [];
+    const yData = data ? data.map(mxObject => parseFloat(mxObject.get(series.yValueAttribute) as string)) : [];
+    const sortData = data && series.xValueSortAttribute ? data.map(mxObject => getAttributeValue(mxObject, series.xValueSortAttribute)) : [];
+    const sortDataError = xData.length !== yData.length || xData.length !== sortData.length;
+    const alreadySorted = series.dataSourceType === "XPath" && series.xValueSortAttribute && series.xValueSortAttribute.split("/").length === 1;
+    if (!series.xValueSortAttribute || alreadySorted || sortDataError) {
+        return {
+            x: xData,
+            y: yData
+        };
+    }
+    const unsorted = sortData.map((value, index) => {
+        return {
+            x: xData[index],
+            y: yData[index],
+            sort: value
+        };
     });
+    const sorted = unsorted.sort((a, b) => {
+        if (series.sortOrder === "asc") {
+            if (a.sort < b.sort) {
+                return -1;
+            }
+            if (a.sort > b.sort) {
+                return 1;
+            }
+        }
+        // Sort order "desc"
+        if (a.sort > b.sort) {
+            return -1;
+        }
+        if (a.sort < b.sort) {
+            return 1;
+        }
+        return 0;
+    });
+    const sortedXData = sorted.map(value => value.x);
+    const sortedYData = sorted.map(value => value.y);
+    return {
+        x: sortedXData,
+        y: sortedYData
+    };
+};
 
 export const getRuntimeTraces = ({ data, series }: SeriesData): ({ name: string } & ScatterTrace) =>
     ({ name: series.name, ...getSeriesTraces({ data, series }) });
 
-export const getXValue = (mxObject: mendix.lib.MxObject, series: SeriesProps): Datum => {
-    if (mxObject.isDate(series.xValueAttribute)) {
-        const timestamp = mxObject.get(series.xValueAttribute) as number;
+export const getAttributeValue = (mxObject: mendix.lib.MxObject, attribute: string): Datum => {
+    let valueObject = mxObject;
+    const path = attribute.split("/");
+    const attributeName = path[path.length - 1];
+    // Use relations only, skip entity and attribute sample: "module.relation_X_Y/module.entity_Y/attribute"
+    for (let i = 0; i < path.length - 1; i += 2) {
+        // Know issue; Mendix will return max 1 level deep
+        valueObject = valueObject.getChildren(path[i])[0];
+        if (!valueObject) {
+            return "";
+        }
+    }
+    if (valueObject.isDate(attributeName)) {
+        const timestamp = valueObject.get(attributeName) as number;
         const date = new Date(timestamp);
 
         return `${parseDate(date)} ${parseTime(date)}`;
     }
-    if (mxObject.isEnum(series.xValueAttribute)) {
-        const enumValue = mxObject.get(series.xValueAttribute) as string;
+    if (valueObject.isEnum(attributeName)) {
+        const enumValue = valueObject.get(attributeName) as string;
 
-        return mxObject.getEnumCaption(series.xValueAttribute, enumValue);
+        return valueObject.getEnumCaption(attributeName, enumValue);
     }
-    const value = mxObject.get(series.xValueAttribute);
+    if (valueObject.isNumeric(attributeName)) {
+        return parseFloat(valueObject.get(attributeName) as any);
+    }
+    const value = valueObject.get(attributeName) as string;
 
-    return value !== null ? value.toString() : "";
+    return value !== null ? value : "";
 };
 
 export const parseDate = (date: Date): string => `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;

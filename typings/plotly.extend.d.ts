@@ -2,9 +2,15 @@
 import { Font } from "plotly.js";
 
 declare module "plotly.js" {
+    /**
+     *  registers individual modules for custom import
+     */
+    export const register: (modules: any[]) => void;
+
     export type BarMode = "group" | "stack";
     export interface Layout {
         barmode: BarMode;
+        showarrow: boolean;
     }
 
     export interface Margin {
@@ -19,7 +25,8 @@ declare module "plotly.js" {
         event: MouseEvent;
         points: Array<{
             x: string | number;
-            y: number;
+            y: string | number;
+            z?: number;
             pointNumber: number;
             curveNumber: number;
             data: ScatterData;
@@ -73,6 +80,16 @@ declare module "plotly.js" {
             colors: string[];
         };
         sort?: boolean; // default: true
+    }
+
+    export interface HeatMapData {
+        x: string[];
+        y: string[];
+        z: number[][];
+        type: "heatmap";
+        hoverinfo?: "label" | "percent" | "name" | "label+percent" | "label+name" | "percent+name" | "label+percent+name" | "skip" | "none";
+        colorscale?: (string | number)[][];
+        showscale?: boolean;
     }
 
     export interface PlotlyHTMLElement extends HTMLElement {

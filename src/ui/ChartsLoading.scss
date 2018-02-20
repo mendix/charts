@@ -1,13 +1,23 @@
 .widget-charts-loading-wrapper {
-    width: 165px;
-    height: 100px;
-    margin: 0 auto;
+    position: relative;
+    top: 20%;
+    left: 50%;
+
+    @media (min-width: 992px) {
+        left: 44%;
+    }
+    @media (min-width: 768px) {
+        left: 40%;
+    }
+    @media (max-width: 767px) {
+        left: 30%;
+    }
 
     .widget-charts-loading {
         padding: 0 10px;
         vertical-align: bottom;
-        width: 100%;
-        height: 100%;
+        width: 165px;
+        height: 100px;
         overflow: hidden;
         position: relative;
         box-sizing: border-box;
@@ -19,6 +29,18 @@
         font-size: 80%;
         text-align: center;
         margin-top: 5px;
+        width: 165px;
+        left: 50%;
+
+        @media (min-width: 992px) {
+            left: 44%;
+        }
+        @media (min-width: 768px) {
+            left: 40%;
+        }
+        @media (max-width: 767px) {
+            left: 30%;
+        }
     }
 
     .widget-charts-loading-bar {

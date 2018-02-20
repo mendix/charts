@@ -1,9 +1,13 @@
+let __webpack_public_path__;
 import { Component, ReactChild, createElement } from "react";
 
 import { PieChart } from "./PieChart";
 import { fetchByMicroflow, fetchByXPath, handleOnClick, validateSeriesProps } from "../../utils/data";
 import { Container } from "../../utils/namespaces";
+import { getDimensions, parseStyle } from "../../utils/style";
 import PieChartContainerProps = Container.PieChartContainerProps;
+
+__webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
 interface PieChartContainerState {
     alertMessage?: ReactChild;
@@ -12,7 +16,7 @@ interface PieChartContainerState {
 }
 
 export default class PieChartContainer extends Component<PieChartContainerProps, PieChartContainerState> {
-    private subscriptionHandle: number;
+    private subscriptionHandle?: number;
 
     constructor(props: PieChartContainerProps) {
         super(props);
@@ -27,7 +31,9 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
     }
 
     render() {
-        return createElement("div", {}, this.getContent());
+        return createElement("div", {
+            style: this.state.loading ? { ...getDimensions(this.props), ...parseStyle(this.props.style) } : undefined
+        }, this.getContent());
     }
 
     componentWillReceiveProps(newProps: PieChartContainerProps) {
@@ -71,10 +77,10 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         if (!this.state.loading) {
             this.setState({ loading: true });
         }
-        const { dataEntity, dataSourceMicroflow, dataSourceType, entityConstraint, sortAttribute } = this.props;
+        const { dataEntity, dataSourceMicroflow, dataSourceType, entityConstraint, sortAttribute, sortOrder } = this.props;
         if (mxObject && dataEntity) {
             if (dataSourceType === "XPath") {
-                fetchByXPath(mxObject.getGuid(), dataEntity, entityConstraint, sortAttribute)
+                fetchByXPath(mxObject.getGuid(), dataEntity, entityConstraint, sortAttribute, sortOrder)
                     .then(data => this.setState({ data, loading: false }))
                     .catch(reason => {
                         window.mx.ui.error(`An error occurred while retrieving chart data: ${reason}`);
