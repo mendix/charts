@@ -73,8 +73,8 @@ export const validateAdvancedOptions = (rawData: string): string => {
     return "";
 };
 
-export const fetchSeriesData = (mxObject: mendix.lib.MxObject, series: SeriesProps): Promise<SeriesData> =>
-    new Promise<SeriesData>((resolve, reject) => {
+export const fetchSeriesData = <S extends SeriesProps = SeriesProps>(mxObject: mendix.lib.MxObject, series: S): Promise<SeriesData<S>> =>
+    new Promise<SeriesData<S>>((resolve, reject) => {
         if (series.dataEntity) {
             if (series.dataSourceType === "XPath") {
                 const references = getReferences(series);

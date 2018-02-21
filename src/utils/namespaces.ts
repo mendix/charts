@@ -55,6 +55,10 @@ export namespace Container {
 
     export interface LineChartContainerState {
         alertMessage?: ReactChild;
+        data?: Data.SeriesData<Data.LineSeriesProps>[];
+        scatterData?: ScatterData[];
+        seriesOptions: string[];
+        loading?: boolean;
     }
 
     export type PieChartType = "pie" | "donut";

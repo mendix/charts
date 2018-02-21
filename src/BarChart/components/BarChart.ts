@@ -17,7 +17,6 @@ export interface BarChartProps extends Container.BarChartContainerProps {
     alertMessage?: ReactChild;
     loading?: boolean;
     scatterData?: ScatterData[];
-    defaultData?: ScatterData[];
     seriesOptions?: string[];
     onClick?: (series: Data.SeriesProps, dataObject: mendix.lib.MxObject, mxform: mxui.lib.form._FormBase) => void;
     onHover?: (node: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) => void;
@@ -127,7 +126,10 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                     : "{}";
 
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
-                return { ...deepMerge.all<ScatterData>([ data, parsedOptions ]) };
+                return {
+                    ...deepMerge.all<ScatterData>([ data, parsedOptions ]),
+                    customdata: data.customdata
+                };
             });
         }
 

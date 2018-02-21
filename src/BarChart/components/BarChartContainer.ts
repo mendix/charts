@@ -3,7 +3,6 @@ import { Component, ReactElement, createElement } from "react";
 
 import { Alert, AlertProps } from "../../components/Alert";
 import { BarChart, BarChartProps } from "./BarChart";
-import { ChartContainer } from "../../components/ChartContainer";
 import { fetchSeriesData, getSeriesTraces, handleOnClick, validateSeriesProps } from "../../utils/data";
 import deepMerge from "deepmerge";
 import { Container, Data } from "../../utils/namespaces";
@@ -59,6 +58,16 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         }
     }
 
+    private resetSubscriptions(mxObject?: mendix.lib.MxObject) {
+        this.componentWillUnmount();
+        if (mxObject) {
+            this.subscriptionHandle = mx.data.subscribe({
+                callback: () => this.fetchData(mxObject),
+                guid: mxObject.getGuid()
+            });
+        }
+    }
+
     private fetchData = (mxObject?: mendix.lib.MxObject) => {
         if (mxObject && this.props.series.length) {
             Promise.all(this.props.series.map(series => fetchSeriesData(mxObject, series)))
@@ -96,7 +105,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
                     x: bar ? traces.y : traces.x,
                     y: bar ? traces.x : traces.y,
                     series, // shall be accessible via the data property of a hover/click point
-                    marker: color && { color },
+                    marker: color ? { color } : {},
                     ... BarChart.getDefaultSeriesOptions(series, this.props)
                 },
                 rawOptions
@@ -105,17 +114,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         };
     }
 
-    private resetSubscriptions(mxObject?: mendix.lib.MxObject) {
-        this.componentWillUnmount();
-        if (mxObject) {
-            this.subscriptionHandle = mx.data.subscribe({
-                callback: () => this.fetchData(mxObject),
-                guid: mxObject.getGuid()
-            });
-        }
-    }
-
-    private static openTooltipForm(domNode: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) {
+    public static openTooltipForm(domNode: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) {
         const context = new mendix.lib.MxContext();
         context.setContext(dataObject.getEntity(), dataObject.getGuid());
         window.mx.ui.openForm(tooltipForm, { domNode, context });

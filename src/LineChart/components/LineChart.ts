@@ -21,7 +21,8 @@ import "../../ui/Charts.scss";
 
 export interface LineChartProps extends LineChartContainerProps {
     data?: SeriesData<LineSeriesProps>[];
-    defaultData?: ScatterData[];
+    scatterData?: ScatterData[];
+    seriesOptions?: string[];
     loading?: boolean;
     alertMessage?: ReactChild;
     onClick?: (series: SeriesProps, dataObject: mendix.lib.MxObject, mxform: mxui.lib.form._FormBase) => void;
@@ -30,28 +31,23 @@ export interface LineChartProps extends LineChartContainerProps {
 
 interface LineChartState {
     layoutOptions: string;
-    data?: SeriesData<LineSeriesProps>[];
+    series?: LineSeriesProps[];
+    scatterData?: ScatterData[];
+    seriesOptions?: string[];
     playgroundLoaded: boolean;
 }
 
 export class LineChart extends Component<LineChartProps, LineChartState> {
+    state: LineChartState = {
+        layoutOptions: this.props.layoutOptions,
+        series: this.props.series,
+        scatterData: this.props.scatterData,
+        seriesOptions: this.props.seriesOptions,
+        playgroundLoaded: false
+    };
     private tooltipNode?: HTMLDivElement;
     private defaultColors: string[] = [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ];
     private Playground?: typeof SeriesPlayground;
-
-    constructor(props: LineChartProps) {
-        super(props);
-
-        this.onClick = this.onClick.bind(this);
-        this.onHover = this.onHover.bind(this);
-        this.onRuntimeUpdate = this.onRuntimeUpdate.bind(this);
-        this.getTooltipNodeRef = this.getTooltipNodeRef.bind(this);
-        this.state = {
-            layoutOptions: props.layoutOptions,
-            data: props.data,
-            playgroundLoaded: false
-        };
-    }
 
     render() {
         if (this.props.alertMessage) {
@@ -70,7 +66,9 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     componentWillReceiveProps(newProps: LineChartProps) {
         this.setState({
             layoutOptions: newProps.layoutOptions,
-            data: newProps.data
+            series: newProps.series,
+            seriesOptions: newProps.seriesOptions,
+            scatterData: newProps.scatterData
         });
         if (newProps.devMode === "developer" && !this.state.playgroundLoaded) {
             this.loadPlaygroundComponent();
@@ -101,24 +99,22 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
 
     private renderPlayground(): ReactElement<any> | null {
         if (this.Playground) {
-            // return createElement(this.Playground, {
-            //     rawData: this.state.data,
-            //     chartData: this.getData(this.props),
-            //     modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
-            //         JSON.stringify(LineChart.getDefaultSeriesOptions(series as LineSeriesProps, this.props), null, 4)
-            //     ),
-            //     traces: this.state.data && this.state.data.map(getRuntimeTraces),
-            //     onChange: this.onRuntimeUpdate,
-            //     layoutOptions: this.state.layoutOptions || "{\n\n}",
-            //     modelerLayoutConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 4)
-            // }, this.renderLineChart());
-            return null;
+            return createElement(this.Playground, {
+                series: this.state.series,
+                seriesOptions: this.state.seriesOptions,
+                modelerSeriesConfigs: this.state.series && this.state.series.map(series =>
+                    JSON.stringify(LineChart.getDefaultSeriesOptions(series as LineSeriesProps, this.props), null, 4)
+                ),
+                onChange: this.onRuntimeUpdate,
+                layoutOptions: this.state.layoutOptions || "{\n\n}",
+                modelerLayoutConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 4)
+            }, this.renderLineChart());
         }
 
         return null;
     }
 
-    private getTooltipNodeRef(node: HTMLDivElement) {
+    private getTooltipNodeRef = (node: HTMLDivElement) => {
         this.tooltipNode = node;
     }
 
@@ -131,38 +127,31 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     private getData(props: LineChartProps): ScatterData[] {
-        let lineData: ScatterData[] = props.defaultData || [];
-        if (this.state.data) {
-            lineData = this.state.data.map(({ data, series }, index) => {
-                const advancedOptions = props.devMode !== "basic" && series.seriesOptions
-                    ? JSON.parse(series.seriesOptions)
-                    : {};
-                const configOptions: Partial<ScatterData> = {
-                    series,
-                    marker: index < this.defaultColors.length ? { color: this.defaultColors[index] } : {},
-                    fillcolor: series.fillColor,
-                    ... LineChart.getDefaultSeriesOptions(series as LineSeriesProps, props),
-                    ... getSeriesTraces({ data, series })
-                };
+        const { seriesOptions } = this.state;
+        if (props.scatterData) {
+            const lineData = props.scatterData.map((data, index) => {
+                const parsedOptions = seriesOptions ? JSON.parse(seriesOptions[index]) : {};
 
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
                 return {
-                    ...deepMerge.all<ScatterData>([ configOptions, advancedOptions ]),
-                    customdata: data
+                    ...deepMerge.all<ScatterData>([ data, parsedOptions ]),
+                    customdata: data.customdata
                 };
             });
+
+            return props.area === "stacked" ? LineChart.getStackedArea(lineData) : lineData;
         }
 
-        return props.area === "stacked" ? LineChart.getStackedArea(lineData) : lineData;
+        return [];
     }
 
-    private onClick({ points }: ScatterHoverData<mendix.lib.MxObject>) {
+    private onClick = ({ points }: ScatterHoverData<mendix.lib.MxObject>) => {
         if (this.props.onClick) {
             this.props.onClick(points[0].data.series, points[0].customdata, this.props.mxform);
         }
     }
 
-    private onHover({ points }: ScatterHoverData<mendix.lib.MxObject>) {
+    private onHover = ({ points }: ScatterHoverData<mendix.lib.MxObject>) => {
         const { customdata, data, x, xaxis, y, yaxis } = points[0];
         if (this.props.onHover && data.series.tooltipForm && this.tooltipNode) {
             const positionYaxis = yaxis.l2p(y as number) + yaxis._offset;
@@ -174,8 +163,8 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         }
     }
 
-    private onRuntimeUpdate(layoutOptions: string, data: SeriesData<LineSeriesProps>[]) {
-        this.setState({ layoutOptions, data });
+    private onRuntimeUpdate = (layoutOptions: string, seriesOptions: string[]) => {
+        this.setState({ layoutOptions, seriesOptions });
     }
 
     public static defaultLayoutConfigs(props: LineChartProps): Partial<Layout> {
