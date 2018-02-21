@@ -85,6 +85,8 @@ Layout options control the general appearance of the chart. Common options inclu
         "showlegend": true
     }
 
+For more details: [Developer cheat sheet](/developerCheatSheet.md)
+
 ### Data options (pie chart)
 On the pie chart, the data options control the appearance of the pie circle beyond the general layout options. Options include hole, name, marker e.t.c
 
@@ -94,6 +96,8 @@ On the pie chart, the data options control the appearance of the pie circle beyo
         "hoverinfo": "label+percent+name",
         "textinfo": "none"
     }
+
+For more details: [Developer cheat sheet](/developerCheatSheet.md)
 
 ### Series options (line & column charts)
 The series options control the appearance of a specific series on the line or column chart. Options include line color, line shape e.t.c
