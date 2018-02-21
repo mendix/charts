@@ -44,6 +44,8 @@ export namespace Container {
     export interface BarChartContainerState {
         alertMessage?: ReactChild;
         data?: Data.SeriesData<SeriesProps>[];
+        scatterData?: ScatterData[];
+        seriesOptions: string[];
         loading?: boolean;
     }
 

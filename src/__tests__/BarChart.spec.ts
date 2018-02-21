@@ -35,14 +35,13 @@ describe("BarChart", () => {
     beforeEach(() => {
         defaultProps = {
             loading: false,
-            data: mockData,
+            // series: mockData,
             devMode: "basic",
             width: 100,
             widthUnit: "percentage",
             height: 100,
             heightUnit: "pixels",
             layoutOptions: "{}",
-            series: sampleSeries as SeriesProps[],
             orientation: "bar"
         };
         window.mendix = mockMendix as any;
@@ -77,7 +76,7 @@ describe("BarChart", () => {
     });
 
     it("with no alert message, isn't loading and whose dev mode isn't set to developer renders the chart correctly", () => {
-        defaultProps.data = [];
+        defaultProps.series = [];
         const chart = renderShallowBarChart(defaultProps as BarChartProps);
 
         expect(chart).toBeElement(
@@ -103,14 +102,14 @@ describe("BarChart", () => {
         expect(chart.state().data).toEqual(mockData);
 
         const layoutOptions = "{ \"title\": \"My Chart\" }";
-        chart.setProps({ layoutOptions, data: undefined });
+        chart.setProps({ layoutOptions });
 
         expect(chart.state().layoutOptions).toEqual(layoutOptions);
         expect(chart.state().data).toBeUndefined();
     });
 
     it("renders the default data when no data has been provided", () => {
-        defaultProps.data = undefined;
+        defaultProps.series = undefined;
         defaultProps.defaultData = preview.getData(defaultProps as BarChartProps);
         const chart = renderShallowBarChart(defaultProps as BarChartProps);
 

@@ -101,17 +101,18 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
 
     private renderPlayground(): ReactElement<any> | null {
         if (this.Playground) {
-            return createElement(this.Playground, {
-                rawData: this.state.data,
-                chartData: this.getData(this.props),
-                modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
-                    JSON.stringify(LineChart.getDefaultSeriesOptions(series as LineSeriesProps, this.props), null, 4)
-                ),
-                traces: this.state.data && this.state.data.map(getRuntimeTraces),
-                onChange: this.onRuntimeUpdate,
-                layoutOptions: this.state.layoutOptions || "{\n\n}",
-                modelerLayoutConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 4)
-            }, this.renderLineChart());
+            // return createElement(this.Playground, {
+            //     rawData: this.state.data,
+            //     chartData: this.getData(this.props),
+            //     modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
+            //         JSON.stringify(LineChart.getDefaultSeriesOptions(series as LineSeriesProps, this.props), null, 4)
+            //     ),
+            //     traces: this.state.data && this.state.data.map(getRuntimeTraces),
+            //     onChange: this.onRuntimeUpdate,
+            //     layoutOptions: this.state.layoutOptions || "{\n\n}",
+            //     modelerLayoutConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 4)
+            // }, this.renderLineChart());
+            return null;
         }
 
         return null;

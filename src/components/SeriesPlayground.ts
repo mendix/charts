@@ -12,10 +12,9 @@ import SeriesProps = Data.SeriesProps;
 
 export interface SeriesPlaygroundProps {
     modelerSeriesConfigs?: string[];
-    rawData?: SeriesData[];
-    chartData?: Partial<ScatterData>[];
-    traces?: PlaygroundSeriesTrace[];
-    onChange?: (layout: string, data: SeriesData[]) => void;
+    seriesOptions?: string[];
+    series?: SeriesProps[];
+    onChange?: (layout: string, seriesOptions: string[]) => void;
     layoutOptions: string;
     modelerLayoutConfigs: string;
 }
@@ -26,9 +25,9 @@ interface SeriesPlaygroundState {
 
 export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPlaygroundState> {
     state = { activeOption: "layout" };
-    private newSeriesOptions: { layout: string, data: SeriesData[] } = {
+    private newSeriesOptions: { layout: string, seriesOptions: string[] } = {
         layout: this.props.layoutOptions || "{}",
-        data: this.props.rawData || []
+        seriesOptions: this.props.seriesOptions || []
     };
     private timeoutId?: number;
     private isValid = false;
@@ -80,11 +79,11 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
     }
 
     private renderSeriesPanels(activeIndex: number): (ReactElement<PanelProps> | null)[] {
-        if (this.props.rawData) {
-            const activeSeriesData = this.props.rawData[activeIndex];
+        if (this.props.seriesOptions) {
+            const activeSeriesOptions = this.props.seriesOptions[activeIndex];
 
             return [
-                this.renderSeriesOptions(activeSeriesData.series, activeIndex),
+                this.renderSeriesOptions(activeSeriesOptions, activeIndex),
                 this.renderSeriesModelerConfig(activeIndex)
             ];
         }
@@ -93,27 +92,23 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
     }
 
     private renderPanelSwitcher(): ReactElement<SelectProps> | null {
-        if (this.props.rawData) {
-            return createElement(Select, {
-                onChange: this.updateView,
-                options: [
-                    { name: "Layout", value: "layout", isDefaultSelected: true },
-                    ...this.getSeriesOptions()
-                ]
-            });
-        }
-
-        return null;
+        return createElement(Select, {
+            onChange: this.updateView,
+            options: [
+                { name: "Layout", value: "layout", isDefaultSelected: true },
+                ...this.getSeriesOptions()
+            ]
+        });
     }
 
-    private renderSeriesOptions(series: SeriesProps, index: number): ReactElement<PanelProps> {
+    private renderSeriesOptions(seriesOptions: string, index: number): ReactElement<PanelProps> {
         return createElement(Panel,
             {
                 heading: "Custom settings",
                 key: `options-${index}`
             },
             Playground.renderAceEditor({
-                value: `${series.seriesOptions || "{\n\n}"}`,
+                value: `${seriesOptions || "{\n\n}"}`,
                 onChange: value => this.onUpdate(`${index}`, value),
                 onValidate: this.onValidate
             })
@@ -121,7 +116,7 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
     }
 
     private renderSeriesModelerConfig(index: number): ReactElement<PanelProps> | null {
-        if (this.props.modelerSeriesConfigs && this.props.rawData) {
+        if (this.props.modelerSeriesConfigs && this.props.series) {
             return createElement(Panel,
                 {
                     heading: "Settings from the Modeler",
@@ -131,7 +126,7 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
                 Playground.renderAceEditor({
                     value: this.props.modelerSeriesConfigs[index] || "{\n\n}",
                     readOnly: true,
-                    overwriteValue: this.props.rawData[index].series.seriesOptions,
+                    overwriteValue: this.props.series[index].seriesOptions,
                     onValidate: this.onValidate
                 })
             );
@@ -142,8 +137,8 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
     }
 
     private getSeriesOptions(): SelectOption[] {
-        return this.props.rawData
-            ? this.props.rawData.map(({ series }, index) =>
+        return this.props.series
+            ? this.props.series.map((series, index) =>
                 ({ name: series.name, value: `${index}`, isDefaultSelected: false }))
             : [];
     }
@@ -174,10 +169,10 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
         if (source === "layout") {
             this.newSeriesOptions.layout = cleanValue;
         } else {
-            (this.newSeriesOptions.data[ parseInt(source, 10) ] as SeriesData).series.seriesOptions = cleanValue;
+            (this.newSeriesOptions.seriesOptions[ parseInt(source, 10) ]) = cleanValue;
         }
         if (this.props.onChange) {
-            this.props.onChange(this.newSeriesOptions.layout, this.newSeriesOptions.data);
+            this.props.onChange(this.newSeriesOptions.layout, this.newSeriesOptions.seriesOptions);
         }
     }
 

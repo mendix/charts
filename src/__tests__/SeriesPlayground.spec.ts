@@ -82,7 +82,7 @@ describe("SeriesPlayground", () => {
         });
 
         it("renders the series panels when raw data is provided", () => {
-            defaultProps.rawData = [
+            defaultProps.series = [
                 {
                     data: [ mockMendix.lib.MxObject() ] as any,
                     series: {
@@ -127,7 +127,7 @@ describe("SeriesPlayground", () => {
     });
 
     it("renders the panel switcher when raw data is specified", () => {
-        defaultProps.rawData = [
+        defaultProps.series = [
             {
                 data: [ mockMendix.lib.MxObject() ] as any,
                 series: {

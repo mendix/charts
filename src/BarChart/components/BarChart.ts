@@ -16,36 +16,31 @@ import "../../ui/Charts.scss";
 export interface BarChartProps extends Container.BarChartContainerProps {
     alertMessage?: ReactChild;
     loading?: boolean;
-    data?: Data.SeriesData[];
+    scatterData?: ScatterData[];
     defaultData?: ScatterData[];
+    seriesOptions?: string[];
     onClick?: (series: Data.SeriesProps, dataObject: mendix.lib.MxObject, mxform: mxui.lib.form._FormBase) => void;
     onHover?: (node: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) => void;
 }
 
 interface BarChartState {
     layoutOptions: string;
-    data?: Data.SeriesData[];
+    series?: Data.SeriesProps[];
+    seriesOptions?: string[];
+    scatterData?: ScatterData[];
     playgroundLoaded: boolean;
 }
 
 export class BarChart extends Component<BarChartProps, BarChartState> {
+    state: BarChartState = {
+        layoutOptions: this.props.layoutOptions,
+        series: this.props.series,
+        seriesOptions: this.props.seriesOptions,
+        scatterData: this.props.scatterData,
+        playgroundLoaded: false
+    };
     private tooltipNode?: HTMLDivElement;
-    private defaultColors: string[] = [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ];
     private Playground?: typeof SeriesPlayground;
-
-    constructor(props: BarChartProps) {
-        super(props);
-
-        this.getTooltipNodeRef = this.getTooltipNodeRef.bind(this);
-        this.onClick = this.onClick.bind(this);
-        this.onHover = this.onHover.bind(this);
-        this.onRuntimeUpdate = this.onRuntimeUpdate.bind(this);
-        this.state = {
-            layoutOptions: props.layoutOptions,
-            data: props.data,
-            playgroundLoaded: false
-        };
-    }
 
     render() {
         if (this.props.alertMessage) {
@@ -64,7 +59,9 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     componentWillReceiveProps(newProps: BarChartProps) {
         this.setState({
             layoutOptions: newProps.layoutOptions,
-            data: newProps.data
+            series: newProps.series,
+            seriesOptions: newProps.seriesOptions,
+            scatterData: newProps.scatterData
         });
         if (newProps.devMode === "developer" && !this.state.playgroundLoaded) {
             this.loadPlaygroundComponent();
@@ -77,7 +74,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
         this.setState({ playgroundLoaded: true });
     }
 
-    private getTooltipNodeRef(node: HTMLDivElement) {
+    private getTooltipNodeRef = (node: HTMLDivElement) => {
         this.tooltipNode = node;
     }
 
@@ -100,12 +97,11 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     private renderPlayground(): ReactElement<any> | null {
         if (this.Playground) {
             return createElement(this.Playground, {
-                rawData: this.state.data,
-                chartData: this.getData(this.props),
-                modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
+                series: this.state.series,
+                seriesOptions: this.props.seriesOptions || [],
+                modelerSeriesConfigs: this.state.series && this.state.series.map(series =>
                     JSON.stringify(BarChart.getDefaultSeriesOptions(series, this.props), null, 4)
                 ),
-                traces: this.state.data && this.state.data.map(getRuntimeTraces),
                 onChange: this.onRuntimeUpdate,
                 layoutOptions: this.state.layoutOptions || "{\n\n}",
                 modelerLayoutConfigs: JSON.stringify(BarChart.defaultLayoutConfigs(this.props), null, 4)
@@ -124,41 +120,28 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     }
 
     private getData(props: BarChartProps): ScatterData[] {
-        if (props.data) {
-            return props.data.map(({ data, series }, index) => {
-                const rawOptions = props.devMode !== "basic" && series.seriesOptions
-                    ? JSON.parse(series.seriesOptions)
-                    : {};
-                const traces = getSeriesTraces({ data, series });
-                const configOptions: Partial<ScatterData> = {
-                    x: props.orientation === "bar" ? traces.y : traces.x,
-                    y: props.orientation === "bar" ? traces.x : traces.y,
-                    series,
-                    marker: !series.barColor && index < this.defaultColors.length
-                        ? { color: this.defaultColors[index] }
-                        : { color: series.barColor },
-                    ... BarChart.getDefaultSeriesOptions(series, props)
-                };
+        if (props.scatterData && this.state.seriesOptions && props.devMode !== "basic") {
+            return props.scatterData.map((data, index) => {
+                const parsedOptions = this.state.seriesOptions
+                    ? JSON.parse(this.state.seriesOptions[index])
+                    : "{}";
 
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
-                return {
-                    ...deepMerge.all<ScatterData>([ configOptions, rawOptions ]),
-                    customdata: data
-                };
+                return { ...deepMerge.all<ScatterData>([ data, parsedOptions ]) };
             });
         }
 
-        return props.defaultData || [];
+        return props.scatterData || [];
     }
 
-    private onClick(data: ScatterHoverData<mendix.lib.MxObject>) {
+    private onClick = (data: ScatterHoverData<mendix.lib.MxObject>) => {
         const pointClicked = data.points[0];
         if (this.props.onClick) {
             this.props.onClick(pointClicked.data.series, pointClicked.customdata, this.props.mxform);
         }
     }
 
-    private onHover({ points }: ScatterHoverData<mendix.lib.MxObject>) {
+    private onHover = ({ points }: ScatterHoverData<mendix.lib.MxObject>) => {
         const { customdata, data, x, xaxis, y, yaxis } = points[0];
         if (this.props.onHover && data.series.tooltipForm && this.tooltipNode) {
             const yAxisPixels = typeof y === "number" ? yaxis.l2p(y) : yaxis.d2p(y);
@@ -172,15 +155,15 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
         }
     }
 
-    private onRuntimeUpdate(layoutOptions: string, data: Data.SeriesData[]) {
-        this.setState({ layoutOptions, data });
+    private onRuntimeUpdate = (layoutOptions: string, seriesOptions: string[]) => {
+        this.setState({ layoutOptions, seriesOptions });
     }
 
     private static getConfigOptions(): Partial<Config> {
         return { displayModeBar: false, doubleClick: false };
     }
 
-    private static getDefaultSeriesOptions(series: Data.SeriesProps, props: BarChartProps): Partial<ScatterData> {
+    public static getDefaultSeriesOptions(series: Data.SeriesProps, props: BarChartProps): Partial<ScatterData> {
         const hoverinfo = (props.orientation === "bar" ? "x" : "y") as any;
 
         return {
