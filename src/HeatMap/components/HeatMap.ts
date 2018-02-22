@@ -43,6 +43,14 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
     private tooltipNode?: HTMLDivElement;
     private Playground?: typeof PiePlayground;
 
+    constructor(props: HeatMapProps) {
+        super(props);
+
+        if (props.devMode === "developer") {
+            this.loadPlaygroundComponent();
+        }
+    }
+
     render() {
         if (this.props.alertMessage) {
             return createElement(Alert, { className: `widget-heat-map-alert` },
@@ -57,12 +65,6 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
         }
 
         return this.renderChart();
-    }
-
-    componentWillReceiveProps(newProps: HeatMapProps) {
-        if (newProps.devMode === "developer" && !this.state.playgroundLoaded) {
-            this.loadPlaygroundComponent();
-        }
     }
 
     private getTooltipNodeRef = (node: HTMLDivElement) => {
@@ -136,7 +138,11 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
 
         return deepMerge.all([
             HeatMap.getDefaultLayoutOptions(props),
-            { annotations: props.showValues ? this.getTextAnnotations(props.data || props.defaultData, props.valuesColor) : undefined },
+            {
+                annotations: props.showValues
+                    ? this.getTextAnnotations(props.data || props.defaultData, props.valuesColor)
+                    : undefined
+            },
             advancedOptions
         ]);
     }

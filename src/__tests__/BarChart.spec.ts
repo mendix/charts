@@ -95,7 +95,7 @@ describe("BarChart", () => {
 
         expect(renderPlaygroundSpy).not.toHaveBeenCalled();
     });
-
+    // tslint:disable-next-line max-line-length
     it("with no alert message, isn't loading and whose dev mode isn't set to developer renders the chart correctly", () => {
         defaultProps.series = [];
         const chart = renderShallowBarChart(defaultProps as BarChartProps);
