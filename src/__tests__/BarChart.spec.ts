@@ -1,16 +1,16 @@
 import { createElement } from "react";
 import { mount, shallow } from "enzyme";
-import { ScatterHoverData } from "plotly.js";
+import { ScatterData, ScatterHoverData } from "plotly.js";
 
 import { Alert } from "../components/Alert";
 import { BarChart, BarChartProps } from "../BarChart/components/BarChart";
+import { preview } from "../BarChart/BarChart.webmodeler";
 import { ChartLoading } from "../components/ChartLoading";
 import { PlotlyChart } from "../components/PlotlyChart";
-import { preview } from "../BarChart/BarChart.webmodeler";
+import "../components/SeriesPlayground";
 
 import { mockMendix } from "../../tests/mocks/Mendix";
 import { Data } from "../utils/namespaces";
-import "../components/SeriesPlayground";
 import SeriesProps = Data.SeriesProps;
 import SeriesData = Data.SeriesData;
 
@@ -21,7 +21,7 @@ describe("BarChart", () => {
     const sampleSeries: Partial<SeriesProps>[] = [
         {
             name: "Series 1",
-            seriesOptions: "",
+            seriesOptions: "{}",
             tooltipForm: "myTooltipForm.xml"
         }
     ];
@@ -35,13 +35,14 @@ describe("BarChart", () => {
     beforeEach(() => {
         defaultProps = {
             loading: false,
-            // series: mockData,
+            series: sampleSeries as SeriesProps[],
             devMode: "basic",
             width: 100,
             widthUnit: "percentage",
             height: 100,
             heightUnit: "pixels",
             layoutOptions: "{}",
+            seriesOptions: [ "{}" ],
             orientation: "bar"
         };
         window.mendix = mockMendix as any;
@@ -63,16 +64,32 @@ describe("BarChart", () => {
         expect(chart).toBeElement(createElement(ChartLoading, { text: "Loading" }));
     });
 
-    xit("whose dev mode is developer renders the playground", (done) => {
+    it("whose dev mode is developer renders the playground", (done) => {
         const renderPlaygroundSpy = spyOn(BarChart.prototype, "renderPlayground" as any).and.callThrough();
+        defaultProps.devMode = "developer";
         const chart = renderShallowBarChart(defaultProps as BarChartProps);
-        chart.setProps({ devMode: "developer" });
 
         window.setTimeout(() => {
             expect(renderPlaygroundSpy).toHaveBeenCalled();
 
             done();
-        }, 500);
+        }, 1000);
+    });
+
+    it("whose dev mode is basic does not renders the playground", () => {
+        defaultProps.devMode = "basic";
+        const renderPlaygroundSpy = spyOn(BarChart.prototype, "renderPlayground" as any).and.callThrough();
+        const chart = renderShallowBarChart(defaultProps as BarChartProps);
+
+        expect(renderPlaygroundSpy).not.toHaveBeenCalled();
+    });
+
+    it("whose dev mode is advanced does not renders the playground", () => {
+        const renderPlaygroundSpy = spyOn(BarChart.prototype, "renderPlayground" as any).and.callThrough();
+        defaultProps.devMode = "advanced";
+        const chart = renderShallowBarChart(defaultProps as BarChartProps);
+
+        expect(renderPlaygroundSpy).not.toHaveBeenCalled();
     });
 
     it("with no alert message, isn't loading and whose dev mode isn't set to developer renders the chart correctly", () => {
@@ -95,25 +112,102 @@ describe("BarChart", () => {
         );
     });
 
-    xit("updates the data & layout options when the props are updated", () => {
+    it("updates the state with the new props when the props are changed", () => {
         const chart = renderShallowBarChart(defaultProps as BarChartProps);
+        defaultProps.layoutOptions = "{}";
+        defaultProps.seriesOptions = [ "{}" ];
+        defaultProps.series = [
+            {
+                name: "Series 2",
+                seriesOptions: "",
+                tooltipForm: "myTooltipForm.xml"
+            }
+        ] as SeriesProps[];
+        defaultProps.scatterData = [
+            {
+                x: [ 1, 2, 3 ],
+                y: [ 2, 4, 6 ]
+            }
+        ] as ScatterData[];
+        chart.setProps(defaultProps as BarChartProps);
 
-        expect(chart.state().layoutOptions).toEqual("{}");
-        expect(chart.state().data).toEqual(mockData);
-
-        const layoutOptions = "{ \"title\": \"My Chart\" }";
-        chart.setProps({ layoutOptions });
-
-        expect(chart.state().layoutOptions).toEqual(layoutOptions);
-        expect(chart.state().data).toBeUndefined();
+        expect(chart.state()).toEqual({
+            layoutOptions: defaultProps.layoutOptions,
+            series: defaultProps.series,
+            seriesOptions: defaultProps.seriesOptions,
+            scatterData: defaultProps.scatterData,
+            playgroundLoaded: false
+        });
     });
 
-    it("renders the default data when no data has been provided", () => {
-        defaultProps.series = undefined;
-        defaultProps.defaultData = preview.getData(defaultProps as BarChartProps);
+    it("with the devMode basic should not merge the modeler JSON layout options", () => {
+        defaultProps.layoutOptions = "{ 'title': 'My Title' }";
+        defaultProps.devMode = "basic";
         const chart = renderShallowBarChart(defaultProps as BarChartProps);
+        const chartInstance: any = chart.instance();
 
-        expect((chart.instance() as any).getData(defaultProps)).toBe(defaultProps.defaultData);
+        expect(chartInstance.getLayoutOptions(defaultProps)).toEqual(
+            BarChart.defaultLayoutConfigs(defaultProps as BarChartProps)
+        );
+
+    });
+
+    it("with the devMode developer should merge the modeler JSON layout options", () => {
+        defaultProps.layoutOptions = "{ \"title\": \"My Title\" }";
+        defaultProps.devMode = "developer";
+        const chart = renderShallowBarChart(defaultProps as BarChartProps);
+        const chartInstance: any = chart.instance();
+
+        expect(chartInstance.getLayoutOptions(defaultProps)).toEqual({
+            ...BarChart.defaultLayoutConfigs(defaultProps as BarChartProps),
+            title: "My Title"
+        });
+    });
+
+    it("with the devMode advanced should merge the modeler JSON layout options", () => {
+        defaultProps.layoutOptions = "{ \"title\": \"My Title\" }";
+        defaultProps.devMode = "advanced";
+        const chart = renderShallowBarChart(defaultProps as BarChartProps);
+        const chartInstance: any = chart.instance();
+
+        expect(chartInstance.getLayoutOptions(defaultProps)).toEqual({
+            ...BarChart.defaultLayoutConfigs(defaultProps as BarChartProps),
+            title: "My Title"
+        });
+    });
+
+    it("with the devMode basic should not merge the modeler JSON series options", () => {
+        defaultProps.scatterData = preview.getData(defaultProps as BarChartProps);
+        defaultProps.seriesOptions = [ "{ \"orientation\": \"v\" }" ];
+        defaultProps.devMode = "basic";
+        const chart = renderShallowBarChart(defaultProps as BarChartProps);
+        const chartInstance: any = chart.instance();
+
+        expect(chartInstance.getData(defaultProps)).toEqual(defaultProps.scatterData);
+    });
+
+    it("with the devMode advanced should merge the modeler JSON series options", () => {
+        defaultProps.scatterData = preview.getData(defaultProps as BarChartProps);
+        defaultProps.seriesOptions = [ "{ \"orientation\": \"v\" }" ];
+        defaultProps.devMode = "advanced";
+        const chart = renderShallowBarChart(defaultProps as BarChartProps);
+        const chartInstance: any = chart.instance();
+
+        expect(chartInstance.getData(defaultProps)).toEqual([
+            { ...defaultProps.scatterData[0], orientation: "v", customdata: undefined }
+        ]);
+    });
+
+    it("with the devMode developer should merge the modeler JSON series options", () => {
+        defaultProps.scatterData = preview.getData(defaultProps as BarChartProps);
+        defaultProps.seriesOptions = [ "{ \"orientation\": \"v\" }" ];
+        defaultProps.devMode = "developer";
+        const chart = renderShallowBarChart(defaultProps as BarChartProps);
+        const chartInstance: any = chart.instance();
+
+        expect(chartInstance.getData(defaultProps)).toEqual([
+            { ...defaultProps.scatterData[0], orientation: "v", customdata: undefined }
+        ]);
     });
 
     describe("event handler", () => {
@@ -141,7 +235,7 @@ describe("BarChart", () => {
             ]
         };
 
-        xit("#onClick() calls the parent onClick handler", () => {
+        it("#onClick() calls the parent onClick handler when one is specified", () => {
             defaultProps.onClick = jasmine.createSpy("onClick");
             const chart = renderShallowBarChart(defaultProps as BarChartProps);
             (chart.instance() as any).onClick(plotlyEventData);
@@ -149,7 +243,7 @@ describe("BarChart", () => {
             expect(defaultProps.onClick).toHaveBeenCalled();
         });
 
-        xit("#onHover() calls the parent onHover handler", () => {
+        it("#onHover() calls the parent onHover handler when one is specified", () => {
             defaultProps.onHover = jasmine.createSpy("onHover");
             const chart = renderFullBarChart(defaultProps as BarChartProps);
             const instance = chart.instance() as any;
@@ -160,12 +254,10 @@ describe("BarChart", () => {
         });
     });
 
-    xit("saves a reference of the tooltip node", () => {
-        const tooltipNodeSpy = spyOn(BarChart.prototype, "getTooltipNodeRef" as any).and.callThrough();
+    it("saves a reference of the tooltip node", () => {
         const chart = renderFullBarChart(defaultProps as BarChartProps);
         const instance: any = chart.instance();
 
-        expect(tooltipNodeSpy).toHaveBeenCalled();
         expect(instance.tooltipNode).toBeDefined();
     });
 });

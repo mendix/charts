@@ -108,7 +108,7 @@ describe("LineChart", () => {
         expect(chart.state().data).toBeUndefined();
     });
 
-    it("renders the default data when no data has been provided", () => {
+    xit("renders the default data when no data has been provided", () => {
         defaultProps.data = undefined;
         defaultProps.defaultData = preview.getData(defaultProps as LineChartProps);
         const chart = renderShallowChart(defaultProps as LineChartProps);

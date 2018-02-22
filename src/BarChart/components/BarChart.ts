@@ -41,6 +41,14 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     private tooltipNode?: HTMLDivElement;
     private Playground?: typeof SeriesPlayground;
 
+    constructor(props: BarChartProps) {
+        super(props);
+
+        if (props.devMode === "developer") {
+            this.loadPlaygroundComponent();
+        }
+    }
+
     render() {
         if (this.props.alertMessage) {
             return createElement(Alert, { className: "widget-charts-bar-alert" }, this.props.alertMessage);
@@ -62,9 +70,6 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
             seriesOptions: newProps.seriesOptions,
             scatterData: newProps.scatterData
         });
-        if (newProps.devMode === "developer" && !this.state.playgroundLoaded) {
-            this.loadPlaygroundComponent();
-        }
     }
 
     private async loadPlaygroundComponent() {
