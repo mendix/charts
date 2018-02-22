@@ -37,7 +37,7 @@ export namespace Container {
 
     export type LineMode = "lines" | "markers" | "lines+markers" | "none";
 
-    export interface BarChartContainerProps extends WrapperProps, Style.Dimensions, BarLayoutProps {
+    export interface BarChartContainerProps extends WrapperProps, Style.Dimensions, Style.Appearance, BarLayoutProps {
         series: Data.SeriesProps[];
     }
 
@@ -49,7 +49,7 @@ export namespace Container {
         loading?: boolean;
     }
 
-    export interface LineChartContainerProps extends WrapperProps, Style.Dimensions, LineLayoutProps {
+    export interface LineChartContainerProps extends WrapperProps, Style.Dimensions, Style.Appearance, LineLayoutProps {
         series: Data.LineSeriesProps[];
     }
 
@@ -63,7 +63,7 @@ export namespace Container {
 
     export type PieChartType = "pie" | "donut";
 
-    export interface PieChartContainerProps extends Data.DataSourceProps, Style.Dimensions, Data.EventProps, WrapperProps {
+    export interface PieChartContainerProps extends Data.DataSourceProps, Style.Dimensions, Style.Appearance, Data.EventProps, WrapperProps {
         nameAttribute: string;
         valueAttribute: string;
         sortAttribute: string;
@@ -76,7 +76,7 @@ export namespace Container {
         devMode: "basic" | "advanced" | "developer";
     }
 
-    export interface HeatMapContainerProps extends Data.DataSourceProps, Style.Dimensions, Data.EventProps, WrapperProps {
+    export interface HeatMapContainerProps extends Data.DataSourceProps, Style.Dimensions, Style.Appearance, Data.EventProps, WrapperProps {
         valueAttribute: string;
         horizontalNameAttribute: string;
         horizontalSortAttribute: string;
@@ -165,5 +165,9 @@ export namespace Style {
         height: number;
         widthUnit: "percentage" | "pixels";
         heightUnit: "percentageOfWidth" | "pixels" | "percentageOfParent";
+    }
+
+    export interface Appearance {
+        refreshInterval: number;
     }
 }

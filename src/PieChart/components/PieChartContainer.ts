@@ -17,6 +17,7 @@ interface PieChartContainerState {
 
 export default class PieChartContainer extends Component<PieChartContainerProps, PieChartContainerState> {
     private subscriptionHandle?: number;
+    private intervalHandler?: number;
 
     constructor(props: PieChartContainerProps) {
         super(props);
@@ -36,6 +37,18 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         }, this.getContent());
     }
 
+    componentDidMount() {
+        if (this.props.refreshInterval > 0) {
+            setTimeout(() => {
+                this.intervalHandler = setInterval(() => {
+                    if (!this.state.loading) {
+                        this.fetchData(this.props.mxObject);
+                    }
+                }, this.props.refreshInterval);
+            }, 500);
+        }
+    }
+
     componentWillReceiveProps(newProps: PieChartContainerProps) {
         this.resetSubscriptions(newProps.mxObject);
         if (!this.state.alertMessage) {
@@ -46,6 +59,9 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
     componentWillUnmount() {
         if (this.subscriptionHandle) {
             window.mx.data.unsubscribe(this.subscriptionHandle);
+        }
+        if (this.intervalHandler) {
+            clearInterval(this.intervalHandler);
         }
     }
 
