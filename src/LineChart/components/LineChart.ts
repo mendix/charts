@@ -20,7 +20,6 @@ import LineSeriesProps = Data.LineSeriesProps;
 import "../../ui/Charts.scss";
 
 export interface LineChartProps extends LineChartContainerProps {
-    data?: SeriesData<LineSeriesProps>[];
     scatterData?: ScatterData[];
     seriesOptions?: string[];
     loading?: boolean;
@@ -49,6 +48,13 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     private defaultColors: string[] = [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ];
     private Playground?: typeof SeriesPlayground;
 
+    constructor(props: LineChartProps) {
+        super(props);
+
+        if (props.devMode === "developer" && !this.state.playgroundLoaded) {
+            this.loadPlaygroundComponent();
+        }
+    }
     render() {
         if (this.props.alertMessage) {
             return createElement(Alert, { className: "widget-charts-line-alert" }, this.props.alertMessage);
@@ -70,9 +76,6 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             seriesOptions: newProps.seriesOptions,
             scatterData: newProps.scatterData
         });
-        if (newProps.devMode === "developer" && !this.state.playgroundLoaded) {
-            this.loadPlaygroundComponent();
-        }
     }
 
     private async loadPlaygroundComponent() {
@@ -130,7 +133,9 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         const { seriesOptions } = this.state;
         if (props.scatterData) {
             const lineData = props.scatterData.map((data, index) => {
-                const parsedOptions = seriesOptions ? JSON.parse(seriesOptions[index]) : {};
+                const parsedOptions = props.devMode !== "basic" && seriesOptions
+                    ? JSON.parse(seriesOptions[index])
+                    : {};
 
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
                 return {

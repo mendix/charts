@@ -76,12 +76,16 @@ describe("BarChart", () => {
         }, 1000);
     });
 
-    it("whose dev mode is basic does not renders the playground", () => {
+    it("whose dev mode is basic does not renders the playground", (done) => {
         defaultProps.devMode = "basic";
         const renderPlaygroundSpy = spyOn(BarChart.prototype, "renderPlayground" as any).and.callThrough();
         const chart = renderShallowBarChart(defaultProps as BarChartProps);
 
-        expect(renderPlaygroundSpy).not.toHaveBeenCalled();
+        window.setTimeout(() => {
+            expect(renderPlaygroundSpy).not.toHaveBeenCalled();
+
+            done();
+        }, 500);
     });
 
     it("whose dev mode is advanced does not renders the playground", () => {
@@ -149,7 +153,6 @@ describe("BarChart", () => {
         expect(chartInstance.getLayoutOptions(defaultProps)).toEqual(
             BarChart.defaultLayoutConfigs(defaultProps as BarChartProps)
         );
-
     });
 
     it("with the devMode developer should merge the modeler JSON layout options", () => {
