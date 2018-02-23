@@ -1,17 +1,36 @@
 # Advanced configuration settings
-A detailed description of the JSON properties that can be applied to the charts widget. 
+A cheat sheet with snippets of JSON objects for easy and quick configuration of charts.
 
 ## Layout (all charts)
 Layout controls the general appearance of the chart. The chart is customized by adding JSON properties to the layout.
-Below is a basic configuration.
+Below is a basic configuration.  
 
     {
+        "font": {
+            // font properties
+        },
+        "title": "CHART TITLE",
+        "titlefont": {
+            // titlefont properties
+        },
         "autosize": true,
-        "separators": ".,"
+        "hovermode": "closest",
+        "showlegend": true,
+        "legend": {
+            // legend properties
+        },
+        "hoverlabel": {
+            // hoverlabel properties
+        },
+        "margin": {
+            // margin properties
+        }
     }
 
+To use this layout snippet above, endeavour to replace all lines that begin with "// sometext properties" with actual properties specific to it.
+
 ### Legend
-The legend properties below can be added to the basic layout configuration to apply custom style to it. Below is are legend properties.
+The legend properties below are added to the layout configuration to apply custom style to it. Below are legend properties.
 
     {
         "showlegend": true,
@@ -33,22 +52,27 @@ The legend properties below can be added to the basic layout configuration to ap
     }
 
 ### Axis
-The axis properties usually apply to charts with two or more axes. They can be configured as: 
+The axis properties apply to charts with two or more axes. They can be configured as: 
 
     {
         "xaxis": {
             "gridcolor": "#eaeaea",
             "title": "X-axis",
-            "showgrid": true,
-            "fixedrange": true
+            "color":"blue",
+            "showgrid": false,
+            "fixedrange": true,
+            "showline": true,
+            "side": "bottom"
         },
         "yaxis": {
             "rangemode": "tozero",
             "zeroline": true,
             "zerolinecolor": "#eaeaea",
             "gridcolor": "#eaeaea",
+            "color":"blue",
             "title": "Y-axis",
             "showgrid": true,
+            "showline": true,
             "fixedrange": true
         }
     }
@@ -66,12 +90,14 @@ The title appears above the chart. It can be configured as:
     }
 
 ### Color
+Sets the a background color to graph.
 
     {
         "paper_bgcolor": "#FFF"
     }
 
-### Margins
+### Margin
+creates space around the chart.
 
     {
         "margin": {
@@ -84,7 +110,8 @@ The title appears above the chart. It can be configured as:
         }
     }
 
-### Tool tip
+### Tooltip
+A small pop-up box that appears when the user moves the mouse pointer over an chart data points.
 
     {
         "hovermode": "text",
@@ -100,7 +127,8 @@ The title appears above the chart. It can be configured as:
         }
     }
 
-### Fonts
+### Font
+Sets a global font that will be applied to all chart elements.
 
     {
         "font": {
@@ -110,12 +138,111 @@ The title appears above the chart. It can be configured as:
         }
     }
 
-## Data Properties
-### column chart
+## Data/Series Properties
+These properties are applied to specific charts only. For each chart, data properties are distinct. They make the chart appear as its supposed to be.
+
+### Column chart
+Displays a series as a set of vertical bars that are grouped by category.
+
     {
-        "name": "Series",
+        "name": "Series A",
         "type": "bar",
         "hoverinfo": "y",
         "orientation": "v"
     }
 
+### Bar chart
+Displays a series as a set of horizontal bars that are grouped by category.
+    {
+        "name": "Series B",
+        "type": "bar",
+        "hoverinfo": "x",
+        "orientation": "h"
+    }
+
+### Pie Chart
+ Displays a circular graph divided into slices to illustrate numerical proportion.
+    {
+        "hole": 0,
+        "hoverinfo": "label",
+        "type": "pie",
+        "sort": false
+    }
+
+### Area chart
+Displays a line chart with the areas below the lines filled with colors.
+
+    {
+        "connectgaps": true,
+        "hoveron": "points",
+        "hoverinfo": "y",
+        "line": {
+            "color": "#17202A",
+            "shape": "linear",
+            "dash": "dot"
+        },
+        "mode": "lines",
+        "name": "Series",
+        "type": "scatter",
+        "fill": "tonexty",
+        "fiilcolor": "#B2BABB"
+    }
+
+### Heat Map
+Displays a two-dimensional representation of data in which values are represented by colors.
+
+    {
+        "type": "heatmap",
+        "hoverinfo": "text",
+        "xgap": 0.5,
+        "ygap": 0.5,
+        "showscale": true,
+        "colorscale": [
+            [
+                0,
+                "#58D68D"
+            ],
+            [
+                0.4,
+                "#196F3D"
+            ],
+            [
+                1,
+                "#0B5345"
+            ]
+        ]
+    }
+
+### Line chart
+Displays a graph of data that changes continuously over time.
+
+    {
+        "connectgaps": true,
+        "hoveron": "points",
+        "hoverinfo": "y",
+        "line": {
+            "color": "",
+            "shape": "linear"
+        },
+        "mode": "lines+markers",
+        "name": "Series B",
+        "type": "scatter",
+        "fill": "none"
+    }
+
+### Time series
+Displays a graph of data points at successive time intervals.
+
+    {
+        "connectgaps": true,
+        "hoveron": "points",
+        "hoverinfo": "y",
+        "line": {
+            "color": "blue",
+            "shape": "linear"
+        },
+        "mode": "lines",
+        "name": "Series A",
+        "type": "scatter",
+        "fill": "tonexty"
+    }
