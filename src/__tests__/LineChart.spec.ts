@@ -5,10 +5,12 @@ import { mockMendix } from "../../tests/mocks/Mendix";
 import { Alert } from "../components/Alert";
 import { ChartLoading } from "../components/ChartLoading";
 import { LineChart, LineChartProps } from "../LineChart/components/LineChart";
-import { preview } from "../LineChart/LineChart.webmodeler";
-import { Data } from "../utils/namespaces";
+import { Container, Data } from "../utils/namespaces";
 import "../components/SeriesPlayground";
 import { PlotlyChart } from "../components/PlotlyChart";
+
+import { getRandomNumbers } from "../utils/data";
+import deepMerge from "deepmerge";
 import { ScatterData, ScatterHoverData } from "plotly.js";
 import LineSeriesProps = Data.LineSeriesProps;
 import SeriesData = Data.SeriesData;
@@ -180,7 +182,7 @@ describe("LineChart", () => {
     });
 
     it("with the devMode basic should not merge the modeler JSON series options", () => {
-        defaultProps.scatterData = preview.getData(defaultProps as LineChartProps);
+        defaultProps.scatterData = getData(defaultProps as LineChartProps);
         defaultProps.seriesOptions = [ "{ \"mode\": \"lines\" }" ];
         defaultProps.devMode = "basic";
         const chart = renderShallowChart(defaultProps as LineChartProps);
@@ -192,7 +194,7 @@ describe("LineChart", () => {
     });
 
     it("with the devMode advanced should merge the modeler JSON series options", () => {
-        defaultProps.scatterData = preview.getData(defaultProps as LineChartProps);
+        defaultProps.scatterData = getData(defaultProps as LineChartProps);
         defaultProps.seriesOptions = [ "{ \"mode\": \"markers\" }" ];
         defaultProps.devMode = "advanced";
         const chart = renderShallowChart(defaultProps as LineChartProps);
@@ -204,7 +206,7 @@ describe("LineChart", () => {
     });
 
     it("with the devMode developer should merge the modeler JSON series options", () => {
-        defaultProps.scatterData = preview.getData(defaultProps as LineChartProps);
+        defaultProps.scatterData = getData(defaultProps as LineChartProps);
         defaultProps.seriesOptions = [ "{ \"mode\": \"lines\" }" ];
         defaultProps.devMode = "developer";
         const chart = renderShallowChart(defaultProps as LineChartProps);
@@ -218,7 +220,7 @@ describe("LineChart", () => {
     it("that is configured as stacked generates the stacked chart data", () => {
         const stackedAreaSpy = spyOn(LineChart, "getStackedArea" as any).and.callThrough();
         defaultProps.area = "stacked";
-        defaultProps.scatterData = preview.getData(defaultProps as LineChartProps);
+        defaultProps.scatterData = getData(defaultProps as LineChartProps);
         const chart = renderShallowChart(defaultProps as LineChartProps);
 
         expect(stackedAreaSpy).toHaveBeenCalled();
@@ -275,3 +277,44 @@ describe("LineChart", () => {
         expect(instance.tooltipNode).not.toBeUndefined();
     });
 });
+
+const getData = (props: Container.LineChartContainerProps): ScatterData[] => {
+    if (props.series.length) {
+        return props.series.map(series => {
+            const seriesOptions = props.devMode !== "basic" && series.seriesOptions.trim()
+                ? JSON.parse(series.seriesOptions)
+                : {};
+            const sampleData = getSampleTraces();
+
+            return deepMerge.all([ {
+                connectgaps: true,
+                hoveron: "points",
+                line: {
+                    color: series.lineColor,
+                    shape: series.lineStyle
+                },
+                mode: series.mode ? series.mode.replace("X", "+") as Container.LineMode : "lines",
+                name: series.name,
+                type: "scatter",
+                fill: "none",
+                x: sampleData.x || [],
+                y: sampleData.y || []
+            }, seriesOptions ]);
+        });
+    }
+
+    return [ {
+        connectgaps: true,
+        hoveron: "points",
+        name: "Sample",
+        type: "scatter",
+        ...getSampleTraces()
+    } as ScatterData ];
+};
+
+const getSampleTraces = (): { x: (string | number)[], y: (string | number)[] } => {
+    return {
+        x: [ "Sample 1", "Sample 2", "Sample 3", "Sample 4" ],
+        y: getRandomNumbers(4, 100)
+    };
+};

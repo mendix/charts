@@ -4,13 +4,14 @@ import { ScatterData, ScatterHoverData } from "plotly.js";
 
 import { Alert } from "../components/Alert";
 import { BarChart, BarChartProps } from "../BarChart/components/BarChart";
-import { preview } from "../BarChart/BarChart.webmodeler";
 import { ChartLoading } from "../components/ChartLoading";
 import { PlotlyChart } from "../components/PlotlyChart";
 import "../components/SeriesPlayground";
 
+import { getRandomNumbers } from "../utils/data";
+import deepMerge from "deepmerge";
 import { mockMendix } from "../../tests/mocks/Mendix";
-import { Data } from "../utils/namespaces";
+import { Container, Data } from "../utils/namespaces";
 import SeriesProps = Data.SeriesProps;
 import SeriesData = Data.SeriesData;
 
@@ -180,7 +181,7 @@ describe("BarChart", () => {
     });
 
     it("with the devMode basic should not merge the modeler JSON series options", () => {
-        defaultProps.scatterData = preview.getData(defaultProps as BarChartProps);
+        defaultProps.scatterData = getData(defaultProps as BarChartProps);
         defaultProps.seriesOptions = [ "{ \"orientation\": \"v\" }" ];
         defaultProps.devMode = "basic";
         const chart = renderShallowBarChart(defaultProps as BarChartProps);
@@ -190,7 +191,7 @@ describe("BarChart", () => {
     });
 
     it("with the devMode advanced should merge the modeler JSON series options", () => {
-        defaultProps.scatterData = preview.getData(defaultProps as BarChartProps);
+        defaultProps.scatterData = getData(defaultProps as BarChartProps);
         defaultProps.seriesOptions = [ "{ \"orientation\": \"v\" }" ];
         defaultProps.devMode = "advanced";
         const chart = renderShallowBarChart(defaultProps as BarChartProps);
@@ -202,7 +203,7 @@ describe("BarChart", () => {
     });
 
     it("with the devMode developer should merge the modeler JSON series options", () => {
-        defaultProps.scatterData = preview.getData(defaultProps as BarChartProps);
+        defaultProps.scatterData = getData(defaultProps as BarChartProps);
         defaultProps.seriesOptions = [ "{ \"orientation\": \"v\" }" ];
         defaultProps.devMode = "developer";
         const chart = renderShallowBarChart(defaultProps as BarChartProps);
@@ -264,3 +265,36 @@ describe("BarChart", () => {
         expect(instance.tooltipNode).toBeDefined();
     });
 });
+
+const getData = (props: Container.BarChartContainerProps): ScatterData[] => {
+    if (props.series.length) {
+        return props.series.map(series => {
+            const seriesOptions = props.devMode !== "basic" && series.seriesOptions.trim()
+                ? JSON.parse(series.seriesOptions)
+                : {};
+            const sampleData = getSampleTraces();
+
+            return deepMerge.all([ {
+                name: series.name,
+                type: "bar",
+                orientation: "h",
+                x: sampleData.x || [],
+                y: sampleData.y || []
+            }, seriesOptions ]);
+        });
+    }
+
+    return [ {
+            type: "bar",
+            orientation: "h",
+            name: "Sample",
+            ...getSampleTraces()
+        } ] as ScatterData[];
+};
+
+const getSampleTraces = (): { x: (string | number)[], y: (string | number)[] } => {
+    return {
+        x: getRandomNumbers(4, 100),
+        y: [ "Sample 1", "Sample 2", "Sample 3", "Sample 4" ]
+    };
+};
