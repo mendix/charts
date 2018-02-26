@@ -10,7 +10,6 @@ const webpackConfigRelease = webpackConfig.map(config => merge(config, {
     plugins: [ new UglifyJsPlugin({
         parallel: true,
         uglifyOptions: {
-            ecma: 6,
             cache: true
         }
     }) ]
