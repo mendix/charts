@@ -30,7 +30,7 @@ Below is a basic configuration.
 To use this layout snippet above, endeavour to replace all lines that begin with "// sometext properties" with actual properties specific to it.
 
 ### Legend
-The legend properties below are added to the layout configuration to apply custom style to it. Below are legend properties.
+The legend properties below are added to the layout configuration to apply custom style to it. Below are legend properties
 
     {
         "showlegend": true,
@@ -51,8 +51,10 @@ The legend properties below are added to the layout configuration to apply custo
         }
     }
 
-### Axis
-The axis properties apply to charts with two or more axes. They can be configured as: 
+![ Legend configurations ](assets/cheatsheet/legend1.gif)  
+
+### Axes
+The axes properties apply to charts with two or more axes. They can be configured as: 
 
     {
         "xaxis": {
@@ -77,6 +79,8 @@ The axis properties apply to charts with two or more axes. They can be configure
         }
     }
 
+![ Axes configurations ](assets/cheatsheet/axes.gif)  
+
 ### Title
 The title appears above the chart. It can be configured as: 
 
@@ -88,6 +92,8 @@ The title appears above the chart. It can be configured as:
             "color": "black"   
         }
     }
+
+![ Title configurations ](assets/cheatsheet/title.gif)  
 
 ### Color
 Sets the a background color to graph.
@@ -110,6 +116,8 @@ creates space around the chart.
         }
     }
 
+![ Margin configurations ](assets/cheatsheet/margin.gif)  
+
 ### Tooltip
 A small pop-up box that appears when the user moves the mouse pointer over an chart data points.
 
@@ -126,6 +134,8 @@ A small pop-up box that appears when the user moves the mouse pointer over an ch
             }
         }
     }
+
+![ Tooltip configurations ](assets/cheatsheet/tooltip.gif)  
 
 ### Font
 Sets a global font that will be applied to all chart elements.
@@ -151,8 +161,11 @@ Displays a series as a set of vertical bars that are grouped by category.
         "orientation": "v"
     }
 
+![ Column chart data properties ](assets/cheatsheet/column_chart.PNG)  
+
 ### Bar chart
 Displays a series as a set of horizontal bars that are grouped by category.
+
     {
         "name": "Series B",
         "type": "bar",
@@ -160,14 +173,19 @@ Displays a series as a set of horizontal bars that are grouped by category.
         "orientation": "h"
     }
 
+![ Bar chart data properties ](assets/cheatsheet/bar_chart.PNG)  
+
 ### Pie Chart
  Displays a circular graph divided into slices to illustrate numerical proportion.
+
     {
         "hole": 0,
         "hoverinfo": "label",
         "type": "pie",
         "sort": false
     }
+
+![ Pie chart data properties ](assets/cheatsheet/pie_chart.PNG)  
 
 ### Area chart
 Displays a line chart with the areas below the lines filled with colors.
@@ -187,6 +205,8 @@ Displays a line chart with the areas below the lines filled with colors.
         "fill": "tonexty",
         "fiilcolor": "#B2BABB"
     }
+
+![ Area chart data properties ](assets/cheatsheet/area_chart.PNG)  
 
 ### Heat Map
 Displays a two-dimensional representation of data in which values are represented by colors.
@@ -213,6 +233,8 @@ Displays a two-dimensional representation of data in which values are represente
         ]
     }
 
+![ Heatmap data properties ](assets/cheatsheet/heatmap.PNG)  
+
 ### Line chart
 Displays a graph of data that changes continuously over time.
 
@@ -230,9 +252,10 @@ Displays a graph of data that changes continuously over time.
         "fill": "none"
     }
 
+![ Line chart data properties ](assets/cheatsheet/line_chart.PNG)  
+
 ### Time series
 Displays a graph of data points at successive time intervals.
-
     {
         "connectgaps": true,
         "hoveron": "points",
@@ -246,3 +269,5 @@ Displays a graph of data points at successive time intervals.
         "type": "scatter",
         "fill": "tonexty"
     }
+
+![ Time series data properties ](assets/cheatsheet/time_series.PNG)  
