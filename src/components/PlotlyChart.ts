@@ -57,6 +57,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         }
         this.renderChart(this.props);
         this.addResizeListener();
+        this.registerTouchEvents();
     }
 
     componentDidUpdate() {
@@ -67,6 +68,60 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         if (this.chartNode && this.purge) {
             this.purge(this.chartNode);
         }
+        this.removeTouchEvents();
+    }
+
+    private registerTouchEvents() {
+        [ "touchenter", "touchleave" ].forEach(eventName => {
+            if (this.chartNode) {
+                this.chartNode.addEventListener(eventName, this.touchHandler);
+            }
+        });
+        if (this.props.type !== "pie") {
+            [ "touchstart", "touchmove", "touchend" ].forEach(eventName => {
+                if (this.chartNode) {
+                    this.chartNode.addEventListener(eventName, this.touchHandler);
+                }
+            });
+        }
+    }
+
+    private removeTouchEvents() {
+        [ "touchenter", "touchleave", "touchstart", "touchmove", "touchend" ].forEach(eventName => {
+            if (this.chartNode) {
+                this.chartNode.removeEventListener(eventName, this.touchHandler);
+            }
+        });
+    }
+
+    private touchHandler = (event: TouchEvent) => {
+        const touches = event.changedTouches;
+        const touchPoint = touches[0];
+        let type = "";
+
+        if (event.type === "touchenter") {
+            type = "mouseover";
+        } else if (event.type === "touchleave") {
+            type = "mouseout";
+        } else if (event.type === "touchstart") {
+            type = "mousedown";
+        } else if (event.type === "touchmove") {
+            type = "mousemove";
+        } else if (event.type === "touchend") {
+            type = "mouseup";
+        }
+
+        const options = {
+            bubbles: true,
+            screenX: touchPoint.screenX,
+            screenY: touchPoint.screenY,
+            clientX: touchPoint.clientX,
+            clientY: touchPoint.clientY
+        };
+        const simulatedEvent = new MouseEvent(type, options);
+
+        touchPoint.target.dispatchEvent(simulatedEvent);
+        event.preventDefault();
     }
 
     private getPlotlyNodeRef(node: HTMLDivElement) {
