@@ -52,6 +52,7 @@ The legend properties below are added to the layout configuration to apply custo
     }
 
 ![ Legend configurations ](assets/cheatsheet/legend1.gif)  
+See more[ Legend configurations ](https://plot.ly/javascript/reference/#layout-legend)
 
 ### Axes
 The axes properties apply to charts with two or more axes. They can be configured as: 
@@ -80,6 +81,7 @@ The axes properties apply to charts with two or more axes. They can be configure
     }
 
 ![ Axes configurations ](assets/cheatsheet/axes.gif)  
+See more[ Axes configurations ](https://plot.ly/javascript/reference/#layout-xaxis)
 
 ### Title
 The title appears above the chart. It can be configured as: 
@@ -94,6 +96,7 @@ The title appears above the chart. It can be configured as:
     }
 
 ![ Title configurations ](assets/cheatsheet/title.gif)  
+See more[ Title configurations ](https://plot.ly/javascript/reference/#layout-title)
 
 ### Color
 Sets the a background color to graph.
@@ -117,6 +120,7 @@ creates space around the chart.
     }
 
 ![ Margin configurations ](assets/cheatsheet/margin.gif)  
+See more[ Margin configurations ](https://plot.ly/javascript/reference/#layout-margin)
 
 ### Tooltip
 A small pop-up box that appears when the user moves the mouse pointer over an chart data points.
@@ -136,6 +140,7 @@ A small pop-up box that appears when the user moves the mouse pointer over an ch
     }
 
 ![ Tooltip configurations ](assets/cheatsheet/tooltip.gif)  
+See more [ Tooltip configurations ](https://plot.ly/javascript/reference/#layout-hovermode)
 
 ### Font
 Sets a global font that will be applied to all chart elements.
@@ -162,6 +167,7 @@ Displays a series as a set of vertical bars that are grouped by category.
     }
 
 ![ Column chart data properties ](assets/cheatsheet/column_chart.PNG)  
+See more [ Column chart data properties ](https://plot.ly/javascript/reference/#bar)
 
 ### Bar chart
 Displays a series as a set of horizontal bars that are grouped by category.
@@ -174,6 +180,7 @@ Displays a series as a set of horizontal bars that are grouped by category.
     }
 
 ![ Bar chart data properties ](assets/cheatsheet/bar_chart.PNG)  
+See more [ Bar chart data properties ](https://plot.ly/javascript/reference/#bar)
 
 ### Pie Chart
  Displays a circular graph divided into slices to illustrate numerical proportion.
@@ -186,6 +193,7 @@ Displays a series as a set of horizontal bars that are grouped by category.
     }
 
 ![ Pie chart data properties ](assets/cheatsheet/pie_chart.PNG)  
+See more [ Pie chart data properties ](https://plot.ly/javascript/reference/#pie)
 
 ### Area chart
 Displays a line chart with the areas below the lines filled with colors.
@@ -207,6 +215,7 @@ Displays a line chart with the areas below the lines filled with colors.
     }
 
 ![ Area chart data properties ](assets/cheatsheet/area_chart.PNG)  
+See more [ Area chart data properties ](https://plot.ly/javascript/reference/#area)
 
 ### Heat Map
 Displays a two-dimensional representation of data in which values are represented by colors.
@@ -234,6 +243,7 @@ Displays a two-dimensional representation of data in which values are represente
     }
 
 ![ Heatmap data properties ](assets/cheatsheet/heatmap.PNG)  
+See more [ Heatmap data properties ](https://plot.ly/javascript/reference/#heatmap)
 
 ### Line chart
 Displays a graph of data that changes continuously over time.
@@ -253,6 +263,7 @@ Displays a graph of data that changes continuously over time.
     }
 
 ![ Line chart data properties ](assets/cheatsheet/line_chart.PNG)  
+See more [ Line chart data properties ](https://plot.ly/javascript/reference/#scatter)
 
 ### Time series
 Displays a graph of data points at successive time intervals.
@@ -271,3 +282,4 @@ Displays a graph of data points at successive time intervals.
     }
 
 ![ Time series data properties ](assets/cheatsheet/time_series.PNG)  
+See more [ Time series data properties ](https://plot.ly/javascript/reference/#scatter)
