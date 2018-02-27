@@ -23,7 +23,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
     };
     private subscriptionHandle?: number;
     private defaultColors: string[] = [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ];
-    private intervalHandler?: number;
+    private intervalID?: number;
 
     render() {
         return createElement("div",
@@ -45,32 +45,33 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         );
     }
 
-    componentDidMount() {
-        if (this.props.refreshInterval > 0) {
-            setTimeout(() => {
-                this.intervalHandler = setInterval(() => {
-                    if (!this.state.loading) {
-                        this.fetchData(this.props.mxObject);
-                    }
-                }, this.props.refreshInterval);
-            }, 500);
-        }
-    }
-
     componentWillReceiveProps(newProps: BarChartContainerProps) {
         this.resetSubscriptions(newProps.mxObject);
         if (!this.state.loading) {
             this.setState({ loading: true });
         }
         this.fetchData(newProps.mxObject);
+        if (newProps.mxObject) {
+            this.setRefreshInterval(newProps.refreshInterval);
+        }
     }
 
     componentWillUnmount() {
         if (this.subscriptionHandle) {
             mx.data.unsubscribe(this.subscriptionHandle);
         }
-        if (this.intervalHandler) {
-            clearInterval(this.intervalHandler);
+        if (this.intervalID) {
+            clearInterval(this.intervalID);
+        }
+    }
+
+    private setRefreshInterval(refreshInterval: number) {
+        if (refreshInterval > 0) {
+            this.intervalID = setInterval(() => {
+                if (!this.state.loading) {
+                    this.fetchData(this.props.mxObject);
+                }
+            }, refreshInterval);
         }
     }
 

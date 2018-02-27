@@ -19,7 +19,7 @@ interface HeatMapContainerState {
 export default class HeatMapContainer extends Component<HeatMapContainerProps, HeatMapContainerState> {
     private subscriptionHandle?: number;
     private rawData: mendix.lib.MxObject[] = [];
-    private intervalHandler?: number;
+    private intervalID?: number;
 
     constructor(props: HeatMapContainerProps) {
         super(props);
@@ -36,22 +36,13 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
         }, this.getContent());
     }
 
-    componentDidMount() {
-        if (this.props.refreshInterval > 0) {
-            setTimeout(() => {
-                this.intervalHandler = setInterval(() => {
-                    if (!this.state.loading) {
-                        this.fetchData(this.props.mxObject);
-                    }
-                }, this.props.refreshInterval);
-            }, 500);
-        }
-    }
-
     componentWillReceiveProps(newProps: HeatMapContainerProps) {
         this.resetSubscriptions(newProps.mxObject);
         if (!this.state.alertMessage) {
             this.fetchData(newProps.mxObject);
+            if (newProps.mxObject) {
+                this.setRefreshInterval(newProps.refreshInterval);
+            }
         }
     }
 
@@ -59,8 +50,18 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
         if (this.subscriptionHandle) {
             window.mx.data.unsubscribe(this.subscriptionHandle);
         }
-        if (this.intervalHandler) {
-            clearInterval(this.intervalHandler);
+        if (this.intervalID) {
+            clearInterval(this.intervalID);
+        }
+    }
+
+    private setRefreshInterval(refreshInterval: number) {
+        if (refreshInterval > 0) {
+            this.intervalID = setInterval(() => {
+                if (!this.state.loading) {
+                    this.fetchData(this.props.mxObject);
+                }
+            }, refreshInterval);
         }
     }
 
