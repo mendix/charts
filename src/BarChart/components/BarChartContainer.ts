@@ -51,23 +51,21 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
             this.setState({ loading: true });
         }
         this.fetchData(newProps.mxObject);
-        if (newProps.mxObject) {
-            this.setRefreshInterval(newProps.refreshInterval);
-        }
+        this.setRefreshInterval(newProps.refreshInterval, newProps.mxObject);
     }
 
     componentWillUnmount() {
         if (this.subscriptionHandle) {
             mx.data.unsubscribe(this.subscriptionHandle);
         }
-        if (this.intervalID) {
-            clearInterval(this.intervalID);
+        if (this.intervalID && this.props.mxObject) {
+            window.clearInterval(this.intervalID);
         }
     }
 
-    private setRefreshInterval(refreshInterval: number) {
-        if (refreshInterval > 0) {
-            this.intervalID = setInterval(() => {
+    private setRefreshInterval(refreshInterval: number, mxObject?: mendix.lib.MxObject) {
+        if (refreshInterval > 0 && mxObject) {
+            this.intervalID = window.setInterval(() => {
                 if (!this.state.loading) {
                     this.fetchData(this.props.mxObject);
                 }

@@ -40,9 +40,7 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
         this.resetSubscriptions(newProps.mxObject);
         if (!this.state.alertMessage) {
             this.fetchData(newProps.mxObject);
-            if (newProps.mxObject) {
-                this.setRefreshInterval(newProps.refreshInterval);
-            }
+            this.setRefreshInterval(newProps.refreshInterval, newProps.mxObject);
         }
     }
 
@@ -50,18 +48,23 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
         if (this.subscriptionHandle) {
             window.mx.data.unsubscribe(this.subscriptionHandle);
         }
-        if (this.intervalID) {
-            clearInterval(this.intervalID);
-        }
+        this.clearRefreshInterval(this.props.mxObject);
     }
 
-    private setRefreshInterval(refreshInterval: number) {
-        if (refreshInterval > 0) {
-            this.intervalID = setInterval(() => {
+    private setRefreshInterval(refreshInterval: number, mxObject?: mendix.lib.MxObject) {
+        this.clearRefreshInterval(mxObject);
+        if (refreshInterval > 0 && mxObject) {
+            this.intervalID = window.setInterval(() => {
                 if (!this.state.loading) {
                     this.fetchData(this.props.mxObject);
                 }
             }, refreshInterval);
+        }
+    }
+
+    private clearRefreshInterval(mxObject?: mendix.lib.MxObject) {
+        if (this.intervalID && mxObject) {
+            window.clearInterval(this.intervalID);
         }
     }
 

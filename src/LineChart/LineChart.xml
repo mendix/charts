@@ -170,6 +170,11 @@
                 <enumerationValue key="both">Horizontal and vertical</enumerationValue>
             </enumerationValues>
         </property>
+        <property key="refreshInterval" type="integer" defaultValue="0">
+            <caption>Refresh interval (ms)</caption>
+            <category>Chart properties</category>
+            <description>Refresh the chart on milliseconds interval, when set to 0 refresh is disabled</description>
+        </property>
         <property key="widthUnit" type="enumeration" defaultValue="percentage">
             <caption>Width unit</caption>
             <category>Appearance</category>
@@ -198,11 +203,6 @@
             <caption>Height</caption>
             <category>Appearance</category>
             <description/>
-        </property>
-        <property key="refreshInterval" type="integer" defaultValue="0">
-            <caption>Refresh interval (ms)</caption>
-            <category>Appearance</category>
-            <description>Refresh the chart on milliseconds interval, when set to 0 refresh is disabled</description>
         </property>
         <property key="devMode" type="enumeration" defaultValue="basic">
             <caption>Mode</caption>
