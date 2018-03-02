@@ -218,7 +218,7 @@ Displays a line chart with the areas below the lines filled with colors.
 See more [ Area chart data properties ](https://plot.ly/javascript/reference/#area)
 
 ### Heat Map
-Displays a two-dimensional representation of data in which values are represented by colors.
+Displays a two-dimensional representation of data in which values are represented by colors.  
 
     {
         "type": "heatmap",
@@ -246,7 +246,7 @@ Displays a two-dimensional representation of data in which values are represente
 See more [ Heatmap data properties ](https://plot.ly/javascript/reference/#heatmap)
 
 ### Line chart
-Displays a graph of data that changes continuously over time.
+Displays a graph of data that changes continuously over time.  
 
     {
         "connectgaps": true,
