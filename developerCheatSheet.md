@@ -27,7 +27,7 @@ Below is a basic configuration.
         }
     }
 
-To use this layout snippet above, endeavour to replace all lines that begin with "// sometext properties" with actual properties specific to it.
+To use this layout snippet above, endeavour to replace all lines that begin with "// sometext properties" with actual properties specific to it.  
 
 ### Legend
 The legend properties below are added to the layout configuration to apply custom style to it. Below are legend properties
@@ -55,7 +55,7 @@ The legend properties below are added to the layout configuration to apply custo
 See more[ Legend configurations ](https://plot.ly/javascript/reference/#layout-legend)
 
 ### Axes
-The axes properties apply to charts with two or more axes. They can be configured as: 
+The axes properties apply to charts with two or more axes. They can be configured as:
 
     {
         "xaxis": {
@@ -251,17 +251,10 @@ Displays a two-dimensional representation of data in which values are represente
     }
 
 ![ Heatmap data properties ](assets/cheatsheet/heatmap.PNG)  
-<<<<<<< HEAD
 See more [ Heatmap data properties ](https://plot.ly/javascript/reference/#heatmap)  
 
 ### Line chart
-Displays a graph of data that changes continuously over time.  
-=======
-See more [ Heatmap data properties ](https://plot.ly/javascript/reference/#heatmap)
-
-### Line chart
 Displays a graph of data that changes continuously over time.
->>>>>>> f9f691ebf63fd99294fce6c9ced384be66c42044
 
     {
         "connectgaps": true,
