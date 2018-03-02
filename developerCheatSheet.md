@@ -96,7 +96,11 @@ The title appears above the chart. It can be configured as:
     }
 
 ![ Title configurations ](assets/cheatsheet/title.gif)  
+<<<<<<< HEAD
 See more[ Title configurations ](https://plot.ly/javascript/reference/#layout-title)  
+=======
+See more[ Title configurations ](https://plot.ly/javascript/reference/#layout-title)
+>>>>>>> f9f691ebf63fd99294fce6c9ced384be66c42044
 
 ### Color
 Sets the a background color to graph.
@@ -218,7 +222,11 @@ Displays a line chart with the areas below the lines filled with colors.
 See more [ Area chart data properties ](https://plot.ly/javascript/reference/#area)
 
 ### Heat Map
+<<<<<<< HEAD
 Displays a two-dimensional representation of data in which values are represented by colors.  
+=======
+Displays a two-dimensional representation of data in which values are represented by colors.
+>>>>>>> f9f691ebf63fd99294fce6c9ced384be66c42044
 
     {
         "type": "heatmap",
@@ -243,10 +251,17 @@ Displays a two-dimensional representation of data in which values are represente
     }
 
 ![ Heatmap data properties ](assets/cheatsheet/heatmap.PNG)  
+<<<<<<< HEAD
 See more [ Heatmap data properties ](https://plot.ly/javascript/reference/#heatmap)  
 
 ### Line chart
 Displays a graph of data that changes continuously over time.  
+=======
+See more [ Heatmap data properties ](https://plot.ly/javascript/reference/#heatmap)
+
+### Line chart
+Displays a graph of data that changes continuously over time.
+>>>>>>> f9f691ebf63fd99294fce6c9ced384be66c42044
 
     {
         "connectgaps": true,
