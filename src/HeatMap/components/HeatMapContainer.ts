@@ -48,22 +48,22 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
         if (this.subscriptionHandle) {
             window.mx.data.unsubscribe(this.subscriptionHandle);
         }
-        this.clearRefreshInterval(this.props.mxObject);
+        this.clearRefreshInterval();
     }
 
     private setRefreshInterval(refreshInterval: number, mxObject?: mendix.lib.MxObject) {
-        this.clearRefreshInterval(mxObject);
         if (refreshInterval > 0 && mxObject) {
+            this.clearRefreshInterval();
             this.intervalID = window.setInterval(() => {
                 if (!this.state.loading) {
-                    this.fetchData(this.props.mxObject);
+                    this.fetchData(mxObject);
                 }
             }, refreshInterval);
         }
     }
 
-    private clearRefreshInterval(mxObject?: mendix.lib.MxObject) {
-        if (this.intervalID && mxObject) {
+    private clearRefreshInterval() {
+        if (this.intervalID) {
             window.clearInterval(this.intervalID);
         }
     }
