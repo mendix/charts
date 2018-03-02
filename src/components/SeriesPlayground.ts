@@ -22,10 +22,14 @@ export interface SeriesPlaygroundProps {
 type PlaygroundSeriesTrace = ({ name: string } & ScatterTrace);
 interface SeriesPlaygroundState {
     activeOption: string;
+    settings: string;
 }
 
 export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPlaygroundState> {
-    state = { activeOption: "layout" };
+    state = {
+        activeOption: "layout",
+        settings: this.props.layoutOptions
+    };
     private newSeriesOptions: { layout: string, data: SeriesData[] } = {
         layout: this.props.layoutOptions || "{}",
         data: this.props.rawData || []
@@ -61,7 +65,8 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
                     onChange: value => this.onUpdate("layout", value),
                     onValidate: this.onValidate
                 })
-            ),
+            )
+            ,
             createElement(Panel,
                 {
                     key: "modeler",
@@ -158,8 +163,14 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
         this.timeoutId = setTimeout(() => {
             try {
                 if (this.isValid && JSON.parse(value)) {
-                    this.updateChart(source, value);
+                    this.updateChart(source, JSON.stringify(JSON.parse(value), null, 2));
+                } else {
+                    const properJson = value.replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, `"$2": `);
+                    const doubleQuote = properJson.replace(/'/g, `"`);
+                    const newValue = JSON.stringify(JSON.parse(doubleQuote), null, 2);
+                    this.updateChart(source, newValue);
                 }
+
             } catch {
                 this.isValid = false;
             }
