@@ -91,7 +91,7 @@ The title appears above the chart. It can be configured as:
         "titlefont": {
             "family": "Droid Sans, Droid Serif, sans-serif",
             "size": 20,
-            "color": "black"   
+            "color": "black"  
         }
     }
 
@@ -266,7 +266,8 @@ Displays a graph of data that changes continuously over time.
 See more [ Line chart data properties ](https://plot.ly/javascript/reference/#scatter)
 
 ### Time series
-Displays a graph of data points at successive time intervals.
+Displays a graph of data points at successive time intervals.  
+
     {
         "connectgaps": true,
         "hoveron": "points",
