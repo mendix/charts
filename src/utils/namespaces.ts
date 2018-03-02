@@ -95,6 +95,24 @@ export namespace Container {
         devMode: "basic" | "advanced" | "developer";
     }
 
+    export interface BubbleChartContainerProps extends Data.DataSourceProps, Style.Dimensions, Data.EventProps, WrapperProps {
+        series: Data.SeriesProps[];
+        showLegend: boolean;
+        serieColor: string;
+        xAxisLabel: string;
+        yAxisLabel: string;
+        layoutOptions: string;
+        dataOptions: string;
+        devMode: "basic" | "advanced" | "developer";
+    }
+
+    export interface BubbleChartContainerState {
+        alertMessage?: ReactChild;
+        data?: Data.SeriesData<Data.SeriesProps>[];
+        scatterData?: ScatterData[];
+        seriesOptions: string[];
+        loading?: boolean;
+    }
     export interface ScaleColors {
         valuePercentage: number;
         colour: number;
@@ -114,6 +132,7 @@ export namespace Data {
         xValueSortAttribute: string;
         sortOrder: SortOrder;
         yValueAttribute: string;
+        bubbleSizeAttribute?: string;
     }
 
     export type SortOrder = "asc" | "desc";
@@ -129,6 +148,7 @@ export namespace Data {
         name: string;
         seriesOptions: string;
         barColor: string;
+        color?: string; // All serie barColor, lineColor, bubbleColor etc should be replaced with 'color'
     }
 
     export interface LineSeriesProps extends SeriesProps {
@@ -147,6 +167,7 @@ export namespace Data {
     export interface ScatterTrace {
         x: Datum[];
         y: number[] | Datum[];
+        size?: number[];
     }
 
     export interface ReferencesSpec {

@@ -169,7 +169,8 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
                 );
 
                 return zData ? Number(zData.get(this.props.valueAttribute)) : 0;
-            }));
+            })
+        );
     }
 
     private getAttributeName(attributePath: string): string {
