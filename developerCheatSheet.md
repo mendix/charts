@@ -96,7 +96,7 @@ The title appears above the chart. It can be configured as:
     }
 
 ![ Title configurations ](assets/cheatsheet/title.gif)  
-See more[ Title configurations ](https://plot.ly/javascript/reference/#layout-title)
+See more[ Title configurations ](https://plot.ly/javascript/reference/#layout-title)  
 
 ### Color
 Sets the a background color to graph.
@@ -243,7 +243,7 @@ Displays a two-dimensional representation of data in which values are represente
     }
 
 ![ Heatmap data properties ](assets/cheatsheet/heatmap.PNG)  
-See more [ Heatmap data properties ](https://plot.ly/javascript/reference/#heatmap)
+See more [ Heatmap data properties ](https://plot.ly/javascript/reference/#heatmap)  
 
 ### Line chart
 Displays a graph of data that changes continuously over time.  
