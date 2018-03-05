@@ -158,4 +158,10 @@ export class Playground extends Component<{}, PlaygroundState> {
 
         return null;
     }
+
+    public static convertJSToJSON(value: string) {
+        const properJSON = value.replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, `"$2": `).replace(/'/g, `"`);
+
+        return JSON.stringify(JSON.parse(properJSON), null, 2);
+    }
 }
