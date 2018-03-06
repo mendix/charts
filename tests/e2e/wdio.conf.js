@@ -5,10 +5,16 @@ exports.config = {
     port: 4444,
     specs: [ "./dist/e2e/**/*.spec.js" ],
     maxInstances: debug ? 1 : 5,
-    capabilities: [ {
-        maxInstances: debug ? 1 : 5,
-        browserName: "chrome"
-    } ],
+    capabilities: [
+        { browserName: "chrome" },
+        { browserName: "firefox", marionette: true },
+        // { 
+        //     browserName: "internet explorer",
+        //     "ignoreZoomSetting": true,
+        //     "ignoreProtectedModeSettings": true
+        // },
+        // { browserName: "MicrosoftEdge" }
+    ],
     sync: true,
     logLevel: "silent",
     coloredLogs: true,
@@ -18,7 +24,12 @@ exports.config = {
     waitforTimeout: 180000,
     connectionRetryTimeout: 200000,
     connectionRetryCount: 2,
-    services: [ "selenium-standalone" ],
+    services: [ /*"iedriver", */"selenium-standalone" ],
+    // seleniumArgs: {
+    //     javaArgs: [
+    //         "-Dwebdriver.edge.driver=C:\\Program Files (x86)\\Microsoft Web Driver\\MicrosoftWebDriver.exe"
+    //     ]
+    // },
     framework: "jasmine",
     reporters: [ "dot", "spec" ],
     execArgv: debug ? [ "--inspect" ] : undefined,

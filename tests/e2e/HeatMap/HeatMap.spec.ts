@@ -1,15 +1,11 @@
 import defaultFilter from "./pages/default.page";
 
-describe("Area chart", () => {
+describe("Heat map", () => {
     beforeAll(() => {
         defaultFilter.open();
     });
 
     it("should generate a chart", () => {
-        //
-    });
-
-    it("should have two series with proper classes", () => {
         //
     });
 });

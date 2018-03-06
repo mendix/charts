@@ -1,15 +1,11 @@
 class DefaultFilter {
 
-    public get checkBoxFilter() {
-        return browser.element("#mxui_widget_ReactCustomWidgetWrapper_0 > input[type='checkbox']");
+    public get getAreaChart() {
+        return browser.element("#mxui_widget_ReactCustomWidgetWrapper_3 > div.widget-charts.widget-charts-line.mx-name-areaChart1.js-plotly-plot");
     }
 
-    public get listView() { return browser.element("#mxui_widget_ListView_0"); }
-
-    public get listViewItems() { return browser.elements("#mxui_widget_ListView_0 .mx-listview-item"); }
-
     public open(): void {
-        browser.url("/p/checkboxfilter");
+        browser.url("/p/home");
     }
 }
 const defaultFilter = new DefaultFilter();

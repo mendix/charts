@@ -1,5 +1,3 @@
-declare function require(name: string): string;
-
 type VisibilityMap<T> = {
     [P in keyof T]: any;
 };

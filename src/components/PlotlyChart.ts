@@ -156,7 +156,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         if (this.timeoutId) {
             clearTimeout(this.timeoutId);
         }
-        this.timeoutId = setTimeout(() => {
+        this.timeoutId = window.setTimeout(() => {
             if (this.chartNode && this.purge) {
                 this.purge(this.chartNode);
                 this.renderChart(this.props);

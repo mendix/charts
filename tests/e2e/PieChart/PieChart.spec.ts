@@ -1,6 +1,6 @@
 import defaultFilter from "./pages/default.page";
 
-describe("Area chart", () => {
+describe("Pie chart", () => {
     beforeAll(() => {
         defaultFilter.open();
     });
@@ -9,7 +9,11 @@ describe("Area chart", () => {
         //
     });
 
-    it("should have two series with proper classes", () => {
+    it("should generate multiple slice", () => {
+        //
+    });
+
+    it("should have legend items with proper classes", () => {
         //
     });
 });
