@@ -95,7 +95,7 @@ export namespace Container {
         devMode: "basic" | "advanced" | "developer";
     }
 
-    export interface BubbleChartContainerProps extends Data.DataSourceProps, Style.Dimensions, Data.EventProps, WrapperProps {
+    export interface BubbleChartContainerProps extends Data.DataSourceProps, LayoutProps, Style.Dimensions, Data.EventProps, WrapperProps {
         series: Data.SeriesProps[];
         showLegend: boolean;
         serieColor: string;
@@ -104,6 +104,8 @@ export namespace Container {
         layoutOptions: string;
         dataOptions: string;
         devMode: "basic" | "advanced" | "developer";
+        refreshInterval: number;
+        showRangeSlider: boolean;
     }
 
     export interface BubbleChartContainerState {

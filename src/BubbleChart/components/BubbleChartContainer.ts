@@ -59,7 +59,9 @@ export default class BubbleChartContainer extends Component<BubbleChartContainer
     }
 
     private resetSubscriptions(mxObject?: mendix.lib.MxObject) {
-        this.componentWillUnmount();
+        if (this.subscriptionHandle) {
+            mx.data.unsubscribe(this.subscriptionHandle);
+        }
         if (mxObject) {
             this.subscriptionHandle = mx.data.subscribe({
                 callback: () => this.fetchData(mxObject),
@@ -109,7 +111,8 @@ export default class BubbleChartContainer extends Component<BubbleChartContainer
                     },
                     ... BubbleChart.getDefaultSeriesOptions(series, this.props),
                     x,
-                    y
+                    y,
+                    text: size // show the size value on hover
                 },
                 rawOptions
             ]),

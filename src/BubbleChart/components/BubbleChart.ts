@@ -65,7 +65,7 @@ export class BubbleChart extends Component<BubbleChartProps, BubbleChartState> {
             return this.renderPlayground();
         }
 
-        return this.renderLineChart();
+        return this.renderBubbleChart();
     }
 
     componentWillReceiveProps(newProps: BubbleChartProps) {
@@ -83,7 +83,7 @@ export class BubbleChart extends Component<BubbleChartProps, BubbleChartState> {
         this.setState({ playgroundLoaded: true });
     }
 
-    private renderLineChart(): ReactElement<any> {
+    private renderBubbleChart(): ReactElement<any> {
         return createElement(PlotlyChart,
             {
                 type: "bubble",
@@ -110,7 +110,7 @@ export class BubbleChart extends Component<BubbleChartProps, BubbleChartState> {
                 onChange: this.onRuntimeUpdate,
                 layoutOptions: this.state.layoutOptions || "{\n\n}",
                 modelerLayoutConfigs: JSON.stringify(BubbleChart.defaultLayoutConfigs(this.props), null, 4)
-            }, this.renderLineChart());
+            }, this.renderBubbleChart());
         }
 
         return null;
@@ -131,7 +131,7 @@ export class BubbleChart extends Component<BubbleChartProps, BubbleChartState> {
     private getData(props: BubbleChartProps): ScatterData[] {
         const { seriesOptions } = this.state;
         if (props.scatterData) {
-            const lineData = props.scatterData.map((data, index) => {
+            const chartData = props.scatterData.map((data, index) => {
                 const parsedOptions = props.devMode !== "basic" && seriesOptions
                     ? JSON.parse(seriesOptions[index])
                     : {};
@@ -143,7 +143,7 @@ export class BubbleChart extends Component<BubbleChartProps, BubbleChartState> {
                 };
             });
 
-            return lineData;
+            return chartData;
         }
 
         return [];
@@ -160,7 +160,6 @@ export class BubbleChart extends Component<BubbleChartProps, BubbleChartState> {
         if (this.props.onHover && data.series.tooltipForm && this.tooltipNode) {
             const positionYaxis = yaxis.l2p(y as number) + yaxis._offset;
             const positionXaxis = xaxis.d2p(x) + xaxis._offset;
-            // const positionSize
             this.tooltipNode.style.top = `${positionYaxis}px`;
             this.tooltipNode.style.left = `${positionXaxis}px`;
             this.tooltipNode.style.opacity = "1";
@@ -184,20 +183,17 @@ export class BubbleChart extends Component<BubbleChartProps, BubbleChartState> {
             showlegend: props.showLegend,
             xaxis: {
                 gridcolor: "#eaeaea",
-                title: props.xAxisLabel
-                // showgrid: props.grid === "vertical" || props.grid === "both",
-                // fixedrange: props.xAxisType !== "date",
-                // type: props.xAxisType,
-                // rangeslider: { visible: props.showRangeSlider || false }
+                title: props.xAxisLabel,
+                showgrid: props.grid === "vertical" || props.grid === "both",
+                rangeslider: { visible: props.showRangeSlider || false }
             },
             yaxis: {
                 rangemode: "tozero",
                 zeroline: true,
                 zerolinecolor: "#eaeaea",
                 gridcolor: "#eaeaea",
-                title: props.yAxisLabel
-                // showgrid: props.grid === "horizontal" || props.grid === "both",
-                // fixedrange: true
+                title: props.yAxisLabel,
+                showgrid: props.grid === "horizontal" || props.grid === "both"
             },
             hoverlabel: {
                 bgcolor: "#888",
@@ -222,8 +218,10 @@ export class BubbleChart extends Component<BubbleChartProps, BubbleChartState> {
 
     public static getDefaultSeriesOptions(series: SeriesProps, props: BubbleChartProps): Partial<ScatterData> {
         return {
-            // hoverinfo: series.tooltipForm ? "text" : "y" as any, // typings don't have a hoverinfo value of "y"
+            connectgaps: true,
             mode: "markers",
+            hoveron: "points",
+            hoverinfo: series.tooltipForm ? "none" : "text" as any, // typings don't have a hoverinfo value of "none"
             name: series.name,
             type: "scatter"
         };
