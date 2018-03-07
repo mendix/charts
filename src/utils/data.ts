@@ -280,10 +280,16 @@ export const parseTime = (date: Date): string => {
     return time.join(":");
 };
 
-export const getRandomNumbers = (count: number, range: number): number[] => {
+/**
+ * Returns a random integer between min (included) and max (included)
+ * @param count
+ * @param rangeMax
+ * @param rangeMin
+ */
+export const getRandomNumbers = (count: number, rangeMax: number, rangeMin = 0): number[] => {
     const numbers: number[] = [];
     for (let i = 0; i < count; i++) {
-        numbers.push(Math.round(Math.random() * range));
+        numbers.push(Math.round(Math.random() * (rangeMax - rangeMin + 1) + rangeMin));
     }
 
     return numbers;
