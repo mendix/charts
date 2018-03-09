@@ -1,12 +1,17 @@
-class DefaultFilter {
+class PieChart {
 
-    public get getPieChart() {
-        return browser.element("#mxui_widget_ReactCustomWidgetWrapper_0 > input[type='checkbox']");
+    public get pieChart() {
+        return browser.element(".mx-name-pieChart1.js-plotly-plot");
+    }
+
+    public get pieLayer() {
+        return browser.element(".pielayer > g");
     }
 
     public open(): void {
-        browser.url("/p/home");
+        browser.url("/p/pie");
     }
 }
-const defaultFilter = new DefaultFilter();
-export default defaultFilter;
+
+const chart = new PieChart();
+export default chart;

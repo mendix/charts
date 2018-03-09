@@ -1,12 +1,16 @@
-class DefaultFilter {
+class BarChart {
 
-    public get getBarChart() {
-        return browser.element("#mxui_widget_ReactCustomWidgetWrapper_0 > input[type='checkbox']");
+    public get svgElement() {
+        return browser.element(".mx-name-barChart1.js-plotly-plot > div.plot-container.plotly > div > svg:nth-child(1)");
     }
 
-    public open(): void {
-        browser.url("/p/home");
+    public get series() {
+        return browser.element(".mx-name-barChart1.js-plotly-plot > div.plot-container.plotly > div > svg:nth-child(3) > g.infolayer > g.legend > g > g");
+    }
+
+    public get serie1() {
+        return browser.element(".mx-name-barChart1.js-plotly-plot > div.plot-container.plotly > div > svg:nth-child(3) > g.infolayer > g.legend > g > g > g:nth-child(1)");
     }
 }
-const defaultFilter = new DefaultFilter();
-export default defaultFilter;
+const chart = new BarChart();
+export default chart;

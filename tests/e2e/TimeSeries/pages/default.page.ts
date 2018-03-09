@@ -1,12 +1,17 @@
-class DefaultFilter {
+class TimeSeries {
 
-    public get getTimeSeries() {
-        return browser.element("#mxui_widget_ReactCustomWidgetWrapper_0 > input[type='checkbox']");
+    public get timeSeries() {
+        return browser.element(".mx-name-timeSeries1.js-plotly-plot > div.plot-container.plotly > div > svg:nth-child(1)");
+    }
+
+    public get miniSlider() {
+        return browser.element(".rangeslider-grabber-min");
     }
 
     public open(): void {
-        browser.url("/p/home");
+        browser.url("/p/timeseries");
     }
 }
-const defaultFilter = new DefaultFilter();
-export default defaultFilter;
+
+const chart = new TimeSeries();
+export default chart;

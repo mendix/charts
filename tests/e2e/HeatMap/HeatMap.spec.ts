@@ -6,6 +6,9 @@ describe("Heat map", () => {
     });
 
     it("should generate a chart", () => {
-        //
+        defaultFilter.heatMap.waitForVisible();
+        const nodeName = defaultFilter.heatMap.getAttribute("nodeName");
+
+        expect(nodeName).toBe("svg");
     });
 });

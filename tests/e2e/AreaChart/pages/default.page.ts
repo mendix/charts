@@ -1,12 +1,12 @@
-class DefaultFilter {
+class AreaChart {
 
-    public get getAreaChart() {
-        return browser.element("#mxui_widget_ReactCustomWidgetWrapper_3 > div.widget-charts.widget-charts-line.mx-name-areaChart1.js-plotly-plot");
+    public get svgElement() {
+        return browser.element(".mx-name-areaChart1.js-plotly-plot");
     }
 
-    public open(): void {
-        browser.url("/p/home");
+    public get series() {
+        return browser.element(".mx-name-areaChart1.js-plotly-plot > div.plot-container.plotly > div > svg:nth-child(3) > g.infolayer > g.legend > g > g");
     }
 }
-const defaultFilter = new DefaultFilter();
-export default defaultFilter;
+const chart = new AreaChart();
+export default chart;

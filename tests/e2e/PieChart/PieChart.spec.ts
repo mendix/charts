@@ -1,19 +1,21 @@
-import defaultFilter from "./pages/default.page";
+import chart from "./pages/default.page";
 
 describe("Pie chart", () => {
     beforeAll(() => {
-        defaultFilter.open();
+        chart.open();
     });
 
     it("should generate a chart", () => {
-        //
+        chart.pieChart.waitForExist();
+        const exists = chart.pieChart.isExisting();
+
+        expect(exists).toBeTruthy();
     });
 
-    it("should generate multiple slice", () => {
-        //
-    });
+    it("should have multiple slices", () => {
+        chart.pieLayer.waitForVisible();
+        const slices = chart.pieLayer.getAttribute("childElementCount");
 
-    it("should have legend items with proper classes", () => {
-        //
+        expect(slices).toBe("10");
     });
 });
