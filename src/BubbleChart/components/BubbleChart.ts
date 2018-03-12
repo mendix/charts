@@ -184,7 +184,7 @@ export class BubbleChart extends Component<BubbleChartProps, BubbleChartState> {
                 gridcolor: "#d7d7d7",
                 title: props.xAxisLabel,
                 showgrid: props.grid === "vertical" || props.grid === "both",
-                rangeslider: { visible: props.showRangeSlider || false }
+                fixedrange: true
             },
             yaxis: {
                 rangemode: "tozero",
@@ -192,7 +192,8 @@ export class BubbleChart extends Component<BubbleChartProps, BubbleChartState> {
                 zerolinecolor: "#eaeaea",
                 gridcolor: "#d7d7d7",
                 title: props.yAxisLabel,
-                showgrid: props.grid === "horizontal" || props.grid === "both"
+                showgrid: props.grid === "horizontal" || props.grid === "both",
+                fixedrange: true
             },
             hoverlabel: {
                 bgcolor: "#888",
