@@ -184,16 +184,16 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     public static defaultLayoutConfigs(props: BarChartProps): Partial<Layout> {
         return {
             font: {
-                family: "Open Sans, sans-serif",
-                size: 12,
-                color: "#888"
+                family: "Open Sans",
+                size: 14,
+                color: "#555"
             },
             autosize: true,
             barmode: props.barMode,
             hovermode: "closest",
             showlegend: props.showLegend,
             xaxis: {
-                gridcolor: "#eaeaea",
+                gridcolor: "#d7d7d7",
                 zerolinecolor: props.orientation === "bar" ? "#eaeaea" : undefined,
                 title: props.xAxisLabel,
                 showgrid: props.grid === "vertical" || props.grid === "both",
@@ -203,7 +203,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                 rangemode: "tozero",
                 zeroline: true,
                 zerolinecolor: "#eaeaea",
-                gridcolor: "#eaeaea",
+                gridcolor: "#d7d7d7",
                 title: props.yAxisLabel,
                 showgrid: props.grid === "horizontal" || props.grid === "both",
                 fixedrange: true

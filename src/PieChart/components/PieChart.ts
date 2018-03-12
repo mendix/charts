@@ -2,16 +2,16 @@ import { Component, ReactChild, ReactElement, createElement } from "react";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
+import { PiePlayground } from "./PiePlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
 import deepMerge from "deepmerge";
 import { Container } from "../../utils/namespaces";
 import { Config, Layout, PieData, PieHoverData, ScatterHoverData } from "plotly.js";
-import { getDimensions, parseStyle } from "../../utils/style";
+import { defaultColours, getDimensions, parseStyle } from "../../utils/style";
 import PieChartContainerProps = Container.PieChartContainerProps;
 
 import "../../ui/Charts.scss";
-import { PiePlayground } from "./PiePlayground";
 
 export interface PieChartProps extends PieChartContainerProps {
     data?: mendix.lib.MxObject[];
@@ -141,7 +141,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 labels: data.map(mxObject => mxObject.get(this.props.nameAttribute) as string),
                 colors: this.props.colors && this.props.colors.length
                     ? this.props.colors.map(color => color.color)
-                    : [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ],
+                    : defaultColours(),
                 values: data.map(mxObject => parseFloat(mxObject.get(this.props.valueAttribute) as string))
             };
         }

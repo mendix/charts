@@ -7,7 +7,7 @@ import { fetchSeriesData, getSeriesTraces, handleOnClick, validateSeriesProps } 
 import deepMerge from "deepmerge";
 import { Container, Data } from "../../utils/namespaces";
 import { ScatterData } from "plotly.js";
-import { getDimensions, parseStyle } from "../../utils/style";
+import { defaultColours, getDimensions, parseStyle } from "../../utils/style";
 import BarChartContainerProps = Container.BarChartContainerProps;
 import BarChartContainerState = Container.BarChartContainerState;
 
@@ -22,7 +22,6 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         loading: true
     };
     private subscriptionHandle?: number;
-    private defaultColors: string[] = [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ];
     private intervalID?: number;
 
     render() {
@@ -117,7 +116,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
     private createScatterData({ data, series }: Data.SeriesData, bar: boolean, index: number, devMode = false): ScatterData {
         const rawOptions = devMode && series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
         const traces = getSeriesTraces({ data, series });
-        const color: string | undefined = series.barColor || this.defaultColors[index];
+        const color: string | undefined = series.barColor || defaultColours()[index];
 
         return {
             ...deepMerge.all<ScatterData>([

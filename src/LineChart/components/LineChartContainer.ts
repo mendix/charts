@@ -7,7 +7,7 @@ import { fetchSeriesData, getSeriesTraces, handleOnClick, validateSeriesProps } 
 import { LineChart } from "./LineChart";
 import { Container, Data } from "../../utils/namespaces";
 import { ScatterData } from "plotly.js";
-import { getDimensions, parseStyle } from "../../utils/style";
+import { defaultColours, fillColours, getDimensions, parseStyle } from "../../utils/style";
 import LineChartContainerProps = Container.LineChartContainerProps;
 import LineChartContainerState = Container.LineChartContainerState;
 
@@ -22,7 +22,6 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         loading: true
     };
     private subscriptionHandle?: number;
-    private defaultColors: string[] = [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ];
     private intervalID?: number;
 
     render() {
@@ -118,13 +117,13 @@ export default class LineChartContainer extends Component<LineChartContainerProp
 
     private createScatterData({ data, series }: Data.SeriesData<Data.LineSeriesProps>, index: number, devMode = false): ScatterData {
         const rawOptions = devMode && series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
-        const color: string | undefined = this.defaultColors[index];
+        const color: string | undefined = defaultColours()[index];
 
         return {
             ...deepMerge.all<ScatterData>([
                 {
                     series, // shall be accessible via the data property of a hover/click point
-                    fillcolor: series.fillColor,
+                    fillcolor: series.fillColor || fillColours[index],
                     marker: color ? { color } : {},
                     ... LineChart.getDefaultSeriesOptions(series, this.props),
                     ... getSeriesTraces({ data, series })

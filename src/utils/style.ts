@@ -32,3 +32,10 @@ export const getDimensions = <T extends Style.Dimensions>(props: T): CSSProperti
 
     return style;
 };
+
+export const defaultColours = (opacity = 1) => [
+    `rgba(5, 149, 219, ${opacity})`,
+    `rgba(23, 52, 123, ${opacity})`,
+    `rgba(118, 202, 2, ${opacity})`
+];
+export const fillColours = [ "rbg(5,149,219,5)", "rbg(23,52,123,5)", "rbg(118,202,2,5)" ];

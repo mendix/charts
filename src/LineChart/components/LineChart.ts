@@ -45,7 +45,6 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         playgroundLoaded: false
     };
     private tooltipNode?: HTMLDivElement;
-    private defaultColors: string[] = [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ];
     private Playground?: typeof SeriesPlayground;
 
     constructor(props: LineChartProps) {
@@ -175,15 +174,15 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     public static defaultLayoutConfigs(props: LineChartProps): Partial<Layout> {
         return {
             font: {
-                family: "Open Sans, sans-serif",
-                size: 12,
-                color: "#888"
+                family: "Open Sans",
+                size: 14,
+                color: "#555"
             },
             autosize: true,
             hovermode: "closest",
             showlegend: props.showLegend,
             xaxis: {
-                gridcolor: "#eaeaea",
+                gridcolor: "#d7d7d7",
                 title: props.xAxisLabel,
                 showgrid: props.grid === "vertical" || props.grid === "both",
                 fixedrange: props.xAxisType !== "date",
@@ -194,7 +193,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 rangemode: "tozero",
                 zeroline: true,
                 zerolinecolor: "#eaeaea",
-                gridcolor: "#eaeaea",
+                gridcolor: "#d7d7d7",
                 title: props.yAxisLabel,
                 showgrid: props.grid === "horizontal" || props.grid === "both",
                 fixedrange: true

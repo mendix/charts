@@ -44,7 +44,6 @@ export class BubbleChart extends Component<BubbleChartProps, BubbleChartState> {
         playgroundLoaded: false
     };
     private tooltipNode?: HTMLDivElement;
-    private defaultColors: string[] = [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ];
     private Playground?: typeof SeriesPlayground;
 
     constructor(props: BubbleChartProps) {
@@ -182,7 +181,7 @@ export class BubbleChart extends Component<BubbleChartProps, BubbleChartState> {
             hovermode: "closest",
             showlegend: props.showLegend,
             xaxis: {
-                gridcolor: "#eaeaea",
+                gridcolor: "#d7d7d7",
                 title: props.xAxisLabel,
                 showgrid: props.grid === "vertical" || props.grid === "both",
                 rangeslider: { visible: props.showRangeSlider || false }
@@ -191,7 +190,7 @@ export class BubbleChart extends Component<BubbleChartProps, BubbleChartState> {
                 rangemode: "tozero",
                 zeroline: true,
                 zerolinecolor: "#eaeaea",
-                gridcolor: "#eaeaea",
+                gridcolor: "#d7d7d7",
                 title: props.yAxisLabel,
                 showgrid: props.grid === "horizontal" || props.grid === "both"
             },

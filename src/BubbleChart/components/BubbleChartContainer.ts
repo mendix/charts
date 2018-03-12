@@ -7,14 +7,13 @@ import { fetchSeriesData, getSeriesTraces, handleOnClick, validateSeriesProps } 
 import { BubbleChart } from "./BubbleChart";
 import { Container, Data } from "../../utils/namespaces";
 import { ScatterData } from "plotly.js";
-import { getDimensions, parseStyle } from "../../utils/style";
+import { defaultColours, getDimensions, parseStyle } from "../../utils/style";
 import BubbleChartContainerProps = Container.BubbleChartContainerProps;
 import BubbleChartContainerState = Container.BubbleChartContainerState;
 
 __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
 export default class BubbleChartContainer extends Component<BubbleChartContainerProps, BubbleChartContainerState> {
-
     state: BubbleChartContainerState = {
         alertMessage: validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions),
         data: [],
@@ -22,7 +21,6 @@ export default class BubbleChartContainer extends Component<BubbleChartContainer
         loading: true
     };
     private subscriptionHandle?: number;
-    private defaultColors: string[] = [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ];
     private refreshIntervalID?: number;
 
     render() {
@@ -118,7 +116,7 @@ export default class BubbleChartContainer extends Component<BubbleChartContainer
 
     private createScatterData({ data, series }: Data.SeriesData<Data.SeriesProps>, index: number, devMode = false): ScatterData {
         const rawOptions = devMode && series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
-        const color: string | undefined = this.defaultColors[index];
+        const color: string | undefined = defaultColours(0.7)[index];
         const { x, y, size } = getSeriesTraces({ data, series });
 
         return {
@@ -126,7 +124,7 @@ export default class BubbleChartContainer extends Component<BubbleChartContainer
                 {
                     series, // shall be accessible via the data property of a hover/click point
                     marker: {
-                        color: series.color,
+                        color: series.color || color,
                         size
                     },
                     ... BubbleChart.getDefaultSeriesOptions(series, this.props),

@@ -225,6 +225,6 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
     public static processColorScale(scaleColors: Container.ScaleColors[]): (string | number)[][] {
         return scaleColors.length > 1
             ? scaleColors.map(colors => [ Math.abs(colors.valuePercentage / 100), colors.colour ])
-            : [ [ 0, "#17347B" ], [ 0.5, "#48B0F7" ], [ 1, "#76CA02" ] ];
+            : [ [ 0, "#17347B" ], [ 0.5, "#0595DB" ], [ 1, "#76CA02" ] ];
     }
 }
