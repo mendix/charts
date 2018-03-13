@@ -10,7 +10,7 @@ import {
 } from "plotly.js";
 
 export interface PlotlyChartProps {
-    type: "line" | "bar" | "pie" | "heatmap" | "full" | "bubble";
+    type: "line" | "bar" | "pie" | "heatmap" | "full";
     layout: Partial<Layout>;
     data: ScatterData[] | PieData[] | HeatMapData[];
     config: Partial<Config>;
@@ -178,7 +178,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
                 if (this.props.type === "bar") {
                     register([ await import("plotly.js/lib/bar") ]);
                 }
-                if (this.props.type === "line" || this.props.type === "bubble") {
+                if (this.props.type === "line") {
                     register([ await import("plotly.js/lib/scatter") ]);
                 }
                 if (this.props.type === "heatmap") {

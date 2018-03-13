@@ -97,8 +97,8 @@ const getReferences = (series: SeriesProps): ReferencesSpec => {
     references = addPathReference(references, series.xValueAttribute);
     references = addPathReference(references, series.yValueAttribute);
     references = addPathReference(references, series.xValueSortAttribute || series.xValueAttribute);
-    if (series.bubbleSizeAttribute) {
-        references = addPathReference(references, series.bubbleSizeAttribute);
+    if (series.markerSizeAttribute) {
+        references = addPathReference(references, series.markerSizeAttribute);
     }
     return references;
 };
@@ -187,22 +187,26 @@ export const handleOnClick = <T extends EventProps>(options: T, mxObject?: mendi
 export const getSeriesTraces = ({ data, series }: SeriesData): ScatterTrace => {
     const xData = data ? data.map(mxObject => getAttributeValue(mxObject, series.xValueAttribute)) : [];
     const yData = data ? data.map(mxObject => parseFloat(mxObject.get(series.yValueAttribute) as string)) : [];
-    const sizeData = data && series.bubbleSizeAttribute ? data.map(mxObject => parseFloat(mxObject.get(series.bubbleSizeAttribute as string) as string)) : undefined;
-    const sortData = data && series.xValueSortAttribute ? data.map(mxObject => getAttributeValue(mxObject, series.xValueSortAttribute)) : [];
+    const markerSizeData = data && series.markerSizeAttribute
+        ? data.map(mxObject => parseFloat(mxObject.get(series.markerSizeAttribute as string) as string))
+        : undefined;
+    const sortData = data && series.xValueSortAttribute
+        ? data.map(mxObject => getAttributeValue(mxObject, series.xValueSortAttribute))
+        : [];
     const sortDataError = xData.length !== yData.length || xData.length !== sortData.length;
     const alreadySorted = series.dataSourceType === "XPath" && series.xValueSortAttribute && series.xValueSortAttribute.split("/").length === 1;
     if (!series.xValueSortAttribute || alreadySorted || sortDataError) {
         return {
             x: xData,
             y: yData,
-            size: sizeData
+            marker: markerSizeData ? { size: markerSizeData } : {}
         };
     }
     const unsorted = sortData.map((value, index) => {
         return {
             x: xData[index],
             y: yData[index],
-            size: sizeData && sizeData[index],
+            marker: markerSizeData ? { size: markerSizeData[index] } : {},
             sort: value
         };
     });
@@ -226,12 +230,12 @@ export const getSeriesTraces = ({ data, series }: SeriesData): ScatterTrace => {
     });
     const sortedXData = sorted.map(value => value.x);
     const sortedYData = sorted.map(value => value.y);
-    const sortedSizeData = sizeData && sorted.map(value => value.size as number);
+    const sortedSizeData = markerSizeData && sorted.map(value => value.marker.size);
 
     return {
         x: sortedXData,
         y: sortedYData,
-        size: sortedSizeData
+        marker: { size: sortedSizeData as number[] }
     };
 };
 

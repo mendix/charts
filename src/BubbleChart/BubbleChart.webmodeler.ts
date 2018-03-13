@@ -1,75 +1,69 @@
 import { Component, createElement } from "react";
 
 import { Alert } from "../components/Alert";
-import { BubbleChart } from "./components/BubbleChart";
+import { LineChart } from "../LineChart/components/LineChart";
 
 import { getRandomNumbers, validateSeriesProps } from "../utils/data";
 import deepMerge from "deepmerge";
 import { ScatterData } from "plotly.js";
-import { Container } from "../utils/namespaces";
-import BubbleChartContainerProps = Container.BubbleChartContainerProps;
+import { Container, Data } from "../utils/namespaces";
+import LineChartContainerProps = Container.LineChartContainerProps;
 
 // tslint:disable-next-line class-name
-export class preview extends Component<BubbleChartContainerProps, {}> {
+export class preview extends Component<LineChartContainerProps, {}> {
     render() {
         return createElement("div", {},
-            createElement(Alert, { className: "widget-charts-line-alert" },
+            createElement(Alert, { className: "widget-charts-bubble-alert" },
                 validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions)
             ),
-            createElement(BubbleChart, {
-                ...this.props as BubbleChartContainerProps,
+            createElement(LineChart, {
+                ...this.props as LineChartContainerProps,
                 scatterData: preview.getData(this.props)
             })
         );
     }
 
-    static getData(props: BubbleChartContainerProps): ScatterData[] {
+    static getData(props: LineChartContainerProps): ScatterData[] {
+        const sampleData = preview.getSampleTraces();
         if (props.series.length) {
             return props.series.map(series => {
                 const seriesOptions = props.devMode !== "basic" && series.seriesOptions.trim()
                     ? JSON.parse(series.seriesOptions)
                     : {};
-                const sampleData = preview.getSampleTraces();
 
                 return deepMerge.all([ {
                     connectgaps: true,
+                    hoverinfo: "text",
                     hoveron: "points",
                     markers: {
-                        color: series.color,
-                        size: sampleData.size
+                        color: series.color
                     },
                     mode: "markers",
                     name: series.name,
                     type: "scatter",
-                    x: sampleData.x || [],
-                    y: sampleData.y || [],
-                    size: sampleData.size
+                    ...sampleData
 
                 }, seriesOptions ]);
             });
         }
-        const defaultData = preview.getSampleTraces();
 
         return [ {
             connectgaps: true,
+            hoverinfo: "text",
             hoveron: "points",
             name: "Sample",
             type: "scatter",
             mode: "markers",
-            x: defaultData.x,
-            y: defaultData.y,
-            marker: {
-                size: defaultData.size
-            },
-            text: defaultData.size
+            text: sampleData.marker ? sampleData.marker.size : "",
+            ...sampleData
         } as ScatterData ];
     }
 
-    private static getSampleTraces(): { x: (string | number)[], y: (string | number)[], size: (string | number)[] } {
+    private static getSampleTraces(): Data.ScatterTrace {
         return {
             x: [ "Sample 1", "Sample 2", "Sample 3", "Sample 4" ],
             y: getRandomNumbers(4, 100),
-            size: getRandomNumbers(4, 100, 20)
+            marker: { size: getRandomNumbers(4, 100, 20) }
         };
     }
 }
@@ -86,7 +80,7 @@ export function getPreviewCss() {
     );
 }
 
-export function getVisibleProperties(valueMap: BubbleChartContainerProps, visibilityMap: VisibilityMap<BubbleChartContainerProps>) { // tslint:disable-line max-line-length
+export function getVisibleProperties(valueMap: LineChartContainerProps, visibilityMap: VisibilityMap<LineChartContainerProps>) { // tslint:disable-line max-line-length
     if (valueMap.series && Array.isArray(valueMap.series)) {
         valueMap.series.forEach((series, index) => {
             if (series.dataSourceType === "XPath") {

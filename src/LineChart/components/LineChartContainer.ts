@@ -118,15 +118,17 @@ export default class LineChartContainer extends Component<LineChartContainerProp
     private createScatterData({ data, series }: Data.SeriesData<Data.LineSeriesProps>, index: number, devMode = false): ScatterData {
         const rawOptions = devMode && series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
         const color: string | undefined = defaultColours()[index];
+        const traces = getSeriesTraces({ data, series });
 
         return {
             ...deepMerge.all<ScatterData>([
                 {
                     series, // shall be accessible via the data property of a hover/click point
                     fillcolor: series.fillColor || fillColours[index],
-                    marker: color ? { color } : {},
+                    marker: color ? { color: series.color || color } : {},
                     ... LineChart.getDefaultSeriesOptions(series, this.props),
-                    ... getSeriesTraces({ data, series })
+                    ... traces,
+                    text: traces.marker ? traces.marker.size : "" // show the size value on hover
                 },
                 rawOptions
             ]),
