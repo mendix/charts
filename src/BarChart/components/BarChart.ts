@@ -1,7 +1,9 @@
 import { Component, ReactChild, ReactElement, createElement } from "react";
+import { render, unmountComponentAtNode } from "react-dom";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
+import { HoverTooltip } from "../../components/HoverTooltip";
 import { SeriesPlayground } from "../../components/SeriesPlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
@@ -149,8 +151,9 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     }
 
     private onHover = ({ points }: ScatterHoverData<mendix.lib.MxObject>) => {
-        const { customdata, data, x, xaxis, y, yaxis } = points[0];
-        if (this.props.onHover && data.series.tooltipForm && this.tooltipNode) {
+        const { customdata, data, x, xaxis, y, yaxis, text } = points[0];
+        if (this.tooltipNode) {
+            unmountComponentAtNode(this.tooltipNode);
             const yAxisPixels = typeof y === "number" ? yaxis.l2p(y) : yaxis.d2p(y);
             const xAxisPixels = typeof x === "number" ? xaxis.l2p(x as number) : xaxis.d2p(x);
             const positionYaxis = yAxisPixels + yaxis._offset;
@@ -158,7 +161,14 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
             this.tooltipNode.style.top = `${positionYaxis}px`;
             this.tooltipNode.style.left = `${positionXaxis}px`;
             this.tooltipNode.style.opacity = "1";
-            this.props.onHover(this.tooltipNode, data.series.tooltipForm, customdata);
+            if (data.series.tooltipForm && this.props.onHover) {
+                this.tooltipNode.innerHTML = "";
+                this.props.onHover(this.tooltipNode, data.series.tooltipForm, customdata);
+            } else {
+                render(createElement(HoverTooltip, {
+                    text: this.props.orientation === "bar" ? x : y
+                }), this.tooltipNode);
+            }
         }
     }
 
@@ -176,7 +186,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
         return {
             name: series.name,
             type: "bar",
-            hoverinfo: series.tooltipForm ? "text" : hoverinfo, // typings don't have a hoverinfo value of "y"
+            hoverinfo: "none" as any, // typings don't have a hoverinfo value of "y"
             orientation: props.orientation === "bar" ? "h" : "v"
         };
     }

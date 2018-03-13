@@ -1,7 +1,9 @@
 import { Component, ReactChild, ReactElement, createElement } from "react";
+import { render, unmountComponentAtNode } from "react-dom";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
+import { HoverTooltip } from "../../components/HoverTooltip";
 
 import { Container } from "../../utils/namespaces";
 import HeatMapContainerProps = Container.HeatMapContainerProps;
@@ -35,7 +37,7 @@ export interface PieTraces {
 }
 
 export class HeatMap extends Component<HeatMapProps, HeatMapState> {
-    state = {
+    state: HeatMapState = {
         layoutOptions: this.props.layoutOptions,
         dataOptions: this.props.dataOptions,
         playgroundLoaded: false
@@ -161,7 +163,11 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
                         x: data.x[ j ],
                         y: data.y[ i ],
                         text: data.z[ i ][ j ],
-                        font: { color: this.props.valuesColor || textColor },
+                        font: {
+                            family: "Open Sans",
+                            size: 14,
+                            color: this.props.valuesColor || "#555"
+                        },
                         showarrow: false
                     };
                     annotations.push(result);
@@ -179,8 +185,9 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
     }
 
     private onHover = ({ points }: ScatterHoverData<any>) => {
-        const { x, xaxis, y, yaxis, z } = points[0];
-        if (this.props.onHover && this.tooltipNode) {
+        const { x, xaxis, y, yaxis, z, text } = points[0];
+        if (this.tooltipNode) {
+            unmountComponentAtNode(this.tooltipNode);
             const yAxisPixels = typeof y === "number" ? yaxis.l2p(y) : yaxis.d2p(y);
             const xAxisPixels = typeof x === "number" ? xaxis.l2p(x as number) : xaxis.d2p(x);
             const positionYaxis = yAxisPixels + yaxis._offset;
@@ -188,7 +195,12 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
             this.tooltipNode.style.top = `${positionYaxis}px`;
             this.tooltipNode.style.left = `${positionXaxis}px`;
             this.tooltipNode.style.opacity = "1";
-            this.props.onHover(this.tooltipNode, x as string, y as string, z as number);
+            if (this.props.onHover) {
+                this.tooltipNode.innerHTML = "";
+                this.props.onHover(this.tooltipNode, x as string, y as string, z as number);
+            } else {
+                render(createElement(HoverTooltip, { text }), this.tooltipNode);
+            }
         }
     }
 
@@ -198,6 +210,11 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
 
     public static getDefaultLayoutOptions(props: HeatMapProps): Partial<Layout> {
         return {
+            font: {
+                family: "Open Sans",
+                size: 14,
+                color: "#555"
+            },
             autosize: true,
             showarrow: false,
             xaxis: {
@@ -228,9 +245,10 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
     public static getDefaultDataOptions(props: HeatMapProps): Partial<HeatMapData> {
         return {
             type: "heatmap",
-            hoverinfo: props.tooltipForm ? "none" : "text" as any, // typings missing valid "text" value
+            hoverinfo: "none",
             showscale: props.data && props.data.showscale,
-            colorscale: props.data && props.data.colorscale
+            colorscale: props.data && props.data.colorscale,
+            colorbar: { outlinecolor: props.valuesColor || "#555" }
         };
     }
 }

@@ -1,7 +1,9 @@
 import { Component, ReactChild, ReactElement, createElement } from "react";
+import { render, unmountComponentAtNode } from "react-dom";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
+import { HoverTooltip } from "../../components/HoverTooltip";
 import { SeriesPlayground } from "../../components/SeriesPlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
@@ -156,14 +158,20 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     private onHover = ({ points }: ScatterHoverData<mendix.lib.MxObject>) => {
-        const { customdata, data, x, xaxis, y, yaxis } = points[0];
-        if (this.props.onHover && data.series.tooltipForm && this.tooltipNode) {
+        const { customdata, data, x, xaxis, y, yaxis, text } = points[0];
+        if (this.tooltipNode) {
+            unmountComponentAtNode(this.tooltipNode);
             const positionYaxis = yaxis.l2p(y as number) + yaxis._offset;
             const positionXaxis = xaxis.d2p(x) + xaxis._offset;
             this.tooltipNode.style.top = `${positionYaxis}px`;
             this.tooltipNode.style.left = `${positionXaxis}px`;
             this.tooltipNode.style.opacity = "1";
-            this.props.onHover(this.tooltipNode, data.series.tooltipForm, customdata);
+            if (data.series.tooltipForm && this.props.onHover) {
+                this.tooltipNode.innerHTML = "";
+                this.props.onHover(this.tooltipNode, data.series.tooltipForm, customdata);
+            } else {
+                render(createElement(HoverTooltip, { text: text || y }), this.tooltipNode);
+            }
         }
     }
 
@@ -223,7 +231,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         return {
             connectgaps: true,
             hoveron: "points",
-            hoverinfo: series.tooltipForm ? "none" : series.markerSizeAttribute ? "text" : "y" as any, // typings don't have a hoverinfo value of "y"
+            hoverinfo: "none" as any,
             line: {
                 color: series.lineColor,
                 shape: series.lineStyle

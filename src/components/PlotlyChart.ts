@@ -2,6 +2,7 @@ import { CSSProperties, Component, createElement } from "react";
 import * as classNames from "classnames";
 
 import { ChartLoading } from "./ChartLoading";
+import { HoverTooltip } from "./HoverTooltip";
 import deepMerge from "deepmerge";
 import * as elementResize from "element-resize-detector";
 import {
@@ -29,15 +30,6 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
     private resizeDetector = elementResize({ strategy: "scroll" });
     private newPlot?: (root: Root, data: Data[], layout?: Partial<Layout>, config?: Partial<Config>) => Promise<PlotlyHTMLElement>;
     private purge?: (root: Root) => void;
-
-    constructor(props: PlotlyChartProps) {
-        super(props);
-
-        this.getPlotlyNodeRef = this.getPlotlyNodeRef.bind(this);
-        this.getTooltipNodeRef = this.getTooltipNodeRef.bind(this);
-        this.clearTooltip = this.clearTooltip.bind(this);
-        this.onResize = this.onResize.bind(this);
-    }
 
     render() {
         return createElement("div",
@@ -124,11 +116,11 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         event.preventDefault();
     }
 
-    private getPlotlyNodeRef(node: HTMLDivElement) {
+    private getPlotlyNodeRef = (node: HTMLDivElement) => {
         this.chartNode = node;
     }
 
-    private getTooltipNodeRef(node: HTMLDivElement) {
+    private getTooltipNodeRef = (node: HTMLDivElement) => {
         this.tooltipNode = node;
         if (this.props.getTooltipNode) {
             this.props.getTooltipNode(node);
@@ -156,8 +148,8 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
                                 }
                                 if (onHover) {
                                     myPlot.on("plotly_hover", onHover as any);
-                                    myPlot.on("plotly_unhover", this.clearTooltip);
                                 }
+                                myPlot.on("plotly_unhover", this.clearTooltip);
                             });
                     }
                 });
@@ -200,14 +192,13 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         }
     }
 
-    private clearTooltip() {
+    private clearTooltip = () => {
         if (this.tooltipNode) {
-            this.tooltipNode.innerHTML = "";
             this.tooltipNode.style.opacity = "0";
         }
     }
 
-    private async onResize() {
+    private onResize = async () => {
         if (this.timeoutId) {
             clearTimeout(this.timeoutId);
         }

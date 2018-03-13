@@ -1,7 +1,9 @@
 import { Component, ReactChild, ReactElement, createElement } from "react";
+import { render, unmountComponentAtNode } from "react-dom";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
+import { HoverTooltip } from "../../components/HoverTooltip";
 import { PiePlayground } from "./PiePlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
@@ -155,13 +157,19 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         }
     }
 
-    private onHover = ({ event, points }: ScatterHoverData<any> | PieHoverData) => {
-        if (this.props.onHover && this.props.data && this.tooltipNode) {
+    private onHover = ({ event, points }: PieHoverData) => {
+        if (this.props.data && this.tooltipNode) {
+            unmountComponentAtNode(this.tooltipNode);
             this.tooltipNode.innerHTML = "";
             this.tooltipNode.style.top = `${event.clientY - 100}px`;
             this.tooltipNode.style.left = `${event.clientX}px`;
             this.tooltipNode.style.opacity = "1";
-            this.props.onHover(this.tooltipNode, this.props.data[points[0].pointNumber]);
+            if (this.props.onHover) {
+                this.tooltipNode.innerHTML = "";
+                this.props.onHover(this.tooltipNode, this.props.data[points[0].pointNumber]);
+            } else {
+                render(createElement(HoverTooltip, { text: points[0].label }), this.tooltipNode);
+            }
         }
     }
 
@@ -191,7 +199,9 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
             },
             legend: {
                 font: {
-                    color: "#888"
+                    family: "Open Sans",
+                    size: 14,
+                    color: "#555"
                 }
             },
             margin: {
@@ -207,7 +217,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
     public static getDefaultDataOptions(props: PieChartProps): Partial<PieData> {
         return {
             hole: props.chartType === "donut" ? 0.4 : 0,
-            hoverinfo: props.tooltipForm ? "none" : "label",
+            hoverinfo: "none",
             type: "pie",
             sort: false
         };
