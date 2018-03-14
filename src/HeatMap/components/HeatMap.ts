@@ -219,11 +219,13 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
             showarrow: false,
             xaxis: {
                 fixedrange: true,
-                title: props.xAxisLabel
+                title: props.xAxisLabel,
+                ticks: ""
             },
             yaxis: {
                 fixedrange: true,
-                title: props.yAxisLabel
+                title: props.yAxisLabel,
+                ticks: ""
             },
             hoverlabel: {
                 bgcolor: "#888",
@@ -248,7 +250,15 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
             hoverinfo: "none",
             showscale: props.data && props.data.showscale,
             colorscale: props.data && props.data.colorscale,
-            colorbar: { outlinecolor: props.valuesColor || "#555" }
+            xgap: 1,
+            ygap: 1,
+            colorbar: {
+                y: 1,
+                yanchor: "top",
+                ypad: 0,
+                xpad: 5,
+                outlinecolor: "#9ba492"
+            }
         };
     }
 }
