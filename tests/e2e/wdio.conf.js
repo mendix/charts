@@ -1,20 +1,19 @@
 const debug = process.env.DEBUG;
+const multiclient = process.env.MULTCLIENT;
 
 exports.config = {
     host: "127.0.0.1",
     port: 4444,
     specs: [ "./dist/e2e/**/*.spec.js" ],
     maxInstances: debug ? 1 : 5,
-    capabilities: [
-        { browserName: "chrome" },
-        { browserName: "firefox", marionette: true },
-        // { 
-        //     browserName: "internet explorer",
-        //     "ignoreZoomSetting": true,
-        //     "ignoreProtectedModeSettings": true
-        // },
-        // { browserName: "MicrosoftEdge" }
-    ],
+    capabilities: multiclient
+        ? [
+            { browserName: "chrome" },
+            { browserName: "firefox", marionette: true },
+            { browserName: "internet explorer", ignoreProtectedModeSettings: true, ignoreZoomSetting: true },
+            { browserName: "MicrosoftEdge", elementScrollBehavior: 1, nativeEvents: false }
+        ]
+        : [{ browserName: "chrome" }],
     sync: true,
     logLevel: "silent",
     coloredLogs: true,
@@ -24,12 +23,14 @@ exports.config = {
     waitforTimeout: 180000,
     connectionRetryTimeout: 200000,
     connectionRetryCount: 2,
-    services: [ /*"iedriver", */"selenium-standalone" ],
-    // seleniumArgs: {
-    //     javaArgs: [
-    //         "-Dwebdriver.edge.driver=C:\\Program Files (x86)\\Microsoft Web Driver\\MicrosoftWebDriver.exe"
-    //     ]
-    // },
+    killInstances: true,
+    services:  multiclient ? [ "iedriver", "selenium-standalone" ] : ["selenium-standalone" ],
+    seleniumArgs: multiclient ? {
+        javaArgs: [
+            "-Dwebdriver.edge.driver=C:\\Selenium\\EdgeDriver\\MicrosoftWebDriver.exe"
+        ]
+    }
+    : {},
     framework: "jasmine",
     reporters: [ "dot", "spec" ],
     execArgv: debug ? [ "--inspect" ] : undefined,

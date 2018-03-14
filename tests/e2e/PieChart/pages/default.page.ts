@@ -5,7 +5,7 @@ class PieChart {
     }
 
     public get pieLayer() {
-        return browser.element(".pielayer > g");
+        return browser.element(".mx-name-pieChart1.js-plotly-plot > div.plot-container.plotly > div > svg:nth-child(1) > g.pielayer > g");
     }
 
     public open(): void {

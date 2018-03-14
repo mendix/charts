@@ -13,7 +13,7 @@ describe("Pie chart", () => {
     });
 
     it("should have multiple slices", () => {
-        chart.pieLayer.waitForVisible();
+        chart.pieLayer.waitForExist();
         const slices = chart.pieLayer.getAttribute("childElementCount");
 
         expect(slices).toBe("10");
