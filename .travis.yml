@@ -1,7 +1,7 @@
 sudo: required
 language: node_js
 node_js:
-- "8"
+- "6"
 before_install:
 - npm i -g npm
 - npm install grunt-cli -g
@@ -36,3 +36,4 @@ deploy:
   on:
     repo: $TRAVIS_REPO_SLUG
     tags: true
+    

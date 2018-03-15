@@ -108,7 +108,6 @@ describe("PlotlyChart", () => {
         chartInstance.tooltipNode.style.opacity = "1";
         chartInstance.clearTooltip();
 
-        expect(chartInstance.tooltipNode.innerHTML).toEqual("");
         expect(chartInstance.tooltipNode.style.opacity).toEqual("0");
     });
 });

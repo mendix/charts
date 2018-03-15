@@ -71,9 +71,9 @@ describe("PieChart", () => {
                     data: [
                         {
                             hole: 0,
-                            hoverinfo: "label",
+                            hoverinfo: "none",
                             labels: [],
-                            marker: { colors: [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ] },
+                            marker: { colors: [ "rgba(5, 149, 219, 1)", "rgba(23, 52, 123, 1)", "rgba(118, 202, 2, 1)" ] },
                             type: "pie",
                             values: [],
                             sort: false
