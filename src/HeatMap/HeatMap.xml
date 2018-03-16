@@ -131,7 +131,7 @@
             <category>Scale</category>
             <description/>
         </property>
-        <property key="valuesColor" type="string" defaultValue="">
+        <property key="valuesColor" type="string" defaultValue="" required="false">
             <caption>Font value color</caption>
             <category>Scale</category>
             <description/>

@@ -1,6 +1,7 @@
 
 // tslint:disable no-console
 import { Component, ReactChild, createElement } from "react";
+import { render, unmountComponentAtNode } from "react-dom";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
@@ -9,10 +10,11 @@ import { PlotlyChart } from "../../components/PlotlyChart";
 import deepMerge from "deepmerge";
 import { Style } from "../../utils/namespaces";
 import { Layout } from "plotly.js";
-import { getDimensions, parseStyle } from "../../utils/style";
+import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
 import "../../ui/Charts.scss";
+import { HoverTooltip } from "../../components/HoverTooltip";
 // TODO improve typing by replace explicit any types
 
 export interface AnyChartProps extends WrapperProps, Style.Dimensions {
@@ -126,26 +128,18 @@ export class AnyChart extends Component<AnyChartProps> {
     }
 
     private onHover({ points, event }: any) {
-        if (this.props.onHover && this.tooltipNode) {
-            const { x, xaxis, y, yaxis } = points[0];
-            this.tooltipNode.innerHTML = "";
-            if (xaxis && yaxis) {
-                const positionYaxis = yaxis.l2p(y) + yaxis._offset;
-                const positionXaxis = xaxis.d2p(x) + xaxis._offset;
-                this.tooltipNode.style.top = `${positionYaxis}px`;
-                this.tooltipNode.style.left = `${positionXaxis}px`;
-            } else if (event) {
-                // Does not work on 3D
-                this.tooltipNode.style.top = `${event.clientY - 100}px`;
-                this.tooltipNode.style.left = `${event.clientX}px`;
-            } else {
-                // TODO when if there is event? 3D charts?
-                // https://plot.ly/javascript/3d-scatter-plots/
-                // https://codepen.io/anon/pen/rYoaRV
+        if (event && this.tooltipNode) {
+            const { x, xaxis, y, yaxis, z, text } = points[0];
+            unmountComponentAtNode(this.tooltipNode);
+            const coordinates = getTooltipCoordinates(event, this.tooltipNode);
+            if (coordinates) {
+                setTooltipPosition(this.tooltipNode, coordinates);
+                if (this.props.onHover) {
+                    this.props.onHover(this.copyPoints(points), this.tooltipNode);
+                } else {
+                    render(createElement(HoverTooltip, { text: z || text || y }), this.tooltipNode);
+                }
             }
-
-            this.tooltipNode.style.opacity = "1";
-            this.props.onHover(this.copyPoints(points), this.tooltipNode);
         }
     }
 

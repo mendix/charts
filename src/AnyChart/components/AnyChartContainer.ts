@@ -12,21 +12,13 @@ import AnyChartContainerState = Container.AnyChartContainerState;
 __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
 export default class AnyChartContainer extends Component<AnyChartContainerProps, AnyChartContainerState> {
+    state: AnyChartContainerState = {
+        alertMessage: this.validateSeriesProps(this.props),
+        attributeData: "[]",
+        attributeLayout: "{}",
+        loading: false
+    };
     private subscriptionHandles: number[] = [];
-
-    constructor(props: AnyChartContainerProps) {
-        super(props);
-
-        this.state = {
-            alertMessage: this.validateSeriesProps(this.props),
-            attributeData: "[]",
-            attributeLayout: "{}",
-            loading: false
-        };
-
-        this.onClick = this.onClick.bind(this);
-        this.onHover = this.onHover.bind(this);
-    }
 
     render() {
         const anyProps: AnyChartProps = {
@@ -35,7 +27,7 @@ export default class AnyChartContainer extends Component<AnyChartContainerProps,
             attributeData: this.state.attributeData,
             attributeLayout: this.state.attributeLayout,
             onClick: this.onClick,
-            onHover: this.onHover,
+            onHover: this.props.tooltipForm ? this.onHover : undefined,
             width: this.props.width,
             widthUnit: this.props.widthUnit,
             height: this.props.height,

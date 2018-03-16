@@ -10,7 +10,7 @@ import { PlotlyChart } from "../../components/PlotlyChart";
 import deepMerge from "deepmerge";
 import { Container } from "../../utils/namespaces";
 import { Config, Layout, PieData, PieHoverData, ScatterHoverData } from "plotly.js";
-import { defaultColours, getDimensions, parseStyle } from "../../utils/style";
+import { defaultColours, getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 import PieChartContainerProps = Container.PieChartContainerProps;
 
 import "../../ui/Charts.scss";
@@ -158,17 +158,16 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
     }
 
     private onHover = ({ event, points }: PieHoverData) => {
-        if (this.props.data && this.tooltipNode) {
+        if (event && this.props.data && this.tooltipNode) {
             unmountComponentAtNode(this.tooltipNode);
-            this.tooltipNode.innerHTML = "";
-            this.tooltipNode.style.top = `${event.clientY - 100}px`;
-            this.tooltipNode.style.left = `${event.clientX}px`;
-            this.tooltipNode.style.opacity = "1";
-            if (this.props.onHover) {
-                this.tooltipNode.innerHTML = "";
-                this.props.onHover(this.tooltipNode, this.props.data[points[0].pointNumber]);
-            } else {
-                render(createElement(HoverTooltip, { text: points[0].label }), this.tooltipNode);
+            const coordinates = getTooltipCoordinates(event, this.tooltipNode);
+            if (coordinates) {
+                setTooltipPosition(this.tooltipNode, coordinates);
+                if (this.props.onHover) {
+                    this.props.onHover(this.tooltipNode, this.props.data[points[0].pointNumber]);
+                } else {
+                    render(createElement(HoverTooltip, { text: points[0].label }), this.tooltipNode);
+                }
             }
         }
     }

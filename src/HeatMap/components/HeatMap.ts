@@ -12,7 +12,7 @@ import deepMerge from "deepmerge";
 import { PiePlayground } from "../../PieChart/components/PiePlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 import { HeatMapData, Layout, ScatterHoverData } from "plotly.js";
-import { getDimensions, parseStyle } from "../../utils/style";
+import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 
 import "../../ui/Charts.scss";
 
@@ -184,22 +184,18 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
         }
     }
 
-    private onHover = ({ points }: ScatterHoverData<any>) => {
+    private onHover = ({ points, event }: ScatterHoverData<any>) => {
         const { x, xaxis, y, yaxis, z, text } = points[0];
-        if (this.tooltipNode) {
+        if (event && this.tooltipNode) {
             unmountComponentAtNode(this.tooltipNode);
-            const yAxisPixels = typeof y === "number" ? yaxis.l2p(y) : yaxis.d2p(y);
-            const xAxisPixels = typeof x === "number" ? xaxis.l2p(x as number) : xaxis.d2p(x);
-            const positionYaxis = yAxisPixels + yaxis._offset;
-            const positionXaxis = xAxisPixels + xaxis._offset;
-            this.tooltipNode.style.top = `${positionYaxis}px`;
-            this.tooltipNode.style.left = `${positionXaxis}px`;
-            this.tooltipNode.style.opacity = "1";
-            if (this.props.onHover) {
-                this.tooltipNode.innerHTML = "";
-                this.props.onHover(this.tooltipNode, x as string, y as string, z as number);
-            } else {
-                render(createElement(HoverTooltip, { text }), this.tooltipNode);
+            const coordinates = getTooltipCoordinates(event, this.tooltipNode);
+            if (coordinates) {
+                setTooltipPosition(this.tooltipNode, coordinates);
+                if (this.props.onHover) {
+                    this.props.onHover(this.tooltipNode, x as string, y as string, z as number);
+                } else {
+                    render(createElement(HoverTooltip, { text }), this.tooltipNode);
+                }
             }
         }
     }

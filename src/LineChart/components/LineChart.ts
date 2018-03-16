@@ -11,7 +11,7 @@ import { getRuntimeTraces, getSeriesTraces } from "../../utils/data";
 import deepMerge from "deepmerge";
 import { Container, Data } from "../../utils/namespaces";
 import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
-import { getDimensions, parseStyle } from "../../utils/style";
+import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 
 import SeriesData = Data.SeriesData;
 import LineChartContainerProps = Container.LineChartContainerProps;
@@ -157,20 +157,19 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         }
     }
 
-    private onHover = ({ points }: ScatterHoverData<mendix.lib.MxObject>) => {
-        const { customdata, data, x, xaxis, y, yaxis, text } = points[0];
-        if (this.tooltipNode) {
+    private onHover = ({ event, points }: ScatterHoverData<mendix.lib.MxObject>) => {
+        const { customdata, data, y, text } = points[0];
+        if (event && this.tooltipNode) {
             unmountComponentAtNode(this.tooltipNode);
-            const positionYaxis = yaxis.l2p(y as number) + yaxis._offset;
-            const positionXaxis = xaxis.d2p(x) + xaxis._offset;
-            this.tooltipNode.style.top = `${positionYaxis}px`;
-            this.tooltipNode.style.left = `${positionXaxis}px`;
-            this.tooltipNode.style.opacity = "1";
-            if (data.series.tooltipForm && this.props.onHover) {
-                this.tooltipNode.innerHTML = "";
-                this.props.onHover(this.tooltipNode, data.series.tooltipForm, customdata);
-            } else {
-                render(createElement(HoverTooltip, { text: text || y }), this.tooltipNode);
+            const coordinates = getTooltipCoordinates(event, this.tooltipNode);
+            if (coordinates) {
+                setTooltipPosition(this.tooltipNode, coordinates);
+                if (data.series.tooltipForm && this.props.onHover) {
+                    this.tooltipNode.innerHTML = "";
+                    this.props.onHover(this.tooltipNode, data.series.tooltipForm, customdata);
+                } else {
+                    render(createElement(HoverTooltip, { text: text || y }), this.tooltipNode);
+                }
             }
         }
     }
