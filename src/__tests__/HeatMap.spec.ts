@@ -8,6 +8,7 @@ import { HeatMap, HeatMapProps } from "../HeatMap/components/HeatMap";
 import "../PieChart/components/PiePlayground";
 import { PlotlyChart } from "../components/PlotlyChart";
 import { HeatMapData, ScatterHoverData } from "plotly.js";
+import * as style from "../utils/style";
 import { Container } from "../utils/namespaces";
 
 describe("HeatMap", () => {
@@ -250,6 +251,7 @@ describe("HeatMap", () => {
         it("#onHover() calls the parent onClick handler", () => {
             defaultProps.data = getData(defaultProps as HeatMapProps);
             defaultProps.onHover = jasmine.createSpy("onHover");
+            spyOn(style, "getTooltipCoordinates").and.returnValue({ x: 4, y: 10 });
             const chart = renderFullChart(defaultProps as HeatMapProps);
             const instance = chart.instance() as any;
             instance.onHover(plotlyEventData);

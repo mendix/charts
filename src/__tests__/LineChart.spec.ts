@@ -10,6 +10,7 @@ import "../components/SeriesPlayground";
 import { PlotlyChart } from "../components/PlotlyChart";
 
 import { getRandomNumbers } from "../utils/data";
+import * as style from "../utils/style";
 import deepMerge from "deepmerge";
 import { ScatterData, ScatterHoverData } from "plotly.js";
 import LineSeriesProps = Data.LineSeriesProps;
@@ -262,6 +263,7 @@ describe("LineChart", () => {
         it("#onHover() calls the parent onClick handler", () => {
             defaultProps.onHover = jasmine.createSpy("onHover");
             const chart = renderFullChart(defaultProps as LineChartProps);
+            spyOn(style, "getTooltipCoordinates").and.returnValue({ x: 4, y: 10 });
             const instance = chart.instance() as any;
             instance.onHover(plotlyEventData);
 

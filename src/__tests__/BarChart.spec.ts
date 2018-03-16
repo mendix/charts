@@ -9,6 +9,7 @@ import { PlotlyChart } from "../components/PlotlyChart";
 import "../components/SeriesPlayground";
 
 import { getRandomNumbers } from "../utils/data";
+import * as style from "../utils/style";
 import deepMerge from "deepmerge";
 import { mockMendix } from "../../tests/mocks/Mendix";
 import { Container, Data } from "../utils/namespaces";
@@ -249,6 +250,7 @@ describe("BarChart", () => {
 
         it("#onHover() calls the parent onHover handler when one is specified", () => {
             defaultProps.onHover = jasmine.createSpy("onHover");
+            spyOn(style, "getTooltipCoordinates").and.returnValue({ x: 4, y: 10 });
             const chart = renderFullBarChart(defaultProps as BarChartProps);
             const instance = chart.instance() as any;
             instance.onHover(plotlyEventData);

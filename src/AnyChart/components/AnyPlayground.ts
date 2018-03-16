@@ -139,7 +139,7 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
         if (this.timeoutId) {
             clearTimeout(this.timeoutId);
         }
-        this.timeoutId = setTimeout(() => {
+        this.timeoutId = window.setTimeout(() => {
             try {
                 if (this.isValid && JSON.parse(value)) {
                     this.updateChart(source, value);
