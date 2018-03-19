@@ -9,6 +9,7 @@ import { ScatterData } from "plotly.js";
 import ScatterTrace = Data.ScatterTrace;
 import SeriesData = Data.SeriesData;
 import SeriesProps = Data.SeriesProps;
+import { SidebarHeaderTools } from "./SidebarHeaderTools";
 
 export interface SeriesPlaygroundProps {
     modelerSeriesConfigs?: string[];
@@ -91,14 +92,16 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
         return [];
     }
 
-    private renderPanelSwitcher(): ReactElement<SelectProps> | null {
-        return createElement(Select, {
-            onChange: this.updateView,
-            options: [
-                { name: "Layout", value: "layout", isDefaultSelected: true },
-                ...this.getSeriesOptions()
-            ]
-        });
+    private renderPanelSwitcher(): ReactElement<any> | null {
+        return createElement(SidebarHeaderTools, {},
+            createElement(Select, {
+                onChange: this.updateView,
+                options: [
+                    { name: "Layout", value: "layout", isDefaultSelected: true },
+                    ...this.getSeriesOptions()
+                ]
+            })
+        );
     }
 
     private renderSeriesOptions(seriesOptions: string, index: number): ReactElement<PanelProps> {

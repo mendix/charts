@@ -3,6 +3,7 @@ import { Component, ReactElement, createElement } from "react";
 import { Playground } from "../../components/Playground";
 import { Panel, PanelProps } from "../../components/Panel";
 import { Select, SelectProps } from "../../components/Select";
+import { SidebarHeaderTools } from "../../components/SidebarHeaderTools";
 
 export interface PiePlaygroundProps {
     dataOptions: string;
@@ -105,14 +106,16 @@ export class PiePlayground extends Component<PiePlaygroundProps, PiePlaygroundSt
         return [];
     }
 
-    private renderPanelSwitcher(): ReactElement<SelectProps> {
-        return createElement(Select, {
-            onChange: this.updateView,
-            options: [
-                { name: "Layout", value: "layout", isDefaultSelected: true },
-                { name: "Data", value: "data", isDefaultSelected: false }
-            ]
-        });
+    private renderPanelSwitcher(): ReactElement<any> {
+        return createElement(SidebarHeaderTools, {},
+            createElement(Select, {
+                onChange: this.updateView,
+                options: [
+                    { name: "Layout", value: "layout", isDefaultSelected: true },
+                    { name: "Data", value: "data", isDefaultSelected: false }
+                ]
+            })
+        );
     }
 
     private onValidate = (annotations: object[]) => {

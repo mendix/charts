@@ -1,5 +1,7 @@
 import { Component, ReactElement, createElement } from "react";
 import { Playground } from "../../components/Playground";
+import { SidebarHeaderTools } from "../../components/SidebarHeaderTools";
+import { MendixButton } from "../../components/MendixButton";
 
 import { AnyChart, AnyChartProps } from "./AnyChart";
 import { Panel, PanelProps } from "../../components/Panel";
@@ -23,11 +25,12 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
             attributeData: props.attributeData,
             activeOption: "layout"
         };
+        this.updateChartFromCopy = this.updateChartFromCopy.bind(this);
     }
 
     render() {
         return createElement("div", {},
-            createElement(Playground, {}, ...this.renderPanels(), this.renderPanelSwitcher()),
+            createElement(Playground, {}, ...this.renderPanels(), this.renderHeaderTools()),
             this.createChart()
         );
     }
@@ -121,14 +124,20 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
         return [];
     }
 
-    private renderPanelSwitcher(): ReactElement<SelectProps> {
-        return createElement(Select, {
-            onChange: this.updateView,
-            options: [
-                { name: "Layout", value: "layout", isDefaultSelected: true },
-                { name: "Data", value: "data", isDefaultSelected: false }
-            ]
-        });
+    private renderHeaderTools(): ReactElement<any> {
+        return createElement(SidebarHeaderTools, {},
+            createElement(Select, {
+                onChange: this.updateView,
+                options: [
+                    { name: "Layout", value: "layout", isDefaultSelected: true },
+                    { name: "Data", value: "data", isDefaultSelected: false }
+                ]
+            }),
+            createElement(MendixButton, {
+                className: "any-chart-plotly-copy",
+                onClick: this.updateChartFromCopy
+            }, "Copy from Plotly")
+        );
     }
 
     private onValidate = (annotations: object[]) => {
@@ -162,5 +171,22 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
 
     private updateView = (activeOption: string) => {
         this.setState({ activeOption });
+    }
+
+    private updateChartFromCopy() {
+        const data = [];
+        const layout = {};
+        const value = window.prompt("Copy your js sample from Plotly") as string;
+        if (value !== null) {
+            const newValue = (value.indexOf(".newPlot") !== -1) ? value.substring(0, value.indexOf("Plotly.new")) : value;
+            // tslint:disable-next-line
+            var results = eval('(function() {' + newValue + '; return {data:data, layout:layout};}())');
+            if (results.data.length > 0) {
+                this.updateChart("data", JSON.stringify(results.data, null, 2));
+            }
+            if (JSON.stringify(results.layout) !== JSON.stringify({}, null, 2)) {
+                this.updateChart("layout", JSON.stringify(results.layout, null, 2));
+            }
+        }
     }
 }

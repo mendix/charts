@@ -71,7 +71,17 @@
     .widget-sidebar {
         .sidebar-content-header {
             .header-content {
+                display: flex;
                 padding-left: 30px;
+
+                .sidebar-header-tools {
+                    width: 100%;
+                    display: flex;
+
+                    button {
+                        margin-left: 15px;
+                    }
+                }
             }
         }
     }
