@@ -111,6 +111,7 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
                                 x: horizontalValues,
                                 y: verticalValues,
                                 z: this.processZData(data, verticalValues, horizontalValues),
+                                zsmooth: this.props.smoothColor ? "best" : false,
                                 colorscale: HeatMapContainer.processColorScale(this.props.scaleColors),
                                 showscale: this.props.showScale,
                                 type: "heatmap"
@@ -144,6 +145,7 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
                                 x: horizontalValues,
                                 y: verticalValues,
                                 z: this.processZData(verticalData, verticalValues, horizontalValues),
+                                zsmooth: this.props.smoothColor ? "best" : false,
                                 colorscale: HeatMapContainer.processColorScale(this.props.scaleColors),
                                 showscale: this.props.showScale,
                                 type: "heatmap"

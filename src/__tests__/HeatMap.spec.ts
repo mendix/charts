@@ -172,6 +172,7 @@ describe("HeatMap", () => {
                 x: defaultProps.data.x,
                 y: defaultProps.data.y,
                 z: defaultProps.data.z,
+                zsmooth: defaultProps.data.zsmooth,
                 text: defaultProps.data.z.map((row, i) => row.map((item, j) => `${item}`)),
                 colorscale: [ [ 0, "#17347B" ], [ 0.5, "#48B0F7" ], [ 1, "#76CA02" ] ]
             }
@@ -191,6 +192,7 @@ describe("HeatMap", () => {
                 x: defaultProps.data.x,
                 y: defaultProps.data.y,
                 z: defaultProps.data.z,
+                zsmooth: defaultProps.data.zsmooth,
                 text: defaultProps.data.z.map((row, i) => row.map((item, j) => `${item}`)),
                 colorscale: [ [ 0, "#17347B" ], [ 0.5, "#48B0F7" ], [ 1, "#76CA02" ] ],
                 showscale: true
@@ -211,6 +213,7 @@ describe("HeatMap", () => {
                 x: defaultProps.data.x,
                 y: defaultProps.data.y,
                 z: defaultProps.data.z,
+                zsmooth: defaultProps.data.zsmooth,
                 text: defaultProps.data.z.map((row, i) => row.map((item, j) => `${item}`)),
                 colorscale: [ [ 0, "#17347B" ], [ 0.5, "#48B0F7" ], [ 1, "#76CA02" ] ],
                 showscale: true
@@ -266,6 +269,7 @@ const getData = (props: Container.HeatMapContainerProps): HeatMapData => {
         x: [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" ],
         y: [ "Morning", "Afternoon", "Evening" ],
         z: [ [ 1, 20, 30, 50, 1 ], [ 20, 1, 60, 80, 30 ], [ 30, 60, 1, -10, 20 ] ],
+        zsmooth: props.smoothColor ? "best" : false,
         colorscale: processColorScale(props.scaleColors),
         showscale: props.showScale,
         type: "heatmap"

@@ -88,7 +88,7 @@ declare module "plotly.js" {
         y: string[];
         z: number[][];
         type: "heatmap";
-        zsmooth?: "fast" | "best" | false;
+        zsmooth: "fast" | "best" | false;
         hoverinfo?: "label" | "percent" | "name" | "label+percent" | "label+name" | "percent+name" | "label+percent+name" | "skip" | "none";
         colorscale?: (string | number)[][];
         showscale?: boolean;
