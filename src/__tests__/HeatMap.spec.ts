@@ -44,7 +44,7 @@ describe("HeatMap", () => {
         defaultProps.loading = true;
         const chart = renderShallowChart(defaultProps as HeatMapProps);
 
-        expect(chart).toBeElement(createElement(ChartLoading, { text: "Loading" }));
+        expect(chart).toBeElement(createElement(ChartLoading));
     });
 
     it("whose dev mode is developer renders the playground", (done) => {

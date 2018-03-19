@@ -32,7 +32,7 @@ describe("PlotlyChart", () => {
         expect(chart).toBeElement(
             createElement("div", { className: "widget-charts widget-charts-line" },
                 createElement("div", { className: "widget-charts-tooltip" }),
-                createElement(ChartLoading, { text: "Loading" })
+                createElement(ChartLoading)
             )
         );
     });

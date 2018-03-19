@@ -53,7 +53,7 @@ export class AnyChart extends Component<AnyChartProps> {
             );
         }
         if (this.props.loading) {
-            return createElement(ChartLoading, { text: "Loading" });
+            return createElement(ChartLoading);
         }
 
         return this.renderChart();

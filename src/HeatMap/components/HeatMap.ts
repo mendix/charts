@@ -60,7 +60,7 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
             );
         }
         if (this.props.loading || (this.props.devMode === "developer" && !this.state.playgroundLoaded)) {
-            return createElement(ChartLoading, { text: "Loading" });
+            return createElement(ChartLoading);
         }
         if (this.props.devMode === "developer" && this.state.playgroundLoaded) {
             return this.renderPlayground();

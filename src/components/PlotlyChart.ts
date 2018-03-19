@@ -39,7 +39,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
                 style: this.props.style
             },
             createElement("div", { className: "widget-charts-tooltip", ref: this.getTooltipNodeRef }),
-            this.state.loading ? createElement(ChartLoading, { text: "Loading" }) : null
+            this.state.loading ? createElement(ChartLoading) : null
         );
     }
 

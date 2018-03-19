@@ -61,7 +61,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             return createElement(Alert, { className: "widget-charts-line-alert" }, this.props.alertMessage);
         }
         if (this.props.loading || (this.props.devMode === "developer" && !this.state.playgroundLoaded)) {
-            return createElement(ChartLoading, { text: "Loading" });
+            return createElement(ChartLoading);
         }
         if (this.props.devMode === "developer" && this.state.playgroundLoaded) {
             return this.renderPlayground();

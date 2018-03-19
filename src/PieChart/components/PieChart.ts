@@ -52,7 +52,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
             );
         }
         if (this.props.loading || (this.props.devMode === "developer" && !this.state.playgroundLoaded)) {
-            return createElement(ChartLoading, { text: "Loading" });
+            return createElement(ChartLoading);
         }
         if (this.props.devMode === "developer" && this.state.playgroundLoaded) {
             return this.renderPlayground();
