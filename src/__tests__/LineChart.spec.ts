@@ -113,6 +113,7 @@ describe("LineChart", () => {
                     config: { displayModeBar: false, doubleClick: false },
                     onClick: jasmine.any(Function),
                     onHover: jasmine.any(Function),
+                    onRestyle: jasmine.any(Function),
                     getTooltipNode: jasmine.any(Function)
                 }
             )
@@ -143,7 +144,8 @@ describe("LineChart", () => {
             series: defaultProps.series,
             seriesOptions: defaultProps.seriesOptions,
             scatterData: defaultProps.scatterData,
-            playgroundLoaded: false
+            playgroundLoaded: false,
+            hiddenTraces: []
         });
     });
 
@@ -190,7 +192,7 @@ describe("LineChart", () => {
         const chartInstance: any = chart.instance();
 
         expect(chartInstance.getData(defaultProps)).toEqual([
-            { ...defaultProps.scatterData[0], customdata: undefined }
+            { ...defaultProps.scatterData[0], visible: true, customdata: undefined }
         ]);
     });
 
@@ -202,7 +204,7 @@ describe("LineChart", () => {
         const chartInstance: any = chart.instance();
 
         expect(chartInstance.getData(defaultProps)).toEqual([
-            { ...defaultProps.scatterData[0], mode: "markers", customdata: undefined }
+            { ...defaultProps.scatterData[0], mode: "markers", visible: true, customdata: undefined }
         ]);
     });
 
@@ -214,7 +216,7 @@ describe("LineChart", () => {
         const chartInstance: any = chart.instance();
 
         expect(chartInstance.getData(defaultProps)).toEqual([
-            { ...defaultProps.scatterData[0], mode: "lines", customdata: undefined }
+            { ...defaultProps.scatterData[0], mode: "lines", visible: true, customdata: undefined }
         ]);
     });
 

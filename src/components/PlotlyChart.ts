@@ -19,6 +19,7 @@ export interface PlotlyChartProps {
     style?: CSSProperties;
     onClick?: (data: ScatterHoverData<any> | PieHoverData) => void;
     onHover?: (data: ScatterHoverData<any> | PieHoverData) => void;
+    onRestyle?: (data: any) => void;
     getTooltipNode?: (node: HTMLDivElement) => void;
 }
 
@@ -127,7 +128,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         }
     }
 
-    private async renderChart({ config, data, layout, onClick, onHover }: PlotlyChartProps) {
+    private async renderChart({ config, data, layout, onClick, onHover, onRestyle }: PlotlyChartProps) {
         if (this.chartNode) {
             const style = window.getComputedStyle(this.chartNode);
 
@@ -150,6 +151,9 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
                                     myPlot.on("plotly_hover", onHover as any);
                                 }
                                 myPlot.on("plotly_unhover", this.clearTooltip);
+                                if (onRestyle) {
+                                    myPlot.on("plotly_restyle", onRestyle as any);
+                                }
                             });
                     }
                 });

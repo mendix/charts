@@ -36,6 +36,7 @@ interface LineChartState {
     scatterData?: ScatterData[];
     seriesOptions?: string[];
     playgroundLoaded: boolean;
+    hiddenTraces: number[];
 }
 
 export class LineChart extends Component<LineChartProps, LineChartState> {
@@ -44,7 +45,8 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         series: this.props.series,
         scatterData: this.props.scatterData,
         seriesOptions: this.props.seriesOptions,
-        playgroundLoaded: false
+        playgroundLoaded: false,
+        hiddenTraces: []
     };
     private tooltipNode?: HTMLDivElement;
     private Playground?: typeof SeriesPlayground;
@@ -96,6 +98,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 config: LineChart.getConfigOptions(),
                 onClick: this.onClick,
                 onHover: this.onHover,
+                onRestyle: this.onRestyle,
                 getTooltipNode: this.getTooltipNodeRef
             }
         );
@@ -141,11 +144,14 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
                 return {
                     ...deepMerge.all<ScatterData>([ data, parsedOptions ]),
+                    visible: this.state.hiddenTraces.indexOf(index) === -1 ? true : "legendonly",
                     customdata: data.customdata
                 };
             });
 
-            return props.area === "stacked" ? LineChart.getStackedArea(lineData) : lineData;
+            return props.area === "stacked"
+                ? LineChart.getStackedArea(lineData, this.state.hiddenTraces)
+                : lineData;
         }
 
         return [];
@@ -171,6 +177,16 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                     render(createElement(HoverTooltip, { text: text || y }), this.tooltipNode);
                 }
             }
+        }
+    }
+
+    private onRestyle = (data: any) => {
+        if (data[0].visible[0] === "legendonly") {
+            this.setState({ hiddenTraces: this.state.hiddenTraces.concat([ data[1][0] ]) });
+        } else if (data[0].visible[0] === true) {
+            const hiddenTraces = [ ...this.state.hiddenTraces ];
+            hiddenTraces.splice(hiddenTraces.indexOf(data[1][0]), 1);
+            this.setState({ hiddenTraces });
         }
     }
 
@@ -242,10 +258,11 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         };
     }
 
-    public static getStackedArea(traces: ScatterData[]) {
-        for (let i = 1; i < traces.length; i++) {
-            for (let j = 0; j < (Math.min(traces[i].y.length, traces[i - 1].y.length)); j++) {
-                (traces[i].y[j] as any) += traces[i - 1].y[j];
+    public static getStackedArea(traces: ScatterData[], hiddenTraces: number[]) {
+        const visibleTraces = traces.filter((data, index) => hiddenTraces.indexOf(index) === -1);
+        for (let i = 1; i < visibleTraces.length; i++) {
+            for (let j = 0; j < (Math.min(visibleTraces[i].y.length, visibleTraces[i - 1].y.length)); j++) {
+                (visibleTraces[i].y[j] as any) += visibleTraces[i - 1].y[j];
             }
         }
 
