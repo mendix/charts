@@ -146,6 +146,11 @@
             <category>Scale</category>
             <description/>
         </property>
+        <property key="smoothColor" type="boolean" defaultValue="false">
+            <caption>Smooth color</caption>
+            <category>Scale</category>
+            <description>Gradual color gradient between data points</description>
+        </property>
         <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
             <caption>On click</caption>
             <category>Events</category>

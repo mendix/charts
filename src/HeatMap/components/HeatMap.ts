@@ -121,7 +121,8 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
                     x: this.props.data.x,
                     y: this.props.data.y,
                     z: this.props.data.z,
-                    text: this.props.data.z.map((row, i) => row.map((item, j) => `${item}`))
+                    text: this.props.data.z.map((row, i) => row.map((item, j) => `${item}`)),
+                    zsmooth: props.smoothColor ? "best" : false
                 },
                 advancedOptions
             ]);

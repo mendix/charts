@@ -5,7 +5,7 @@
 ### Internet Explorer
 
 Add `wdio-iedriver-service` as a devDependency using`npm`.
-You can simple do it by:
+You can simply do it by:
 
 ```bash
 npm install wdio-iedriver-service --save-dev

@@ -87,6 +87,7 @@ export namespace Container {
         showScale: boolean;
         scaleColors: ScaleColors[];
         showValues: boolean;
+        smoothColor: boolean;
         valuesColor: string;
         xAxisLabel: string;
         yAxisLabel: string;
