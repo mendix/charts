@@ -13,7 +13,7 @@ exports.config = {
             { browserName: "internet explorer", ignoreProtectedModeSettings: true, ignoreZoomSetting: true },
             { browserName: "MicrosoftEdge", elementScrollBehavior: 1, nativeEvents: false }
         ]
-        : [{ browserName: "chrome" }],
+        : [{ maxInstances: debug ? 1 : 5, browserName: "chrome" }],
     sync: true,
     logLevel: "silent",
     coloredLogs: true,
