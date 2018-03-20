@@ -12,6 +12,7 @@ import { Select } from "../components/Select";
 import { Sidebar } from "../components/Sidebar";
 import { SidebarContent } from "../components/SidebarContent";
 import { SidebarHeader } from "../components/SidebarHeader";
+import { SidebarHeaderTools } from "../components/SidebarHeaderTools";
 
 describe("Playground", () => {
     it("should render the structure correctly", () => {
@@ -53,11 +54,11 @@ describe("Playground", () => {
     });
 
     it("should render the sidebar header with the playground options", () => {
-        const playground = shallow(createElement(Playground, {}, createElement(Select)));
+        const playground = shallow(createElement(Playground, {}, createElement(SidebarHeaderTools)));
         const sidebarHeader = playground.find(SidebarHeader);
-        const select = sidebarHeader.find(Select);
+        const headerTools = sidebarHeader.find(SidebarHeaderTools);
 
-        expect(select.length).toBe(1);
+        expect(headerTools.length).toBe(1);
     });
 
     it("should render the sidebar content panels", () => {
@@ -87,13 +88,13 @@ describe("Playground", () => {
                     createElement(Panel),
                     createElement(Panel),
                     createElement(PlotlyChart),
-                    createElement(Select)
+                    createElement(SidebarHeaderTools)
                 )
             );
 
             const sidebarHeader = playground.find(SidebarHeader);
-            const select = sidebarHeader.find(Select);
-            expect(select.length).toBe(1);
+            const headerTools = sidebarHeader.find(SidebarHeaderTools);
+            expect(headerTools.length).toBe(1);
 
             const sidebarContent = playground.find(SidebarContent);
             const panel = sidebarContent.find(Panel);
