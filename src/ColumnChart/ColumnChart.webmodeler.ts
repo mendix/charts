@@ -34,7 +34,9 @@ export class preview extends Component<BarChartContainerProps, {}> {
                     type: "bar",
                     orientation: "v",
                     x: sampleData.x || [],
-                    y: sampleData.y || []
+                    y: sampleData.y || [],
+                    series: {},
+                    hoverinfo: "none"
                 } ]);
             });
         }
@@ -44,8 +46,10 @@ export class preview extends Component<BarChartContainerProps, {}> {
                 type: "bar",
                 orientation: "v",
                 name: "Sample",
+                hoverinfo: "none",
+                series: {},
                 ...preview.getSampleTraces()
-            } as ScatterData
+            } as any
         ];
     }
 

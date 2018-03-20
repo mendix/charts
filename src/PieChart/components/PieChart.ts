@@ -158,12 +158,12 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
     }
 
     private onHover = ({ event, points }: PieHoverData) => {
-        if (event && this.props.data && this.tooltipNode) {
+        if (event && this.tooltipNode) {
             unmountComponentAtNode(this.tooltipNode);
             const coordinates = getTooltipCoordinates(event, this.tooltipNode);
             if (coordinates) {
                 setTooltipPosition(this.tooltipNode, coordinates);
-                if (this.props.onHover) {
+                if (this.props.onHover && this.props.data) {
                     this.props.onHover(this.tooltipNode, this.props.data[points[0].pointNumber]);
                 } else {
                     render(createElement(HoverTooltip, { text: points[0].label }), this.tooltipNode);

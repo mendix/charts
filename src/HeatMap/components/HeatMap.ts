@@ -195,7 +195,7 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
                 if (this.props.onHover) {
                     this.props.onHover(this.tooltipNode, x as string, y as string, z as number);
                 } else {
-                    render(createElement(HoverTooltip, { text }), this.tooltipNode);
+                    render(createElement(HoverTooltip, { text: text || z }), this.tooltipNode);
                 }
             }
         }

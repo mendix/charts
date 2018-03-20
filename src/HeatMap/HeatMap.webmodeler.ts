@@ -31,7 +31,8 @@ export class preview extends Component<HeatMapContainerProps, {}> {
             zsmooth: props.smoothColor ? "best" : false,
             colorscale: HeatMapContainer.processColorScale(props.scaleColors),
             showscale: props.showScale,
-            type: "heatmap"
+            type: "heatmap",
+            hoverinfo: "none"
         };
     }
 }

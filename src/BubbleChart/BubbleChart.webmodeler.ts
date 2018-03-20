@@ -41,6 +41,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                     mode: "markers",
                     name: series.name,
                     type: "scatter",
+                    series: {},
                     ...sampleData
 
                 }, seriesOptions ]);
@@ -49,14 +50,15 @@ export class preview extends Component<LineChartContainerProps, {}> {
 
         return [ {
             connectgaps: true,
-            hoverinfo: "text",
+            hoverinfo: "none",
             hoveron: "points",
             name: "Sample",
             type: "scatter",
             mode: "markers",
             text: sampleData.marker ? sampleData.marker.size : "",
+            series: {},
             ...sampleData
-        } as ScatterData ];
+        } as any ];
     }
 
     private static getSampleTraces(): Data.ScatterTrace {

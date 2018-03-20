@@ -18,6 +18,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
             ),
             createElement(BarChart, {
                 ...this.props as BarChartContainerProps,
+                orientation: "bar",
                 scatterData: preview.getData(this.props)
             })
         );
@@ -35,8 +36,10 @@ export class preview extends Component<BarChartContainerProps, {}> {
                     name: series.name,
                     type: "bar",
                     orientation: "h",
+                    hoverinfo: "none",
                     x: sampleData.x || [],
-                    y: sampleData.y || []
+                    y: sampleData.y || [],
+                    series: {}
                 }, seriesOptions ]);
             });
         }
@@ -45,6 +48,8 @@ export class preview extends Component<BarChartContainerProps, {}> {
                 type: "bar",
                 orientation: "h",
                 name: "Sample",
+                hoverinfo: "none" as any,
+                series: {},
                 ...preview.getSampleTraces()
             } ] as ScatterData[];
     }
