@@ -15,6 +15,8 @@ Plot and compare your data across different charts.
 * `Bar Chart`
 * `Time Series Chart`
 * `Heat Map`
+* `Bubble Chart`
+* `Any Chart`
 
 ## Dependencies
 * Mendix 7.11.0
@@ -67,6 +69,46 @@ The heat map should be configured with a required horizontal, vertical and data 
 The sample domain model could be either of the two below.
 
 ![Heat Map Sample Domain Model](assets/heatmap_sample_domain_model.png)
+
+### Bubble chart
+The bubble chart has data properties identical to those of the line chart but for one distinction: `Bubble size data attribute` [required] - The attribute that contains and determines the size of the bubble.
+
+### Any chart
+The any chart can be configured to any type of chart by addding data and layout properities from any plolty chart sample.
+Below are the steps for configuring any chart:
+#### Identify a sample chat from Plotly
+
+```
+    var data = [{
+        values: [20, 29, 55],
+        labels: ['Apples', 'Oranges', 'Mangoes'],
+        type: 'pie'
+    }];
+
+    `var layout = {
+        height: 400,
+        width: 500
+    };
+
+    Plotly.newPlot('myDiv', data, layout);
+```
+1. From the desktop modeler
+    - Copy the value of `data` and paste it to `Static` under the `Data` tab in your modeler.
+
+    - Copy the value of `layout` and paste it to `Static` under the `Layout options` tab in your modeler.
+2. From the playground (`Mode` option on Advanced tab set to `Developer`)
+    - Copy the value of `data` and paste it to `Custom settings` under the `Data` option on the sidebar.
+
+    - Copy the value of `layout` and paste it to `Custom settings` under the `Layout`option on the sidebar.
+3. Using the `Copy from Plotly` feature.
+    - Enable this feature by "mode" option in the "Advanced" tab to `Developer`.
+    - From the sidebar click `Copy from Plotly` button.
+
+        ![Copy from Plotyly button](assets/copy_button.PNG)
+
+    - Copy and paste your sample code from plotly on the prompt that appears and click `OK`
+
+        ![Copy from Plotyly button](assets/copy_prompt.PNG)
 
 ## Advanced configuration
 The charts in this widget are based on the [https://github.com/mendixlabs/charts/issues](Plotly) library.
