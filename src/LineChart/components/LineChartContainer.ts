@@ -102,10 +102,10 @@ export default class LineChartContainer extends Component<LineChartContainerProp
                 })
                 .catch(reason => {
                     window.mx.ui.error(reason);
-                    this.setState({ loading: false, data: [] });
+                    this.setState({ loading: false, data: [], scatterData: [] });
                 });
         } else {
-            this.setState({ loading: false, data: [] });
+            this.setState({ loading: false, data: [], scatterData: [] });
         }
     }
 
