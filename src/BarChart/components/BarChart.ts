@@ -159,10 +159,12 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                 setTooltipPosition(this.tooltipNode, coordinates);
                 if (data.series.tooltipForm && this.props.onHover) {
                     this.props.onHover(this.tooltipNode, data.series.tooltipForm, customdata);
-                } else {
+                } else if (points[0].data.hoverinfo === "none" as any) {
                     render(createElement(HoverTooltip, {
                         text: this.props.orientation === "bar" ? x : y
                     }), this.tooltipNode);
+                } else {
+                    this.tooltipNode.style.opacity = "0";
                 }
             }
         }

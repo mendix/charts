@@ -194,8 +194,10 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
                 setTooltipPosition(this.tooltipNode, coordinates);
                 if (this.props.onHover) {
                     this.props.onHover(this.tooltipNode, x as string, y as string, z as number);
-                } else {
+                } else if (points[0].data.hoverinfo === "none" as any) {
                     render(createElement(HoverTooltip, { text: text || z }), this.tooltipNode);
+                } else {
+                    this.tooltipNode.style.opacity = "0";
                 }
             }
         }

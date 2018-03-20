@@ -17,6 +17,15 @@
                 <attributeType name="String"/>
             </attributeTypes>
         </property>
+        <property key="devMode" type="enumeration" defaultValue="developer">
+            <caption>Mode</caption>
+            <category>Data</category>
+            <description>The development mode adds a button to the charts when running the app which can be used to toggle a live editor for the advanced configuration options.</description>
+            <enumerationValues>
+                <enumerationValue key="developer">Development</enumerationValue>
+                <enumerationValue key="advanced">Production</enumerationValue>
+            </enumerationValues>
+        </property>
         <property key="layoutStatic" type="string" required="false" multiline="true">
             <caption>Static </caption>
             <category>Layout options</category>
@@ -58,15 +67,6 @@
             <caption>Height</caption>
             <category>Appearance</category>
             <description/>
-        </property>
-        <property key="devMode" type="enumeration" defaultValue="advanced">
-            <caption>Mode</caption>
-            <category>Appearance</category>
-            <description>The development mode adds a button to the charts when running the app which can be used to toggle a live editor for the advanced configuration options.</description>
-            <enumerationValues>
-                <enumerationValue key="advanced">Production</enumerationValue>
-                <enumerationValue key="developer">Development</enumerationValue>
-            </enumerationValues>
         </property>
         <property key="eventEntity" type="entity" allowNonPersistableEntities="true" required="false">
             <caption>Event entity</caption>

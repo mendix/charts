@@ -165,8 +165,10 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 setTooltipPosition(this.tooltipNode, coordinates);
                 if (this.props.onHover && this.props.data) {
                     this.props.onHover(this.tooltipNode, this.props.data[points[0].pointNumber]);
-                } else {
+                } else if (points[0].data.hoverinfo === "none") {
                     render(createElement(HoverTooltip, { text: points[0].label }), this.tooltipNode);
+                } else {
+                    this.tooltipNode.style.opacity = "0";
                 }
             }
         }

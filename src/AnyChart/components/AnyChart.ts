@@ -9,7 +9,7 @@ import { PlotlyChart } from "../../components/PlotlyChart";
 
 import deepMerge from "deepmerge";
 import { Style } from "../../utils/namespaces";
-import { Layout } from "plotly.js";
+import { Config, Layout } from "plotly.js";
 import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
@@ -84,7 +84,7 @@ export class AnyChart extends Component<AnyChartProps> {
             style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
             layout: this.getLayoutOptions(this.props),
             data: this.getData(this.props),
-            config: {},
+            config: AnyChart.getConfigOptions(),
             onClick: this.onClick,
             onHover: this.onHover,
             getTooltipNode: this.getTooltipNodeRef
@@ -95,9 +95,22 @@ export class AnyChart extends Component<AnyChartProps> {
             try {
                 const staticData = JSON.parse(props.dataStatic || "[]");
 
-                return props.attributeData
-                    ? deepMerge.all([ staticData, JSON.parse(props.attributeData) ])
-                    : staticData;
+                if (props.attributeData) {
+                    const attributeData = JSON.parse(props.attributeData)
+                        .map((data: any) => {
+                            return !data.type || data.type.toLowerCase().indexOf("3d") === -1
+                                ? deepMerge.all([ { hoverinfo: "none" }, data ])
+                                : data;
+                        });
+
+                    return deepMerge.all([ staticData, attributeData ]);
+                }
+
+                return staticData.map((data: any) => {
+                    return !data.type || data.type.toLowerCase().indexOf("3d") === -1
+                        ? deepMerge.all([ { hoverinfo: "none" }, data ])
+                        : data;
+                });
             } catch (error) {
                 console.error("Failed convert data into JSON: ", props.dataStatic, props.attributeData, error);
 
@@ -136,8 +149,10 @@ export class AnyChart extends Component<AnyChartProps> {
                 setTooltipPosition(this.tooltipNode, coordinates);
                 if (this.props.onHover) {
                     this.props.onHover(this.copyPoints(points), this.tooltipNode);
-                } else {
+                } else if (points[0].data.hoverinfo === "none") {
                     render(createElement(HoverTooltip, { text: z || text || y }), this.tooltipNode);
+                } else {
+                    this.tooltipNode.style.opacity = "0";
                 }
             }
         }
@@ -156,4 +171,7 @@ export class AnyChart extends Component<AnyChartProps> {
         });
     }
 
+    private static getConfigOptions(): Partial<Config> {
+        return { displayModeBar: false, doubleClick: false };
+    }
 }

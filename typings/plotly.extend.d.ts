@@ -56,6 +56,7 @@ declare module "plotly.js" {
         points: Array<{
             cx: number;
             cy: number;
+            data: PieData;
             pointNumber: number;
             curveNumber: number;
             color: string;

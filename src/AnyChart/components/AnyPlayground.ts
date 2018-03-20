@@ -68,7 +68,7 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
                     heading: "Custom settings"
                 },
                 Playground.renderAceEditor({
-                    value: `${this.state.attributeLayout}`,
+                    value: `${this.state.attributeLayout || "{\n\n}"}`,
                     onChange: value => this.onUpdate("layout", value),
                     onValidate: this.onValidate
                 })
@@ -80,7 +80,7 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
                     headingClass: "read-only"
                 },
                 Playground.renderAceEditor({
-                    value: this.props.layoutStatic,
+                    value: this.props.layoutStatic || "{\n\n}",
                     readOnly: true,
                     overwriteValue: this.props.attributeLayout,
                     onValidate: this.onValidate

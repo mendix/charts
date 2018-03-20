@@ -173,8 +173,10 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 if (data.series.tooltipForm && this.props.onHover) {
                     this.tooltipNode.innerHTML = "";
                     this.props.onHover(this.tooltipNode, data.series.tooltipForm, customdata);
-                } else {
+                } else if (points[0].data.hoverinfo === "none" as any) {
                     render(createElement(HoverTooltip, { text: text || y }), this.tooltipNode);
+                } else {
+                    this.tooltipNode.style.opacity = "0";
                 }
             }
         }
