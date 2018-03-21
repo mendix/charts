@@ -14,19 +14,13 @@ interface AnyPlaygroundState {
 }
 
 export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> {
+    state: AnyPlaygroundState = {
+        attributeLayout: this.props.attributeLayout,
+        attributeData: this.props.attributeData,
+        activeOption: "layout"
+    };
     private timeoutId?: number;
     private isValid = false;
-
-    constructor(props: AnyChartProps) {
-        super(props);
-
-        this.state = {
-            attributeLayout: props.attributeLayout,
-            attributeData: props.attributeData,
-            activeOption: "layout"
-        };
-        this.updateChartFromCopy = this.updateChartFromCopy.bind(this);
-    }
 
     render() {
         return createElement("div", {},
@@ -100,7 +94,7 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
                         headingClass: "item-header"
                     },
                     Playground.renderAceEditor({
-                        value: `${this.state.attributeData}`,
+                        value: `${this.state.attributeData || "{\n\n}"}`,
                         onChange: value => this.onUpdate("data", value),
                         onValidate: this.onValidate
                     })
@@ -112,7 +106,7 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
                         headingClass: "read-only"
                     },
                     Playground.renderAceEditor({
-                        value: this.props.dataStatic,
+                        value: this.props.dataStatic || "{\n\n}",
                         readOnly: true,
                         overwriteValue: this.state.attributeData,
                         onValidate: this.onValidate
@@ -132,11 +126,11 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
                     { name: "Layout", value: "layout", isDefaultSelected: true },
                     { name: "Data", value: "data", isDefaultSelected: false }
                 ]
-            }),
-            createElement(MendixButton, {
-                className: "any-chart-plotly-copy",
-                onClick: this.updateChartFromCopy
-            }, "Copy from Plotly")
+            })
+            // createElement(MendixButton, {
+            //     className: "any-chart-plotly-copy",
+            //     onClick: this.updateChartFromCopy
+            // }, "Copy from Plotly")
         );
     }
 
@@ -176,7 +170,7 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
     private updateChartFromCopy() {
         const data = [];
         const layout = {};
-        const value = window.prompt("Copy your js sample from Plotly") as string;
+        const value = window.prompt("Copy and paste the Plotly JavaScript example code here") as string;
         if (value !== null) {
             const newValue = (value.indexOf(".newPlot") !== -1) ? value.substring(0, value.indexOf("Plotly.new")) : value;
             // tslint:disable-next-line

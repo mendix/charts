@@ -22,7 +22,7 @@ module.exports = function(grunt) {
         watch: {
             updateWidgetFiles: {
                 files: [ "./src/**/*", "src/**/*" ],
-                tasks: [ "webpack:develop", "file_append", "compress:dist", "copy" ],
+                tasks: [ "webpack:develop", "file_append", "compress", "copy" ],
                 options: {
                     debounceDelay: 250
                 }
@@ -42,25 +42,48 @@ module.exports = function(grunt) {
                     cwd: "./dist/tmp/src",
                     src: [ "**/*" ]
                 } ]
+            },
+            any: {
+                options: {
+                    archive: "./dist/" + pkg.version + "/AnyChart.mpk",
+                    mode: "zip"
+                },
+                files: [ {
+                    expand: true,
+                    date: new Date(),
+                    store: false,
+                    cwd: "./dist/tmp/AnyChart",
+                    src: [ "**/*" ]
+                } ]
             }
         },
 
         copy: {
             distDeployment: {
-                files: [ {
-                    dest: "./dist/MxTestProject/deployment/web/widgets",
-                    cwd: "./dist/tmp/src/",
-                    src: [ "**/*" ],
-                    expand: true
-                } ]
+                files: [
+                    {
+                        dest: "./dist/MxTestProject/deployment/web/widgets",
+                        cwd: "./dist/tmp/src/",
+                        src: [ "**/*" ],
+                        expand: true
+                    },
+                    {
+                        dest: "./dist/MxTestProject/deployment/web/widgets",
+                        cwd: "./dist/tmp/AnyChart/",
+                        src: [ "**/*" ],
+                        expand: true
+                    }
+                ]
             },
             mpk: {
-                files: [ {
-                    dest: "./dist/MxTestProject/widgets",
-                    cwd: "./dist/" + pkg.version + "/",
-                    src: [ pkg.widgetName + ".mpk" ],
-                    expand: true
-                } ]
+                files: [
+                    {
+                        dest: "./dist/MxTestProject/widgets",
+                        cwd: "./dist/" + pkg.version + "/",
+                        src: [ "*.mpk" ],
+                        expand: true
+                    }
+                ]
             }
         },
 
@@ -83,11 +106,14 @@ module.exports = function(grunt) {
         clean: {
             build: [
                 "./dist/" + pkg.version + "/" + pkg.widgetName + "/*",
+                "./dist/" + pkg.version + "/AnyChart/*",
                 "./dist/tmp/**/*",
                 "./dist/tsc/**/*",
                 "./dist/testresults/**/*",
                 "./dist/MxTestProject/deployment/web/widgets/" + pkg.widgetName + "/*",
-                "./dist/MxTestProject/widgets/" + pkg.widgetName + ".mpk"
+                "./dist/MxTestProject/widgets/" + pkg.widgetName + ".mpk",
+                "./dist/MxTestProject/deployment/web/widgets/AnyChart/*",
+                "./dist/MxTestProject/widgets/AnyChart.mpk"
             ]
         },
 
@@ -108,12 +134,12 @@ module.exports = function(grunt) {
     grunt.registerTask(
         "clean build",
         "Compiles all the assets and copies the files to the dist directory.",
-        [ "checkDependencies", "clean:build", "webpack:develop", "file_append", "compress:dist", "copy:mpk" ]
+        [ "checkDependencies", "clean:build", "webpack:develop", "file_append", "compress", "copy:mpk" ]
     );
     grunt.registerTask(
         "release",
         "Compiles all the assets and copies the files to the dist directory. Minified without source mapping",
-        [ "checkDependencies", "clean:build", "webpack:release", "file_append", "compress:dist", "copy:mpk" ]
+        [ "checkDependencies", "clean:build", "webpack:release", "file_append", "compress", "copy:mpk" ]
     );
     grunt.registerTask("build", [ "clean build" ]);
 };
