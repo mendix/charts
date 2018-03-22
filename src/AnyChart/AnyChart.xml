@@ -7,29 +7,29 @@
         <property key="dataStatic" type="string" required="false" multiline="true">
             <caption>Static</caption>
             <category>Data</category>
-            <description>JSON array based on https://plot.ly/javascript/reference/</description>
+            <description>Data JSON array based on https://plot.ly/javascript/reference/</description>
         </property>
         <property key="dataAttribute" type="attribute" required="false">
             <caption>Source attribute</caption>
             <category>Data</category>
-            <description>Attribute data will merge and overwrite static data</description>
+            <description>The attribute data will merge and overwrite 'Static' data</description>
             <attributeTypes>
                 <attributeType name="String"/>
             </attributeTypes>
         </property>
+        <property key="sampleData" type="string" required="false" multiline="true">
+            <caption>Sample data</caption>
+            <category>Data</category>
+            <description>Data for preview. It will be merged with the 'Static data' in the webmodeler or at runtime when no 'Source attribute' is selected</description>
+        </property>
         <property key="devMode" type="enumeration" defaultValue="developer">
             <caption>Mode</caption>
             <category>Data</category>
-            <description>The development mode adds a button to the charts when running the app which can be used to toggle a live editor for the advanced configuration options.</description>
+            <description>The development mode adds a button to the charts when running the app which can be used to toggle a live editor for the advanced configuration options</description>
             <enumerationValues>
                 <enumerationValue key="developer">Development</enumerationValue>
                 <enumerationValue key="advanced">Production</enumerationValue>
             </enumerationValues>
-        </property>
-        <property key="sampleData" type="string" required="false" multiline="true">
-            <caption>Sample data</caption>
-            <category>Data</category>
-            <description>The data to preview in the web modeler. It will be merged with the static data and must be a JSON array based on https://plot.ly/javascript/reference/</description>
         </property>
         <property key="layoutStatic" type="string" required="false" multiline="true">
             <caption>Static </caption>
