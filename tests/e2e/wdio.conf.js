@@ -5,7 +5,7 @@ exports.config = {
     host: "127.0.0.1",
     port: 4444,
     specs: [ "./dist/e2e/**/*.spec.js" ],
-    maxInstances: debug ? 1 : 5,
+    maxInstances: 1,
     capabilities: multiclient
         ? [
             { browserName: "chrome" },
@@ -13,7 +13,7 @@ exports.config = {
             { browserName: "internet explorer", ignoreProtectedModeSettings: true, ignoreZoomSetting: true },
             { browserName: "MicrosoftEdge", elementScrollBehavior: 1, nativeEvents: false }
         ]
-        : [{ maxInstances: debug ? 1 : 5, browserName: "chrome" }],
+        : [ { maxInstances: 1, browserName: "chrome" } ],
     sync: true,
     logLevel: "silent",
     coloredLogs: true,
@@ -24,7 +24,7 @@ exports.config = {
     connectionRetryTimeout: 200000,
     connectionRetryCount: 2,
     killInstances: true,
-    services:  multiclient ? [ "iedriver", "selenium-standalone" ] : ["selenium-standalone" ],
+    services:  multiclient ? [ "iedriver", "selenium-standalone" ] : [ "selenium-standalone" ],
     seleniumArgs: multiclient ? {
         javaArgs: [
             "-Dwebdriver.edge.driver=C:\\Selenium\\EdgeDriver\\MicrosoftWebDriver.exe"
