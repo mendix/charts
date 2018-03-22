@@ -7,7 +7,10 @@ import { Container } from "../utils/namespaces";
 export class preview extends Component<Container.AnyChartContainerProps, {}> {
     render() {
         return createElement("div", {},
-            createElement(AnyChart, this.props as any)
+            createElement(AnyChart, {
+                ...this.props as any,
+                attributeData: this.props.sampleData
+            })
         );
     }
 }

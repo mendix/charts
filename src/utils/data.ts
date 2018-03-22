@@ -1,4 +1,5 @@
 import { ReactChild, createElement } from "react";
+import deepMerge from "deepmerge";
 import { Datum } from "plotly.js";
 import { Data } from "./namespaces";
 import SeriesProps = Data.SeriesProps;
@@ -297,4 +298,26 @@ export const getRandomNumbers = (count: number, rangeMax: number, rangeMin = 0):
     }
 
     return numbers;
+};
+
+const emptyTarget = (value: any) => Array.isArray(value) ? [] : {};
+
+const clone = (value: any, options: any) => deepMerge(emptyTarget(value), value, options);
+
+export const arrayMerge = (target: any[], source: any[], options: any) => {
+    const destination = target.slice();
+
+    source.forEach((e, i) => {
+        if (typeof destination[i] === "undefined") {
+            const cloneRequested = options.clone !== false;
+            const shouldClone = cloneRequested && options.isMergeableObject(e);
+            destination[i] = shouldClone ? clone(e, options) : e;
+        } else if (options.isMergeableObject(e)) {
+            destination[i] = deepMerge(target[i], e, options);
+        } else if (target.indexOf(e) === -1) {
+            destination.push(e);
+        }
+    });
+
+    return destination;
 };

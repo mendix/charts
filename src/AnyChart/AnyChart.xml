@@ -26,6 +26,11 @@
                 <enumerationValue key="advanced">Production</enumerationValue>
             </enumerationValues>
         </property>
+        <property key="sampleData" type="string" required="false" multiline="true">
+            <caption>Sample data</caption>
+            <category>Data</category>
+            <description>The data to preview in the web modeler. It will be merged with the static data and must be a JSON array based on https://plot.ly/javascript/reference/</description>
+        </property>
         <property key="layoutStatic" type="string" required="false" multiline="true">
             <caption>Static </caption>
             <category>Layout options</category>

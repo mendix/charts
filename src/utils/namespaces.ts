@@ -123,6 +123,7 @@ export namespace Container {
     export interface AnyChartContainerPropsBase extends WrapperProps, Style.Dimensions {
         dataStatic: string;
         dataAttribute: string;
+        sampleData: string;
         layoutStatic: string;
         layoutAttribute: string;
         eventEntity: string;

@@ -5,8 +5,10 @@ import { render, unmountComponentAtNode } from "react-dom";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
+import { HoverTooltip } from "../../components/HoverTooltip";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
+import { arrayMerge } from "../../utils/data";
 import deepMerge from "deepmerge";
 import { Style } from "../../utils/namespaces";
 import { Config, Layout } from "plotly.js";
@@ -14,7 +16,6 @@ import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } 
 import { WrapperProps } from "../../utils/types";
 
 import "../../ui/Charts.scss";
-import { HoverTooltip } from "../../components/HoverTooltip";
 // TODO improve typing by replace explicit any types
 
 export interface AnyChartProps extends WrapperProps, Style.Dimensions {
@@ -92,43 +93,46 @@ export class AnyChart extends Component<AnyChartProps> {
     }
 
     private getData(props: AnyChartProps): any[] {
-            try {
-                const staticData = JSON.parse(props.dataStatic || "[]");
+        let invalidJSON: string = props.layoutStatic;
+        try {
+            invalidJSON = props.dataStatic;
+            const staticData: any[] = JSON.parse(props.dataStatic || "[]");
+            invalidJSON = props.attributeData;
+            if (props.attributeData) {
+                const attributeData: any[] = JSON.parse(props.attributeData)
+                    .map((data: any) => {
+                        return !data.type || data.type.toLowerCase().indexOf("3d") === -1
+                            ? deepMerge.all([ { hoverinfo: "none" }, data ])
+                            : data;
+                    });
 
-                if (props.attributeData) {
-                    const attributeData = JSON.parse(props.attributeData)
-                        .map((data: any) => {
-                            return !data.type || data.type.toLowerCase().indexOf("3d") === -1
-                                ? deepMerge.all([ { hoverinfo: "none" }, data ])
-                                : data;
-                        });
-
-                    return deepMerge.all([ staticData, attributeData ]);
-                }
-
-                return staticData.map((data: any) => {
-                    return !data.type || data.type.toLowerCase().indexOf("3d") === -1
-                        ? deepMerge.all([ { hoverinfo: "none" }, data ])
-                        : data;
-                });
-            } catch (error) {
-                console.error("Failed convert data into JSON: ", props.dataStatic, props.attributeData, error);
-
-                return [];
+                return deepMerge.all([ staticData, attributeData ], { arrayMerge });
             }
+
+            return staticData.map((data: any) => {
+                return !data.type || data.type.toLowerCase().indexOf("3d") === -1
+                    ? deepMerge.all([ { hoverinfo: "none" }, data ])
+                    : data;
+            });
+        } catch (error) {
+            window.mx.ui.error(`Failed convert data into JSON: \n${error}: \n${invalidJSON}`);
+
+            return [];
+        }
     }
 
     private getLayoutOptions(props: AnyChartProps): Partial<Layout> {
-        const arrayMerge = (_destinationArray: any[], sourceArray: any[]) => sourceArray;
+        let invalidJSON: string = props.layoutStatic;
         try {
             const staticLayout = JSON.parse(props.layoutStatic || "{}");
+            invalidJSON = props.attributeLayout;
 
-            return props.attributeData
+            return props.attributeLayout
                 ? deepMerge.all([ staticLayout, JSON.parse(props.attributeLayout) ], { arrayMerge }) as Partial<Layout>
                 : staticLayout;
 
         } catch (error) {
-            console.error("Failed convert layout to JSON: ", props.dataStatic, props.attributeData, error);
+            window.mx.ui.error(`Failed convert layout into JSON: \n${error}: \n${invalidJSON}`);
 
             return {};
         }
