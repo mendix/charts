@@ -95,7 +95,11 @@ module.exports = function(grunt) {
                         input: `dist/tmp/src/${widgetName}/${widgetName}.webmodeler.js`
                     };
                 })
-            }
+            },
+            addSourceUrlAnyChart: { files: [ {
+                append: `\n\n//# sourceURL=AnyChart.webmodeler.js\n`,
+                input: `dist/tmp/AnyChart/AnyChart/AnyChart.webmodeler.js`
+            } ] }
         },
 
         webpack: {
