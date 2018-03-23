@@ -1,7 +1,7 @@
 const webpack = require("webpack");
 const path = require("path");
 
-const widgetName = require("./package").widgetName;
+const widgetName = require("./package").widgetName[0];
 
 module.exports = {
     entry: {

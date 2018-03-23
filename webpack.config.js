@@ -4,7 +4,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const DynamicPublicPathPlugin = require("dynamic-public-path-webpack-plugin");
 
-const widgetName = require("./package").widgetName;
+const widgetName = require("./package").widgetName[0];
 
 const widgetConfig = {
     entry: {
@@ -72,7 +72,7 @@ const anyChartConfig = {
     output: {
         path: path.resolve(__dirname, "dist/tmp/AnyChart"),
         filename: "com/mendix/widget/custom/[name]/[name].js",
-        chunkFilename: `com/mendix/widget/custom/AnyChart/chunk[id].js`,
+        chunkFilename: `com/mendix/widget/custom/anychart/chunk[id].js`,
         libraryTarget: "umd",
         publicPath: "/"
     },

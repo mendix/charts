@@ -3,7 +3,8 @@ const webpack = require("webpack");
 const webpackConfig = require("./webpack.config");
 const merge = require("webpack-merge");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
-const widgetNames = [ "LineChart", "PieChart", "ColumnChart", "BarChart", "TimeSeries", "HeatMap" ];
+const widgetNames = [ "LineChart", "AreaChart", "PieChart", "ColumnChart", "BarChart",
+    "TimeSeries", "HeatMap", "BubbleChart" ];
 
 const webpackConfigRelease = webpackConfig.map(config => merge(config, {
     devtool: false,
@@ -17,6 +18,8 @@ const webpackConfigRelease = webpackConfig.map(config => merge(config, {
 
 module.exports = function(grunt) {
     const pkg = grunt.file.readJSON("package.json");
+    const packageNameCharts = pkg.widgetName[0];
+    const packageNameAnyChart = pkg.widgetName[1];
     grunt.initConfig({
 
         watch: {
@@ -32,7 +35,7 @@ module.exports = function(grunt) {
         compress: {
             dist: {
                 options: {
-                    archive: "./dist/" + pkg.version + "/" + pkg.widgetName + ".mpk",
+                    archive: `./dist/${pkg.version}/${packageNameCharts}.mpk`,
                     mode: "zip"
                 },
                 files: [ {
@@ -45,14 +48,14 @@ module.exports = function(grunt) {
             },
             any: {
                 options: {
-                    archive: "./dist/" + pkg.version + "/AnyChart.mpk",
+                    archive: `./dist/${pkg.version}/${packageNameAnyChart}.mpk`,
                     mode: "zip"
                 },
                 files: [ {
                     expand: true,
                     date: new Date(),
                     store: false,
-                    cwd: "./dist/tmp/AnyChart",
+                    cwd: `./dist/tmp/${packageNameAnyChart}`,
                     src: [ "**/*" ]
                 } ]
             }
@@ -69,7 +72,7 @@ module.exports = function(grunt) {
                     },
                     {
                         dest: "./dist/MxTestProject/deployment/web/widgets",
-                        cwd: "./dist/tmp/AnyChart/",
+                        cwd: `./dist/tmp/${packageNameAnyChart}/`,
                         src: [ "**/*" ],
                         expand: true
                     }
@@ -79,7 +82,7 @@ module.exports = function(grunt) {
                 files: [
                     {
                         dest: "./dist/MxTestProject/widgets",
-                        cwd: "./dist/" + pkg.version + "/",
+                        cwd: `./dist/${pkg.version}/`,
                         src: [ "*.mpk" ],
                         expand: true
                     }
@@ -98,7 +101,7 @@ module.exports = function(grunt) {
             },
             addSourceUrlAnyChart: { files: [ {
                 append: `\n\n//# sourceURL=AnyChart.webmodeler.js\n`,
-                input: `dist/tmp/AnyChart/AnyChart/AnyChart.webmodeler.js`
+                input: `dist/tmp/${packageNameAnyChart}/${packageNameAnyChart}/${packageNameAnyChart}.webmodeler.js`
             } ] }
         },
 
@@ -109,15 +112,15 @@ module.exports = function(grunt) {
 
         clean: {
             build: [
-                "./dist/" + pkg.version + "/" + pkg.widgetName + "/*",
-                "./dist/" + pkg.version + "/AnyChart/*",
+                `./dist/${pkg.version}/${packageNameCharts}/*`,
+                `./dist/${pkg.version}/${packageNameAnyChart}/*`,
                 "./dist/tmp/**/*",
                 "./dist/tsc/**/*",
                 "./dist/testresults/**/*",
-                "./dist/MxTestProject/deployment/web/widgets/" + pkg.widgetName + "/*",
-                "./dist/MxTestProject/widgets/" + pkg.widgetName + ".mpk",
-                "./dist/MxTestProject/deployment/web/widgets/AnyChart/*",
-                "./dist/MxTestProject/widgets/AnyChart.mpk"
+                `./dist/MxTestProject/deployment/web/widgets/${packageNameCharts}/*`,
+                `./dist/MxTestProject/widgets/${packageNameCharts}.mpk`,
+                `./dist/MxTestProject/deployment/web/widgets/${packageNameAnyChart}/*`,
+                `./dist/MxTestProject/widgets/${packageNameAnyChart}.mpk`
             ]
         },
 

@@ -1,6 +1,9 @@
 {
   "name": "charts",
-  "widgetName": "Charts",
+  "widgetName": [
+    "Charts",
+    "AnyChart"
+  ],
   "version": "1.0.0",
   "description": "Create charts based on the Plotly library",
   "copyright": "Mendix BV",
@@ -88,7 +91,7 @@
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.13",
     "mendix-client": "^7.6.5",
-    "mendix-widget-build-script": "^1.0.0-rc2",
+    "mendix-widget-build-script": "^1.0.0",
     "node-sass": "^4.7.2",
     "pre-commit": "^1.2.2",
     "raw-loader": "^0.5.1",
