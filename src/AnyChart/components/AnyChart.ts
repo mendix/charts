@@ -16,6 +16,7 @@ import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } 
 import { WrapperProps } from "../../utils/types";
 
 import "../../ui/Charts.scss";
+import { create } from "domain";
 // TODO improve typing by replace explicit any types
 
 export interface AnyChartProps extends WrapperProps, Style.Dimensions {
@@ -29,29 +30,12 @@ export interface AnyChartProps extends WrapperProps, Style.Dimensions {
     onHover?: (data: any, node: HTMLDivElement) => void;
 }
 
-export class AnyChart extends Component<AnyChartProps> {
+export class AnyChart extends Component<AnyChartProps, { alertMessage?: ReactChild }> {
     private tooltipNode?: HTMLDivElement;
-
-    constructor(props: AnyChartProps) {
-        super(props);
-
-        this.getTooltipNodeRef = this.getTooltipNodeRef.bind(this);
-        this.onClick = this.onClick.bind(this);
-        this.onHover = this.onHover.bind(this);
-
-        this.state = {
-            layoutStatic: props.layoutStatic,
-            dataStatic: props.dataStatic,
-            attributeLayout: props.attributeLayout,
-            attributeData: props.attributeData
-        };
-    }
 
     render() {
         if (this.props.alertMessage) {
-            return createElement(Alert, { className: `widget-charts-any-alert` },
-                this.props.alertMessage
-            );
+            return createElement(Alert, { className: `widget-charts-any-alert` }, this.props.alertMessage);
         }
         if (this.props.loading) {
             return createElement(ChartLoading);
@@ -60,19 +44,11 @@ export class AnyChart extends Component<AnyChartProps> {
         return this.renderChart();
     }
 
-    componentDidMount() {
-        if (!this.props.loading) {
-            this.renderChart();
-        }
+    componentWillReceiveProps(newProps: AnyChartProps) {
+        this.setState({ alertMessage: newProps.alertMessage });
     }
 
-    componentDidUpdate() {
-        if (!this.props.loading) {
-            this.renderChart();
-        }
-    }
-
-    private getTooltipNodeRef(node: HTMLDivElement) {
+    private getTooltipNodeRef = (node: HTMLDivElement) => {
         if (node) {
             this.tooltipNode = node;
         }
@@ -87,78 +63,29 @@ export class AnyChart extends Component<AnyChartProps> {
             data: this.getData(this.props),
             config: AnyChart.getConfigOptions(),
             onClick: this.onClick,
-            onHover: this.onHover,
             getTooltipNode: this.getTooltipNodeRef
         });
     }
 
     private getData(props: AnyChartProps): any[] {
-        let invalidJSON: string = props.layoutStatic;
-        try {
-            invalidJSON = props.dataStatic;
-            const staticData: any[] = JSON.parse(props.dataStatic || "[]");
-            invalidJSON = props.attributeData;
-            if (props.attributeData) {
-                const attributeData: any[] = JSON.parse(props.attributeData)
-                    .map((data: any) => {
-                        return !data.type || data.type.toLowerCase().indexOf("3d") === -1
-                            ? deepMerge.all([ { hoverinfo: "none" }, data ])
-                            : data;
-                    });
+        const staticData: any[] = JSON.parse(props.dataStatic || "[]");
 
-                return deepMerge.all([ staticData, attributeData ], { arrayMerge });
-            }
-
-            return staticData.map((data: any) => {
-                return !data.type || data.type.toLowerCase().indexOf("3d") === -1
-                    ? deepMerge.all([ { hoverinfo: "none" }, data ])
-                    : data;
-            });
-        } catch (error) {
-            window.mx.ui.error(`Failed convert data into JSON: \n${error}: \n${invalidJSON}`);
-
-            return [];
-        }
+        return props.attributeData
+            ? deepMerge.all([ staticData, JSON.parse(props.attributeData) ], { arrayMerge })
+            : staticData;
     }
 
     private getLayoutOptions(props: AnyChartProps): Partial<Layout> {
-        let invalidJSON: string = props.layoutStatic;
-        try {
-            const staticLayout = JSON.parse(props.layoutStatic || "{}");
-            invalidJSON = props.attributeLayout;
+        const staticLayout = JSON.parse(props.layoutStatic || "{}");
 
-            return props.attributeLayout
-                ? deepMerge.all([ staticLayout, JSON.parse(props.attributeLayout) ], { arrayMerge }) as Partial<Layout>
-                : staticLayout;
-
-        } catch (error) {
-            window.mx.ui.error(`Failed convert layout into JSON: \n${error}: \n${invalidJSON}`);
-
-            return {};
-        }
+        return props.attributeLayout
+            ? deepMerge.all([ staticLayout, JSON.parse(props.attributeLayout) ], { arrayMerge }) as Partial<Layout>
+            : staticLayout;
     }
 
-    private onClick({ points }: any) {
+    private onClick = ({ points }: any) => {
         if (this.props.onClick) {
             this.props.onClick(this.copyPoints(points));
-        }
-    }
-
-    private onHover({ points, event }: any) {
-        if (event && this.tooltipNode) {
-            const { x, xaxis, y, yaxis, z, text } = points[0];
-            unmountComponentAtNode(this.tooltipNode);
-            const coordinates = getTooltipCoordinates(event, this.tooltipNode);
-            if (coordinates) {
-                setTooltipPosition(this.tooltipNode, coordinates);
-                if (this.props.onHover) {
-                    this.props.onHover(this.copyPoints(points), this.tooltipNode);
-                } else if (points[0].data.hoverinfo === "none") {
-                    render(createElement(HoverTooltip, { text: z || text || y }), this.tooltipNode);
-                } else {
-                    this.tooltipNode.style.opacity = "0";
-                }
-            }
         }
     }
 

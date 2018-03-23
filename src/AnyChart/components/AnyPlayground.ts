@@ -3,6 +3,7 @@ import { Playground } from "../../components/Playground";
 import { SidebarHeaderTools } from "../../components/SidebarHeaderTools";
 import { MendixButton } from "../../components/MendixButton";
 
+import { Alert } from "../../components/Alert";
 import { AnyChart, AnyChartProps } from "./AnyChart";
 import { Panel, PanelProps } from "../../components/Panel";
 import { Select, SelectProps } from "../../components/Select";
@@ -23,6 +24,10 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
     private isValid = false;
 
     render() {
+        if (this.props.alertMessage) {
+            return createElement(Alert, { className: `widget-charts-any-alert` }, this.props.alertMessage);
+        }
+
         return createElement("div", {},
             createElement(Playground, {}, ...this.renderPanels(), this.renderHeaderTools()),
             this.createChart()

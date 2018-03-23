@@ -13,7 +13,7 @@ __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../wi
 
 export default class AnyChartContainer extends Component<AnyChartContainerProps, AnyChartContainerState> {
     state: AnyChartContainerState = {
-        alertMessage: this.validateSeriesProps(this.props),
+        alertMessage: AnyChartContainer.validateSeriesProps(this.props),
         attributeData: "[]",
         attributeLayout: "{}",
         loading: false
@@ -31,7 +31,8 @@ export default class AnyChartContainer extends Component<AnyChartContainerProps,
             width: this.props.width,
             widthUnit: this.props.widthUnit,
             height: this.props.height,
-            heightUnit: this.props.heightUnit
+            heightUnit: this.props.heightUnit,
+            alertMessage: this.state.alertMessage
         };
 
         return createElement("div", {},
@@ -52,14 +53,14 @@ export default class AnyChartContainer extends Component<AnyChartContainerProps,
         const errorMessages: string[] = [];
         let error = validateAdvancedOptions(attributeData);
         if (error) {
-            errorMessages.push(error);
+            errorMessages.push(`Data Source attribute value contains invalid JSON: \n${error}`);
         }
         error = validateAdvancedOptions(attributeLayout);
         if (error) {
-            errorMessages.push(error);
+            errorMessages.push(`Layout Source attribute value contains invalid JSON: \n${error}`);
         }
         this.setState({
-            alertMessage: this.renderError(friendlyId, errorMessages),
+            alertMessage: AnyChartContainer.renderError(friendlyId, errorMessages),
             loading: false,
             attributeData,
             attributeLayout
@@ -132,7 +133,7 @@ export default class AnyChartContainer extends Component<AnyChartContainerProps,
         window.mx.ui.openForm(tooltipForm, { domNode, context });
     }
 
-    validateSeriesProps(props: AnyChartContainerProps): ReactChild {
+    public static validateSeriesProps(props: AnyChartContainerProps): ReactChild {
         const errorMessages: string[] = [];
 
         if (props.layoutStatic && props.layoutStatic.trim()) {
@@ -159,10 +160,10 @@ export default class AnyChartContainer extends Component<AnyChartContainerProps,
         }
         // TODO can we validate the context object of tooltip form to match the tooltip entity?
 
-        return this.renderError(props.friendlyId, errorMessages);
+        return AnyChartContainer.renderError(props.friendlyId, errorMessages);
     }
 
-    private renderError(id: string, errorMessages: string[]) {
+    public static renderError(id: string, errorMessages: string[]) {
         if (errorMessages.length) {
             return createElement("div", {},
                 `Configuration error in widget ${id}:`,
@@ -171,5 +172,4 @@ export default class AnyChartContainer extends Component<AnyChartContainerProps,
         }
         return "";
     }
-
 }

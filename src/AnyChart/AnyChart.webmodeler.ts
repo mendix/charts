@@ -2,6 +2,8 @@ import { Component, createElement } from "react";
 
 import { AnyChart } from "./components/AnyChart";
 import { Container } from "../utils/namespaces";
+import AnyChartContainer from "./components/AnyChartContainer";
+import { Alert } from "../components/Alert";
 
 // tslint:disable-next-line class-name
 export class preview extends Component<Container.AnyChartContainerProps, {}> {
@@ -9,7 +11,8 @@ export class preview extends Component<Container.AnyChartContainerProps, {}> {
         return createElement("div", {},
             createElement(AnyChart, {
                 ...this.props as any,
-                attributeData: this.props.sampleData
+                attributeData: this.props.sampleData,
+                alertMessage: AnyChartContainer.validateSeriesProps(this.props)
             })
         );
     }
