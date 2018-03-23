@@ -23,7 +23,9 @@ export const getDimensions = <T extends Style.Dimensions>(props: T): CSSProperti
         width: props.widthUnit === "percentage" ? `${props.width}%` : `${props.width}px`
     };
     if (props.heightUnit === "percentageOfWidth") {
-        style.paddingBottom = `${props.height}%`;
+        style.paddingBottom = props.widthUnit === "percentage"
+            ? `${props.height}%`
+            : `${props.width / 2}px`;
     } else if (props.heightUnit === "pixels") {
         style.height = `${props.height}px`;
     } else if (props.heightUnit === "percentageOfParent") {
