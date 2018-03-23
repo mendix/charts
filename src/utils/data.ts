@@ -1,4 +1,5 @@
 import { ReactChild, createElement } from "react";
+import deepMerge from "deepmerge";
 import { Datum } from "plotly.js";
 import { Data } from "./namespaces";
 import SeriesProps = Data.SeriesProps;
@@ -73,8 +74,8 @@ export const validateAdvancedOptions = (rawData: string): string => {
     return "";
 };
 
-export const fetchSeriesData = (mxObject: mendix.lib.MxObject, series: SeriesProps): Promise<SeriesData> =>
-    new Promise<SeriesData>((resolve, reject) => {
+export const fetchSeriesData = <S extends SeriesProps = SeriesProps>(mxObject: mendix.lib.MxObject, series: S): Promise<SeriesData<S>> =>
+    new Promise<SeriesData<S>>((resolve, reject) => {
         if (series.dataEntity) {
             if (series.dataSourceType === "XPath") {
                 const references = getReferences(series);
@@ -97,6 +98,9 @@ const getReferences = (series: SeriesProps): ReferencesSpec => {
     references = addPathReference(references, series.xValueAttribute);
     references = addPathReference(references, series.yValueAttribute);
     references = addPathReference(references, series.xValueSortAttribute || series.xValueAttribute);
+    if (series.markerSizeAttribute) {
+        references = addPathReference(references, series.markerSizeAttribute);
+    }
     return references;
 };
 
@@ -184,19 +188,26 @@ export const handleOnClick = <T extends EventProps>(options: T, mxObject?: mendi
 export const getSeriesTraces = ({ data, series }: SeriesData): ScatterTrace => {
     const xData = data ? data.map(mxObject => getAttributeValue(mxObject, series.xValueAttribute)) : [];
     const yData = data ? data.map(mxObject => parseFloat(mxObject.get(series.yValueAttribute) as string)) : [];
-    const sortData = data && series.xValueSortAttribute ? data.map(mxObject => getAttributeValue(mxObject, series.xValueSortAttribute)) : [];
+    const markerSizeData = data && series.markerSizeAttribute
+        ? data.map(mxObject => parseFloat(mxObject.get(series.markerSizeAttribute as string) as string))
+        : undefined;
+    const sortData = data && series.xValueSortAttribute
+        ? data.map(mxObject => getAttributeValue(mxObject, series.xValueSortAttribute))
+        : [];
     const sortDataError = xData.length !== yData.length || xData.length !== sortData.length;
     const alreadySorted = series.dataSourceType === "XPath" && series.xValueSortAttribute && series.xValueSortAttribute.split("/").length === 1;
     if (!series.xValueSortAttribute || alreadySorted || sortDataError) {
         return {
             x: xData,
-            y: yData
+            y: yData,
+            marker: markerSizeData ? { size: markerSizeData } : {}
         };
     }
     const unsorted = sortData.map((value, index) => {
         return {
             x: xData[index],
             y: yData[index],
+            marker: markerSizeData ? { size: markerSizeData[index] } : {},
             sort: value
         };
     });
@@ -220,9 +231,12 @@ export const getSeriesTraces = ({ data, series }: SeriesData): ScatterTrace => {
     });
     const sortedXData = sorted.map(value => value.x);
     const sortedYData = sorted.map(value => value.y);
+    const sortedSizeData = markerSizeData && sorted.map(value => value.marker.size);
+
     return {
         x: sortedXData,
-        y: sortedYData
+        y: sortedYData,
+        marker: { size: sortedSizeData as number[] }
     };
 };
 
@@ -271,11 +285,39 @@ export const parseTime = (date: Date): string => {
     return time.join(":");
 };
 
-export const getRandomNumbers = (count: number, range: number): number[] => {
+/**
+ * Returns a random integer between min (included) and max (included)
+ * @param count
+ * @param rangeMax
+ * @param rangeMin
+ */
+export const getRandomNumbers = (count: number, rangeMax: number, rangeMin = 0): number[] => {
     const numbers: number[] = [];
     for (let i = 0; i < count; i++) {
-        numbers.push(Math.round(Math.random() * range));
+        numbers.push(Math.round(Math.random() * (rangeMax - rangeMin + 1) + rangeMin));
     }
 
     return numbers;
+};
+
+const emptyTarget = (value: any) => Array.isArray(value) ? [] : {};
+
+const clone = (value: any, options: any) => deepMerge(emptyTarget(value), value, options);
+
+export const arrayMerge = (target: any[], source: any[], options: any) => {
+    const destination = target.slice();
+
+    source.forEach((e, i) => {
+        if (typeof destination[i] === "undefined") {
+            const cloneRequested = options.clone !== false;
+            const shouldClone = cloneRequested && options.isMergeableObject(e);
+            destination[i] = shouldClone ? clone(e, options) : e;
+        } else if (options.isMergeableObject(e)) {
+            destination[i] = deepMerge(target[i], e, options);
+        } else if (target.indexOf(e) === -1) {
+            destination.push(e);
+        }
+    });
+
+    return destination;
 };

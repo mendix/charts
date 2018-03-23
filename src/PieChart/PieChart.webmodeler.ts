@@ -26,7 +26,7 @@ export class preview extends Component<PieChartContainerProps, {}> {
         return [
             {
                 hole: props.chartType === "donut" ? 0.4 : 0,
-                hoverinfo: "label+name",
+                hoverinfo: "none",
                 name: "GHG Emissions",
                 type: "pie",
                 labels: [ "US", "China", "European Union" ],

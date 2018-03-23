@@ -3,7 +3,8 @@ const webpack = require("webpack");
 const webpackConfig = require("./webpack.config");
 const merge = require("webpack-merge");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
-const widgetNames = [ "LineChart", "PieChart", "ColumnChart", "BarChart", "TimeSeries", "HeatMap" ];
+const widgetNames = [ "LineChart", "AreaChart", "PieChart", "ColumnChart", "BarChart",
+    "TimeSeries", "HeatMap", "BubbleChart" ];
 
 const webpackConfigRelease = webpackConfig.map(config => merge(config, {
     devtool: false,
@@ -17,12 +18,14 @@ const webpackConfigRelease = webpackConfig.map(config => merge(config, {
 
 module.exports = function(grunt) {
     const pkg = grunt.file.readJSON("package.json");
+    const packageNameCharts = pkg.widgetName[0];
+    const packageNameAnyChart = pkg.widgetName[1];
     grunt.initConfig({
 
         watch: {
             updateWidgetFiles: {
                 files: [ "./src/**/*", "src/**/*" ],
-                tasks: [ "webpack:develop", "file_append", "compress:dist", "copy" ],
+                tasks: [ "webpack:develop", "file_append", "compress", "copy" ],
                 options: {
                     debounceDelay: 250
                 }
@@ -32,7 +35,7 @@ module.exports = function(grunt) {
         compress: {
             dist: {
                 options: {
-                    archive: "./dist/" + pkg.version + "/" + pkg.widgetName + ".mpk",
+                    archive: `./dist/${pkg.version}/${packageNameCharts}.mpk`,
                     mode: "zip"
                 },
                 files: [ {
@@ -42,25 +45,48 @@ module.exports = function(grunt) {
                     cwd: "./dist/tmp/src",
                     src: [ "**/*" ]
                 } ]
+            },
+            any: {
+                options: {
+                    archive: `./dist/${pkg.version}/${packageNameAnyChart}.mpk`,
+                    mode: "zip"
+                },
+                files: [ {
+                    expand: true,
+                    date: new Date(),
+                    store: false,
+                    cwd: `./dist/tmp/${packageNameAnyChart}`,
+                    src: [ "**/*" ]
+                } ]
             }
         },
 
         copy: {
             distDeployment: {
-                files: [ {
-                    dest: "./dist/MxTestProject/deployment/web/widgets",
-                    cwd: "./dist/tmp/src/",
-                    src: [ "**/*" ],
-                    expand: true
-                } ]
+                files: [
+                    {
+                        dest: "./dist/MxTestProject/deployment/web/widgets",
+                        cwd: "./dist/tmp/src/",
+                        src: [ "**/*" ],
+                        expand: true
+                    },
+                    {
+                        dest: "./dist/MxTestProject/deployment/web/widgets",
+                        cwd: `./dist/tmp/${packageNameAnyChart}/`,
+                        src: [ "**/*" ],
+                        expand: true
+                    }
+                ]
             },
             mpk: {
-                files: [ {
-                    dest: "./dist/MxTestProject/widgets",
-                    cwd: "./dist/" + pkg.version + "/",
-                    src: [ pkg.widgetName + ".mpk" ],
-                    expand: true
-                } ]
+                files: [
+                    {
+                        dest: "./dist/MxTestProject/widgets",
+                        cwd: `./dist/${pkg.version}/`,
+                        src: [ "*.mpk" ],
+                        expand: true
+                    }
+                ]
             }
         },
 
@@ -72,7 +98,11 @@ module.exports = function(grunt) {
                         input: `dist/tmp/src/${widgetName}/${widgetName}.webmodeler.js`
                     };
                 })
-            }
+            },
+            addSourceUrlAnyChart: { files: [ {
+                append: `\n\n//# sourceURL=AnyChart.webmodeler.js\n`,
+                input: `dist/tmp/${packageNameAnyChart}/${packageNameAnyChart}/${packageNameAnyChart}.webmodeler.js`
+            } ] }
         },
 
         webpack: {
@@ -82,12 +112,15 @@ module.exports = function(grunt) {
 
         clean: {
             build: [
-                "./dist/" + pkg.version + "/" + pkg.widgetName + "/*",
+                `./dist/${pkg.version}/${packageNameCharts}/*`,
+                `./dist/${pkg.version}/${packageNameAnyChart}/*`,
                 "./dist/tmp/**/*",
                 "./dist/tsc/**/*",
                 "./dist/testresults/**/*",
-                "./dist/MxTestProject/deployment/web/widgets/" + pkg.widgetName + "/*",
-                "./dist/MxTestProject/widgets/" + pkg.widgetName + ".mpk"
+                `./dist/MxTestProject/deployment/web/widgets/${packageNameCharts}/*`,
+                `./dist/MxTestProject/widgets/${packageNameCharts}.mpk`,
+                `./dist/MxTestProject/deployment/web/widgets/${packageNameAnyChart}/*`,
+                `./dist/MxTestProject/widgets/${packageNameAnyChart}.mpk`
             ]
         },
 
@@ -108,12 +141,12 @@ module.exports = function(grunt) {
     grunt.registerTask(
         "clean build",
         "Compiles all the assets and copies the files to the dist directory.",
-        [ "checkDependencies", "clean:build", "webpack:develop", "file_append", "compress:dist", "copy:mpk" ]
+        [ "checkDependencies", "clean:build", "webpack:develop", "file_append", "compress", "copy:mpk" ]
     );
     grunt.registerTask(
         "release",
         "Compiles all the assets and copies the files to the dist directory. Minified without source mapping",
-        [ "checkDependencies", "clean:build", "webpack:release", "file_append", "compress:dist", "copy:mpk" ]
+        [ "checkDependencies", "clean:build", "webpack:release", "file_append", "compress", "copy:mpk" ]
     );
     grunt.registerTask("build", [ "clean build" ]);
 };

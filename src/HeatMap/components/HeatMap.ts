@@ -1,7 +1,9 @@
 import { Component, ReactChild, ReactElement, createElement } from "react";
+import { render, unmountComponentAtNode } from "react-dom";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
+import { HoverTooltip } from "../../components/HoverTooltip";
 
 import { Container } from "../../utils/namespaces";
 import HeatMapContainerProps = Container.HeatMapContainerProps;
@@ -10,7 +12,7 @@ import deepMerge from "deepmerge";
 import { PiePlayground } from "../../PieChart/components/PiePlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 import { HeatMapData, Layout, ScatterHoverData } from "plotly.js";
-import { getDimensions, parseStyle } from "../../utils/style";
+import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 
 import "../../ui/Charts.scss";
 
@@ -35,13 +37,21 @@ export interface PieTraces {
 }
 
 export class HeatMap extends Component<HeatMapProps, HeatMapState> {
-    state = {
+    state: HeatMapState = {
         layoutOptions: this.props.layoutOptions,
         dataOptions: this.props.dataOptions,
         playgroundLoaded: false
     };
     private tooltipNode?: HTMLDivElement;
     private Playground?: typeof PiePlayground;
+
+    constructor(props: HeatMapProps) {
+        super(props);
+
+        if (props.devMode === "developer") {
+            this.loadPlaygroundComponent();
+        }
+    }
 
     render() {
         if (this.props.alertMessage) {
@@ -50,19 +60,13 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
             );
         }
         if (this.props.loading || (this.props.devMode === "developer" && !this.state.playgroundLoaded)) {
-            return createElement(ChartLoading, { text: "Loading" });
+            return createElement(ChartLoading);
         }
         if (this.props.devMode === "developer" && this.state.playgroundLoaded) {
             return this.renderPlayground();
         }
 
         return this.renderChart();
-    }
-
-    componentWillReceiveProps(newProps: HeatMapProps) {
-        if (newProps.devMode === "developer" && !this.state.playgroundLoaded) {
-            this.loadPlaygroundComponent();
-        }
     }
 
     private getTooltipNodeRef = (node: HTMLDivElement) => {
@@ -117,7 +121,8 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
                     x: this.props.data.x,
                     y: this.props.data.y,
                     z: this.props.data.z,
-                    text: this.props.data.z.map((row, i) => row.map((item, j) => `${item}`))
+                    text: this.props.data.z.map((row, i) => row.map((item, j) => `${item}`)),
+                    zsmooth: props.smoothColor ? "best" : false
                 },
                 advancedOptions
             ]);
@@ -136,7 +141,11 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
 
         return deepMerge.all([
             HeatMap.getDefaultLayoutOptions(props),
-            { annotations: props.showValues ? this.getTextAnnotations(props.data || props.defaultData, props.valuesColor) : undefined },
+            {
+                annotations: props.showValues
+                    ? this.getTextAnnotations(props.data || props.defaultData, props.valuesColor)
+                    : undefined
+            },
             advancedOptions
         ]);
     }
@@ -155,7 +164,11 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
                         x: data.x[ j ],
                         y: data.y[ i ],
                         text: data.z[ i ][ j ],
-                        font: { color: this.props.valuesColor || textColor },
+                        font: {
+                            family: "Open Sans",
+                            size: 14,
+                            color: this.props.valuesColor || "#555"
+                        },
                         showarrow: false
                     };
                     annotations.push(result);
@@ -172,17 +185,21 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
         }
     }
 
-    private onHover = ({ points }: ScatterHoverData<any>) => {
-        const { x, xaxis, y, yaxis, z } = points[0];
-        if (this.props.onHover && this.tooltipNode) {
-            const yAxisPixels = typeof y === "number" ? yaxis.l2p(y) : yaxis.d2p(y);
-            const xAxisPixels = typeof x === "number" ? xaxis.l2p(x as number) : xaxis.d2p(x);
-            const positionYaxis = yAxisPixels + yaxis._offset;
-            const positionXaxis = xAxisPixels + xaxis._offset;
-            this.tooltipNode.style.top = `${positionYaxis}px`;
-            this.tooltipNode.style.left = `${positionXaxis}px`;
-            this.tooltipNode.style.opacity = "1";
-            this.props.onHover(this.tooltipNode, x as string, y as string, z as number);
+    private onHover = ({ points, event }: ScatterHoverData<any>) => {
+        const { x, xaxis, y, yaxis, z, text } = points[0];
+        if (event && this.tooltipNode) {
+            unmountComponentAtNode(this.tooltipNode);
+            const coordinates = getTooltipCoordinates(event, this.tooltipNode);
+            if (coordinates) {
+                setTooltipPosition(this.tooltipNode, coordinates);
+                if (this.props.onHover) {
+                    this.props.onHover(this.tooltipNode, x as string, y as string, z as number);
+                } else if (points[0].data.hoverinfo === "none" as any) {
+                    render(createElement(HoverTooltip, { text: text || z }), this.tooltipNode);
+                } else {
+                    this.tooltipNode.style.opacity = "0";
+                }
+            }
         }
     }
 
@@ -192,15 +209,22 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
 
     public static getDefaultLayoutOptions(props: HeatMapProps): Partial<Layout> {
         return {
+            font: {
+                family: "Open Sans",
+                size: 14,
+                color: "#555"
+            },
             autosize: true,
             showarrow: false,
             xaxis: {
                 fixedrange: true,
-                title: props.xAxisLabel
+                title: props.xAxisLabel,
+                ticks: ""
             },
             yaxis: {
                 fixedrange: true,
-                title: props.yAxisLabel
+                title: props.yAxisLabel,
+                ticks: ""
             },
             hoverlabel: {
                 bgcolor: "#888",
@@ -222,9 +246,18 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
     public static getDefaultDataOptions(props: HeatMapProps): Partial<HeatMapData> {
         return {
             type: "heatmap",
-            hoverinfo: props.tooltipForm ? "none" : "text" as any, // typings missing valid "text" value
+            hoverinfo: "none",
             showscale: props.data && props.data.showscale,
-            colorscale: props.data && props.data.colorscale
+            colorscale: props.data && props.data.colorscale,
+            xgap: 1,
+            ygap: 1,
+            colorbar: {
+                y: 1,
+                yanchor: "top",
+                ypad: 0,
+                xpad: 5,
+                outlinecolor: "#9ba492"
+            }
         };
     }
 }

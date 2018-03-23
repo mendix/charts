@@ -9,7 +9,7 @@ interface SidebarHeaderProps {
 }
 
 export class SidebarHeader extends Component<SidebarHeaderProps> {
-    private contentSize = 9;
+    private contentSize = 10;
 
     render() {
         return createElement("div", { className: classNames("sidebar-content-header", this.props.className) },
@@ -28,7 +28,7 @@ export class SidebarHeader extends Component<SidebarHeaderProps> {
 
     private renderCloser() {
         if (this.props.onClose) {
-            return createElement("div", { className: "col-sm-3 col-xs-3" },
+            return createElement("div", { className: "col-sm-2 col-xs-2" },
                 createElement(IconButton, {
                     className: "pull-right remove",
                     glyphIcon: "remove",

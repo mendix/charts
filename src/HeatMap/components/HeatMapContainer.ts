@@ -19,6 +19,7 @@ interface HeatMapContainerState {
 export default class HeatMapContainer extends Component<HeatMapContainerProps, HeatMapContainerState> {
     private subscriptionHandle?: number;
     private rawData: mendix.lib.MxObject[] = [];
+    private intervalID?: number;
 
     constructor(props: HeatMapContainerProps) {
         super(props);
@@ -39,12 +40,31 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
         this.resetSubscriptions(newProps.mxObject);
         if (!this.state.alertMessage) {
             this.fetchData(newProps.mxObject);
+            this.setRefreshInterval(newProps.refreshInterval, newProps.mxObject);
         }
     }
 
     componentWillUnmount() {
         if (this.subscriptionHandle) {
             window.mx.data.unsubscribe(this.subscriptionHandle);
+        }
+        this.clearRefreshInterval();
+    }
+
+    private setRefreshInterval(refreshInterval: number, mxObject?: mendix.lib.MxObject) {
+        if (refreshInterval > 0 && mxObject) {
+            this.clearRefreshInterval();
+            this.intervalID = window.setInterval(() => {
+                if (!this.state.loading) {
+                    this.fetchData(mxObject);
+                }
+            }, refreshInterval);
+        }
+    }
+
+    private clearRefreshInterval() {
+        if (this.intervalID) {
+            window.clearInterval(this.intervalID);
         }
     }
 
@@ -91,6 +111,7 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
                                 x: horizontalValues,
                                 y: verticalValues,
                                 z: this.processZData(data, verticalValues, horizontalValues),
+                                zsmooth: this.props.smoothColor ? "best" : false,
                                 colorscale: HeatMapContainer.processColorScale(this.props.scaleColors),
                                 showscale: this.props.showScale,
                                 type: "heatmap"
@@ -124,6 +145,7 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
                                 x: horizontalValues,
                                 y: verticalValues,
                                 z: this.processZData(verticalData, verticalValues, horizontalValues),
+                                zsmooth: this.props.smoothColor ? "best" : false,
                                 colorscale: HeatMapContainer.processColorScale(this.props.scaleColors),
                                 showscale: this.props.showScale,
                                 type: "heatmap"
@@ -149,7 +171,8 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
                 );
 
                 return zData ? Number(zData.get(this.props.valueAttribute)) : 0;
-            }));
+            })
+        );
     }
 
     private getAttributeName(attributePath: string): string {
@@ -204,6 +227,6 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
     public static processColorScale(scaleColors: Container.ScaleColors[]): (string | number)[][] {
         return scaleColors.length > 1
             ? scaleColors.map(colors => [ Math.abs(colors.valuePercentage / 100), colors.colour ])
-            : [ [ 0, "#17347B" ], [ 0.5, "#48B0F7" ], [ 1, "#76CA02" ] ];
+            : [ [ 0, "#17347B" ], [ 0.5, "#0595DB" ], [ 1, "#76CA02" ] ];
     }
 }

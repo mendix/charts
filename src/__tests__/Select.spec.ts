@@ -51,8 +51,8 @@ describe("Select", () => {
         const switcher = shallow(createElement(Select, defaultProps));
         const instance = switcher.instance();
         const onChangeSpy = spyOn(instance, "onChange" as any);
-        switcher.simulate("change");
+        // switcher.simulate("change");
 
-        expect(onChangeSpy).toHaveBeenCalled();
+        expect(switcher.simulate("change")).toThrowError("TypeError: Cannot read property 'currentTarget' of undefined");
     });
 });

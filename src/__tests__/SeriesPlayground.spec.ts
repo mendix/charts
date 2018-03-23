@@ -61,7 +61,13 @@ describe("SeriesPlayground", () => {
                         editorProps: { $blockScrolling: Infinity },
                         setOptions: { showLineNumbers: false, highlightActiveLine: false, highlightGutterLine: true }
                     })
-                )
+                ),
+                createElement(Select, {
+                    onChange: jasmine.any(Function),
+                    options: [
+                        { name: "Layout", value: "layout", isDefaultSelected: true }
+                    ]
+                })
             )
         );
     });
@@ -81,17 +87,8 @@ describe("SeriesPlayground", () => {
             expect(playground.find(Panel).length).toBe(0);
         });
 
-        it("renders the series panels when raw data is provided", () => {
-            defaultProps.rawData = [
-                {
-                    data: [ mockMendix.lib.MxObject() ] as any,
-                    series: {
-                        name: "Series 1",
-                        seriesOptions: "{}",
-                        tooltipForm: "myTooltipForm.xml"
-                    }
-                } as any
-            ];
+        it("renders the series panels when series options are provided", () => {
+            defaultProps.seriesOptions = [ "{}", "{}" ];
             const playground = renderSeriesPlayground(defaultProps);
             playground.setState({ activeOption: "0" });
 
@@ -127,7 +124,7 @@ describe("SeriesPlayground", () => {
     });
 
     it("renders the panel switcher when raw data is specified", () => {
-        defaultProps.rawData = [
+        defaultProps.series = [
             {
                 data: [ mockMendix.lib.MxObject() ] as any,
                 series: {
@@ -140,12 +137,6 @@ describe("SeriesPlayground", () => {
         const playground = renderSeriesPlayground(defaultProps);
 
         expect(playground.find(Select).length).toBe(1);
-    });
-
-    it("does not render a panel switcher when no raw data is specified", () => {
-        const playground = renderSeriesPlayground(defaultProps);
-
-        expect(playground.find(Select).length).toBe(0);
     });
 
     it("renders the specified children last", () => {

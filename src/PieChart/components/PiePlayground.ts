@@ -3,6 +3,7 @@ import { Component, ReactElement, createElement } from "react";
 import { Playground } from "../../components/Playground";
 import { Panel, PanelProps } from "../../components/Panel";
 import { Select, SelectProps } from "../../components/Select";
+import { SidebarHeaderTools } from "../../components/SidebarHeaderTools";
 
 export interface PiePlaygroundProps {
     dataOptions: string;
@@ -105,14 +106,16 @@ export class PiePlayground extends Component<PiePlaygroundProps, PiePlaygroundSt
         return [];
     }
 
-    private renderPanelSwitcher(): ReactElement<SelectProps> {
-        return createElement(Select, {
-            onChange: this.updateView,
-            options: [
-                { name: "Layout", value: "layout", isDefaultSelected: true },
-                { name: "Data", value: "data", isDefaultSelected: false }
-            ]
-        });
+    private renderPanelSwitcher(): ReactElement<any> {
+        return createElement(SidebarHeaderTools, {},
+            createElement(Select, {
+                onChange: this.updateView,
+                options: [
+                    { name: "Layout", value: "layout", isDefaultSelected: true },
+                    { name: "Data", value: "data", isDefaultSelected: false }
+                ]
+            })
+        );
     }
 
     private onValidate = (annotations: object[]) => {
@@ -123,14 +126,15 @@ export class PiePlayground extends Component<PiePlaygroundProps, PiePlaygroundSt
         if (this.timeoutId) {
             clearTimeout(this.timeoutId);
         }
-        this.timeoutId = setTimeout(() => {
+        this.timeoutId = window.setTimeout(() => {
             try {
-                if (this.isValid && JSON.parse(value)) {
-                    this.updateChart(source, value);
+                if (this.isValid) {
+                    this.updateChart(source, JSON.stringify(JSON.parse(value), null, 2));
+                } else {
+                    this.updateChart(source, Playground.convertJSToJSON(value));
                 }
             } catch (error) {
                 this.isValid = false;
-                console.error("An error occured while updating the playground chart", error); // tslint:disable-line
             }
         }, 1000);
     }

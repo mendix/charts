@@ -1,0 +1,14 @@
+{
+    "extends": "./tsconfig",
+    "compilerOptions": {
+        "module": "CommonJS",
+        "types": [ "mendix-client" ]
+    },
+    "exclude": [
+        "**/*Container.ts",
+        "src/utils/data.ts",
+        "**/*.spec.ts",
+        "tests",
+        "node_modules"
+    ]
+}

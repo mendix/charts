@@ -5,10 +5,11 @@ import { mockMendix } from "../../tests/mocks/Mendix";
 import { Alert } from "../components/Alert";
 import { ChartLoading } from "../components/ChartLoading";
 import { HeatMap, HeatMapProps } from "../HeatMap/components/HeatMap";
-import { preview } from "../HeatMap/HeatMap.webmodeler";
 import "../PieChart/components/PiePlayground";
 import { PlotlyChart } from "../components/PlotlyChart";
-import { ScatterHoverData } from "plotly.js";
+import { HeatMapData, ScatterHoverData } from "plotly.js";
+import * as style from "../utils/style";
+import { Container } from "../utils/namespaces";
 
 describe("HeatMap", () => {
     const renderShallowChart = (props: HeatMapProps) => shallow(createElement(HeatMap, props));
@@ -24,7 +25,8 @@ describe("HeatMap", () => {
             widthUnit: "percentage",
             height: 100,
             heightUnit: "pixels",
-            layoutOptions: "{}"
+            layoutOptions: "{}",
+            scaleColors: []
         };
         window.mendix = mockMendix as any;
     });
@@ -42,30 +44,57 @@ describe("HeatMap", () => {
         defaultProps.loading = true;
         const chart = renderShallowChart(defaultProps as HeatMapProps);
 
-        expect(chart).toBeElement(createElement(ChartLoading, { text: "Loading" }));
+        expect(chart).toBeElement(createElement(ChartLoading));
     });
 
-    xit("whose dev mode is developer renders the playground", (done) => {
-        defaultProps.data = preview.getData(defaultProps as HeatMapProps);
+    it("whose dev mode is developer renders the playground", (done) => {
+        defaultProps.data = getData(defaultProps as HeatMapProps);
         const renderPlaygroundSpy = spyOn(HeatMap.prototype, "renderPlayground" as any).and.callThrough();
+        defaultProps.devMode = "developer";
         const chart = renderShallowChart(defaultProps as HeatMapProps);
-        chart.setProps({ devMode: "developer" });
 
         window.setTimeout(() => {
             expect(renderPlaygroundSpy).toHaveBeenCalled();
 
             done();
-        }, 1000);
+        }, 500);
     });
 
-    xit("with no alert message, isn't loading and whose dev mode isn't set to developer renders the chart correctly", () => {
-        defaultProps.data = preview.getData(defaultProps as HeatMapProps);
+    it("whose dev mode is basic does not render the playground", (done) => {
+        defaultProps.data = getData(defaultProps as HeatMapProps);
+        const renderPlaygroundSpy = spyOn(HeatMap.prototype, "renderPlayground" as any).and.callThrough();
+        defaultProps.devMode = "basic";
+        const chart = renderShallowChart(defaultProps as HeatMapProps);
+
+        window.setTimeout(() => {
+            expect(renderPlaygroundSpy).not.toHaveBeenCalled();
+
+            done();
+        }, 500);
+    });
+
+    it("whose dev mode is advanced does not render the playground", (done) => {
+        defaultProps.data = getData(defaultProps as HeatMapProps);
+        const renderPlaygroundSpy = spyOn(HeatMap.prototype, "renderPlayground" as any).and.callThrough();
+        defaultProps.devMode = "advanced";
+        const chart = renderShallowChart(defaultProps as HeatMapProps);
+
+        window.setTimeout(() => {
+            expect(renderPlaygroundSpy).not.toHaveBeenCalled();
+
+            done();
+        }, 500);
+    });
+    // tslint:disable-next-line max-line-length
+    it("with no alert message, isn't loading and whose dev mode isn't set to developer renders the chart correctly", () => {
+        defaultProps.devMode = "basic";
+        defaultProps.data = getData(defaultProps as HeatMapProps);
         const chart = renderShallowChart(defaultProps as HeatMapProps);
 
         expect(chart).toBeElement(
             createElement(PlotlyChart,
                 {
-                    type: "full",
+                    type: "heatmap",
                     style: { width: "100%", height: "100px" },
                     layout: jasmine.any(Object) as any,
                     data: jasmine.any(Object) as any,
@@ -76,6 +105,120 @@ describe("HeatMap", () => {
                 }
             )
         );
+    });
+
+    it("saves a reference of the tooltip node", () => {
+        defaultProps.data = getData(defaultProps as HeatMapProps);
+        const chart = renderFullChart(defaultProps as HeatMapProps);
+        const instance: any = chart.instance();
+
+        expect(instance.tooltipNode).toBeDefined();
+    });
+
+    it("with the devMode basic should not merge the modeler JSON layout options", () => {
+        defaultProps.data = getData(defaultProps as HeatMapProps);
+        defaultProps.layoutOptions = "{ \"title\": \"My HeatMap\" }";
+        defaultProps.showValues = false;
+        defaultProps.devMode = "basic";
+        const chart = renderShallowChart(defaultProps as HeatMapProps);
+        const chartInstance: any = chart.instance();
+
+        expect(chartInstance.getLayoutOptions(defaultProps)).toEqual({
+            ...HeatMap.getDefaultLayoutOptions(defaultProps as HeatMapProps),
+            annotations: undefined
+        });
+    });
+
+    it("with the devMode advanced should merge the modeler JSON layout options", () => {
+        defaultProps.data = getData(defaultProps as HeatMapProps);
+        defaultProps.layoutOptions = "{ \"title\": \"My HeatMap\" }";
+        defaultProps.showValues = false;
+        defaultProps.devMode = "advanced";
+        const chart = renderShallowChart(defaultProps as HeatMapProps);
+        const chartInstance: any = chart.instance();
+
+        expect(chartInstance.getLayoutOptions(defaultProps)).toEqual({
+            ...HeatMap.getDefaultLayoutOptions(defaultProps as HeatMapProps),
+            annotations: undefined,
+            title: "My HeatMap"
+        });
+    });
+
+    it("with the devMode developer should merge the modeler JSON layout options", () => {
+        defaultProps.data = getData(defaultProps as HeatMapProps);
+        defaultProps.layoutOptions = "{ \"title\": \"My HeatMap\" }";
+        defaultProps.showValues = false;
+        defaultProps.devMode = "developer";
+        const chart = renderShallowChart(defaultProps as HeatMapProps);
+        const chartInstance: any = chart.instance();
+
+        expect(chartInstance.getLayoutOptions(defaultProps)).toEqual({
+            ...HeatMap.getDefaultLayoutOptions(defaultProps as HeatMapProps),
+            annotations: undefined,
+            title: "My HeatMap"
+        });
+    });
+
+    it("with the devMode basic should not merge the modeler JSON data options", () => {
+        defaultProps.data = getData(defaultProps as HeatMapProps);
+        defaultProps.dataOptions = "{ \"showscale\": true }";
+        defaultProps.devMode = "basic";
+        const chart = renderShallowChart(defaultProps as HeatMapProps);
+        const chartInstance: any = chart.instance();
+
+        expect(chartInstance.getData(defaultProps)).toEqual([
+            {
+                ...HeatMap.getDefaultDataOptions(defaultProps as HeatMapProps),
+                x: defaultProps.data.x,
+                y: defaultProps.data.y,
+                z: defaultProps.data.z,
+                zsmooth: defaultProps.data.zsmooth,
+                text: defaultProps.data.z.map((row, i) => row.map((item, j) => `${item}`)),
+                colorscale: [ [ 0, "#17347B" ], [ 0.5, "#48B0F7" ], [ 1, "#76CA02" ] ]
+            }
+        ]);
+    });
+
+    it("with the devMode advanced should merge the modeler JSON data options", () => {
+        defaultProps.data = getData(defaultProps as HeatMapProps);
+        defaultProps.dataOptions = "{ \"showscale\": true }";
+        defaultProps.devMode = "advanced";
+        const chart = renderShallowChart(defaultProps as HeatMapProps);
+        const chartInstance: any = chart.instance();
+
+        expect(chartInstance.getData(defaultProps)).toEqual([
+            {
+                ...HeatMap.getDefaultDataOptions(defaultProps as HeatMapProps),
+                x: defaultProps.data.x,
+                y: defaultProps.data.y,
+                z: defaultProps.data.z,
+                zsmooth: defaultProps.data.zsmooth,
+                text: defaultProps.data.z.map((row, i) => row.map((item, j) => `${item}`)),
+                colorscale: [ [ 0, "#17347B" ], [ 0.5, "#48B0F7" ], [ 1, "#76CA02" ] ],
+                showscale: true
+            }
+        ]);
+    });
+
+    it("with the devMode developer should not merge the modeler JSON data options", () => {
+        defaultProps.data = getData(defaultProps as HeatMapProps);
+        defaultProps.dataOptions = "{ \"showscale\": true }";
+        defaultProps.devMode = "developer";
+        const chart = renderShallowChart(defaultProps as HeatMapProps);
+        const chartInstance: any = chart.instance();
+
+        expect(chartInstance.getData(defaultProps)).toEqual([
+            {
+                ...HeatMap.getDefaultDataOptions(defaultProps as HeatMapProps),
+                x: defaultProps.data.x,
+                y: defaultProps.data.y,
+                z: defaultProps.data.z,
+                zsmooth: defaultProps.data.zsmooth,
+                text: defaultProps.data.z.map((row, i) => row.map((item, j) => `${item}`)),
+                colorscale: [ [ 0, "#17347B" ], [ 0.5, "#48B0F7" ], [ 1, "#76CA02" ] ],
+                showscale: true
+            }
+        ]);
     });
 
     describe("event handler", () => {
@@ -99,7 +242,8 @@ describe("HeatMap", () => {
             ]
         };
 
-        xit("#onClick() calls the parent onClick handler", () => {
+        it("#onClick() calls the parent onClick handler", () => {
+            defaultProps.data = getData(defaultProps as HeatMapProps);
             defaultProps.onClick = jasmine.createSpy("onClick");
             const chart = renderShallowChart(defaultProps as HeatMapProps);
             (chart.instance() as any).onClick(plotlyEventData);
@@ -107,8 +251,10 @@ describe("HeatMap", () => {
             expect(defaultProps.onClick).toHaveBeenCalled();
         });
 
-        xit("#onHover() calls the parent onClick handler", () => {
+        it("#onHover() calls the parent onClick handler", () => {
+            defaultProps.data = getData(defaultProps as HeatMapProps);
             defaultProps.onHover = jasmine.createSpy("onHover");
+            spyOn(style, "getTooltipCoordinates").and.returnValue({ x: 4, y: 10 });
             const chart = renderFullChart(defaultProps as HeatMapProps);
             const instance = chart.instance() as any;
             instance.onHover(plotlyEventData);
@@ -117,3 +263,21 @@ describe("HeatMap", () => {
         });
     });
 });
+
+const getData = (props: Container.HeatMapContainerProps): HeatMapData => {
+    return {
+        x: [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" ],
+        y: [ "Morning", "Afternoon", "Evening" ],
+        z: [ [ 1, 20, 30, 50, 1 ], [ 20, 1, 60, 80, 30 ], [ 30, 60, 1, -10, 20 ] ],
+        zsmooth: props.smoothColor ? "best" : false,
+        colorscale: processColorScale(props.scaleColors),
+        showscale: props.showScale,
+        type: "heatmap"
+    };
+};
+
+const processColorScale = (scaleColors: Container.ScaleColors[]): (string | number)[][] => {
+    return scaleColors.length > 1
+        ? scaleColors.map(colors => [ Math.abs(colors.valuePercentage / 100), colors.colour ])
+        : [ [ 0, "#17347B" ], [ 0.5, "#48B0F7" ], [ 1, "#76CA02" ] ];
+};

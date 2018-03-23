@@ -18,7 +18,8 @@ export class preview extends Component<BarChartContainerProps, {}> {
             ),
             createElement(BarChart, {
                 ...this.props as BarChartContainerProps,
-                defaultData: preview.getData(this.props)
+                orientation: "bar",
+                scatterData: preview.getData(this.props)
             })
         );
     }
@@ -26,15 +27,19 @@ export class preview extends Component<BarChartContainerProps, {}> {
     static getData(props: BarChartContainerProps): ScatterData[] {
         if (props.series.length) {
             return props.series.map(series => {
-                const seriesOptions = series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
+                const seriesOptions = props.devMode !== "basic" && series.seriesOptions.trim()
+                    ? JSON.parse(series.seriesOptions)
+                    : {};
                 const sampleData = preview.getSampleTraces();
 
                 return deepMerge.all([ {
                     name: series.name,
                     type: "bar",
                     orientation: "h",
+                    hoverinfo: "none",
                     x: sampleData.x || [],
-                    y: sampleData.y || []
+                    y: sampleData.y || [],
+                    series: {}
                 }, seriesOptions ]);
             });
         }
@@ -43,6 +48,8 @@ export class preview extends Component<BarChartContainerProps, {}> {
                 type: "bar",
                 orientation: "h",
                 name: "Sample",
+                hoverinfo: "none" as any,
+                series: {},
                 ...preview.getSampleTraces()
             } ] as ScatterData[];
     }

@@ -1,17 +1,19 @@
 import { Component, ReactChild, ReactElement, createElement } from "react";
+import { render, unmountComponentAtNode } from "react-dom";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
+import { HoverTooltip } from "../../components/HoverTooltip";
+import { PiePlayground } from "./PiePlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
 import deepMerge from "deepmerge";
 import { Container } from "../../utils/namespaces";
 import { Config, Layout, PieData, PieHoverData, ScatterHoverData } from "plotly.js";
-import { getDimensions, parseStyle } from "../../utils/style";
+import { defaultColours, getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 import PieChartContainerProps = Container.PieChartContainerProps;
 
 import "../../ui/Charts.scss";
-import { PiePlayground } from "./PiePlayground";
 
 export interface PieChartProps extends PieChartContainerProps {
     data?: mendix.lib.MxObject[];
@@ -50,7 +52,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
             );
         }
         if (this.props.loading || (this.props.devMode === "developer" && !this.state.playgroundLoaded)) {
-            return createElement(ChartLoading, { text: "Loading" });
+            return createElement(ChartLoading);
         }
         if (this.props.devMode === "developer" && this.state.playgroundLoaded) {
             return this.renderPlayground();
@@ -141,7 +143,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 labels: data.map(mxObject => mxObject.get(this.props.nameAttribute) as string),
                 colors: this.props.colors && this.props.colors.length
                     ? this.props.colors.map(color => color.color)
-                    : [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ],
+                    : defaultColours(),
                 values: data.map(mxObject => parseFloat(mxObject.get(this.props.valueAttribute) as string))
             };
         }
@@ -155,13 +157,20 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         }
     }
 
-    private onHover = ({ event, points }: ScatterHoverData<any> | PieHoverData) => {
-        if (this.props.onHover && this.props.data && this.tooltipNode) {
-            this.tooltipNode.innerHTML = "";
-            this.tooltipNode.style.top = `${event.clientY - 100}px`;
-            this.tooltipNode.style.left = `${event.clientX}px`;
-            this.tooltipNode.style.opacity = "1";
-            this.props.onHover(this.tooltipNode, this.props.data[points[0].pointNumber]);
+    private onHover = ({ event, points }: PieHoverData) => {
+        if (event && this.tooltipNode) {
+            unmountComponentAtNode(this.tooltipNode);
+            const coordinates = getTooltipCoordinates(event, this.tooltipNode);
+            if (coordinates) {
+                setTooltipPosition(this.tooltipNode, coordinates);
+                if (this.props.onHover && this.props.data) {
+                    this.props.onHover(this.tooltipNode, this.props.data[points[0].pointNumber]);
+                } else if (points[0].data.hoverinfo === "none") {
+                    render(createElement(HoverTooltip, { text: points[0].label }), this.tooltipNode);
+                } else {
+                    this.tooltipNode.style.opacity = "0";
+                }
+            }
         }
     }
 
@@ -191,7 +200,9 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
             },
             legend: {
                 font: {
-                    color: "#888"
+                    family: "Open Sans",
+                    size: 14,
+                    color: "#555"
                 }
             },
             margin: {
@@ -207,7 +218,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
     public static getDefaultDataOptions(props: PieChartProps): Partial<PieData> {
         return {
             hole: props.chartType === "donut" ? 0.4 : 0,
-            hoverinfo: props.tooltipForm ? "none" : "label",
+            hoverinfo: "none",
             type: "pie",
             sort: false
         };

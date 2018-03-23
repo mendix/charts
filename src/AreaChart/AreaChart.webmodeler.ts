@@ -19,7 +19,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
             createElement(LineChart, {
                 ...this.props as LineChartContainerProps,
                 fill: true,
-                defaultData: this.getData(this.props)
+                scatterData: this.getData(this.props)
             })
         );
     }
@@ -33,6 +33,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                 return deepMerge.all([ seriesOptions, {
                     connectgaps: true,
                     hoveron: "points",
+                    hoverinfo: "none",
                     line: {
                         color: series.lineColor,
                         shape: series.lineStyle
@@ -42,7 +43,8 @@ export class preview extends Component<LineChartContainerProps, {}> {
                     type: "scatter",
                     fill: "tonexty",
                     x: sampleData.x || [],
-                    y: sampleData.y || []
+                    y: sampleData.y || [],
+                    series: {}
                 } ]);
             });
         }
@@ -50,11 +52,13 @@ export class preview extends Component<LineChartContainerProps, {}> {
         return [ {
             connectgaps: true,
             hoveron: "points",
+            hoverinfo: "none",
             name: "Sample",
             type: "scatter",
             fill: "tonexty",
+            series: {},
             ...preview.getSampleTraces()
-        } as ScatterData ];
+        } as any ];
     }
 
     private static getSampleTraces(): { x: (string | number)[], y: (string | number)[] } {

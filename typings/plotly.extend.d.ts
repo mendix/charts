@@ -41,6 +41,7 @@ declare module "plotly.js" {
                 _offset: number;
             };
             customdata: T;
+            text: string;
         }>;
     }
 
@@ -55,6 +56,7 @@ declare module "plotly.js" {
         points: Array<{
             cx: number;
             cy: number;
+            data: PieData;
             pointNumber: number;
             curveNumber: number;
             color: string;
@@ -87,9 +89,19 @@ declare module "plotly.js" {
         y: string[];
         z: number[][];
         type: "heatmap";
+        zsmooth: "fast" | "best" | false;
         hoverinfo?: "label" | "percent" | "name" | "label+percent" | "label+name" | "percent+name" | "label+percent+name" | "skip" | "none";
         colorscale?: (string | number)[][];
         showscale?: boolean;
+        xgap?: number;
+        ygap?: number;
+        colorbar?: Partial<{
+            outlinecolor: string;
+            y: number;
+            yanchor: string;
+            ypad: number;
+            xpad: number;
+        }>;
     }
 
     export interface PlotlyHTMLElement extends HTMLElement {

@@ -12,6 +12,7 @@ import { PlotlyChart } from "./PlotlyChart";
 import { Sidebar } from "./Sidebar";
 import { SidebarHeader } from "./SidebarHeader";
 import { SidebarContent } from "./SidebarContent";
+import { SidebarHeaderTools } from "./SidebarHeaderTools";
 
 import { PlaygroundInfo } from "./PlaygroundInfo";
 
@@ -52,7 +53,7 @@ export class Playground extends Component<{}, PlaygroundState> {
                     onClick: this.closeTooltip,
                     onClose: this.toggleShowEditor
                 },
-                createElement(SidebarHeader, { className: "row" }, this.renderContent(Select)),
+                createElement(SidebarHeader, { className: "row" }, this.renderContent(SidebarHeaderTools)),
                 createElement(SidebarContent, {},
                     createElement(InfoTooltip, { show: this.state.showTooltip, onClick: this.toggleTooltip },
                         createElement(PlaygroundInfo)
@@ -67,7 +68,7 @@ export class Playground extends Component<{}, PlaygroundState> {
         );
     }
 
-    private renderContent(component: typeof Panel | typeof PlotlyChart | typeof Select): ReactChild | (ReactChild | any | boolean)[] | null {
+    private renderContent(component: typeof Panel | typeof PlotlyChart | typeof SidebarHeaderTools): ReactChild | (ReactChild | any | boolean)[] | null {
         if (this.props.children && Array.isArray(this.props.children)) {
             return this.props.children.filter(child => isValidElement(child) && child.type === component);
         } else if (isValidElement(this.props.children) && this.props.children.type === component) {
@@ -157,5 +158,11 @@ export class Playground extends Component<{}, PlaygroundState> {
         }
 
         return null;
+    }
+
+    public static convertJSToJSON(value: string) {
+        const properJSON = value.replace(/(['"])?([a-z0-9A-Z_]+)(['"])?:/g, `"$2": `).replace(/'/g, `"`);
+
+        return JSON.stringify(JSON.parse(properJSON), null, 2);
     }
 }

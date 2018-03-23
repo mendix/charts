@@ -23,7 +23,9 @@ export const getDimensions = <T extends Style.Dimensions>(props: T): CSSProperti
         width: props.widthUnit === "percentage" ? `${props.width}%` : `${props.width}px`
     };
     if (props.heightUnit === "percentageOfWidth") {
-        style.paddingBottom = `${props.height}%`;
+        style.paddingBottom = props.widthUnit === "percentage"
+            ? `${props.height}%`
+            : `${props.width / 2}px`;
     } else if (props.heightUnit === "pixels") {
         style.height = `${props.height}px`;
     } else if (props.heightUnit === "percentageOfParent") {
@@ -31,4 +33,34 @@ export const getDimensions = <T extends Style.Dimensions>(props: T): CSSProperti
     }
 
     return style;
+};
+
+export const defaultColours = (opacity = 1) => [
+    `rgba(5, 149, 219, ${opacity})`,
+    `rgba(23, 52, 123, ${opacity})`,
+    `rgba(118, 202, 2, ${opacity})`
+];
+export const fillColours = [ "rbg(5,149,219,5)", "rbg(23,52,123,5)", "rbg(118,202,2,5)" ];
+
+export const getTooltipCoordinates = (event: MouseEvent, tooltipNode: HTMLDivElement): SVGPoint | null => {
+    const parentElement = tooltipNode.parentElement;
+    if (parentElement) {
+        const svg: SVGSVGElement = parentElement.getElementsByClassName("main-svg")[0] as SVGSVGElement;
+        if (svg) {
+            const point = svg.createSVGPoint();
+            point.x = event.clientX;
+            point.y = event.clientY;
+
+            return point.matrixTransform(svg.getScreenCTM().inverse());
+        }
+    }
+
+    return null;
+};
+
+export const setTooltipPosition = (tooltipNode: HTMLDivElement, coordinates: SVGPoint) => {
+    tooltipNode.innerHTML = "";
+    tooltipNode.style.left = `${coordinates.x}px`;
+    tooltipNode.style.top = `${coordinates.y}px`;
+    tooltipNode.style.opacity = "1";
 };

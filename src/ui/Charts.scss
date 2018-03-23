@@ -5,9 +5,10 @@
 
 .widget-charts {
     .widget-charts-tooltip {
-        background-color: #f1f1f1;
+        background-color: #FFFFFF;
         border-color: #f1f1f1;
-        border-radius: 6px;
+        border-radius: 3px;
+        box-shadow: 0 8px 30px 0 rgba(0,0,0,0.10);
         display: inline-block;
         opacity: 0;
         padding: 8px;
@@ -44,4 +45,3 @@
         margin: 0;
     }
 }
-

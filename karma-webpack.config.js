@@ -1,7 +1,7 @@
 const webpack = require("webpack");
 const path = require("path");
 
-const widgetName = require("./package").widgetName;
+const widgetName = require("./package").widgetName[0];
 
 module.exports = {
     entry: {
@@ -11,7 +11,8 @@ module.exports = {
         AreaChart: "./src/AreaChart/components/AreaChartContainer.ts",
         PieChart: "./src/PieChart/components/PieChartContainer.ts",
         TimeSeries: "./src/TimeSeries/components/TimeSeriesContainer.ts",
-        HeatMap: "./src/HeatMap/components/HeatMapContainer.ts"
+        HeatMap: "./src/HeatMap/components/HeatMapContainer.ts",
+        BubbleChart: "./src/BubbleChart/components/BubbleChartContainer.ts"
     },
     output: {
         path: path.resolve(__dirname, "dist/tmp/src"),

@@ -19,7 +19,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
             ),
             createElement(LineChart, {
                 ...this.props as LineChartContainerProps,
-                defaultData: preview.getData(this.props)
+                scatterData: preview.getData(this.props)
             })
         );
     }
@@ -27,12 +27,14 @@ export class preview extends Component<LineChartContainerProps, {}> {
     static getData(props: LineChartContainerProps): ScatterData[] {
         if (props.series.length) {
             return props.series.map(series => {
-                const seriesOptions = series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
+                const seriesOptions = props.devMode !== "basic" && series.seriesOptions.trim()
+                    ? JSON.parse(series.seriesOptions)
+                    : {};
                 const sampleData = preview.getSampleTraces();
 
                 return deepMerge.all([ {
                     connectgaps: true,
-                    hoveron: "points",
+                    hoverinfo: "none",
                     line: {
                         color: series.lineColor,
                         shape: series.lineStyle
@@ -42,7 +44,8 @@ export class preview extends Component<LineChartContainerProps, {}> {
                     type: "scatter",
                     fill: "none",
                     x: sampleData.x || [],
-                    y: sampleData.y || []
+                    y: sampleData.y || [],
+                    series: {}
                 }, seriesOptions ]);
             });
         }
@@ -50,10 +53,12 @@ export class preview extends Component<LineChartContainerProps, {}> {
         return [ {
             connectgaps: true,
             hoveron: "points",
+            hoverinfo: "none",
             name: "Sample",
             type: "scatter",
+            series: {},
             ...preview.getSampleTraces()
-        } as ScatterData ];
+        } as any ];
     }
 
     private static getSampleTraces(): { x: (string | number)[], y: (string | number)[] } {

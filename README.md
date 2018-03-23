@@ -15,6 +15,8 @@ Plot and compare your data across different charts.
 * `Bar Chart`
 * `Time Series Chart`
 * `Heat Map`
+* `Bubble Chart`
+* `Any Chart`
 
 ## Dependencies
 * Mendix 7.11.0
@@ -68,6 +70,46 @@ The sample domain model could be either of the two below.
 
 ![Heat Map Sample Domain Model](assets/heatmap_sample_domain_model.png)
 
+### Bubble chart
+The bubble chart has data properties identical to those of the line chart but for one distinction: `Bubble size data attribute` [required] - The attribute that contains and determines the size of the bubble.
+
+### Any chart
+The any chart can be configured to any type of chart by addding data and layout properities from any plolty chart sample.
+Below are the steps for configuring any chart:
+#### Identify a sample chat from Plotly
+
+```
+    var data = [{
+        values: [20, 29, 55],
+        labels: ['Apples', 'Oranges', 'Mangoes'],
+        type: 'pie'
+    }];
+
+    `var layout = {
+        height: 400,
+        width: 500
+    };
+
+    Plotly.newPlot('myDiv', data, layout);
+```
+1. From the desktop modeler
+    - Copy the value of `data` and paste it to `Static` under the `Data` tab in your modeler.
+
+    - Copy the value of `layout` and paste it to `Static` under the `Layout options` tab in your modeler.
+2. From the playground (`Mode` option on Advanced tab set to `Developer`)
+    - Copy the value of `data` and paste it to `Custom settings` under the `Data` option on the sidebar.
+
+    - Copy the value of `layout` and paste it to `Custom settings` under the `Layout`option on the sidebar.
+3. Using the `Copy from Plotly` feature.
+    - Enable this feature by "mode" option in the "Advanced" tab to `Developer`.
+    - From the sidebar click `Copy from Plotly` button.
+
+        ![Copy from Plotyly button](assets/copy_button.PNG)
+
+    - Copy and paste your sample code from plotly on the prompt that appears and click `OK`
+
+        ![Copy from Plotyly button](assets/copy_prompt.PNG)
+
 ## Advanced configuration
 The charts in this widget are based on the [https://github.com/mendixlabs/charts/issues](Plotly) library.
 As such, the widget provides support for advanced users to extend or overwrite the basic settings by adding the chart properties as JSON.
@@ -85,6 +127,8 @@ Layout options control the general appearance of the chart. Common options inclu
         "showlegend": true
     }
 
+For more details: [Developer cheat sheet](/developerCheatSheet.md)
+
 ### Data options (pie chart)
 On the pie chart, the data options control the appearance of the pie circle beyond the general layout options. Options include hole, name, marker e.t.c
 
@@ -94,6 +138,8 @@ On the pie chart, the data options control the appearance of the pie circle beyo
         "hoverinfo": "label+percent+name",
         "textinfo": "none"
     }
+
+For more details: [Developer cheat sheet](/developerCheatSheet.md)
 
 ### Series options (line & column charts)
 The series options control the appearance of a specific series on the line or column chart. Options include line color, line shape e.t.c
@@ -122,12 +168,43 @@ Create a Mendix test project in the dist folder and rename its root folder to `d
 
 To automatically compile, bundle and push code changes to the running test project, run:
 
-    grunt
+    npm start
 
 To run the project unit tests with code coverage, results can be found at dist/testresults/coverage/index.html, run:
 
-    npm test
+    npm test:unit
 
 or run the test continuously during development:
 
     karma start
+
+## Scripts
+While developing, you will probably rely mostly on `npm start`; however, there are additional scripts at your disposal:
+
+|`npm run <script>`|Description|
+|------------------|-----------|
+|`start`|Build the project and monitor source and config for changes and rebuild.|
+|`test`|Runs lint, build, unit tests with Karma and generates a coverage report, deploy and run e2e test|
+|`test:dev`|Runs karma and watches for changes to re-run tests. Does not generate coverage reports.|
+|`test:unit`|Runs unit tests with karma and generates a coverage report.|
+|`deploy`|Use the latest widget build to update the Mendix sandbox project.|
+|`build`|Build the widget optimized for production|
+|`lint`|Lint all `.js` files.|
+|`lint:fix`|Lint and fix all fixable issues in the `.ts` files.|
+
+# CI and remote testing
+To enable the continues integration services.
+Copy the `node_modules/mendix-widget-build-script/dist/localSettings.js` to your project root, and update the settings to run the update deployment from local source.
+
+**Do not forget** to exclude this file in the `.gitignore` as it contains sensitive data.
+```
+exports.settings = {
+    appName: "appName",
+    key: "xxxxxxxx-xxxx-xxxx-xxxxx-xxxxxxxxxxxx",
+    password: "secret",
+    projectId: "xxxxxxxx-xxxx-xxxx-xxxxx-xxxxxxxxxxxx",
+    user: "ci@example.com"
+};
+```
+
+More information about the [Mendix widget build script](https://github.com/FlockOfBirds/mendix-widget-build-script).

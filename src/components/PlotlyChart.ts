@@ -2,6 +2,7 @@ import { CSSProperties, Component, createElement } from "react";
 import * as classNames from "classnames";
 
 import { ChartLoading } from "./ChartLoading";
+import { HoverTooltip } from "./HoverTooltip";
 import deepMerge from "deepmerge";
 import * as elementResize from "element-resize-detector";
 import {
@@ -18,6 +19,7 @@ export interface PlotlyChartProps {
     style?: CSSProperties;
     onClick?: (data: ScatterHoverData<any> | PieHoverData) => void;
     onHover?: (data: ScatterHoverData<any> | PieHoverData) => void;
+    onRestyle?: (data: any) => void;
     getTooltipNode?: (node: HTMLDivElement) => void;
 }
 
@@ -30,15 +32,6 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
     private newPlot?: (root: Root, data: Data[], layout?: Partial<Layout>, config?: Partial<Config>) => Promise<PlotlyHTMLElement>;
     private purge?: (root: Root) => void;
 
-    constructor(props: PlotlyChartProps) {
-        super(props);
-
-        this.getPlotlyNodeRef = this.getPlotlyNodeRef.bind(this);
-        this.getTooltipNodeRef = this.getTooltipNodeRef.bind(this);
-        this.clearTooltip = this.clearTooltip.bind(this);
-        this.onResize = this.onResize.bind(this);
-    }
-
     render() {
         return createElement("div",
             {
@@ -47,7 +40,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
                 style: this.props.style
             },
             createElement("div", { className: "widget-charts-tooltip", ref: this.getTooltipNodeRef }),
-            this.state.loading ? createElement(ChartLoading, { text: "Loading" }) : null
+            this.state.loading ? createElement(ChartLoading) : null
         );
     }
 
@@ -57,6 +50,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         }
         this.renderChart(this.props);
         this.addResizeListener();
+        this.registerTouchEvents();
     }
 
     componentDidUpdate() {
@@ -67,28 +61,82 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         if (this.chartNode && this.purge) {
             this.purge(this.chartNode);
         }
+        this.removeTouchEvents();
     }
 
-    private getPlotlyNodeRef(node: HTMLDivElement) {
+    private registerTouchEvents() {
+        [ "touchenter", "touchleave" ].forEach(eventName => {
+            if (this.chartNode) {
+                this.chartNode.addEventListener(eventName, this.touchHandler);
+            }
+        });
+        if (this.props.type !== "pie") {
+            [ "touchstart", "touchmove", "touchend" ].forEach(eventName => {
+                if (this.chartNode) {
+                    this.chartNode.addEventListener(eventName, this.touchHandler);
+                }
+            });
+        }
+    }
+
+    private removeTouchEvents() {
+        [ "touchenter", "touchleave", "touchstart", "touchmove", "touchend" ].forEach(eventName => {
+            if (this.chartNode) {
+                this.chartNode.removeEventListener(eventName, this.touchHandler);
+            }
+        });
+    }
+
+    private touchHandler = (event: TouchEvent) => {
+        const touches = event.changedTouches;
+        const touchPoint = touches[0];
+        let type = "";
+
+        if (event.type === "touchenter") {
+            type = "mouseover";
+        } else if (event.type === "touchleave") {
+            type = "mouseout";
+        } else if (event.type === "touchstart") {
+            type = "mousedown";
+        } else if (event.type === "touchmove") {
+            type = "mousemove";
+        } else if (event.type === "touchend") {
+            type = "mouseup";
+        }
+
+        const options = {
+            bubbles: true,
+            screenX: touchPoint.screenX,
+            screenY: touchPoint.screenY,
+            clientX: touchPoint.clientX,
+            clientY: touchPoint.clientY
+        };
+        const simulatedEvent = new MouseEvent(type, options);
+
+        touchPoint.target.dispatchEvent(simulatedEvent);
+        event.preventDefault();
+    }
+
+    private getPlotlyNodeRef = (node: HTMLDivElement) => {
         this.chartNode = node;
     }
 
-    private getTooltipNodeRef(node: HTMLDivElement) {
+    private getTooltipNodeRef = (node: HTMLDivElement) => {
         this.tooltipNode = node;
         if (this.props.getTooltipNode) {
             this.props.getTooltipNode(node);
         }
     }
 
-    private renderChart({ config, data, layout, onClick, onHover }: PlotlyChartProps) {
+    private async renderChart({ config, data, layout, onClick, onHover, onRestyle }: PlotlyChartProps) {
         if (this.chartNode) {
             const style = window.getComputedStyle(this.chartNode);
 
             const layoutOptions = deepMerge.all([
                 layout,
                 {
-                    width: parseFloat(style.getPropertyValue("width").split("px")[0]),
-                    height: parseFloat(style.getPropertyValue("height").split("px")[0])
+                    width: parseFloat(style.getPropertyValue("width").replace("px", "")),
+                    height: parseFloat(style.getPropertyValue("height").replace("px", ""))
                 }
             ]);
             this.loadPlotlyAPI()
@@ -101,7 +149,10 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
                                 }
                                 if (onHover) {
                                     myPlot.on("plotly_hover", onHover as any);
-                                    myPlot.on("plotly_unhover", this.clearTooltip);
+                                }
+                                myPlot.on("plotly_unhover", this.clearTooltip);
+                                if (onRestyle) {
+                                    myPlot.on("plotly_restyle", onRestyle as any);
                                 }
                             });
                     }
@@ -145,18 +196,17 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         }
     }
 
-    private clearTooltip() {
+    private clearTooltip = () => {
         if (this.tooltipNode) {
-            this.tooltipNode.innerHTML = "";
             this.tooltipNode.style.opacity = "0";
         }
     }
 
-    private async onResize() {
+    private onResize = async () => {
         if (this.timeoutId) {
             clearTimeout(this.timeoutId);
         }
-        this.timeoutId = setTimeout(() => {
+        this.timeoutId = window.setTimeout(() => {
             if (this.chartNode && this.purge) {
                 this.purge(this.chartNode);
                 this.renderChart(this.props);

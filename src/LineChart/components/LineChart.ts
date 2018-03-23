@@ -1,7 +1,9 @@
 import { Component, ReactChild, ReactElement, createElement } from "react";
+import { render, unmountComponentAtNode } from "react-dom";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
+import { HoverTooltip } from "../../components/HoverTooltip";
 import { SeriesPlayground } from "../../components/SeriesPlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
@@ -9,7 +11,7 @@ import { getRuntimeTraces, getSeriesTraces } from "../../utils/data";
 import deepMerge from "deepmerge";
 import { Container, Data } from "../../utils/namespaces";
 import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
-import { getDimensions, parseStyle } from "../../utils/style";
+import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 
 import SeriesData = Data.SeriesData;
 import LineChartContainerProps = Container.LineChartContainerProps;
@@ -20,8 +22,8 @@ import LineSeriesProps = Data.LineSeriesProps;
 import "../../ui/Charts.scss";
 
 export interface LineChartProps extends LineChartContainerProps {
-    data?: SeriesData<LineSeriesProps>[];
-    defaultData?: ScatterData[];
+    scatterData?: ScatterData[];
+    seriesOptions?: string[];
     loading?: boolean;
     alertMessage?: ReactChild;
     onClick?: (series: SeriesProps, dataObject: mendix.lib.MxObject, mxform: mxui.lib.form._FormBase) => void;
@@ -30,35 +32,38 @@ export interface LineChartProps extends LineChartContainerProps {
 
 interface LineChartState {
     layoutOptions: string;
-    data?: SeriesData<LineSeriesProps>[];
+    series?: LineSeriesProps[];
+    scatterData?: ScatterData[];
+    seriesOptions?: string[];
     playgroundLoaded: boolean;
+    hiddenTraces: number[];
 }
 
 export class LineChart extends Component<LineChartProps, LineChartState> {
+    state: LineChartState = {
+        layoutOptions: this.props.layoutOptions,
+        series: this.props.series,
+        scatterData: this.props.scatterData,
+        seriesOptions: this.props.seriesOptions,
+        playgroundLoaded: false,
+        hiddenTraces: []
+    };
     private tooltipNode?: HTMLDivElement;
-    private defaultColors: string[] = [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ];
     private Playground?: typeof SeriesPlayground;
 
     constructor(props: LineChartProps) {
         super(props);
 
-        this.onClick = this.onClick.bind(this);
-        this.onHover = this.onHover.bind(this);
-        this.onRuntimeUpdate = this.onRuntimeUpdate.bind(this);
-        this.getTooltipNodeRef = this.getTooltipNodeRef.bind(this);
-        this.state = {
-            layoutOptions: props.layoutOptions,
-            data: props.data,
-            playgroundLoaded: false
-        };
+        if (props.devMode === "developer" && !this.state.playgroundLoaded) {
+            this.loadPlaygroundComponent();
+        }
     }
-
     render() {
         if (this.props.alertMessage) {
             return createElement(Alert, { className: "widget-charts-line-alert" }, this.props.alertMessage);
         }
         if (this.props.loading || (this.props.devMode === "developer" && !this.state.playgroundLoaded)) {
-            return createElement(ChartLoading, { text: "Loading" });
+            return createElement(ChartLoading);
         }
         if (this.props.devMode === "developer" && this.state.playgroundLoaded) {
             return this.renderPlayground();
@@ -70,11 +75,10 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     componentWillReceiveProps(newProps: LineChartProps) {
         this.setState({
             layoutOptions: newProps.layoutOptions,
-            data: newProps.data
+            series: newProps.series,
+            seriesOptions: newProps.seriesOptions,
+            scatterData: newProps.scatterData
         });
-        if (newProps.devMode === "developer" && !this.state.playgroundLoaded) {
-            this.loadPlaygroundComponent();
-        }
     }
 
     private async loadPlaygroundComponent() {
@@ -94,6 +98,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 config: LineChart.getConfigOptions(),
                 onClick: this.onClick,
                 onHover: this.onHover,
+                onRestyle: this.onRestyle,
                 getTooltipNode: this.getTooltipNodeRef
             }
         );
@@ -102,12 +107,11 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     private renderPlayground(): ReactElement<any> | null {
         if (this.Playground) {
             return createElement(this.Playground, {
-                rawData: this.state.data,
-                chartData: this.getData(this.props),
-                modelerSeriesConfigs: this.state.data && this.state.data.map(({ series }) =>
+                series: this.state.series,
+                seriesOptions: this.state.seriesOptions,
+                modelerSeriesConfigs: this.state.series && this.state.series.map(series =>
                     JSON.stringify(LineChart.getDefaultSeriesOptions(series as LineSeriesProps, this.props), null, 4)
                 ),
-                traces: this.state.data && this.state.data.map(getRuntimeTraces),
                 onChange: this.onRuntimeUpdate,
                 layoutOptions: this.state.layoutOptions || "{\n\n}",
                 modelerLayoutConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 4)
@@ -117,7 +121,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         return null;
     }
 
-    private getTooltipNodeRef(node: HTMLDivElement) {
+    private getTooltipNodeRef = (node: HTMLDivElement) => {
         this.tooltipNode = node;
     }
 
@@ -130,65 +134,80 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     private getData(props: LineChartProps): ScatterData[] {
-        let lineData: ScatterData[] = props.defaultData || [];
-        if (this.state.data) {
-            lineData = this.state.data.map(({ data, series }, index) => {
-                const advancedOptions = props.devMode !== "basic" && series.seriesOptions
-                    ? JSON.parse(series.seriesOptions)
+        const { seriesOptions } = this.state;
+        if (props.scatterData) {
+            const lineData = props.scatterData.map((data, index) => {
+                const parsedOptions = props.devMode !== "basic" && seriesOptions
+                    ? JSON.parse(seriesOptions[index])
                     : {};
-                const configOptions: Partial<ScatterData> = {
-                    series,
-                    marker: index < this.defaultColors.length ? { color: this.defaultColors[index] } : {},
-                    fillcolor: series.fillColor,
-                    ... LineChart.getDefaultSeriesOptions(series as LineSeriesProps, props),
-                    ... getSeriesTraces({ data, series })
-                };
 
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
                 return {
-                    ...deepMerge.all<ScatterData>([ configOptions, advancedOptions ]),
-                    customdata: data
+                    ...deepMerge.all<ScatterData>([ data, parsedOptions ]),
+                    visible: this.state.hiddenTraces.indexOf(index) === -1 ? true : "legendonly",
+                    customdata: data.customdata
                 };
             });
+
+            return props.area === "stacked"
+                ? LineChart.getStackedArea(lineData, this.state.hiddenTraces)
+                : lineData;
         }
 
-        return props.area === "stacked" ? LineChart.getStackedArea(lineData) : lineData;
+        return [];
     }
 
-    private onClick({ points }: ScatterHoverData<mendix.lib.MxObject>) {
+    private onClick = ({ points }: ScatterHoverData<mendix.lib.MxObject>) => {
         if (this.props.onClick) {
             this.props.onClick(points[0].data.series, points[0].customdata, this.props.mxform);
         }
     }
 
-    private onHover({ points }: ScatterHoverData<mendix.lib.MxObject>) {
-        const { customdata, data, x, xaxis, y, yaxis } = points[0];
-        if (this.props.onHover && data.series.tooltipForm && this.tooltipNode) {
-            const positionYaxis = yaxis.l2p(y as number) + yaxis._offset;
-            const positionXaxis = xaxis.d2p(x) + xaxis._offset;
-            this.tooltipNode.style.top = `${positionYaxis}px`;
-            this.tooltipNode.style.left = `${positionXaxis}px`;
-            this.tooltipNode.style.opacity = "1";
-            this.props.onHover(this.tooltipNode, data.series.tooltipForm, customdata);
+    private onHover = ({ event, points }: ScatterHoverData<mendix.lib.MxObject>) => {
+        const { customdata, data, y, text } = points[0];
+        if (event && this.tooltipNode) {
+            unmountComponentAtNode(this.tooltipNode);
+            const coordinates = getTooltipCoordinates(event, this.tooltipNode);
+            if (coordinates) {
+                setTooltipPosition(this.tooltipNode, coordinates);
+                if (data.series.tooltipForm && this.props.onHover) {
+                    this.tooltipNode.innerHTML = "";
+                    this.props.onHover(this.tooltipNode, data.series.tooltipForm, customdata);
+                } else if (points[0].data.hoverinfo === "none" as any) {
+                    render(createElement(HoverTooltip, { text: text || y }), this.tooltipNode);
+                } else {
+                    this.tooltipNode.style.opacity = "0";
+                }
+            }
         }
     }
 
-    private onRuntimeUpdate(layoutOptions: string, data: SeriesData<LineSeriesProps>[]) {
-        this.setState({ layoutOptions, data });
+    private onRestyle = (data: any) => {
+        if (data[0].visible[0] === "legendonly") {
+            this.setState({ hiddenTraces: this.state.hiddenTraces.concat([ data[1][0] ]) });
+        } else if (data[0].visible[0] === true) {
+            const hiddenTraces = [ ...this.state.hiddenTraces ];
+            hiddenTraces.splice(hiddenTraces.indexOf(data[1][0]), 1);
+            this.setState({ hiddenTraces });
+        }
+    }
+
+    private onRuntimeUpdate = (layoutOptions: string, seriesOptions: string[]) => {
+        this.setState({ layoutOptions, seriesOptions });
     }
 
     public static defaultLayoutConfigs(props: LineChartProps): Partial<Layout> {
         return {
             font: {
-                family: "Open Sans, sans-serif",
-                size: 12,
-                color: "#888"
+                family: "Open Sans",
+                size: 14,
+                color: "#555"
             },
             autosize: true,
             hovermode: "closest",
             showlegend: props.showLegend,
             xaxis: {
-                gridcolor: "#eaeaea",
+                gridcolor: "#d7d7d7",
                 title: props.xAxisLabel,
                 showgrid: props.grid === "vertical" || props.grid === "both",
                 fixedrange: props.xAxisType !== "date",
@@ -199,7 +218,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 rangemode: "tozero",
                 zeroline: true,
                 zerolinecolor: "#eaeaea",
-                gridcolor: "#eaeaea",
+                gridcolor: "#d7d7d7",
                 title: props.yAxisLabel,
                 showgrid: props.grid === "horizontal" || props.grid === "both",
                 fixedrange: true
@@ -229,7 +248,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         return {
             connectgaps: true,
             hoveron: "points",
-            hoverinfo: series.tooltipForm ? "text" : "y" as any, // typings don't have a hoverinfo value of "y"
+            hoverinfo: "none" as any,
             line: {
                 color: series.lineColor,
                 shape: series.lineStyle
@@ -241,10 +260,11 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         };
     }
 
-    public static getStackedArea(traces: ScatterData[]) {
-        for (let i = 1; i < traces.length; i++) {
-            for (let j = 0; j < (Math.min(traces[i].y.length, traces[i - 1].y.length)); j++) {
-                (traces[i].y[j] as any) += traces[i - 1].y[j];
+    public static getStackedArea(traces: ScatterData[], hiddenTraces: number[]) {
+        const visibleTraces = traces.filter((data, index) => hiddenTraces.indexOf(index) === -1);
+        for (let i = 1; i < visibleTraces.length; i++) {
+            for (let j = 0; j < (Math.min(visibleTraces[i].y.length, visibleTraces[i - 1].y.length)); j++) {
+                (visibleTraces[i].y[j] as any) += visibleTraces[i - 1].y[j];
             }
         }
 

@@ -8,6 +8,7 @@ import { PieChart, PieChartProps } from "../PieChart/components/PieChart";
 import "../PieChart/components/PiePlayground";
 import { PlotlyChart } from "../components/PlotlyChart";
 import { ScatterHoverData } from "plotly.js";
+import * as style from "../utils/style";
 
 describe("PieChart", () => {
     const renderShallowChart = (props: PieChartProps) => shallow(createElement(PieChart, props));
@@ -42,7 +43,7 @@ describe("PieChart", () => {
         defaultProps.loading = true;
         const chart = renderShallowChart(defaultProps as PieChartProps);
 
-        expect(chart).toBeElement(createElement(ChartLoading, { text: "Loading" }));
+        expect(chart).toBeElement(createElement(ChartLoading));
     });
 
     it("whose dev mode is developer renders the playground", (done) => {
@@ -71,9 +72,9 @@ describe("PieChart", () => {
                     data: [
                         {
                             hole: 0,
-                            hoverinfo: "label",
+                            hoverinfo: "none",
                             labels: [],
-                            marker: { colors: [ "#2CA1DD", "#76CA02", "#F99B1D", "#B765D1" ] },
+                            marker: { colors: [ "rgba(5, 149, 219, 1)", "rgba(23, 52, 123, 1)", "rgba(118, 202, 2, 1)" ] },
                             type: "pie",
                             values: [],
                             sort: false
@@ -104,6 +105,7 @@ describe("PieChart", () => {
 
         it("#onHover() calls the parent onClick handler", () => {
             defaultProps.onHover = jasmine.createSpy("onHover");
+            spyOn(style, "getTooltipCoordinates").and.returnValue({ x: 4, y: 10 });
             const chart = renderFullChart(defaultProps as PieChartProps);
             const instance = chart.instance() as any;
             instance.onHover(plotlyEventData);
