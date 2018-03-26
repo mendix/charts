@@ -5,9 +5,9 @@ A cheat sheet with snippets of JSON objects for easy and quick configuration of 
 ```JSON
 [
   {
-    "x": ["9", "8", "5", "1"],
-    "y": ["1", "2", "4", "8"], 
-    "z": ["11", "8", "15", "3"],
+    "x": [ "9", "8", "5", "1" ],
+    "y": [ "1", "2", "4", "8" ], 
+    "z": [ "11", "8", "15", "3" ],
     "mode": "markers",
     "type": "scatter3d"
   }
