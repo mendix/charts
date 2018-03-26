@@ -18,6 +18,7 @@ const widgetConfig = {
         BubbleChart: "./src/BubbleChart/components/BubbleChartContainer.ts"
     },
     output: {
+        jsonpFunction: "webpack3Jsonp",
         path: path.resolve(__dirname, "dist/tmp/src"),
         filename: "com/mendix/widget/custom/[name]/[name].js",
         chunkFilename: `com/mendix/widget/custom/${widgetName.toLowerCase()}/chunk[id].js`,
@@ -70,6 +71,7 @@ const anyChartConfig = {
         AnyChart: "./src/AnyChart/components/AnyChartContainer.ts"
     },
     output: {
+        jsonpFunction: "webpack3Jsonp",
         path: path.resolve(__dirname, "dist/tmp/AnyChart"),
         filename: "com/mendix/widget/custom/[name]/[name].js",
         chunkFilename: `com/mendix/widget/custom/anychart/chunk[id].js`,
