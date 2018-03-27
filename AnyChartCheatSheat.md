@@ -17,8 +17,8 @@
 ]
 ```
 
-![BubbleChartProperties](/assets/cheatsheet/BubbleChart.png)
 ### Bubble Charts
+![BubbleChartProperties](/assets/cheatsheet/BubbleChart.png)
 ``` json
 [ {
   "x": [ 1, 2, 3 ],
@@ -38,8 +38,8 @@
   "x": [ 1, 2, 3 ],
   "y": [ 1, 2, 3 ],
   "text": [ "A", "B", "C" ],
-  "textposition": "top center",
-  "mode": "marker+text"
+  "textposition": "left center",
+  "mode": "markers+text"
 } ]
 ```
 
@@ -158,9 +158,9 @@
 Data
 ``` json
 [ {
-  "locations": ["AZ", "CA", "VT"],
+  "locations": [ "AZ", "CA", "VT" ],
   "locationmode": "USA-states",
-  "z": [10, 20, 40],
+  "z": [ 10, 20, 40 ],
   "type": "scattergeo"
 } ]
 ```
@@ -177,8 +177,8 @@ Layout
 ![ScatterMapProperties](/assets/cheatsheet/ScatterMap.png)
 ``` json
 [ {
-  "lon": [ 42, 39 ],
-  "lat": [ 12, 22 ],
+  "lon": [ 12, 22 ],
+  "lat": [ 42, 39 ],
   "type": "scattergeo",
   "text": [ "Rome", "Greece" ],
   "mode": "marker"
@@ -191,7 +191,7 @@ Layout
 ``` json
 [ {
   "colorscale": "Viridis",
-  "z": [ [3, 5, 7, 9], [ 21, 13, 8, 5 ] ],
+  "z": [ [ 3, 5, 7, 9 ], [ 21, 13, 8, 5 ] ],
   "type": "surface"
 } ]
 ```
@@ -222,7 +222,7 @@ Layout
 
 ## Other Charts
 
-### Contour chart
+### Contour Chart
 ![ContourProperties](/assets/cheatsheet/Contour.png)
 ``` json
 [ {
@@ -231,18 +231,18 @@ Layout
 } ]
 ```
 
-### Time series
+### Time Series
 ![TimeSeriesProperties](/assets/cheatsheet/TimeSeries.png)
 ``` json
 [ {
   "type": "scatter",
   "mode": "lines",
-  "x": ["2018-09-04", "2018-10-04", "2018-11-04", "2018-12-04", "2018-12-04"],
+  "x": [ "2018-09-04", "2018-10-04", "2018-11-04", "2018-12-04", "2018-12-04" ],
   "y": [ 5, 2, 7, 10 ]
 } ]
 ```
 
-### Group by chart
+### Group By Chart
 ![GroupByChartProperties](/assets/cheatsheet/GroupByChart.png)
 ``` json
 [ {
@@ -253,7 +253,7 @@ Layout
 } ]
 ```
 
-### Symmetric error bar
+### Symmetric Error Bar
 ![ErrorBarProperties](/assets/cheatsheet/ErrorBar.png)
 ``` json
 [ {
