@@ -76,6 +76,16 @@
                         <attributeType name="Integer"/>
                     </attributeTypes>
                 </property>
+                <property key="autoBubbleSize" type="boolean" defaultValue="true">
+                    <caption>Auto bubble size</caption>
+                    <category>Data points</category>
+                    <description/>
+                </property>
+                <property key="markerSizeReference" type="integer" defaultValue="0">
+                    <caption>Marker size reference</caption>
+                    <category>Data points</category>
+                    <description>The percentage to be used if the Auto bubble size is false</description>
+                </property>
                 <property key="xValueSortAttribute" type="attribute" entityProperty="dataEntity" required="false" isPath="optional" pathType="reference">
                     <caption>X-axis sort attribute</caption>
                     <category>Data points</category>

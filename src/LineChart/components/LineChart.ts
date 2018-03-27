@@ -11,7 +11,7 @@ import { getRuntimeTraces, getSeriesTraces } from "../../utils/data";
 import deepMerge from "deepmerge";
 import { Container, Data } from "../../utils/namespaces";
 import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
-import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
+import { getDimensions, getDimensionsFromNode, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 
 import SeriesData = Data.SeriesData;
 import LineChartContainerProps = Container.LineChartContainerProps;
@@ -40,6 +40,11 @@ interface LineChartState {
     hiddenTraces: number[];
 }
 
+interface Dimensions {
+    width: number;
+    height: number;
+}
+
 export class LineChart extends Component<LineChartProps, LineChartState> {
     static defaultProps: Partial<LineChartProps> = {
         type: "line"
@@ -54,6 +59,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         hiddenTraces: []
     };
     private tooltipNode?: HTMLDivElement;
+    private chartNode?: HTMLDivElement;
     private Playground?: typeof SeriesPlayground;
 
     constructor(props: LineChartProps) {
@@ -104,7 +110,9 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 onClick: this.onClick,
                 onHover: this.onHover,
                 onRestyle: this.onRestyle,
-                getTooltipNode: this.getTooltipNodeRef
+                getTooltipNode: this.getTooltipNodeRef,
+                onRender: this.onLoadAndResize,
+                onResize: this.onLoadAndResize
             }
         );
     }
@@ -141,18 +149,30 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     private getData(props: LineChartProps): ScatterData[] {
-        if (this.state.scatterData) {
+        if (this.state.scatterData && this.chartNode) {
+            const dimensions = getDimensionsFromNode(this.chartNode);
             const lineData: ScatterData[] = this.state.scatterData.map((data, index) => {
                 const parsedOptions = props.devMode !== "basic" && this.state.seriesOptions
                     ? JSON.parse(this.state.seriesOptions[index])
                     : {};
+                const scatterData = deepMerge.all<ScatterData>([ data, parsedOptions, {
+                    visible: data.visible || true
+                } ]);
+                const series = this.props.series[index];
+                if (series.mode === ("bubble" as any)) {
+                    return {
+                        ...deepMerge.all<ScatterData>([ scatterData, {
+                            marker: {
+                                sizemode: "diameter",
+                                sizeref: LineChart.getMarkerSizeReference(props, series, data.marker.size as number[], dimensions)
+                            }
+                        } ]),
+                        customdata: data.customdata
+                    };
+                }
 
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
-                return {
-                    ...deepMerge.all<ScatterData>([ data, parsedOptions ]),
-                    visible: data.visible || true,
-                    customdata: data.customdata
-                };
+                return { ...scatterData, customdata: data.customdata };
             });
 
             return props.area === "stacked"
@@ -208,6 +228,11 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             return (this.state.scatterData as any)[index];
         });
         this.setState({ layoutOptions, seriesOptions, scatterData: updatedScatterData });
+    }
+
+    private onLoadAndResize = (node: HTMLDivElement) => {
+        this.chartNode = node;
+        this.forceUpdate();
     }
 
     public static defaultLayoutConfigs(props: LineChartProps): Partial<Layout> {
@@ -308,5 +333,28 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         }
 
         return traces;
+    }
+
+    public static getMarkerSizeReference(props: LineChartProps, series: LineSeriesProps, markerSize: number[], dimensions?: { width: number; height: number }): number {
+        if (series.autoBubbleSize) {
+            const width = dimensions ? dimensions.width : 0;
+            const height = dimensions ? dimensions.height : 0;
+            let sizeRef = 0;
+            const averageSize = (width + height) / 2;
+            const percentageSize = averageSize / 10;
+
+            if (markerSize.length > 0) {
+                sizeRef = Math.max(...markerSize) / percentageSize;
+            }
+
+            return Math.round(sizeRef * 1000) / 1000;
+        } else if (series.markerSizeReference > 0) {
+            const scale = series.markerSizeReference;
+            const percentageScale = scale / 100;
+
+            return 1 / percentageScale;
+        }
+
+        return 1;
     }
 }

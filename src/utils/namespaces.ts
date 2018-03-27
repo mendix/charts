@@ -187,6 +187,8 @@ export namespace Data {
         sortOrder: SortOrder;
         yValueAttribute: string;
         markerSizeAttribute?: string;
+        markerSizeReference: number;
+        autoBubbleSize: boolean;
     }
 
     export type SortOrder = "asc" | "desc";
@@ -227,12 +229,12 @@ export namespace Data {
     }
 
     export interface ReferencesSpec {
-            attributes?: string[];
-            amount?: number;
-            sort?: [ string, "desc" | "asc" ][];
-            references?: {
-                [index: string]: ReferencesSpec;
-            };
+        attributes?: string[];
+        amount?: number;
+        sort?: [ string, "desc" | "asc" ][];
+        references?: {
+            [ index: string ]: ReferencesSpec;
+        };
     }
 }
 

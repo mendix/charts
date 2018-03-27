@@ -23,6 +23,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
     };
     private subscriptionHandle?: number;
     private intervalID?: number;
+    private markerSize?: number[];
 
     render() {
         return createElement("div",
