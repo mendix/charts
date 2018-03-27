@@ -56,8 +56,8 @@
 ![BarChartProperties](/assets/cheatsheet/BarChart.png)
 ``` json
 [ {
-  "x": [ 1, 2 ],
-  "y": [ 1, 2 ],
+  "y": [ "giraffe", "elephant" ],
+  "x": [ 2, 4 ],
   "type": "bar",
   "orientation": "h"
 } ]
@@ -67,9 +67,10 @@
 ![ColumnChartProperties](/assets/cheatsheet/ColumnChart.png)
 ``` json
 [ {
-  "x": [ 1, 2 ],
-  "y": [ 1, 2 ],
-  "type": "bar"
+  "x": [ "giraffe", "elephant" ],
+  "y": [ 2, 4 ],
+  "type": "bar",
+  "orientation": "v"
 } ]
 ```
 
@@ -111,7 +112,7 @@
 ![HistogramProperties](/assets/cheatsheet/Histogram.png)
 ``` json
 [ {
-  "x": [ 40, 15, 5, 50, 25 ],
+  "x": [ 0, 2, 1, 3, 4, 2 ],
   "type": "histogram"
 } ]
 ```
@@ -163,7 +164,7 @@ Data
   "type": "scattergeo"
 } ]
 ```
-Layout 
+Layout
 ``` json
 { 
   "geo": { 
