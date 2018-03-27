@@ -11,19 +11,42 @@ With the AnyChart it is possible to build all the chart types that are possible 
 The Any Charts can be configured with a JSON `Data` array and `Layout` object configuration. The configuration can be set statically, via the `Source attribute` or with the `Sample data`. The data of the attribute will be merged into the static settings and will overwrite the properties. The `Sample data` is for demo purpose during run time when there is no `Source attribute` selected or when rendering sample data in the webmodeler preview.
 
 ### Use building blocks
- 1) Download the building blocks from the app store (link)
- 2) Add the required building block on a page
- 3) Run to preview the chart
- 4) Create a JSON export that generates the data in the same structure `Sample data`
- 5 ) Create a microflow to generate the data and store it in the `Source attribute`
-
-Enable the `Mode` `Development` and fine tune the settings during runtime. Cheat sheet (link) gives you a quick help and the full reference is found here: (link)
+1. Download the building blocks module from the app store (link) into your project
+1. Create a `Map` entity
+1. Create page with a Data view and use the `Map` entity
+1. Add the required building block into the Data view
+1. Run the project to preview the chart
 
 ### Start from scratch
- 1) Select one of the charts sample for the Any Chart cheat sheet. For example the line chart: `[ { "x": [ 1, 2 ], "y": [ 1, 2 ], "type": "scatter" } ]`
- 2) Copy the data in the tab `Data`, `Static`
- 3) Enable the the `Mode` `Development` 
- 4) Run the project, to validate the chart renders correctly
- 5) Click the 'Editor' button and fine tune your settings. The editor is only a playground and no settings are stored. Copy the required setting back into the modeler.
- 6) Split the data into static and dynamic parts that are going to be generated from the domain model. Static : `[ "type": "scatter" } ]` and sample data `[ { "x": [ 1, 2 ], "y": [ 1, 2 ] } ]`
- 7) Create a microflow that generates a dynamic JSON string with the same structure as the `Sample data`. Store the JSON in a attribute. The attribute should be selected in `Attribute Source`
+1. Select one of the charts sample for the [Any Chart cheat sheet](/AnyChartCheatSheet.md). For example the line chart: `[ { "x": [ 1, 2 ], "y": [ 1, 2 ], "type": "scatter" } ]`
+1. Copy the data in the tab `Data`, field `Static`
+1. Run the project, to validate the chart renders correctly
+1. Split the data into static and dynamic parts that are going to be generated from the domain model. Static : `[ "type": "scatter" } ]` and Sample data `[ { "x": [ 1, 2 ], "y": [ 1, 2 ] } ]`
+1. Run the project to preview the chart
+
+### Generating data and layout
+1. Add a `Data` attribute to the map entity
+1. In the widget set the Data `Source attribute`
+1. Create a `JSON Structure` and use the `Sample data` as the snippet
+1. Create an `Export Mapping` with the `JSON Structure`
+1. Create a microflow that retrieves the data and use the `Export Mapping` to generate a `String Variable`. Store the value in the object attribute that is select as `Source attribute`
+
+If need be the layout can also be generated in the same way as the data. In most  cases a `Static` layout will suffice.
+
+### Runtime editor playground
+Editing the JSON configuration in the modeler could be cumbersome. With the live preview editor developers can directly see the output of there changes. 
+
+The editor is only a playground and no settings are stored. All changes you make in the runtime preview, you have to apply to your data model too.
+
+1. Enable the `Mode` `Development`
+1. Run the project, and open the chart page
+1. Click the 'Toggle Editor' button and fine tune your settings
+ The editor is only a playground and no settings are stored. Copy the required setting back into the modeler.
+1. Select the `Data` or `Layout` from the dropdown menu
+1. Edit Static or data setting till
+1. Copy the new settings and apply them in the modeler
+1. Re-run the project to confirm the change are applied
+
+The [cheat sheet](/AdvancedCheatSheet.md) gives you a quick help. 
+
+The full reference is found here: [https://plot.ly/javascript/reference/](https://plot.ly/javascript/reference/).
