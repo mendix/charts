@@ -1,6 +1,6 @@
-## Basic Charts
+## Basic Chart
 
-### Line Plots
+### Line Chart
 ![LineChartProperties](/assets/cheatsheet/LineChart.png)
 ``` json
 [
@@ -17,7 +17,7 @@
 ]
 ```
 
-### Bubble Charts
+### Bubble Chart
 ![BubbleChartProperties](/assets/cheatsheet/BubbleChart.png)
 ``` json
 [ {
@@ -31,7 +31,7 @@
 } ]
 ```
 
-### Scatter Plots
+### Scatter Chart
 ![ScatterPlotProperties](/assets/cheatsheet/ScatterPlot.png)
 ``` json
 [ {
@@ -95,7 +95,7 @@
 } ]
 ```
 
-### Area Plots
+### Area Chart
 ![AreaChartProperties](/assets/cheatsheet/AreaChart.png)
 ``` json
 [ {
@@ -106,7 +106,7 @@
 } ]
 ```
 
-## Statistical Charts
+## Statistical Chart
 
 ### Histograms
 ![HistogramProperties](/assets/cheatsheet/Histogram.png)
@@ -117,7 +117,7 @@
 } ]
 ```
 
-### Box Plots
+### Box Chart
 ![BoxPlotProperties](/assets/cheatsheet/BoxPlot.png)
 ``` json
 [ {
@@ -184,9 +184,9 @@ Layout
   "mode": "marker"
 } ]
 ```
-## 3D Charts
+## 3D Chart
 
-### 3D Surface Plots
+### 3D Surface Chart
 ![3DSurfacePlotProperties](/assets/cheatsheet/3DSurfacePlot.png)
 ``` json
 [ {
@@ -196,7 +196,7 @@ Layout
 } ]
 ```
 
-### 3D Line Plots
+### 3D Line Chart
 ![3DLineChartProperties](/assets/cheatsheet/3DLineChart.png)
 ``` json
 [ {
@@ -208,7 +208,7 @@ Layout
 } ]
 ```
 
-### 3D Scatter Plots
+### 3D Scatter Chart
 ![3DScatterPlotProperties](/assets/cheatsheet/3DScatterPlot.png)
 ``` json
 [ {
@@ -220,7 +220,7 @@ Layout
 } ]
 ```
 
-## Other Charts
+## Other Chart
 
 ### Contour Chart
 ![ContourProperties](/assets/cheatsheet/Contour.png)

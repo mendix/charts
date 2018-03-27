@@ -33,9 +33,9 @@ Static : `[ "type": "scatter" } ]` and Sample data `[ { "x": [ 1, 2 ], "y": [ 1,
 1. Create an `Export Mapping` with the `JSON Structure`
 1. Create a microflow that retrieves the data and use the `Export Mapping` to generate a `String Variable`. Store the value in the object attribute that is select as `Source attribute`
 
-If need be, the layout can also be generated in the same way as the data. In most  cases a `Static` layout will suffice.
+If need be, the layout can also be generated in the same way as the data. In most cases a `Static` layout will suffice.
 
-### Runtime editor playground
+### Runtime preview editor
 Editing the JSON configuration in the modeler could be cumbersome. With the live preview editor, developers can directly see the output of their changes. 
 
 The editor is only a playground and no settings are stored. All changes you make in the runtime preview that you wish to persist have to be applied to your data model too.
