@@ -17,6 +17,7 @@
 ]
 ```
 
+![BubbleChartProperties](/assets/cheatsheet/BubbleChart.png)
 ### Bubble Charts
 ``` json
 [ {
@@ -31,6 +32,7 @@
 ```
 
 ### Scatter Plots
+![ScatterPlotProperties](/assets/cheatsheet/ScatterPlot.png)
 ``` json
 [ {
   "x": [ 1, 2, 3 ],
@@ -41,7 +43,8 @@
 } ]
 ```
 
-### Heatmaps
+### Heatmap
+![HeatMapProperties](/assets/cheatsheet/HeatMap1.png)
 ``` json
 [ {
   "z": [ [ 1, 2 ], [ 3, 4 ] ],
@@ -50,6 +53,7 @@
 ```
 
 ### Bar Chart
+![BarChartProperties](/assets/cheatsheet/BarChart.png)
 ``` json
 [ {
   "x": [ 1, 2 ],
@@ -60,6 +64,7 @@
 ```
 
 ### Column Chart
+![ColumnChartProperties](/assets/cheatsheet/ColumnChart.png)
 ``` json
 [ {
   "x": [ 1, 2 ],
@@ -69,25 +74,28 @@
 ```
 
 ### Pie Chart
+![PieChartProperties](/assets/cheatsheet/PieChart.png)
 ``` json
-[{
+[ {
   "values": [ 10, 20, 30 ],
   "labels": [ "Uganda", "Netherlands", "US" ],
   "type": "pie"
-}]
+} ]
 ```
 
 ### Doughnut Chart
-``` json
-[{
+![DoughNutChartProperties](/assets/cheatsheet/DoughNutChart.png)
+```json
+[ {
   "values": [ 10, 20, 30 ],
   "labels": [ "Uganda", "Netherlands", "US" ],
   "hole": 0.4,
   "type": "pie"
-}]
+} ]
 ```
 
 ### Area Plots
+![AreaChartProperties](/assets/cheatsheet/AreaChart.png)
 ``` json
 [ {
   "x": [ 1, 2, 3 ],
@@ -100,15 +108,16 @@
 ## Statistical Charts
 
 ### Histograms
-?????
+![HistogramProperties](/assets/cheatsheet/Histogram.png)
 ``` json
 [ {
-  "x": [ 1, 2, 3, 4, 5 ],
+  "x": [ 40, 15, 5, 50, 25 ],
   "type": "histogram"
 } ]
 ```
 
 ### Box Plots
+![BoxPlotProperties](/assets/cheatsheet/BoxPlot.png)
 ``` json
 [ {
   "x": [ 1, 2, 3, 4, 5 ],
@@ -117,6 +126,7 @@
 ```
 
 ### 2D Histogram
+![2DHistogramProperties](/assets/cheatsheet/2DHistogram.png)
 ``` json
 [ {
   "x": [ 1, 2, 3, 4, 5 ],
@@ -128,7 +138,7 @@
 ## Maps
 
 ### Bubble Map
-????
+![BubbleMapProperties](/assets/cheatsheet/BubbleMap.png)
 ``` json
 [ {
   "lon": [ 100, 400 ],
@@ -143,7 +153,8 @@
 ```
 
 ### Choropleth Map
-????
+![ChoroplethMapProperties](/assets/cheatsheet/ChoroplethMap.png)  
+Data
 ``` json
 [ {
   "locations": ["AZ", "CA", "VT"],
@@ -152,7 +163,7 @@
   "type": "scattergeo"
 } ]
 ```
-Layout
+Layout 
 ``` json
 { 
   "geo": { 
@@ -162,6 +173,7 @@ Layout
 ```
 
 ### Scatter Map
+![ScatterMapProperties](/assets/cheatsheet/ScatterMap.png)
 ``` json
 [ {
   "lon": [ 42, 39 ],
@@ -174,32 +186,82 @@ Layout
 ## 3D Charts
 
 ### 3D Surface Plots
-????
+![3DSurfacePlotProperties](/assets/cheatsheet/3DSurfacePlot.png)
 ``` json
 [ {
   "colorscale": "Viridis",
-  "z": [ [3, 5, 7, 9], [21, 13, 8, 5 ] ] 
+  "z": [ [3, 5, 7, 9], [ 21, 13, 8, 5 ] ],
+  "type": "surface"
 } ]
 ```
 
 ### 3D Line Plots
-???
+![3DLineChartProperties](/assets/cheatsheet/3DLineChart.png)
 ``` json
 [ {
   "x": [ 9, 8, 5, 1 ],
   "y": [ 1, 2, 4, 8 ],
   "z": [ 11, 8, 15, 3 ],
   "mode": "lines",
+  "type": "scatter3d"
 } ]
 ```
 
 ### 3D Scatter Plots
-???
+![3DScatterPlotProperties](/assets/cheatsheet/3DScatterPlot.png)
 ``` json
 [ {
-  "x": [ 9, 8, 5, 1 ],
-  "y": [ 1, 2, 4, 8 ],
-  "z": [ 11, 8, 15, 3 ],
+  "x": [ "9", "8", "5", "1" ],
+  "y": [ "1", "2", "4", "8" ], 
+  "z": [ "11", "8", "15", "3" ],
   "mode": "markers",
+  "type": "scatter3d"
+} ]
+```
+
+## Other Charts
+
+### Contour chart
+![ContourProperties](/assets/cheatsheet/Contour.png)
+``` json
+[ {
+  "z": [ [ 2, 2, 4, 11 ], [ 5, 14, 8, 11 ] ],
+  "type": "contour"
+} ]
+```
+
+### Time series
+![TimeSeriesProperties](/assets/cheatsheet/TimeSeries.png)
+``` json
+[ {
+  "type": "scatter",
+  "mode": "lines",
+  "x": ["2018-09-04", "2018-10-04", "2018-11-04", "2018-12-04", "2018-12-04"],
+  "y": [ 5, 2, 7, 10 ]
+} ]
+```
+
+### Group by chart
+![GroupByChartProperties](/assets/cheatsheet/GroupByChart.png)
+``` json
+[ {
+    "type": "scatter",
+    "x": [ "Arthur","Jolly","Daphine","Arthur","Jolly","Daphine" ],
+    "y": [ 1, 6, 2, 5, 8, 1 ],
+    "mode": "markers"
+} ]
+```
+
+### Symmetric error bar
+![ErrorBarProperties](/assets/cheatsheet/ErrorBar.png)
+``` json
+[ {
+  "x": [ 0, 1, 2 ],
+  "y": [ 6, 10, 2 ],
+  "error_y": {
+    "type": "data",
+    "array": [ 4, 2, 3 ]
+  },
+  "type": "scatter"
 } ]
 ```
