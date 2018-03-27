@@ -3,25 +3,21 @@ A cheat sheet with snippets of JSON objects for easy and quick configuration of 
 
 ## 3D chart
 ```JSON
-[
-  {
-    "x": [ "9", "8", "5", "1" ],
-    "y": [ "1", "2", "4", "8" ], 
-    "z": [ "11", "8", "15", "3" ],
-    "mode": "markers",
-    "type": "scatter3d"
-  }
-]
+[ {
+  "x": [ "9", "8", "5", "1" ],
+  "y": [ "1", "2", "4", "8" ], 
+  "z": [ "11", "8", "15", "3" ],
+  "mode": "markers",
+  "type": "scatter3d"
+} ]
 ```
 
 ## Contour chart
 ```JSON
-[
-  {
-    "z": [ [ 2, 2, 4, 11 ] [ 5, 14, 8, 11 ] ],
-    "type": "contour"
-  }
-]
+[ {
+  "z": [ [ 2, 2, 4, 11 ] [ 5, 14, 8, 11 ] ],
+  "type": "contour"
+} ]
 ```
 
 ## Multiple Y Axes
@@ -41,58 +37,48 @@ A cheat sheet with snippets of JSON objects for easy and quick configuration of 
 
 ## Pie chart
 ```JSON
-[
-  {
+[ {
   "values": [ 5, 1, 11, 8 ],
   "labels": [ "Thailand", "Brazil", "Cameroon", "Vietnam"],
   "type": "pie"
-  }
-]
+} ]
 ```
 
 ## Heat map
 ```JSON
-[
- {
-    "z": [ [ 5, 2, 3 ], [ 2, 5, 6 ], [ 3, 6, 5 ] ],
-    "type": "heatmap"
-  }
-]
+[ {
+  "z": [ [ 5, 2, 3 ], [ 2, 5, 6 ], [ 3, 6, 5 ] ],
+  "type": "heatmap"
+} ]
 ```
 
 ## Time series
 ```JSON
-[
-  {
-    "type": "scatter",
-    "mode": "lines",
-    "x": [ 1, 2, 3, 4 ],
-    "y": [ 5, 2, 7, 10 ]
-  }
-]
+[ {
+  "type": "scatter",
+  "mode": "lines",
+  "x": [ 1, 2, 3, 4 ],
+  "y": [ 5, 2, 7, 10 ]
+} ]
 ```
 
 ## Bubble chart
 ```JSON
-[
-  {
-    "x": [ 1, 2, 3, 1 ],
-    "y": [ 10, 11, 12, 13 ],
-    "mode": "markers"
-  }
-]
+[ {
+  "x": [ 1, 2, 3, 1 ],
+  "y": [ 10, 11, 12, 13 ],
+  "mode": "markers"
+} ]
 ```
 
 ## Group by chart
 ```JSON
-[ 
-  {
+[ {
     "type": "scatter",
     "x": [ "Arthur","Jolly","Daphine","Arthur","Jolly","Daphine" ],
     "y": [ 1, 6, 2, 5, 8, 1 ],
     "mode": "markers"
-  }
-]
+} ]
 ```
 
 ## Symmetric error bar
@@ -130,8 +116,8 @@ A cheat sheet with snippets of JSON objects for easy and quick configuration of 
   {
     "y": [ 2, 3, 5, 4 ],
     "x": [ 4, 5, 7, 8 ],
-  "xaxis": "x2",
-  "type": "scatter"
+    "xaxis": "x2",
+    "type": "scatter"
   }
 ]
 ```
