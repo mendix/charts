@@ -122,7 +122,13 @@ export class Playground extends Component<{}, PlaygroundState> {
             maxLines: 1000, // crappy attempt to avoid a third scroll bar
             onValidate,
             editorProps: { $blockScrolling: Infinity },
-            setOptions: { showLineNumbers: false, highlightActiveLine: false, highlightGutterLine: true }
+            setOptions: {
+                showLineNumbers: false,
+                highlightActiveLine: false,
+                highlightGutterLine: true,
+                tabSize: 2,
+                useSoftTabs: true
+            }
         });
     }
 
@@ -130,7 +136,7 @@ export class Playground extends Component<{}, PlaygroundState> {
         const markers: Marker[] = [];
         if (right) {
             const diffs = compare(JSON.parse(left), JSON.parse(right));
-            diffs.forEach(diff => {
+            diffs.forEach((diff: any) => {
                 if (diff.op === "replace") {
                     const pos = Playground.getStartAndEndPosOfDiff(left, diff);
                     if (pos) {

@@ -120,12 +120,12 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
 
         return {
             ...deepMerge.all<ScatterData>([
+                BarChart.getDefaultSeriesOptions(series, this.props),
                 {
                     x: bar ? traces.y : traces.x,
                     y: bar ? traces.x : traces.y,
                     series, // shall be accessible via the data property of a hover/click point
-                    marker: color ? { color } : {},
-                    ... BarChart.getDefaultSeriesOptions(series, this.props)
+                    marker: color ? { color } : {}
                 },
                 rawOptions
             ]),

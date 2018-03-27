@@ -110,11 +110,11 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 series: this.state.series,
                 seriesOptions: this.state.seriesOptions,
                 modelerSeriesConfigs: this.state.series && this.state.series.map(series =>
-                    JSON.stringify(LineChart.getDefaultSeriesOptions(series as LineSeriesProps, this.props), null, 4)
+                    JSON.stringify(LineChart.getDefaultSeriesOptions(series as LineSeriesProps, this.props), null, 2)
                 ),
                 onChange: this.onRuntimeUpdate,
                 layoutOptions: this.state.layoutOptions || "{\n\n}",
-                modelerLayoutConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 4)
+                modelerLayoutConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 2)
             }, this.renderLineChart());
         }
 
