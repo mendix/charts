@@ -108,7 +108,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         if (this.Playground) {
             return createElement(this.Playground, {
                 series: this.state.series,
-                seriesOptions: this.state.seriesOptions,
+                seriesOptions: this.state.seriesOptions || [],
                 modelerSeriesConfigs: this.state.series && this.state.series.map(series =>
                     JSON.stringify(LineChart.getDefaultSeriesOptions(series as LineSeriesProps, this.props), null, 2)
                 ),
@@ -134,12 +134,11 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     private getData(props: LineChartProps): ScatterData[] {
-        const { seriesOptions } = this.state;
         if (props.scatterData) {
-            const lineData = props.scatterData.map((data, index) => {
-                const parsedOptions = props.devMode !== "basic" && seriesOptions
-                    ? JSON.parse(seriesOptions[index])
-                    : {};
+            const lineData: ScatterData[] = props.scatterData.map((data, index) => {
+                const parsedOptions = this.state.seriesOptions
+                    ? JSON.parse(this.state.seriesOptions[index])
+                    : "{}";
 
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
                 return {

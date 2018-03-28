@@ -104,7 +104,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
         if (this.Playground) {
             return createElement(this.Playground, {
                 series: this.state.series,
-                seriesOptions: this.props.seriesOptions || [],
+                seriesOptions: this.state.seriesOptions || [],
                 modelerSeriesConfigs: this.state.series && this.state.series.map(series =>
                     JSON.stringify(BarChart.getDefaultSeriesOptions(series, this.props), null, 2)
                 ),

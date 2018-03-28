@@ -129,7 +129,7 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
                 Playground.renderAceEditor({
                     value: this.props.modelerSeriesConfigs[index] || "{\n\n}",
                     readOnly: true,
-                    overwriteValue: this.props.series[index].seriesOptions,
+                    overwriteValue: this.props.seriesOptions && this.props.seriesOptions[index],
                     onValidate: this.onValidate
                 })
             );
