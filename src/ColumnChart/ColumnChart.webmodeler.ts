@@ -8,6 +8,7 @@ import deepMerge from "deepmerge";
 import { ScatterData } from "plotly.js";
 import { Container } from "../utils/namespaces";
 import BarChartContainerProps = Container.BarChartContainerProps;
+import { defaultColours } from "../utils/style";
 
 // tslint:disable-next-line class-name
 export class preview extends Component<BarChartContainerProps, {}> {
@@ -36,6 +37,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
                     x: sampleData.x || [],
                     y: sampleData.y || [],
                     series: {},
+                    marker: {  color: defaultColours() },
                     hoverinfo: "none"
                 } ]);
             });
@@ -48,6 +50,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
                 name: "Sample",
                 hoverinfo: "none",
                 series: {},
+                marker: {  color: defaultColours() },
                 ...preview.getSampleTraces()
             } as any
         ];

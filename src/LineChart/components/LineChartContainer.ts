@@ -122,11 +122,11 @@ export default class LineChartContainer extends Component<LineChartContainerProp
 
         return {
             ...deepMerge.all<ScatterData>([
+                LineChart.getDefaultSeriesOptions(series, this.props),
                 {
                     series, // shall be accessible via the data property of a hover/click point
                     fillcolor: series.fillColor || fillColours[index],
                     marker: color ? { color: series.color || color } : {},
-                    ... LineChart.getDefaultSeriesOptions(series, this.props),
                     ... traces,
                     text: traces.marker ? traces.marker.size : "" // show the size value on hover
                 },

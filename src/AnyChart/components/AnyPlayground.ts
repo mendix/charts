@@ -9,6 +9,8 @@ import { Panel, PanelProps } from "../../components/Panel";
 import { Select, SelectProps } from "../../components/Select";
 
 interface AnyPlaygroundState {
+    staticData: string;
+    staticLayout: string;
     attributeData: string;
     attributeLayout: string;
     activeOption: string;
@@ -16,6 +18,8 @@ interface AnyPlaygroundState {
 
 export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> {
     state: AnyPlaygroundState = {
+        staticData: this.props.dataStatic,
+        staticLayout: this.props.layoutStatic,
         attributeLayout: this.props.attributeLayout,
         attributeData: this.props.attributeData,
         activeOption: "layout"
@@ -37,8 +41,8 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
     private createChart() {
         return createElement(AnyChart, {
             ...this.props as AnyChartProps,
-            layoutStatic: this.props.layoutStatic,
-            dataStatic: this.props.dataStatic,
+            layoutStatic: this.state.staticLayout,
+            dataStatic: this.state.staticData,
             attributeLayout: this.state.attributeLayout,
             attributeData: this.state.attributeData
         });
@@ -47,7 +51,9 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
     componentWillReceiveProps(newProps: AnyChartProps) {
         this.setState({
             attributeData: newProps.attributeData,
-            attributeLayout: newProps.attributeLayout
+            attributeLayout: newProps.attributeLayout,
+            staticData: newProps.dataStatic,
+            staticLayout: newProps.layoutStatic
         });
     }
 
@@ -64,23 +70,23 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
             createElement(Panel,
                 {
                     key: "layout",
-                    heading: "Custom settings"
+                    heading: "Dynamic"
                 },
                 Playground.renderAceEditor({
                     value: `${this.state.attributeLayout || "{\n\n}"}`,
-                    onChange: value => this.onUpdate("layout", value),
+                    onChange: value => this.onUpdate("layoutDynamic", value),
                     onValidate: this.onValidate
                 })
             ),
             createElement(Panel,
                 {
                     key: "modeler",
-                    heading: "Settings from the Modeler",
+                    heading: "Static",
                     headingClass: "read-only"
                 },
                 Playground.renderAceEditor({
-                    value: this.props.layoutStatic || "{\n\n}",
-                    readOnly: true,
+                    value: this.state.staticLayout || "{\n\n}",
+                    onChange: value => this.onUpdate("layoutStatic", value),
                     overwriteValue: this.props.attributeLayout,
                     onValidate: this.onValidate
                 })
@@ -95,24 +101,24 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
                 createElement(Panel,
                     {
                         key: "data",
-                        heading: "Custom settings",
+                        heading: "Dynamic",
                         headingClass: "item-header"
                     },
                     Playground.renderAceEditor({
                         value: `${this.state.attributeData || "{\n\n}"}`,
-                        onChange: value => this.onUpdate("data", value),
+                        onChange: value => this.onUpdate("dataDynamic", value),
                         onValidate: this.onValidate
                     })
                 ),
                 createElement(Panel,
                     {
                         key: "modeler",
-                        heading: "Settings from the Modeler",
+                        heading: "Static",
                         headingClass: "read-only"
                     },
                     Playground.renderAceEditor({
-                        value: this.props.dataStatic || "{\n\n}",
-                        readOnly: true,
+                        value: this.state.staticData || "{\n\n}",
+                        onChange: value => this.onUpdate("dataStatic", value),
                         overwriteValue: this.state.attributeData,
                         onValidate: this.onValidate
                     })
@@ -132,10 +138,6 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
                     { name: "Data", value: "data", isDefaultSelected: false }
                 ]
             })
-            // createElement(MendixButton, {
-            //     className: "any-chart-plotly-copy",
-            //     onClick: this.updateChartFromCopy
-            // }, "Copy from Plotly")
         );
     }
 
@@ -150,7 +152,7 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
         this.timeoutId = window.setTimeout(() => {
             try {
                 if (this.isValid && JSON.parse(value)) {
-                    this.updateChart(source, value);
+                    this.updateChart(source, JSON.stringify(JSON.parse(value), null, 2));
                 }
             } catch (error) {
                 this.isValid = false;
@@ -161,31 +163,15 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
 
     private updateChart = (source: string, value: string) => {
         const cleanValue = Playground.removeTrailingNewLine(value);
-        if (source === "layout") {
-            this.setState({ attributeLayout: cleanValue });
-        } else {
-            this.setState({ attributeData: cleanValue });
-        }
+        this.setState({
+            attributeLayout: source === "layoutDynamic" ? cleanValue : this.state.attributeLayout,
+            attributeData: source === "dataDynamic" ? cleanValue : this.state.attributeData,
+            staticLayout: source === "layoutStatic" ? cleanValue : this.state.staticLayout,
+            staticData: source === "dataStatic" ? cleanValue : this.state.staticData
+        });
     }
 
     private updateView = (activeOption: string) => {
         this.setState({ activeOption });
-    }
-
-    private updateChartFromCopy() {
-        const data = [];
-        const layout = {};
-        const value = window.prompt("Copy and paste the Plotly JavaScript example code here") as string;
-        if (value !== null) {
-            const newValue = (value.indexOf(".newPlot") !== -1) ? value.substring(0, value.indexOf("Plotly.new")) : value;
-            // tslint:disable-next-line
-            var results = eval('(function() {' + newValue + '; return {data:data, layout:layout};}())');
-            if (results.data.length > 0) {
-                this.updateChart("data", JSON.stringify(results.data, null, 2));
-            }
-            if (JSON.stringify(results.layout) !== JSON.stringify({}, null, 2)) {
-                this.updateChart("layout", JSON.stringify(results.layout, null, 2));
-            }
-        }
     }
 }

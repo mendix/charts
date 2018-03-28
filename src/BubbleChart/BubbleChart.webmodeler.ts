@@ -8,6 +8,7 @@ import deepMerge from "deepmerge";
 import { ScatterData } from "plotly.js";
 import { Container, Data } from "../utils/namespaces";
 import LineChartContainerProps = Container.LineChartContainerProps;
+import { defaultColours } from "../utils/style";
 
 // tslint:disable-next-line class-name
 export class preview extends Component<LineChartContainerProps, {}> {
@@ -42,6 +43,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                     name: series.name,
                     type: "scatter",
                     series: {},
+                    marker: {  color: defaultColours() },
                     ...sampleData
 
                 }, seriesOptions ]);
@@ -57,6 +59,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
             mode: "markers",
             text: sampleData.marker ? sampleData.marker.size : "",
             series: {},
+            marker: {  color: defaultColours() },
             ...sampleData
         } as any ];
     }

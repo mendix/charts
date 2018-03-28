@@ -47,9 +47,9 @@ export default class AnyChartContainer extends Component<AnyChartContainerProps,
     }
 
     private fetchData(mxObject?: mendix.lib.MxObject) {
-        const { dataAttribute, layoutAttribute, friendlyId, sampleData } = this.props;
+        const { dataAttribute, layoutAttribute, friendlyId, sampleData, sampleLayout } = this.props;
         const attributeData = mxObject && dataAttribute ? mxObject.get(dataAttribute) as string : sampleData || "[]";
-        const attributeLayout = mxObject && layoutAttribute ? mxObject.get(layoutAttribute) as string : "{}";
+        const attributeLayout = mxObject && layoutAttribute ? mxObject.get(layoutAttribute) as string : sampleLayout || "{}";
         const errorMessages: string[] = [];
         let error = validateAdvancedOptions(attributeData);
         if (error) {

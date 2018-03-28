@@ -74,7 +74,7 @@ const anyChartConfig = {
         jsonpFunction: "webpack3Jsonp",
         path: path.resolve(__dirname, "dist/tmp/AnyChart"),
         filename: "com/mendix/widget/custom/[name]/[name].js",
-        chunkFilename: `com/mendix/widget/custom/anychart/chunk[id].js`,
+        chunkFilename: `com/mendix/widget/custom/AnyChart/chunk[id].js`,
         libraryTarget: "umd",
         publicPath: "/"
     },

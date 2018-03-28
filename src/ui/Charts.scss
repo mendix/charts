@@ -38,6 +38,22 @@
             right: 0;
         }
     }
+
+    rect {
+        &.rangeslider-handle-min {
+            width: 8px;
+            rx: 4;
+            x: -2;
+        }
+    }
+
+    rect {
+        &.rangeslider-handle-max {
+            width: 8px;
+            rx: 4;
+            x: -1;
+        }
+    }
 }
 
 .alert {

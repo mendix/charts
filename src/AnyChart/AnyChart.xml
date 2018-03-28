@@ -4,7 +4,7 @@
     <description>Create any chart</description>
     <icon>iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAABRFBMVEUAAACA//9V//+Av/9Jtv9Vxv9Jtv9LtP9Ns/9Ruf9Ms/9Jtv9bW1tNs/9aWlpNsvlLtPlKtflJsfpIsvpXV1dWVlZXV1dKsvlVVVVKsvlIsflKsvpKs/dXV1dKsfhJsvhKsPhKsfhKsflKsvdIsfhJsPhJsfhJsfhIsfhKsPhJsfdIsfdUVFRWVlZJsfhIsfhJsfhJsPhIsfhJsPhJsPhJsPhJsfhWVlZJsfhIsPhJsfdJsfdIsPdIsPdVVVVJsfdWVlZJsfdWVlZJsfdJsfdJsPhIsfhWVlZJsfhJsPhIsfhJsPhJsPhIsfhIsfhJsPhIsfhJsfdVVVVJsfdIsPdVVVVIsPdVVVVJsfdVVVVJsfhVVVVIsPhWVlZVVVVIsPhVVVVVVVVUVFRJsfhJsPhIsfhVVVVJsPhVVVVIsfhIsPdVVVXWX4B8AAAAanRSTlMAAgMEBwkOERQWGxwcHh8rLC0xNUZHSVZXWVxdZGdobW5vfIeKi4+QlJWhpqamq62ur7Gytbm6u72/wMHCxsbHx8jJysvMzc3Oz9DS09TY2dvh4+Tm5unp6u3u7vDx8vPz9PX4+fv8/f3+l8owdAAAAc5JREFUeAHtlldXU0EURg/YNSAWEUtE7IUIGgR7wYJFUdErYgSxiJc9///dEMlwc3OYc5fjWjyQ/TIv+fZk5nyZFemQZdvJl19/IzalSpJUSpJnx1tWKJCfc3Xm2gxVCgoqrkFFWukD3hzdv0dMEtcgkVYGgQNShJouuAifpQgDqX6EyzBdKL/knHqJI/CoaD6tKWOswsOC+aUBURiDuzF5uQ63rcaF8nILxo3GBfPyHEbUxk0dLP39NrU0lJePcEFamHVN5u8Nf6svwXwPcESylFPXRrpuXs7Aj52yRu+EU6jJOmwZWoaz2e0Xmpnvww/mvSARnep74OrW/PaLk6tjLB2aUvvvAT6d6Pazn1x0K0z0to80IDje5T/YYKGsl0pl9B1Q7fKzz23v6Z9xq8z0Swvdg8tweu21ScuiUc97gzLGn7u8YFZUXAatSMf0B9MU+Cqft267GVQFL2DUuu2g4A7cFIOgYBzuRwnG4HGU4Bo8iRJcgWdRgkvwKkpwDj5Y3Q8KhoC9RveDgn3A68N9u0PVDQrkBg3+XdAzrQoCa57tp55++RUj8GygwJq7KbDmbgpcho0T+LUj2JQC/zuw0f8jmHnF8F8FEUfo8AfO1uZQ2h37rwAAAABJRU5ErkJggg==</icon>
     <properties>
-        <property key="dataStatic" type="string" required="false" multiline="true">
+        <property key="dataStatic" type="translatableString" required="false" multiline="true">
             <caption>Static</caption>
             <category>Data</category>
             <description>Data JSON array based on https://plot.ly/javascript/reference/</description>
@@ -17,10 +17,10 @@
                 <attributeType name="String"/>
             </attributeTypes>
         </property>
-        <property key="sampleData" type="string" required="false" multiline="true">
+        <property key="sampleData" type="translatableString" required="false" multiline="true">
             <caption>Sample data</caption>
             <category>Data</category>
-            <description>Data for preview. It will be merged with the 'Static data' in the webmodeler or at runtime when no 'Source attribute' is selected</description>
+            <description>Data for preview. It will be merged with the 'Static data' in the web modeler or at runtime when no 'Source attribute' is selected</description>
         </property>
         <property key="devMode" type="enumeration" defaultValue="developer">
             <caption>Mode</caption>
@@ -31,7 +31,7 @@
                 <enumerationValue key="advanced">Production</enumerationValue>
             </enumerationValues>
         </property>
-        <property key="layoutStatic" type="string" required="false" multiline="true">
+        <property key="layoutStatic" type="translatableString" required="false" multiline="true">
             <caption>Static </caption>
             <category>Layout options</category>
             <description>JSON object based on https://plot.ly/javascript/reference/</description>
@@ -43,6 +43,11 @@
             <attributeTypes>
                 <attributeType name="String"/>
             </attributeTypes>
+        </property>
+        <property key="sampleLayout" type="translatableString" required="false" multiline="true">
+            <caption>Sample layout</caption>
+            <category>Layout options</category>
+            <description>Layout options for preview. It will be merged with the 'Static' in the web modeler or at runtime when no 'Source attribute' is selected</description>
         </property>
         <property key="widthUnit" type="enumeration" defaultValue="percentage">
             <caption>Width unit</caption>
