@@ -50,7 +50,8 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         }
         this.renderChart(this.props);
         this.addResizeListener();
-        this.registerTouchEvents();
+        // TODO: Fix mobile touch events
+        // this.registerTouchEvents();
     }
 
     componentDidUpdate() {
@@ -61,7 +62,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         if (this.chartNode && this.purge) {
             this.purge(this.chartNode);
         }
-        this.removeTouchEvents();
+        // this.removeTouchEvents();
     }
 
     private registerTouchEvents() {
@@ -105,7 +106,6 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         }
 
         const options = {
-            bubbles: true,
             screenX: touchPoint.screenX,
             screenY: touchPoint.screenY,
             clientX: touchPoint.clientX,
@@ -114,7 +114,6 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         const simulatedEvent = new MouseEvent(type, options);
 
         touchPoint.target.dispatchEvent(simulatedEvent);
-        event.preventDefault();
     }
 
     private getPlotlyNodeRef = (node: HTMLDivElement) => {
