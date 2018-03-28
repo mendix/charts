@@ -1,5 +1,5 @@
 # Advanced configuration settings
-The standard charts provide the most common settings trough the widget configuration. Addtional settings can set via the Advanced settings. 
+The standard charts provide the most common settings trough the widget configuration. Additional settings can set via the Advanced settings. 
 This cheat sheet with JSON snippets will provide some sample for the advance configuration.
 
 The full reference is found be found at [https://plot.ly/javascript/](https://plot.ly/javascript/).
@@ -32,7 +32,7 @@ Below is a basic configuration.
   }
 }
 ```
-To use this layout snippet above, endeavour to replace all lines that begin with "// sometext properties" with actual properties specific to it.
+To use this layout snippet above, endeavour to replace all lines that begin with "// some text properties" with actual properties specific to it.
 
 ### Legend
 The legend properties below are added to the layout configuration to apply custom style to it. Below are legend properties
@@ -149,7 +149,6 @@ See more[ Axes configurations ](https://plot.ly/javascript/reference/#layout-xax
 The properties apply to charts with more than one Y axis. They can be configured as:
 ``` json
 {
-  "title": "Any Chart Multiple Y axes",
   "yaxis": {
     "title": "Y-axis 1",
     "zeroline": true,
@@ -310,8 +309,8 @@ Sets a global font on the root level will be applied to all chart elements. Or s
 These properties are applied to specific charts only. For each chart, data properties are distinct. They make the chart appear as its supposed to be.
 
 ### Lines
-A mode and line config can be added in the `Advanced` configuration of the series.
-![ Lyne styles ](/assets/cheatsheet/LineStyles.png)
+A mode and line configuration can be added in the `Advanced` configuration of the series.
+![ Line styles ](/assets/cheatsheet/LineStyles.png)
 ``` json
 [
   {
@@ -431,7 +430,7 @@ See more [ Area chart data properties ](https://plot.ly/javascript/reference/#ar
 See more properties on the [Range Selector](https://plot.ly/javascript/reference/#layout-xaxis-rangeselector)
 
 ### Multiple Y axes data properties
-Displays a two different Y axes with different scales, in the data set.
+Displays two different Y axes with different scales, in the data set.
 ``` json
 [
   {
@@ -445,9 +444,10 @@ Displays a two different Y axes with different scales, in the data set.
   }
 ]
 ```
+![ Multiple Y axes properties ](assets/cheatsheet/DataMultiple_Y.PNG)
 
 ### Multiple X axes data properties
-Displays a two different X axes with different scales.
+Displays two different X axes with different scales.
 ``` json
 [
   {
@@ -462,3 +462,4 @@ Displays a two different X axes with different scales.
   }
 ]
 ```
+![ Multiple X axes properties ](assets/cheatsheet/DataMultiple_X.PNG)

@@ -269,3 +269,35 @@ Layout
   "type": "scatter"
 } ]
 ```
+### Polar Chart
+![PolarChartProperties](/assets/cheatsheet/PolarChart.png)
+``` json
+[ {
+  "type": "scatterpolar",
+  "r": [ 34, 11, 39, 37, 34 ],
+  "theta": [ "A", "B", "C", "D", "A" ],
+  "fill": "toself"
+} ]
+```
+### Ternary Plot
+![TernaryPlotProperties](/assets/cheatsheet/TernaryPlot.png)  
+Data
+``` json
+[{
+    "type": "scatterternary",
+    "mode": "markers",
+    "a": [ 5, 4, 5, 2, 10 ],
+    "b": [ 2, 1, 15, 20, 8 ],
+    "c": [ 1, 20, 5, 15, 10 ],
+    "text":[ "point 1", "point 2", "point 3", "point 4", "point 5" ]
+}]
+```
+
+Layout
+```json
+{
+  "ternary": {
+    "sum":100
+  }
+}
+```
