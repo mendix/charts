@@ -1,3 +1,6 @@
+# Chart types
+This cheat sheet lists the most common chart types, more chart types could be found at [https://plot.ly/javascript/](https://plot.ly/javascript/).
+
 ## Basic Chart
 
 ### Line Chart
