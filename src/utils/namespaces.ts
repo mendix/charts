@@ -126,6 +126,7 @@ export namespace Container {
         sampleData: string;
         layoutStatic: string;
         layoutAttribute: string;
+        sampleLayout: string;
         eventEntity: string;
         eventDataAttribute: string;
         onClickMicroflow: string;
