@@ -11,9 +11,9 @@ With the AnyChart it is possible to build all the chart types that are possible 
 The Any Charts can be configured with a JSON `Data` array and `Layout` object. The configuration can be set statically, via the `Source attribute` or with the `Sample data`. The data of the attribute will be merged into the static settings and will overwrite any common properties. The `Sample data` is for demo purposes at run time when there is no `Source attribute` selected or when rendering sample data in the web modeler preview.
 
 ### Use building blocks
-[Building blocks](https://docs.mendix.com/refguide/building-block) can provide pre-configured configurations widget. The modules contains various chart samples for a quick start.
+[Building blocks](https://docs.mendix.com/refguide/building-block) can provide pre-configured widget. The modules contains various chart samples for a quick start.
 
-1. Download the building blocks module from the app store (link) into your project
+1. Download the [Any Chart building blocks](https://appstore.home.mendix.com/link/app/106459/Mendix/Any-Chart-Building-blocks-Module) module from the app store into your project
 1. Create a Chart entity
 1. Create a page with a data view and use the Chart entity above as the data source entity
 1. Add the required building block into the data view
