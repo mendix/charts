@@ -171,11 +171,8 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
                 if (this.props.type === "pie") {
                     register([ await import("plotly.js/lib/pie") ]);
                 }
-                if (this.props.type === "bar") {
-                    register([ await import("plotly.js/lib/bar") ]);
-                }
-                if (this.props.type === "line") {
-                    register([ await import("plotly.js/lib/scatter") ]);
+                if (this.props.type === "bar" || this.props.type === "line") {
+                    register([ await import("plotly.js/lib/bar"), await import("plotly.js/lib/scatter") ]);
                 }
                 if (this.props.type === "heatmap") {
                     register([ await import("plotly.js/lib/heatmap") ]);
