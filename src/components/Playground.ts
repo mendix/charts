@@ -125,9 +125,7 @@ export class Playground extends Component<{}, PlaygroundState> {
             setOptions: {
                 showLineNumbers: false,
                 highlightActiveLine: false,
-                highlightGutterLine: true,
-                tabSize: 2,
-                useSoftTabs: true
+                highlightGutterLine: true
             }
         });
     }
