@@ -7,6 +7,7 @@ import { Container } from "../utils/namespaces";
 import { PieData } from "plotly.js";
 import { validateSeriesProps } from "../utils/data";
 import PieChartContainerProps = Container.PieChartContainerProps;
+import { defaultColours } from "../utils/style";
 
 // tslint:disable-next-line class-name
 export class preview extends Component<PieChartContainerProps, {}> {
@@ -30,7 +31,8 @@ export class preview extends Component<PieChartContainerProps, {}> {
                 name: "GHG Emissions",
                 type: "pie",
                 labels: [ "US", "China", "European Union" ],
-                values: [ 16, 15, 12 ]
+                values: [ 16, 15, 12 ],
+                marker:  { colors: defaultColours() }
             }
         ];
     }

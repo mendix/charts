@@ -9,6 +9,7 @@ import { ScatterData } from "plotly.js";
 import { Container } from "../utils/namespaces";
 import LineChartContainerProps = Container.LineChartContainerProps;
 import LineMode = Container.LineMode;
+import { defaultColours } from "../utils/style";
 
 // tslint:disable-next-line class-name
 export class preview extends Component<LineChartContainerProps, {}> {
@@ -45,7 +46,8 @@ export class preview extends Component<LineChartContainerProps, {}> {
                     fill: "none",
                     x: sampleData.x || [],
                     y: sampleData.y || [],
-                    series: {}
+                    series: {},
+                    marker: {  color: defaultColours() }
                 }, seriesOptions ]);
             });
         }
@@ -57,6 +59,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
             name: "Sample",
             type: "scatter",
             series: {},
+            marker: {  color: defaultColours() },
             ...preview.getSampleTraces()
         } as any ];
     }
