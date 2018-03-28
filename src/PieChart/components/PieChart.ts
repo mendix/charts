@@ -104,12 +104,20 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
             };
 
             const traces = this.getTraces(props.data);
-            return [ deepMerge.all([ {
-                ...PieChart.getDefaultDataOptions(this.props),
-                labels: traces.labels,
-                values: traces.values,
-                marker: { colors: traces.colors }
-            }, advancedOptions ], { arrayMerge }) ];
+            return [
+                deepMerge.all(
+                    [
+                        PieChart.getDefaultDataOptions(this.props),
+                        {
+                            labels: traces.labels,
+                            values: traces.values,
+                            marker: { colors: traces.colors }
+                        },
+                        advancedOptions
+                    ],
+                    { arrayMerge }
+                )
+            ];
         }
 
         return props.defaultData || [];
