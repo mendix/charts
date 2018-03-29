@@ -26,7 +26,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
 
     private getData(props: BarChartContainerProps): ScatterData[] {
         if (props.series.length) {
-            return props.series.map(series => {
+            return props.series.map((series, index) => {
                 const seriesOptions = series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
                 const sampleData = preview.getSampleTraces();
 
@@ -37,7 +37,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
                     x: sampleData.x || [],
                     y: sampleData.y || [],
                     series: {},
-                    marker: {  color: defaultColours() },
+                    marker: {  color: series.color || defaultColours()[index] },
                     hoverinfo: "none"
                 } ]);
             });
@@ -50,7 +50,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
                 name: "Sample",
                 hoverinfo: "none",
                 series: {},
-                marker: {  color: defaultColours() },
+                marker: {  color: defaultColours()[0] },
                 ...preview.getSampleTraces()
             } as any
         ];

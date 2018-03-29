@@ -8,6 +8,7 @@ import deepMerge from "deepmerge";
 import { ScatterData } from "plotly.js";
 import { Container } from "../utils/namespaces";
 import LineChartContainerProps = Container.LineChartContainerProps;
+import { defaultColours } from "../utils/style";
 
 // tslint:disable-next-line class-name
 export class preview extends Component<LineChartContainerProps, {}> {
@@ -26,32 +27,39 @@ export class preview extends Component<LineChartContainerProps, {}> {
 
     private getData(props: LineChartContainerProps): ScatterData[] {
         if (props.series.length) {
-            return props.series.map(series => {
+            return props.series.map((series, index) => {
                 const seriesOptions = series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
                 const sampleData = preview.getSampleTraces();
 
-                return deepMerge.all([ seriesOptions, {
+                return deepMerge.all([ {
                     connectgaps: true,
                     hoveron: "points",
+                    hoverinfo: "none",
                     line: {
-                        color: series.lineColor,
+                        color: series.lineColor || defaultColours()[index],
                         shape: series.lineStyle
                     },
+                    marker: {  color: series.color || defaultColours()[index] },
                     mode: series.mode ? series.mode.replace("X", "+") as Container.LineMode : "lines",
                     name: series.name,
                     type: "scatter",
                     fill: "tonexty",
+                    series: {},
                     x: sampleData.x || [],
                     y: sampleData.y || []
-                } ]);
+                }, seriesOptions ]);
             });
         }
 
         return [ {
             connectgaps: true,
             hoveron: "points",
+            hoverinfo: "none" as any,
             name: "Sample",
             type: "scatter",
+            line: { color: defaultColours()[0] },
+            marker: {  color: defaultColours()[0] },
+            series: {},
             ...preview.getSampleTraces()
         } as ScatterData ];
     }
