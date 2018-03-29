@@ -130,7 +130,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
                     marker: color ? { color } : {},
                     text: traces.marker ? traces.marker.size : "", // show the size value on hover,
                     mode: series.mode === ("bubble" as any) ? "markers" : series.mode,
-                    ... traces
+                    ...this.props.type === "polar" ? { r: traces.y, theta: traces.x } : traces
                 },
                 rawOptions
             ]),

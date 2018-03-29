@@ -90,7 +90,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     private renderLineChart(): ReactElement<any> {
         return createElement(PlotlyChart,
             {
-                type: "line",
+                type: this.props.type || "line",
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 layout: this.getLayoutOptions(this.props),
@@ -163,7 +163,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     private onHover = ({ event, points }: ScatterHoverData<mendix.lib.MxObject>) => {
-        const { customdata, data, y, text } = points[0];
+        const { customdata, data, r, y, text } = points[0];
         if (event && this.tooltipNode) {
             unmountComponentAtNode(this.tooltipNode);
             const coordinates = getTooltipCoordinates(event, this.tooltipNode);
@@ -173,7 +173,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                     this.tooltipNode.innerHTML = "";
                     this.props.onHover(this.tooltipNode, data.series.tooltipForm, customdata);
                 } else if (points[0].data.hoverinfo === "none" as any) {
-                    render(createElement(HoverTooltip, { text: text || y }), this.tooltipNode);
+                    render(createElement(HoverTooltip, { text: text || y || r }), this.tooltipNode);
                 } else {
                     this.tooltipNode.style.opacity = "0";
                 }
@@ -245,7 +245,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 l: 60,
                 r: 60,
                 b: 60,
-                t: 10,
+                t: props.type === "polar" ? 60 : 10,
                 pad: 10
             }
         };
@@ -266,8 +266,8 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             },
             mode: series.mode ? series.mode.replace("X", "+").replace("bubble", "markers") as LineMode : "lines",
             name: series.name,
-            type: "scatter",
-            fill: props.fill || series.fill ? "tonexty" : "none",
+            type: props.type === "line" ? "scatter" : "scatterpolar" as any,
+            fill: props.fill || series.fill ? props.type === "line" ? "tonexty" : "toself" : "none",
             marker: series.mode === ("bubble" as any) ? { line: { width: 0 } } : {}
         };
     }

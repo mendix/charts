@@ -20,7 +20,7 @@ describe("Column chart", () => {
     });
 
     // with other drivers apart from chrome it does not autoscroll to the element in overflow:auto block
-    xit("should hide a column when a serie toggle item is clicked", () => {
+    it("should hide a column when a serie toggle item is clicked", () => {
         chart.serie1.click();
         chart.serie1.waitForValue();
         const serie1 = chart.serie1.getCssProperty("opacity");
