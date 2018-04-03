@@ -35,6 +35,7 @@ interface LineChartState {
     series?: LineSeriesProps[];
     scatterData?: ScatterData[];
     seriesOptions?: string[];
+    configurationOptions: string;
     playgroundLoaded: boolean;
     hiddenTraces: number[];
 }
@@ -45,6 +46,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     };
     state: LineChartState = {
         layoutOptions: this.props.layoutOptions,
+        configurationOptions: this.props.configurationOptions,
         series: this.props.series,
         scatterData: this.props.scatterData,
         seriesOptions: this.props.seriesOptions,
@@ -98,7 +100,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 layout: this.getLayoutOptions(this.props),
                 data: this.getData(this.props),
-                config: LineChart.getConfigOptions(this.props),
+                config: this.getConfigOptions(this.props),
                 onClick: this.onClick,
                 onHover: this.onHover,
                 onRestyle: this.onRestyle,
@@ -117,6 +119,8 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 ),
                 onChange: this.onRuntimeUpdate,
                 layoutOptions: this.state.layoutOptions || "{\n\n}",
+                configurationOptions: this.state.configurationOptions || "{\n\n}",
+                configurationOptionsDefault: JSON.stringify(LineChart.getDefaultConfigOptions(), null, 2),
                 modelerLayoutConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 2)
             }, this.renderLineChart());
         }
@@ -265,8 +269,15 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         return sharedConfigs;
     }
 
-    public static getConfigOptions(props: LineChartProps): Partial<Config> {
-        return { displayModeBar: false, doubleClick: props.xAxisType === "date" ? "reset" : false };
+    public static getDefaultConfigOptions(): Partial<Config> {
+        return { displayModeBar: false, doubleClick: false };
+    }
+
+    public getConfigOptions(props: LineChartProps): Partial<Config> {
+        const parsedConfig = props.devMode !== "basic" && this.state.configurationOptions
+            ? JSON.parse(this.state.configurationOptions)
+            : {};
+        return deepMerge.all([ LineChart.getDefaultConfigOptions() , parsedConfig ]);
     }
 
     public static getDefaultSeriesOptions(series: LineSeriesProps, props: LineChartProps): Partial<ScatterData> {

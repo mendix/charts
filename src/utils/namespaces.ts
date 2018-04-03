@@ -20,6 +20,7 @@ export namespace Container {
         xAxisLabel: string;
         yAxisLabel: string;
         layoutOptions: string;
+        configurationOptions: string;
         devMode: "basic" | "advanced" | "developer";
     }
 
