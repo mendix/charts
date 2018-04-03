@@ -25,43 +25,51 @@ export class preview extends Component<LineChartContainerProps, {}> {
     }
 
     static getData(props: LineChartContainerProps): ScatterData[] {
-        const sampleData = preview.getSampleTraces();
+        let sampleData = preview.getSampleTraces();
         if (props.series.length) {
-            return props.series.map(series => {
+            return props.series.map((series, index) => {
                 const seriesOptions = props.devMode !== "basic" && series.seriesOptions.trim()
                     ? JSON.parse(series.seriesOptions)
                     : {};
+                sampleData = preview.getSampleTraces();
 
-                return deepMerge.all([ {
-                    connectgaps: true,
-                    hoverinfo: "text",
-                    hoveron: "points",
-                    markers: {
-                        color: series.color
+                return deepMerge.all([
+                    {
+                        connectgaps: true,
+                        hoverinfo: "none",
+                        hoveron: "points",
+                        mode: "markers",
+                        name: series.name,
+                        type: "scatter",
+                        series: {},
+                        text: sampleData.marker ? sampleData.marker.size : "",
+                        marker: {  color: series.color || defaultColours()[index] }
+
                     },
-                    mode: "markers",
-                    name: series.name,
-                    type: "scatter",
-                    series: {},
-                    marker: {  color: defaultColours() },
-                    ...sampleData
-
-                }, seriesOptions ]);
+                    sampleData,
+                    seriesOptions
+                ]);
             });
         }
 
-        return [ {
-            connectgaps: true,
-            hoverinfo: "none",
-            hoveron: "points",
-            name: "Sample",
-            type: "scatter",
-            mode: "markers",
-            text: sampleData.marker ? sampleData.marker.size : "",
-            series: {},
-            marker: {  color: defaultColours() },
-            ...sampleData
-        } as any ];
+        return [
+            deepMerge.all(
+                [
+                    {
+                        connectgaps: true,
+                        hoverinfo: "none",
+                        hoveron: "points",
+                        name: "Sample",
+                        type: "scatter",
+                        mode: "markers",
+                        text: sampleData.marker ? sampleData.marker.size : "",
+                        series: {},
+                        marker: {  color: defaultColours()[0] }
+                    } as any,
+                    sampleData
+                ]
+            )
+        ];
     }
 
     private static getSampleTraces(): Data.ScatterTrace {

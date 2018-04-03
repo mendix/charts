@@ -27,7 +27,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
 
     private getData(props: LineChartContainerProps): ScatterData[] {
         if (props.series.length) {
-            return props.series.map(series => {
+            return props.series.map((series, index) => {
                 const seriesOptions = series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
                 const sampleData = preview.getSampleTraces();
 
@@ -36,7 +36,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                     hoveron: "points",
                     hoverinfo: "none",
                     line: {
-                        color: series.lineColor,
+                        color: series.lineColor || defaultColours()[index],
                         shape: series.lineStyle
                     },
                     mode: series.mode ? series.mode.replace("X", "+") as Container.LineMode : "lines",
@@ -45,7 +45,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                     fill: "tonexty",
                     x: sampleData.x || [],
                     y: sampleData.y || [],
-                    marker: {  color: defaultColours() },
+                    marker: {  color: series.lineColor || defaultColours()[index] },
                     series: {}
                 } ]);
             });
@@ -59,7 +59,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
             type: "scatter",
             fill: "tonexty",
             series: {},
-            marker: {  color: defaultColours() },
+            marker: {  color: defaultColours()[0] },
             ...preview.getSampleTraces()
         } as any ];
     }
