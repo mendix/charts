@@ -50,8 +50,9 @@ export const getTooltipCoordinates = (event: MouseEvent, tooltipNode: HTMLDivEle
             const point = svg.createSVGPoint();
             point.x = event.clientX;
             point.y = event.clientY;
+            const screenCTM = svg.getScreenCTM();
 
-            return point.matrixTransform(svg.getScreenCTM().inverse());
+            return screenCTM ? point.matrixTransform(screenCTM.inverse()) : null;
         }
     }
 

@@ -45,7 +45,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                     fill: "tonexty",
                     x: sampleData.x || [],
                     y: sampleData.y || [],
-                    marker: {  color: series.color || defaultColours()[index] },
+                    marker: {  color: series.lineColor || defaultColours()[index] },
                     series: {}
                 } ]);
             });

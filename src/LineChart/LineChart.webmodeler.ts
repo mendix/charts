@@ -47,7 +47,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                     x: sampleData.x || [],
                     y: sampleData.y || [],
                     series: {},
-                    marker: {  color: series.color || defaultColours()[index] }
+                    marker: {  color: series.lineColor || defaultColours()[index] }
                 }, seriesOptions ]);
             });
         }
