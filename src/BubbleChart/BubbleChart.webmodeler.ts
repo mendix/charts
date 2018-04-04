@@ -19,6 +19,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
             ),
             createElement(LineChart, {
                 ...this.props as LineChartContainerProps,
+                devMode: this.props.devMode === "developer" ? "advanced" : "basic",
                 scatterData: preview.getData(this.props)
             })
         );

@@ -19,6 +19,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
             ),
             createElement(BarChart, {
                 ...this.props as BarChartContainerProps,
+                devMode: this.props.devMode === "developer" ? "advanced" : "basic",
                 orientation: "bar",
                 scatterData: preview.getData(this.props)
             })

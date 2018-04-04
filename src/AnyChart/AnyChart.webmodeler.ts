@@ -11,6 +11,7 @@ export class preview extends Component<Container.AnyChartContainerProps, {}> {
         return createElement("div", {},
             createElement(AnyChart, {
                 ...this.props as any,
+                devMode: "advanced",
                 attributeData: this.props.sampleData,
                 attributeLayout:  this.props.sampleLayout,
                 alertMessage: AnyChartContainer.validateSeriesProps(this.props)
