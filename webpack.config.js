@@ -4,7 +4,8 @@ const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const DynamicPublicPathPlugin = require("dynamic-public-path-webpack-plugin");
-// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+// const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
+// new BundleAnalyzerPlugin()
 
 const widgetName = require("./package").widgetName[0];
 
@@ -158,7 +159,7 @@ const previewConfig = {
     },
     externals: [ "react", "react-dom" ],
     plugins: [
-        new webpack.IgnorePlugin(/^plotly\.js\/dist\/plotly$/)
+        new webpack.IgnorePlugin(/^plotly\.js\/dist\/plotly$|\/SeriesPlayground$|\/PiePlayground$/)
     ]
 };
 
