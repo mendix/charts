@@ -11,7 +11,8 @@ const webpackConfigRelease = webpackConfig.map(config => merge(config, {
     plugins: [ new UglifyJsPlugin({
         parallel: true,
         uglifyOptions: {
-            cache: true
+            cache: true,
+            exclude: /.*\.min\.js$/
         }
     }) ]
 }));

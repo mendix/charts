@@ -1,8 +1,10 @@
+// tslint:disable max-line-length
 const webpack = require("webpack");
 const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const DynamicPublicPathPlugin = require("dynamic-public-path-webpack-plugin");
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 
 const widgetName = require("./package").widgetName[0];
 
@@ -62,7 +64,8 @@ const widgetConfig = {
             copyUnmodified: true
         }),
         new ExtractTextPlugin({ filename: `./com/mendix/widget/custom/[name]/ui/[name].css` }),
-        new webpack.LoaderOptionsPlugin({ debug: true })
+        new webpack.LoaderOptionsPlugin({ debug: true }),
+        new webpack.IgnorePlugin(/^plotly\.js\/dist\/plotly$/)
     ]
 };
 
@@ -81,7 +84,8 @@ const anyChartConfig = {
     resolve: {
         extensions: [ ".ts", ".js" ],
         alias: {
-            "tests": path.resolve(__dirname, "./tests")
+            "tests": path.resolve(__dirname, "./tests"),
+            "plotly.js/dist/plotly": "plotly.js/dist/plotly.min.js"
         }
     },
     devtool: "eval",
@@ -115,7 +119,8 @@ const anyChartConfig = {
             copyUnmodified: true
         }),
         new ExtractTextPlugin({ filename: `./com/mendix/widget/custom/[name]/ui/[name].css` }),
-        new webpack.LoaderOptionsPlugin({ debug: true })
+        new webpack.LoaderOptionsPlugin({ debug: true }),
+        new webpack.IgnorePlugin(/^plotly\.js\/lib\/core$|^plotly\.js\/lib\/pie$|^plotly\.js\/lib\/bar&|^plotly\.js\/lib\/scatter$^plotly\.js\/lib\/heatmap$/)
     ]
 };
 
@@ -151,7 +156,10 @@ const previewConfig = {
             ] }
         ]
     },
-    externals: [ "react", "react-dom" ]
+    externals: [ "react", "react-dom" ],
+    plugins: [
+        new webpack.IgnorePlugin(/^plotly\.js\/dist\/plotly$/)
+    ]
 };
 
 const anyChartPreviewConfig = {
@@ -164,7 +172,10 @@ const anyChartPreviewConfig = {
         libraryTarget: "commonjs"
     },
     resolve: {
-        extensions: [ ".ts", ".js" ]
+        extensions: [ ".ts", ".js" ],
+        alias: {
+            "plotly.js/dist/plotly": "plotly.js/dist/plotly.min.js"
+        }
     },
     devtool: "eval",
     module: {
@@ -179,7 +190,10 @@ const anyChartPreviewConfig = {
             ] }
         ]
     },
-    externals: [ "react", "react-dom" ]
+    externals: [ "react", "react-dom" ],
+    plugins: [
+        new webpack.IgnorePlugin(/^plotly\.js\/lib\/core$|^plotly\.js\/lib\/pie$|^plotly\.js\/lib\/bar$|^plotly\.js\/lib\/scatter$|^plotly\.js\/lib\/heatmap$/)
+    ]
 };
 
 module.exports = [ widgetConfig, anyChartConfig, previewConfig, anyChartPreviewConfig ];
