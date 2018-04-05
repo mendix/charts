@@ -16,3 +16,5 @@ export const generateDivs = (amount: number) => {
 
     return divs;
 };
+
+ChartLoading.displayName = "ChartLoading";

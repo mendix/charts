@@ -37,13 +37,21 @@ export interface PieTraces {
 }
 
 export class PieChart extends Component<PieChartProps, PieChartState> {
-    state = {
+    state: PieChartState = {
         layoutOptions: this.props.layoutOptions,
         dataOptions: this.props.dataOptions,
         playgroundLoaded: false
     };
     private tooltipNode?: HTMLDivElement;
     private Playground?: typeof PiePlayground;
+
+    constructor(props: PieChartProps) {
+        super(props);
+
+        if (props.devMode === "developer") {
+            this.loadPlaygroundComponent();
+        }
+    }
 
     render() {
         if (this.props.alertMessage) {
@@ -59,12 +67,6 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         }
 
         return this.renderChart();
-    }
-
-    componentWillReceiveProps(newProps: PieChartProps) {
-        if (newProps.devMode === "developer" && !this.state.playgroundLoaded) {
-            this.loadPlaygroundComponent();
-        }
     }
 
     private async loadPlaygroundComponent() {

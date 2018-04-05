@@ -61,3 +61,8 @@
         margin: 0;
     }
 }
+
+// Sadly, this div exists as a child of the body
+div.plotly-notifier {
+    visibility: hidden;
+}

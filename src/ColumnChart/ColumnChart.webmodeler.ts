@@ -19,6 +19,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
             ),
             createElement(BarChart, {
                 ...this.props as BarChartContainerProps,
+                devMode: this.props.devMode === "developer" ? "advanced" : "basic",
                 scatterData: this.getData(this.props)
             })
         );
@@ -68,10 +69,6 @@ export function getPreviewCss() {
     return (
         require("../ui/Charts.scss") +
         require("../ui/ChartsLoading.scss") +
-        require("../ui/Sidebar.scss") +
-        require("../ui/Playground.scss") +
-        require("../ui/Panel.scss") +
-        require("../ui/InfoTooltip.scss") +
         require("plotly.js/src/css/style.scss")
     );
 }

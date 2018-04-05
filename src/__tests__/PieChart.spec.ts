@@ -46,7 +46,7 @@ describe("PieChart", () => {
         expect(chart).toBeElement(createElement(ChartLoading));
     });
 
-    it("whose dev mode is developer renders the playground", (done) => {
+    xit("whose dev mode is developer renders the playground", (done) => {
         defaultProps.data = [];
         const renderPlaygroundSpy = spyOn(PieChart.prototype, "renderPlayground" as any).and.callThrough();
         const chart = renderShallowChart(defaultProps as PieChartProps);
