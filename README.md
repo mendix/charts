@@ -93,7 +93,7 @@ Layout options control the general appearance of the chart. Common options inclu
 }
 ```
 
-For more details: [Developer cheat sheet](https://github.com/mendixlabs/charts/AdvancedCheatSheet.md)
+For more details: [Developer cheat sheet](/AdvancedCheatSheet.md)
 
 ### Data options (pie chart)
 On the pie chart, the data options control the appearance of the pie circle beyond the general layout options. Options include hole, name, marker e.t.c
@@ -102,7 +102,7 @@ On the pie chart, the data options control the appearance of the pie circle beyo
   "hole": 0.5
 }
 ```
-For more details: [Developer cheat sheet](https://github.com/mendixlabs/charts/AdvancedCheatSheet.md)
+For more details: [Developer cheat sheet](/AdvancedCheatSheet.md)
 
 ### Series options (line & column charts)
 The series options control the appearance of a specific series on the line or column chart. Options include line color, line shape e.t.c
@@ -113,4 +113,4 @@ Full Plotly API reference: [https://plot.ly/javascript/reference/](https://plot.
 We are actively maintaining this widget, please report any issues or suggestion for improvement at [https://github.com/mendixlabs/charts/issues](https://github.com/mendixlabs/charts/issues)
 
 ## Development
-See https://github.com/mendixlabs/charts/Development.md
+See [here](/Development.md)
