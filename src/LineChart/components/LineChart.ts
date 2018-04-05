@@ -95,7 +95,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 layout: this.getLayoutOptions(this.props),
                 data: this.getData(this.props),
-                config: LineChart.getConfigOptions(),
+                config: LineChart.getConfigOptions(this.props),
                 onClick: this.onClick,
                 onHover: this.onHover,
                 onRestyle: this.onRestyle,
@@ -239,8 +239,8 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         };
     }
 
-    public static getConfigOptions(): Partial<Config> {
-        return { displayModeBar: false, doubleClick: false };
+    public static getConfigOptions(props: LineChartProps): Partial<Config> {
+        return { displayModeBar: false, doubleClick: props.xAxisType === "date" ? "reset" : false };
     }
 
     public static getDefaultSeriesOptions(series: LineSeriesProps, props: LineChartProps): Partial<ScatterData> {
@@ -255,7 +255,10 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             mode: series.mode ? series.mode.replace("X", "+") as LineMode : "lines",
             name: series.name,
             type: "scatter",
-            fill: props.fill || series.fill ? "tonexty" : "none"
+            fill: props.fill || series.fill ? "tonexty" : "none",
+            marker: {
+                line: { width: 0 }
+            }
         };
     }
 
