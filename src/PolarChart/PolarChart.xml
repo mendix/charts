@@ -42,7 +42,7 @@
                     <description>Returns a list of data values</description>
                     <returnType type="Object" entityProperty="dataEntity" isList="true"/>
                 </property>
-                <!--xValueAttribute (also used by other charts) is been used for retrieving data in data.ts file -->
+                <!--xValueAttribute (also used by other charts) is used for retrieving data in data.ts file -->
                 <property key="xValueAttribute" type="attribute" entityProperty="dataEntity" isPath="optional" pathType="reference">
                     <caption>Theta data attribute</caption>
                     <category>Data points</category>
@@ -56,6 +56,7 @@
                         <attributeType name="Enum"/>
                     </attributeTypes>
                 </property>
+                <!--yValueAttribute (also used by other charts) is used for retrieving data in data.ts file -->
                 <property key="yValueAttribute" type="attribute" entityProperty="dataEntity">
                     <caption>R data attribute</caption>
                     <category>Data points</category>

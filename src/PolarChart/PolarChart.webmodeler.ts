@@ -35,6 +35,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
 
                 return deepMerge.all([ {
                     connectgaps: true,
+                    hoveron: "points",
                     hoverinfo: "none",
                     line: {
                         color: series.lineColor,

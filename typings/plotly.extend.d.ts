@@ -27,7 +27,7 @@ declare module "plotly.js" {
             x: string | number;
             y: string | number;
             z?: number;
-            r?: number | number;
+            r?: string | number;
             pointNumber: number;
             curveNumber: number;
             data: ScatterData;
