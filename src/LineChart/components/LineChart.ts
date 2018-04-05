@@ -267,7 +267,9 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             mode: series.mode ? series.mode.replace("X", "+").replace("bubble", "markers") as LineMode : "lines",
             name: series.name,
             type: props.type === "line" ? "scatter" : "scatterpolar" as any,
-            fill: props.fill || series.fill ? props.type === "line" ? "tonexty" : "toself" : "none",
+            fill: props.fill || series.fill
+                ? props.type === "polar" ? "toself" : "tonexty"
+                : "none",
             marker: series.mode === ("bubble" as any) ? { line: { width: 0 } } : {}
         };
     }
