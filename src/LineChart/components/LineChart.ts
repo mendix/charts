@@ -136,7 +136,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     private getData(props: LineChartProps): ScatterData[] {
         if (props.scatterData) {
             const lineData: ScatterData[] = props.scatterData.map((data, index) => {
-                const parsedOptions = this.state.seriesOptions
+                const parsedOptions = props.devMode !== "basic" && this.state.seriesOptions
                     ? JSON.parse(this.state.seriesOptions[index])
                     : "{}";
 

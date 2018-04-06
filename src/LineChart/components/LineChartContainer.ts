@@ -111,7 +111,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
 
     private getData(seriesData: Data.SeriesData<Data.LineSeriesProps>[]): ScatterData[] {
         return seriesData.map((data, index) =>
-            this.createScatterData(data, index, this.props.devMode === "basic")
+            this.createScatterData(data, index, this.props.devMode !== "basic")
         );
     }
 
