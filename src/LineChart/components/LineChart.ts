@@ -211,7 +211,9 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 showgrid: props.grid === "vertical" || props.grid === "both",
                 fixedrange: props.xAxisType !== "date",
                 type: props.xAxisType,
-                rangeslider: { visible: props.showRangeSlider || false }
+                rangeslider: { visible: props.showRangeSlider || false },
+                zeroline: true,
+                zerolinecolor: "#eaeaea"
             },
             yaxis: {
                 rangemode: "tozero",
