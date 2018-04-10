@@ -33,7 +33,10 @@ export namespace Container {
         area?: "separate" | "stacked";
         showRangeSlider: boolean;
         xAxisType?: AxisType;
+        rangeMode?: RangeMode;
     }
+
+    export type RangeMode = "normal" | "tozero" | "nonnegative";
 
     export type LineMode = "lines" | "markers" | "lines+markers" | "none";
 

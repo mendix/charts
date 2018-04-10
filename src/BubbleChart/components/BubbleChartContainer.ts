@@ -14,6 +14,6 @@ export default class BubbleChartContainer extends Component<Container.LineChartC
     }
 
     private setSeriesMode(): Data.LineSeriesProps[] {
-        return this.props.series.map(series => ({ ...series, mode: "markers" as Container.LineMode }));
+        return this.props.series.map(series => ({ ...series, mode: "bubble" as Container.LineMode }));
     }
 }

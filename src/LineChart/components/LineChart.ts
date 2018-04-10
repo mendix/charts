@@ -95,7 +95,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 layout: this.getLayoutOptions(this.props),
                 data: this.getData(this.props),
-                config: LineChart.getConfigOptions(),
+                config: LineChart.getConfigOptions(this.props),
                 onClick: this.onClick,
                 onHover: this.onHover,
                 onRestyle: this.onRestyle,
@@ -136,9 +136,9 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     private getData(props: LineChartProps): ScatterData[] {
         if (props.scatterData) {
             const lineData: ScatterData[] = props.scatterData.map((data, index) => {
-                const parsedOptions = this.state.seriesOptions
+                const parsedOptions = props.devMode !== "basic" && this.state.seriesOptions
                     ? JSON.parse(this.state.seriesOptions[index])
-                    : "{}";
+                    : {};
 
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
                 return {
@@ -211,10 +211,12 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 showgrid: props.grid === "vertical" || props.grid === "both",
                 fixedrange: props.xAxisType !== "date",
                 type: props.xAxisType,
-                rangeslider: { visible: props.showRangeSlider || false }
+                rangeslider: { visible: props.showRangeSlider || false },
+                zeroline: true,
+                zerolinecolor: "#eaeaea"
             },
             yaxis: {
-                rangemode: "tozero",
+                rangemode: props.rangeMode || "tozero",
                 zeroline: true,
                 zerolinecolor: "#eaeaea",
                 gridcolor: "#d7d7d7",
@@ -239,8 +241,8 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         };
     }
 
-    public static getConfigOptions(): Partial<Config> {
-        return { displayModeBar: false, doubleClick: false };
+    public static getConfigOptions(props: LineChartProps): Partial<Config> {
+        return { displayModeBar: false, doubleClick: props.xAxisType === "date" ? "reset" : false };
     }
 
     public static getDefaultSeriesOptions(series: LineSeriesProps, props: LineChartProps): Partial<ScatterData> {
@@ -252,10 +254,11 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 color: series.lineColor,
                 shape: series.lineStyle
             },
-            mode: series.mode ? series.mode.replace("X", "+") as LineMode : "lines",
+            mode: series.mode ? series.mode.replace("X", "+").replace("bubble", "markers") as LineMode : "lines",
             name: series.name,
             type: "scatter",
-            fill: props.fill || series.fill ? "tonexty" : "none"
+            fill: props.fill || series.fill ? "tonexty" : "none",
+            marker: series.mode === ("bubble" as any) ? { line: { width: 0 } } : {}
         };
     }
 

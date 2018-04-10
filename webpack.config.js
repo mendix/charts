@@ -24,7 +24,7 @@ const widgetConfig = {
         jsonpFunction: "webpack3Jsonp",
         path: path.resolve(__dirname, "dist/tmp/src"),
         filename: "com/mendix/widget/custom/[name]/[name].js",
-        chunkFilename: `com/mendix/widget/custom/${widgetName.toLowerCase()}/chunk[id].js`,
+        chunkFilename: `com/mendix/widget/custom/${widgetName.toLowerCase()}/chunk[chunkhash].js`,
         libraryTarget: "umd",
         publicPath: "/"
     },
@@ -78,7 +78,7 @@ const anyChartConfig = {
         jsonpFunction: "webpack3Jsonp",
         path: path.resolve(__dirname, "dist/tmp/AnyChart"),
         filename: "com/mendix/widget/custom/[name]/[name].js",
-        chunkFilename: `com/mendix/widget/custom/AnyChart/chunk[id].js`,
+        chunkFilename: `com/mendix/widget/custom/AnyChart/chunk[chunkhash].js`,
         libraryTarget: "umd",
         publicPath: "/"
     },

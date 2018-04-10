@@ -109,7 +109,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
 
     private getData(seriesData: Data.SeriesData[]): ScatterData[] {
         return seriesData.map((data, index) =>
-            this.createScatterData(data, this.props.orientation === "bar", index, this.props.devMode === "basic")
+            this.createScatterData(data, this.props.orientation === "bar", index, this.props.devMode !== "basic")
         );
     }
 

@@ -111,13 +111,13 @@ export default class LineChartContainer extends Component<LineChartContainerProp
 
     private getData(seriesData: Data.SeriesData<Data.LineSeriesProps>[]): ScatterData[] {
         return seriesData.map((data, index) =>
-            this.createScatterData(data, index, this.props.devMode === "basic")
+            this.createScatterData(data, index, this.props.devMode !== "basic")
         );
     }
 
     private createScatterData({ data, series }: Data.SeriesData<Data.LineSeriesProps>, index: number, devMode = false): ScatterData {
         const rawOptions = devMode && series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
-        const color: string | undefined = series.lineColor || defaultColours()[index];
+        const color: string | undefined = series.lineColor || defaultColours(series.mode === ("bubble" as any) ? 0.7 : 1)[index];
         const traces = getSeriesTraces({ data, series });
 
         return {
@@ -128,8 +128,9 @@ export default class LineChartContainer extends Component<LineChartContainerProp
                     fillcolor: series.fillColor || fillColours[index],
                     line: color ? { color } : {},
                     marker: color ? { color } : {},
-                    ... traces,
-                    text: traces.marker ? traces.marker.size : "" // show the size value on hover
+                    text: traces.marker ? traces.marker.size : "", // show the size value on hover,
+                    mode: series.mode === ("bubble" as any) ? "markers" : series.mode,
+                    ... traces
                 },
                 rawOptions
             ]),

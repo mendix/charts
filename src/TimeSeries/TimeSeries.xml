@@ -154,6 +154,16 @@
                 <enumerationValue key="both">Horizontal and vertical</enumerationValue>
             </enumerationValues>
         </property>
+        <property key="rangeMode" type="enumeration" defaultValue="tozero">
+            <caption>Y-axis range mode</caption>
+            <category>Chart properties</category>
+            <description>Controls the y-axis range. "From zero" starts the y-axis from zero. "Auto" sets the range based on the plotted values. "Non-negative" only shows a range of positive values. If the series "Fill area" property is set to "yes", the range mode is set to "From zero" by default.</description>
+            <enumerationValues>
+                <enumerationValue key="normal">Auto</enumerationValue>
+                <enumerationValue key="tozero">From zero</enumerationValue>
+                <enumerationValue key="nonnegative">Non-negative</enumerationValue>
+            </enumerationValues>
+        </property>
         <property key="showRangeSlider" type="boolean" defaultValue="false">
             <caption>Show range slider</caption>
             <category>Chart properties</category>

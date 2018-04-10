@@ -44,7 +44,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                         type: "scatter",
                         series: {},
                         text: sampleData.marker ? sampleData.marker.size : "",
-                        marker: {  color: series.color || defaultColours()[index] }
+                        marker: {  color: series.color || defaultColours(0.7)[index] }
 
                     },
                     sampleData,
@@ -65,7 +65,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                         mode: "markers",
                         text: sampleData.marker ? sampleData.marker.size : "",
                         series: {},
-                        marker: {  color: defaultColours()[0] }
+                        marker: {  color: defaultColours(0.7)[0] }
                     } as any,
                     sampleData
                 ]
