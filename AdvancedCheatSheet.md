@@ -199,7 +199,7 @@ These properties apply to charts with more than one X axis. They can be configur
     "side": "top"
   }
 }
-````
+```
 
 The layout properties above should be used with the corresponding [ data properties ](#multiple-x-axes-data-properties).
 ![ Multiple X axes configurations ](/assets/cheatsheet/multiple_x.gif)  
@@ -305,19 +305,10 @@ Sets a global font on the root level will be applied to all chart elements. Or s
 }
 ```
 
-### Rangemode 
-#### nonnegative
-```json
-{
-  "yaxis": {
-    "rangemode": "nonnegative"
-  }
-}
-```
-![ Rangemode ](/assets/cheatsheet/nonnegative.gif)  
-
+### Range mode 
+Sets how the range of a given axis should be displayed.
 #### normal
-Default ```rangemode``` in charts is set to ```"tozero"```.  rangemodes ```"tozero"``` and ```"normal"``` are indistinguishable unless ```fill``` is set to ```"none"```.
+Sets the range based on the plotted values, adjusting to fit them.
 ```json
 {
   "yaxis": {
@@ -325,8 +316,48 @@ Default ```rangemode``` in charts is set to ```"tozero"```.  rangemodes ```"toze
   }
 }
 ```
-![ Rangemode ](/assets/cheatsheet/normal.gif)  
-See more [ Rangemode configurations ](https://plot.ly/javascript/reference/#layout-yaxis-rangemode)
+![ Range mode ](/assets/cheatsheet/normal.gif)  
+
+#### nonnegative
+Shows only positive values starting from zero.
+```json
+{
+  "yaxis": {
+    "rangemode": "nonnegative"
+  }
+}
+```
+![ Range mode ](/assets/cheatsheet/nonnegative.gif)  
+
+#### tozero
+This is the default range mode in charts. Both positive and negative ranges for the axes will start from the zero mark.
+```json
+{
+  "yaxis": {
+    "rangemode": "tozero"
+  }
+}
+```
+![ Range mode ](/assets/cheatsheet/tozero.gif)  
+
+:heavy_exclamation_mark: **NB:** When `fill` is not set to `"none"` in the series, the y-axis range is forced to start from zero (`tozero`).  
+Layout
+```json
+{
+  "yaxis": {
+    "rangemode": "normal"
+  }
+}
+```
+Data
+```json
+{
+  "fill": "tonexty"
+}
+```
+
+![ Range mode ](/assets/cheatsheet/rangemode_note.gif)  
+See more [ range mode configurations ](https://plot.ly/javascript/reference/#layout-yaxis-rangemode)
 
 ## Data/Series Properties
 These properties are applied to specific charts only. For each chart, data properties are distinct. They make the chart appear as its supposed to be.
