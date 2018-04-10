@@ -216,7 +216,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 zerolinecolor: "#eaeaea"
             },
             yaxis: {
-                rangemode: "tozero",
+                rangemode: props.rangeMode || "tozero",
                 zeroline: true,
                 zerolinecolor: "#eaeaea",
                 gridcolor: "#d7d7d7",
@@ -254,13 +254,11 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 color: series.lineColor,
                 shape: series.lineStyle
             },
-            mode: series.mode ? series.mode.replace("X", "+") as LineMode : "lines",
+            mode: series.mode ? series.mode.replace("X", "+").replace("bubble", "markers") as LineMode : "lines",
             name: series.name,
             type: "scatter",
             fill: props.fill || series.fill ? "tonexty" : "none",
-            marker: {
-                line: { width: 0 }
-            }
+            marker: series.mode === ("bubble" as any) ? { line: { width: 0 } } : {}
         };
     }
 
