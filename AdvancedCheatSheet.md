@@ -305,6 +305,29 @@ Sets a global font on the root level will be applied to all chart elements. Or s
 }
 ```
 
+### Rangemode 
+#### nonnegative
+```json
+{
+  "yaxis": {
+    "rangemode": "nonnegative"
+  }
+}
+```
+![ Rangemode ](/assets/cheatsheet/nonnegative.gif)  
+
+#### normal
+Default ```rangemode``` in charts is set to ```"tozero"```.  rangemodes ```"tozero"``` and ```"normal"``` are indistinguishable unless ```fill``` is set to ```"none"```.
+```json
+{
+  "yaxis": {
+    "rangemode": "normal"
+  }
+}
+```
+![ Rangemode ](/assets/cheatsheet/normal.gif)  
+See more [ Rangemode configurations ](https://plot.ly/javascript/reference/#layout-yaxis-rangemode)
+
 ## Data/Series Properties
 These properties are applied to specific charts only. For each chart, data properties are distinct. They make the chart appear as its supposed to be.
 
