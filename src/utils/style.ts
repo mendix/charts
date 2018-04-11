@@ -36,11 +36,20 @@ export const getDimensions = <T extends Style.Dimensions>(props: T): CSSProperti
 };
 
 export const defaultColours = (opacity = 1) => [
+     // Mendix defaults
     `rgba(5, 149, 219, ${opacity})`,
     `rgba(23, 52, 123, ${opacity})`,
-    `rgba(118, 202, 2, ${opacity})`
+    `rgba(118, 202, 2, ${opacity})`,
+    // Plotly defaults, minus the top 3 - (source)[https://github.com/plotly/plotly.js/blob/master/src/components/color/attributes.js]
+    `rgba(214, 39, 40, ${opacity})`,
+    `rgba(148, 103, 189, ${opacity})`,
+    `rgba(140, 86, 75, ${opacity})`,
+    `rgba(227, 119, 194, ${opacity})`,
+    `rgba(127, 127, 127, ${opacity})`,
+    `rgba(188, 189, 34, ${opacity})`,
+    `rgba(23, 190, 207, ${opacity})`
 ];
-export const fillColours = [ "rbg(5,149,219,5)", "rbg(23,52,123,5)", "rbg(118,202,2,5)" ];
+export const fillColours = defaultColours(0.1);
 
 export const getTooltipCoordinates = (event: MouseEvent, tooltipNode: HTMLDivElement): SVGPoint | null => {
     const parentElement = tooltipNode.parentElement;
