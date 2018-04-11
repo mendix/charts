@@ -202,7 +202,8 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
             showlegend: props.showLegend,
             xaxis: {
                 gridcolor: "#d7d7d7",
-                zerolinecolor: props.orientation === "bar" ? "#eaeaea" : undefined,
+                zerolinecolor: "#d7d7d7",
+                zeroline: props.orientation === "bar" ? true : false,
                 title: props.xAxisLabel,
                 showgrid: props.grid === "vertical" || props.grid === "both",
                 fixedrange: true
@@ -210,7 +211,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
             yaxis: {
                 rangemode: "tozero",
                 zeroline: true,
-                zerolinecolor: "#eaeaea",
+                zerolinecolor: "#d7d7d7",
                 gridcolor: "#d7d7d7",
                 title: props.yAxisLabel,
                 showgrid: props.grid === "horizontal" || props.grid === "both",

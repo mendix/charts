@@ -213,12 +213,12 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 type: props.xAxisType,
                 rangeslider: { visible: props.showRangeSlider || false },
                 zeroline: true,
-                zerolinecolor: "#eaeaea"
+                zerolinecolor: "#d7d7d7"
             },
             yaxis: {
                 rangemode: props.rangeMode || "tozero",
                 zeroline: true,
-                zerolinecolor: "#eaeaea",
+                zerolinecolor: "#d7d7d7",
                 gridcolor: "#d7d7d7",
                 title: props.yAxisLabel,
                 showgrid: props.grid === "horizontal" || props.grid === "both",
