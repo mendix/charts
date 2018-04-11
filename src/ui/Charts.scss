@@ -45,13 +45,18 @@
             rx: 4;
             x: -2;
         }
-    }
-
-    rect {
         &.rangeslider-handle-max {
             width: 8px;
             rx: 4;
             x: -1;
+        }
+        &.rangeslider-mask-min {
+            fill: rgb(255, 255, 255) !important;
+            fill-opacity: 0.9 !important;
+        }
+        &.rangeslider-mask-max {
+            fill: rgb(255, 255, 255) !important;
+            fill-opacity: 0.9 !important;
         }
     }
 }
