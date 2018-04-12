@@ -60,6 +60,20 @@
         }
     }
 
+    .infolayer {
+        .rangeslider-container {
+            stroke: #d7d7d7;
+            stroke-width: 1px;
+
+            .rangeslider-grabber-min {
+                stroke-width: 0;
+            }
+            .rangeslider-grabber-max {
+                stroke-width: 0;
+            }
+        }
+    }
+
     .zoomlayer {
         .zoombox {
             fill: rgba(255, 255, 255, 0.9) !important;
