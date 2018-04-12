@@ -133,7 +133,7 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
                 options: [
                     { name: "Layout", value: "layout", isDefaultSelected: true },
                     ...this.getSeriesOptions(),
-                    { name: "Configuration", value: "config", isDefaultSelected: true }
+                    { name: "Configuration", value: "config", isDefaultSelected: false }
                 ]
             })
         );

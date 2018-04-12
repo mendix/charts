@@ -28,6 +28,7 @@ interface PieChartState {
     layoutOptions: string;
     dataOptions: string;
     playgroundLoaded: boolean;
+    configurationOptions: string;
 }
 
 export interface PieTraces {
@@ -40,6 +41,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
     state: PieChartState = {
         layoutOptions: this.props.layoutOptions,
         dataOptions: this.props.dataOptions,
+        configurationOptions: this.props.configurationOptions,
         playgroundLoaded: false
     };
     private tooltipNode?: HTMLDivElement;
@@ -87,7 +89,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 layout: this.getLayoutOptions(this.props),
                 data: this.getData(this.props),
-                config: PieChart.getConfigOptions(),
+                config: this.getConfigOptions(this.props),
                 onClick: this.onClick,
                 onHover: this.onHover,
                 getTooltipNode: this.getTooltipNodeRef
@@ -132,6 +134,8 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 modelerDataConfigs: JSON.stringify(PieChart.getDefaultDataOptions(this.props), null, 4),
                 onChange: this.onRuntimeUpdate,
                 layoutOptions: this.state.layoutOptions || "{\n\n}",
+                configurationOptions: this.state.configurationOptions || "{\n\n}",
+                configurationOptionsDefault: JSON.stringify(PieChart.getDefaultConfigOptions(), null, 2),
                 modelerLayoutConfigs: JSON.stringify(PieChart.getDefaultLayoutOptions(this.props), null, 4)
             }, this.renderChart());
         }
@@ -184,12 +188,19 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         }
     }
 
-    private onRuntimeUpdate = (layoutOptions: string, dataOptions: string) => {
-        this.setState({ layoutOptions, dataOptions });
+    private onRuntimeUpdate = (layoutOptions: string, dataOptions: string, configurationOptions: string) => {
+        this.setState({ layoutOptions, dataOptions, configurationOptions });
     }
 
-    private static getConfigOptions(): Partial<Config> {
+    private static getDefaultConfigOptions(): Partial<Config> {
         return { displayModeBar: false, doubleClick: false };
+    }
+
+    public getConfigOptions(props: PieChartProps): Partial<Config> {
+        const parsedConfig = props.devMode !== "basic" && this.state.configurationOptions
+            ? JSON.parse(this.state.configurationOptions)
+            : {};
+        return deepMerge.all([ PieChart.getDefaultConfigOptions(), parsedConfig ]);
     }
 
     public static getDefaultLayoutOptions(props: PieChartProps): Partial<Layout> {
@@ -201,13 +212,6 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
             },
             autosize: true,
             showlegend: props.showLegend,
-            hoverlabel: {
-                bgcolor: "#888",
-                bordercolor: "#888",
-                font: {
-                    color: "#FFF"
-                }
-            },
             legend: {
                 font: {
                     family: "Open Sans",

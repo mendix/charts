@@ -210,5 +210,10 @@
             <category>Advanced</category>
             <description>The JSON containing the Plotly layout options</description>
         </property>
+        <property key="configurationOptions" type="string" required="false" multiline="true">
+            <caption>Configuration options</caption>
+            <category>Advanced</category>
+            <description>The JSON containing the Plotly configuration options</description>
+        </property>
     </properties>
 </widget>

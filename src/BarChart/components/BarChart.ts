@@ -30,12 +30,14 @@ interface BarChartState {
     seriesOptions?: string[];
     scatterData?: ScatterData[];
     playgroundLoaded: boolean;
+    configurationOptions: string;
 }
 
 export class BarChart extends Component<BarChartProps, BarChartState> {
     state: BarChartState = {
         layoutOptions: this.props.layoutOptions,
         series: this.props.series,
+        configurationOptions: this.props.configurationOptions,
         seriesOptions: this.props.seriesOptions,
         scatterData: this.props.scatterData,
         playgroundLoaded: false
@@ -92,7 +94,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 layout: this.getLayoutOptions(this.props),
                 data: this.getData(this.props),
-                config: BarChart.getConfigOptions(),
+                config: this.getConfigOptions(this.props),
                 onClick: this.onClick,
                 onHover: this.onHover,
                 getTooltipNode: this.getTooltipNodeRef
@@ -110,6 +112,8 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                 ),
                 onChange: this.onRuntimeUpdate,
                 layoutOptions: this.state.layoutOptions || "{\n\n}",
+                configurationOptions: this.state.configurationOptions || "{\n\n}",
+                configurationOptionsDefault: JSON.stringify(BarChart.getDefaultConfigOptions(), null, 2),
                 modelerLayoutConfigs: JSON.stringify(BarChart.defaultLayoutConfigs(this.props), null, 2)
             }, this.renderChart());
         }
@@ -170,12 +174,19 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
         }
     }
 
-    private onRuntimeUpdate = (layoutOptions: string, seriesOptions: string[]) => {
-        this.setState({ layoutOptions, seriesOptions });
+    private onRuntimeUpdate = (layoutOptions: string, seriesOptions: string[], configurationOptions: string) => {
+        this.setState({ layoutOptions, seriesOptions, configurationOptions });
     }
 
-    private static getConfigOptions(): Partial<Config> {
+    private static getDefaultConfigOptions(): Partial<Config> {
         return { displayModeBar: false, doubleClick: false };
+    }
+
+    public getConfigOptions(props: BarChartProps): Partial<Config> {
+        const parsedConfig = props.devMode !== "basic" && this.state.configurationOptions
+            ? JSON.parse(this.state.configurationOptions)
+            : {};
+        return deepMerge.all([ BarChart.getDefaultConfigOptions(), parsedConfig ]);
     }
 
     public static getDefaultSeriesOptions(series: Data.SeriesProps, props: BarChartProps): Partial<ScatterData> {
@@ -216,13 +227,6 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                 title: props.yAxisLabel,
                 showgrid: props.grid === "horizontal" || props.grid === "both",
                 fixedrange: true
-            },
-            hoverlabel: {
-                bgcolor: "#888",
-                bordercolor: "#888",
-                font: {
-                    color: "#FFF"
-                }
             },
             margin: {
                 l: 60,

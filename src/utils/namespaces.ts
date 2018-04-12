@@ -91,6 +91,7 @@ export namespace Container {
         chartType: PieChartType;
         showLegend: boolean;
         layoutOptions: string;
+        configurationOptions: string;
         dataOptions: string;
         devMode: "basic" | "advanced" | "developer";
     }
@@ -111,6 +112,7 @@ export namespace Container {
         xAxisLabel: string;
         yAxisLabel: string;
         layoutOptions: string;
+        configurationOptions: string;
         dataOptions: string;
         devMode: "basic" | "advanced" | "developer";
     }
