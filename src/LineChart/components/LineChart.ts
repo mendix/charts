@@ -206,19 +206,21 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             hovermode: "closest",
             showlegend: props.showLegend,
             xaxis: {
-                gridcolor: "#d7d7d7",
-                title: props.xAxisLabel,
-                showgrid: props.grid === "vertical" || props.grid === "both",
                 fixedrange: props.xAxisType !== "date",
+                gridcolor: "#d7d7d7",
+                rangeslider: {
+                    visible: props.showRangeSlider || false
+                },
+                showgrid: props.grid === "vertical" || props.grid === "both",
+                title: props.xAxisLabel,
                 type: props.xAxisType,
-                rangeslider: { visible: props.showRangeSlider || false },
                 zeroline: true,
-                zerolinecolor: "#eaeaea"
+                zerolinecolor: "#d7d7d7"
             },
             yaxis: {
                 rangemode: props.rangeMode || "tozero",
                 zeroline: true,
-                zerolinecolor: "#eaeaea",
+                zerolinecolor: "#d7d7d7",
                 gridcolor: "#d7d7d7",
                 title: props.yAxisLabel,
                 showgrid: props.grid === "horizontal" || props.grid === "both",

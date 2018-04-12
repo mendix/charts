@@ -319,7 +319,7 @@ Sets the range based on the plotted values, adjusting to fit them.
 ![ Range mode ](/assets/cheatsheet/normal.gif)  
 
 #### nonnegative
-Shows only positive values starting from zero.
+Shows only positive values, the range based on the plotted positive values.
 ```json
 {
   "yaxis": {
