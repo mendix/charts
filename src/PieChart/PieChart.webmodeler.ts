@@ -18,7 +18,7 @@ export class preview extends Component<PieChartContainerProps, {}> {
             ),
             createElement(PieChart, {
                 ...this.props as PieChartContainerProps,
-                devMode: this.props.devMode === "developer" ? "advanced" : "basic",
+                devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
                 defaultData: preview.getData(this.props)
             })
         );
