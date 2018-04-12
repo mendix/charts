@@ -18,7 +18,7 @@ export class preview extends Component<HeatMapContainerProps, {}> {
             ),
             createElement(HeatMap, {
                 ...this.props as HeatMapContainerProps,
-                devMode: this.props.devMode === "developer" ? "advanced" : "basic",
+                devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
                 defaultData: preview.getData(this.props)
             })
         );
