@@ -5,6 +5,7 @@ import { HeatMap } from "./components/HeatMap";
 import HeatMapContainer from "./components/HeatMapContainer";
 import { HeatMapData } from "plotly.js";
 
+import deepMerge from "deepmerge";
 import { validateSeriesProps } from "../utils/data";
 import { Container } from "../utils/namespaces";
 import HeatMapContainerProps = Container.HeatMapContainerProps;
@@ -19,7 +20,7 @@ export class preview extends Component<HeatMapContainerProps, {}> {
             createElement(HeatMap, {
                 ...this.props as HeatMapContainerProps,
                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-                defaultData: preview.getData(this.props)
+                defaultData: deepMerge.all([ HeatMap.getDefaultDataOptions(this.props), preview.getData(this.props) ])
             })
         );
     }

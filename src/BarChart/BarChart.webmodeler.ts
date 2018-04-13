@@ -42,7 +42,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
                     x: sampleData.x || [],
                     y: sampleData.y || [],
                     series: {},
-                    marker: {  color: series.color || defaultColours()[index] }
+                    marker: {  color: series.barColor || defaultColours()[index] }
                 }, seriesOptions ]);
             });
         }

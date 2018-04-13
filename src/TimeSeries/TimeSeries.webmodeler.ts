@@ -29,7 +29,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
     private getData(props: LineChartContainerProps): ScatterData[] {
         if (props.series.length) {
             return props.series.map((series, index) => {
-                const seriesOptions = series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
+                const seriesOptions = props.devMode !== "basic" && series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
                 const sampleData = preview.getSampleTraces();
 
                 return deepMerge.all([ {
@@ -44,8 +44,8 @@ export class preview extends Component<LineChartContainerProps, {}> {
                     mode: series.mode ? series.mode.replace("X", "+") as Container.LineMode : "lines",
                     name: series.name,
                     type: "scatter",
-                    fill: "tonexty",
-                    fillcolor: fillColours[index],
+                    fill: series.fill ? "tonexty" : "none",
+                    fillcolor: series.fillColor || fillColours[index],
                     series: {},
                     x: sampleData.x || [],
                     y: sampleData.y || []

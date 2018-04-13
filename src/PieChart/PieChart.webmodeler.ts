@@ -3,6 +3,7 @@ import { Component, createElement } from "react";
 import { Alert } from "../components/Alert";
 import { PieChart } from "./components/PieChart";
 
+import deepMerge from "deepmerge";
 import { Container } from "../utils/namespaces";
 import { PieData } from "plotly.js";
 import { validateSeriesProps } from "../utils/data";
@@ -25,16 +26,27 @@ export class preview extends Component<PieChartContainerProps, {}> {
     }
 
     static getData(props: PieChartContainerProps): PieData[] {
+        const advancedOptions = props.devMode !== "basic" && props.dataOptions
+            ? JSON.parse(props.dataOptions)
+            : {};
+
         return [
-            {
-                hole: props.chartType === "donut" ? 0.4 : 0,
-                hoverinfo: "none",
-                name: "GHG Emissions",
-                type: "pie",
-                labels: [ "US", "China", "European Union" ],
-                values: [ 16, 15, 12 ],
-                marker:  { colors: defaultColours() }
-            }
+            deepMerge.all([
+                {
+                    hole: props.chartType === "donut" ? 0.4 : 0,
+                    hoverinfo: "none",
+                    name: "GHG Emissions",
+                    type: "pie",
+                    labels: [ "US", "China", "European Union" ],
+                    values: [ 16, 15, 12 ],
+                    marker:  {
+                        colors: props.colors && props.colors.length
+                            ? props.colors.map(color => color.color)
+                            : defaultColours()
+                    }
+                },
+                advancedOptions
+            ])
         ];
     }
 }
