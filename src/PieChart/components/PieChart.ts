@@ -96,7 +96,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
     }
 
     private getData(props: PieChartProps): PieData[] {
-        if (props.data) {
+        if (props.data && props.data.length) {
             const advancedOptions = props.devMode !== "basic" && this.state.dataOptions
                 ? JSON.parse(this.state.dataOptions)
                 : {};
