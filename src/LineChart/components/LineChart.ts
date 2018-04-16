@@ -134,8 +134,8 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     private getData(props: LineChartProps): ScatterData[] {
-        if (props.scatterData) {
-            const lineData: ScatterData[] = props.scatterData.map((data, index) => {
+        if (this.state.scatterData) {
+            const lineData: ScatterData[] = this.state.scatterData.map((data, index) => {
                 const parsedOptions = props.devMode !== "basic" && this.state.seriesOptions
                     ? JSON.parse(this.state.seriesOptions[index])
                     : {};
@@ -143,13 +143,13 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
                 return {
                     ...deepMerge.all<ScatterData>([ data, parsedOptions ]),
-                    visible: this.state.hiddenTraces.indexOf(index) === -1 ? true : "legendonly",
+                    visible: data.visible || true,
                     customdata: data.customdata
                 };
             });
 
             return props.area === "stacked"
-                ? LineChart.getStackedArea(lineData, this.state.hiddenTraces)
+                ? LineChart.getStackedArea(lineData)
                 : lineData;
         }
 
@@ -181,18 +181,26 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         }
     }
 
-    private onRestyle = (data: any) => {
-        if (data[0].visible[0] === "legendonly") {
-            this.setState({ hiddenTraces: this.state.hiddenTraces.concat([ data[1][0] ]) });
-        } else if (data[0].visible[0] === true) {
-            const hiddenTraces = [ ...this.state.hiddenTraces ];
-            hiddenTraces.splice(hiddenTraces.indexOf(data[1][0]), 1);
-            this.setState({ hiddenTraces });
+    private onRestyle = (data: any[]) => {
+        if (this.state.scatterData) {
+            (this.state.scatterData as any)[data[1][0]].visible = data[0].visible[0];
+            this.setState({ scatterData: this.state.scatterData });
         }
     }
 
     private onRuntimeUpdate = (layoutOptions: string, seriesOptions: string[]) => {
-        this.setState({ layoutOptions, seriesOptions });
+        const updatedScatterData = seriesOptions.map((option, index) => {
+            const rawOptions = option ? JSON.parse(option) : {};
+            if (rawOptions.visible) {
+                const { scatterData } = this.state;
+                (scatterData as any)[index].visible = rawOptions.visible;
+
+                return (scatterData as any)[index];
+            }
+
+            return (this.state.scatterData as any)[index];
+        });
+        this.setState({ layoutOptions, seriesOptions, scatterData: updatedScatterData });
     }
 
     public static defaultLayoutConfigs(props: LineChartProps): Partial<Layout> {
@@ -264,8 +272,8 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         };
     }
 
-    public static getStackedArea(traces: ScatterData[], hiddenTraces: number[]) {
-        const visibleTraces = traces.filter((data, index) => hiddenTraces.indexOf(index) === -1);
+    public static getStackedArea(traces: ScatterData[]) {
+        const visibleTraces = traces.filter((data, index) => data.visible === true);
         for (let i = 1; i < visibleTraces.length; i++) {
             for (let j = 0; j < (Math.min(visibleTraces[i].y.length, visibleTraces[i - 1].y.length)); j++) {
                 (visibleTraces[i].y[j] as any) += visibleTraces[i - 1].y[j];

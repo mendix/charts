@@ -34,7 +34,7 @@ const widgetConfig = {
             "tests": path.resolve(__dirname, "./tests")
         }
     },
-    devtool: "source-map",
+    devtool: "eval",
     module: {
         rules: [
             {
@@ -89,7 +89,7 @@ const anyChartConfig = {
             "plotly.js/dist/plotly": "plotly.js/dist/plotly.min.js"
         }
     },
-    devtool: "source-map",
+    devtool: "eval",
     module: {
         rules: [
             {
@@ -144,7 +144,7 @@ const previewConfig = {
     resolve: {
         extensions: [ ".ts", ".js" ]
     },
-    devtool: "inline-source-map",
+    devtool: "eval",
     module: {
         rules: [
             { test: /\.ts$/, loader: "ts-loader", options: {
@@ -178,7 +178,7 @@ const anyChartPreviewConfig = {
             "plotly.js/dist/plotly": "plotly.js/dist/plotly.min.js"
         }
     },
-    devtool: "inline-source-map",
+    devtool: "eval",
     module: {
         rules: [
             { test: /\.ts$/, loader: "ts-loader", options: {

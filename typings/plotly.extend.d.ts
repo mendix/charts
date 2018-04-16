@@ -69,6 +69,7 @@ declare module "plotly.js" {
         series: any; // custom property, not part of the official plotly.js api
         orientation?: "h" | "v";
         customdata: any[];
+        visible?: boolean | "legendonly"; // default = true
     }
 
     export interface PieData {
