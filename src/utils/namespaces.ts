@@ -151,6 +151,7 @@ export namespace Container {
         sampleData: string;
         layoutStatic: string;
         layoutAttribute: string;
+        configurationOptions: string;
         sampleLayout: string;
         eventEntity: string;
         eventDataAttribute: string;

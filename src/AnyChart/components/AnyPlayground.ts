@@ -14,6 +14,7 @@ interface AnyPlaygroundState {
     attributeData: string;
     attributeLayout: string;
     activeOption: string;
+    configurationOptions: string;
 }
 
 export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> {
@@ -22,6 +23,7 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
         staticLayout: this.props.layoutStatic,
         attributeLayout: this.props.attributeLayout,
         attributeData: this.props.attributeData,
+        configurationOptions: this.props.configurationOptions,
         activeOption: "layout"
     };
     private timeoutId?: number;
@@ -44,7 +46,8 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
             layoutStatic: this.state.staticLayout,
             dataStatic: this.state.staticData,
             attributeLayout: this.state.attributeLayout,
-            attributeData: this.state.attributeData
+            attributeData: this.state.attributeData,
+            configurationOptions: this.state.configurationOptions
         });
     }
 
@@ -53,13 +56,16 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
             attributeData: newProps.attributeData,
             attributeLayout: newProps.attributeLayout,
             staticData: newProps.dataStatic,
-            staticLayout: newProps.layoutStatic
+            staticLayout: newProps.layoutStatic,
+            configurationOptions: newProps.configurationOptions
         });
     }
 
     private renderPanels(): (ReactElement<PanelProps> | null)[] {
         if (this.state.activeOption === "layout") {
             return this.renderLayoutPanels();
+        } else if (this.state.activeOption === "config") {
+            return this.renderConfigPanels();
         }
 
         return this.renderPieDataPanes();
@@ -129,13 +135,48 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
         return [];
     }
 
+    private renderConfigPanels() {
+        if (this.state.attributeData) {
+
+            return [
+                createElement(Panel,
+                    {
+                        key: "config",
+                        heading: "Configuration settings"
+                    },
+                    Playground.renderAceEditor({
+                        value: `${this.state.configurationOptions || "{\n\n}"}`,
+                        onChange: value => this.onUpdate("config", value),
+                        onValidate: this.onValidate
+                    })
+                ),
+                createElement(Panel,
+                    {
+                        key: "default",
+                        heading: "Default configuration",
+                        headingClass: "read-only"
+                    },
+                    Playground.renderAceEditor({
+                        value: `{ "displayModeBar": false, "doubleClick": false }`,
+                        readOnly: true,
+                        overwriteValue: this.state.configurationOptions,
+                        onValidate: this.onValidate
+                    })
+                )
+            ];
+        }
+
+        return [];
+    }
+
     private renderHeaderTools(): ReactElement<any> {
         return createElement(SidebarHeaderTools, {},
             createElement(Select, {
                 onChange: this.updateView,
                 options: [
                     { name: "Layout", value: "layout", isDefaultSelected: true },
-                    { name: "Data", value: "data", isDefaultSelected: false }
+                    { name: "Data", value: "data", isDefaultSelected: false },
+                    { name: "Configuration", value: "config", isDefaultSelected: false }
                 ]
             })
         );
@@ -169,7 +210,8 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
             attributeLayout: source === "layoutDynamic" ? cleanValue : this.state.attributeLayout,
             attributeData: source === "dataDynamic" ? cleanValue : this.state.attributeData,
             staticLayout: source === "layoutStatic" ? cleanValue : this.state.staticLayout,
-            staticData: source === "dataStatic" ? cleanValue : this.state.staticData
+            staticData: source === "dataStatic" ? cleanValue : this.state.staticData,
+            configurationOptions: source === "config" ? cleanValue : this.state.configurationOptions
         });
     }
 

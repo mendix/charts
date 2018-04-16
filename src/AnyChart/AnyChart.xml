@@ -49,6 +49,11 @@
             <category>Layout options</category>
             <description>Layout options for preview. It will be merged with the 'Static' in the web modeler or at runtime when no 'Source attribute' is selected</description>
         </property>
+        <property key="configurationOptions" type="string" required="false" multiline="true">
+            <caption>Configuration options</caption>
+            <category>Configuration options</category>
+            <description>The JSON containing the Plotly configuration options</description>
+        </property>
         <property key="widthUnit" type="enumeration" defaultValue="percentage">
             <caption>Width unit</caption>
             <category>Appearance</category>

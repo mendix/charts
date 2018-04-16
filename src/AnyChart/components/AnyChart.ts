@@ -26,6 +26,7 @@ export interface AnyChartProps extends WrapperProps, Style.Dimensions {
     layoutStatic: string;
     attributeData: string;
     attributeLayout: string;
+    configurationOptions: string;
     onClick?: (data: any) => void;
     onHover?: (data: any, node: HTMLDivElement) => void;
 }
@@ -61,7 +62,7 @@ export class AnyChart extends Component<AnyChartProps, { alertMessage?: ReactChi
             style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
             layout: this.getLayoutOptions(this.props),
             data: this.getData(this.props),
-            config: AnyChart.getConfigOptions(),
+            config: this.getConfigOptions(this.props),
             onClick: this.onClick,
             getTooltipNode: this.getTooltipNodeRef
         });
@@ -102,7 +103,9 @@ export class AnyChart extends Component<AnyChartProps, { alertMessage?: ReactChi
         });
     }
 
-    private static getConfigOptions(): Partial<Config> {
-        return { displayModeBar: false, doubleClick: false };
+    public getConfigOptions(props: AnyChartProps): Partial<Config> {
+        const parsedConfig = JSON.parse(this.props.configurationOptions || "{}");
+
+        return deepMerge.all([ { displayModeBar: false, doubleClick: false }, parsedConfig ]);
     }
 }
