@@ -112,15 +112,13 @@ export default class LineChartContainer extends Component<LineChartContainerProp
 
     private fetchData = (mxObject?: mendix.lib.MxObject) => {
         if (mxObject && this.props.series.length) {
-            Promise.all(this.props.series.map(series => fetchSeriesData<Data.LineSeriesProps>(mxObject, series)))
-                .then(seriesData => {
-                    this.setState({
-                        loading: false,
-                        data: seriesData,
-                        scatterData: this.getData(seriesData),
-                        seriesOptions: seriesData.map(({ series }) => series.seriesOptions || "{\n\n}")
-                    });
-                })
+            Promise.all(this.props.series.map(series => fetchSeriesData<Data.LineSeriesProps>(mxObject, series, this.props.restParameters)))
+                .then(seriesData => this.setState({
+                    loading: false,
+                    data: seriesData,
+                    scatterData: this.getData(seriesData),
+                    seriesOptions: seriesData.map(({ series }) => series.seriesOptions || "{\n\n}")
+                }))
                 .catch(reason => {
                     window.mx.ui.error(reason);
                     this.setState({ loading: false, data: [], scatterData: [] });
@@ -136,10 +134,10 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         );
     }
 
-    private createScatterData({ data, series }: Data.SeriesData<Data.LineSeriesProps>, index: number, devMode = false): ScatterData {
+    private createScatterData({ data, jsonData, series }: Data.SeriesData<Data.LineSeriesProps>, index: number, devMode = false): ScatterData {
         const rawOptions = devMode && series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
         const color: string | undefined = series.lineColor || defaultColours(this.props.type === "bubble" ? 0.7 : 1)[index];
-        let traces = getSeriesTraces({ data, series });
+        let traces = getSeriesTraces({ data, jsonData, series });
         if (this.props.type === "polar") {
             traces = {
                 r: (traces.y as number[]).concat(traces.y[0] as number),
@@ -161,7 +159,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
                 traces,
                 rawOptions
             ]),
-            customdata: data // each array element shall be returned as the custom data of a corresponding point
+            customdata: data || [] // each array element shall be returned as the custom data of a corresponding point
         };
     }
 }

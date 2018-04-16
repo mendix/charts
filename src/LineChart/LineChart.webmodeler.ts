@@ -87,10 +87,14 @@ export function getPreviewCss() {
 export function getVisibleProperties(valueMap: LineChartContainerProps, visibilityMap: VisibilityMap<LineChartContainerProps>) { // tslint:disable-line max-line-length
     if (valueMap.series && Array.isArray(valueMap.series)) {
         valueMap.series.forEach((series, index) => {
-            if (series.dataSourceType === "XPath") {
-                visibilityMap.series[index].dataSourceMicroflow = false;
-            } else if (series.dataSourceType === "microflow") {
+            if (series.dataSourceType !== "XPath") {
                 visibilityMap.series[index].entityConstraint = false;
+            }
+            if (series.dataSourceType !== "microflow") {
+                visibilityMap.series[index].dataSourceMicroflow = false;
+            }
+            if (series.dataSourceType !== "REST") {
+                visibilityMap.series[index].restUrl = false;
             }
             visibilityMap.series[index].seriesOptions = false;
             if (series.onClickEvent === "doNothing") {

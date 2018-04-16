@@ -1,7 +1,7 @@
 import { ReactChild, createElement } from "react";
 import deepMerge from "deepmerge";
 import { Datum } from "plotly.js";
-import { Data } from "./namespaces";
+import { Container, Data } from "./namespaces";
 import SeriesProps = Data.SeriesProps;
 import SeriesData = Data.SeriesData;
 import SortOrder = Data.SortOrder;
@@ -24,12 +24,22 @@ export const validateSeriesProps = <T extends Partial<SeriesProps>>(dataSeries: 
                 if (series.xValueSortAttribute && series.xValueSortAttribute.split("/").length > 1) {
                     errorMessage.push(`'X-axis sort attribute' in ${identifier} does not support references for data source 'Microflow'`);
                 }
-            } else {
+            } else if (series.dataSourceType === "XPath") {
                 if (series.xValueAttribute && series.xValueAttribute.split("/").length > 3) {
                     errorMessage.push(`'X-axis data attribute' in ${identifier} supports maximal one level deep reference`);
                 }
                 if (series.xValueSortAttribute && series.xValueSortAttribute.split("/").length > 3) {
                     errorMessage.push(`'X-axis sort attribute' in ${identifier} supports maximal one level deep reference`);
+                }
+            } else if (series.dataSourceType === "REST") {
+                if (!series.restUrl) {
+                    errorMessage.push(`\n'Data source type' in ${identifier} is set to 'REST' but no REST URL is specified.`);
+                }
+                if (series.onClickEvent !== "doNothing") {
+                    errorMessage.push(`\n'Data source type' in ${identifier} is set to 'REST' but does not support 'On click' events`);
+                }
+                if (series.tooltipForm) {
+                    errorMessage.push(`\n'Data source type' in ${identifier} is set to 'REST' but does not support 'Tooltip form'`);
                 }
             }
             if (series.seriesOptions && series.seriesOptions.trim()) {
@@ -74,7 +84,7 @@ export const validateAdvancedOptions = (rawData: string): string => {
     return "";
 };
 
-export const fetchSeriesData = <S extends SeriesProps = SeriesProps>(mxObject: mendix.lib.MxObject, series: S): Promise<SeriesData<S>> =>
+export const fetchSeriesData = <S extends SeriesProps = SeriesProps>(mxObject: mendix.lib.MxObject, series: S, restParameters: Container.RestParameter[]): Promise<SeriesData<S>> =>
     new Promise<SeriesData<S>>((resolve, reject) => {
         if (series.dataEntity) {
             if (series.dataSourceType === "XPath") {
@@ -86,6 +96,17 @@ export const fetchSeriesData = <S extends SeriesProps = SeriesProps>(mxObject: m
             } else if (series.dataSourceType === "microflow" && series.dataSourceMicroflow) {
                 fetchByMicroflow(series.dataSourceMicroflow, mxObject.getGuid())
                     .then(mxObjects => resolve({ data: mxObjects, series }))
+                    .catch(reject);
+            } else if (series.dataSourceType === "REST" && series.restUrl) {
+                const parameters: string[] = [];
+                parameters.push("contextId=" + mxObject.getGuid());
+                parameters.push("seriesName=" + series.name);
+                restParameters.forEach(parameter => {
+                    parameters.push(parameter.parameterAttribute + "=" + mxObject.get(parameter.parameterAttribute));
+                });
+                const url = series.restUrl + "?" + parameters.join("&");
+                fetchByRest(url)
+                    .then(jsonData => resolve({ jsonData, series }))
                     .catch(reject);
             }
         } else {
@@ -162,6 +183,23 @@ export const fetchByMicroflow = (actionname: string, guid: string): Promise<mend
         });
     });
 
+export const fetchByRest = (url: string): Promise<any> =>
+new Promise((resolve, reject) => {
+    const errorMessage = `An error occurred while retrieving data via REST endpoint (${url}): `;
+    window.fetch(url, {
+        credentials: "include",
+        headers: {
+            "X-Csrf-Token" : mx.session.getConfig("csrftoken")
+        }
+    }).then((data) => {
+        if (data.ok) {
+            resolve(data.json());
+        } else {
+            reject(`${errorMessage} ${data.statusText}`);
+        }
+    }).catch(error => reject(`${errorMessage} ${error.message}`));
+});
+
 export const handleOnClick = <T extends EventProps>(options: T, mxObject?: mendix.lib.MxObject, mxform?: mxui.lib.form._FormBase) => {
     if (!mxObject || options.onClickEvent === "doNothing") {
         return;
@@ -185,15 +223,25 @@ export const handleOnClick = <T extends EventProps>(options: T, mxObject?: mendi
     }
 };
 
-export const getSeriesTraces = ({ data, series }: SeriesData): ScatterTrace => {
-    const xData = data ? data.map(mxObject => getAttributeValue(mxObject, series.xValueAttribute)) : [];
-    const yData = data ? data.map(mxObject => parseFloat(mxObject.get(series.yValueAttribute) as string)) : [];
-    const markerSizeData = data && series.markerSizeAttribute
-        ? data.map(mxObject => parseFloat(mxObject.get(series.markerSizeAttribute as string) as string))
-        : undefined;
-    const sortData = data && series.xValueSortAttribute
-        ? data.map(mxObject => getAttributeValue(mxObject, series.xValueSortAttribute))
-        : [];
+export const getSeriesTraces = ({ data, jsonData, series }: SeriesData): ScatterTrace => {
+    let xData: Datum[] = [];
+    let yData: number[] = [];
+    let markerSizeData: number[] | undefined = [];
+    let sortData: Datum[] = [];
+    if (data) {
+        xData = data.map(mxObject => getAttributeValue(mxObject, series.xValueAttribute));
+        yData = data.map(mxObject => parseFloat(mxObject.get(series.yValueAttribute) as string));
+        markerSizeData = series.markerSizeAttribute
+            ? data.map(mxObject => parseFloat(mxObject.get(series.markerSizeAttribute as string) as string))
+            : undefined;
+        sortData = series.xValueSortAttribute
+            ? data.map(mxObject => getAttributeValue(mxObject, series.xValueSortAttribute))
+            : [];
+    } else if (jsonData) {
+        xData = jsonData.map((dataValue: any) => dataValue[series.xValueAttribute]);
+        yData = jsonData.map((dataValue: any) => dataValue[series.yValueAttribute]);
+        // TODO add markerSizeData, and sortData
+    }
     const sortDataError = xData.length !== yData.length || xData.length !== sortData.length;
     const alreadySorted = series.dataSourceType === "XPath" && series.xValueSortAttribute && series.xValueSortAttribute.split("/").length === 1;
     if (!series.xValueSortAttribute || alreadySorted || sortDataError) {

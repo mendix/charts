@@ -100,7 +100,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
 
     private fetchData = (mxObject?: mendix.lib.MxObject) => {
         if (mxObject && this.props.series.length) {
-            Promise.all(this.props.series.map(series => fetchSeriesData(mxObject, series)))
+            Promise.all(this.props.series.map(series => fetchSeriesData(mxObject, series, [])))
                 .then(seriesData => {
                     this.setState({
                         loading: false,
@@ -140,7 +140,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
                 },
                 rawOptions
             ]),
-            customdata: data // each array element shall be returned as the custom data of a corresponding point
+            customdata: data || [] // each array element shall be returned as the custom data of a corresponding point
         };
     }
 
