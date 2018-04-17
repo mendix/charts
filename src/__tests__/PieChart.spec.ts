@@ -69,17 +69,7 @@ describe("PieChart", () => {
                     type: "pie",
                     style: { width: "100%", height: "100px" },
                     layout: PieChart.getDefaultLayoutOptions(defaultProps as PieChartProps),
-                    data: [
-                        {
-                            hole: 0,
-                            hoverinfo: "none",
-                            labels: [],
-                            marker: { colors: style.defaultColours() },
-                            type: "pie",
-                            values: [],
-                            sort: false
-                        }
-                    ],
+                    data: [],
                     config: { displayModeBar: false, doubleClick: false },
                     onClick: jasmine.any(Function),
                     onHover: jasmine.any(Function),
