@@ -40,6 +40,9 @@ interface LineChartState {
 }
 
 export class LineChart extends Component<LineChartProps, LineChartState> {
+    static defaultProps: Partial<LineChartProps> = {
+        type: "line"
+    };
     state: LineChartState = {
         layoutOptions: this.props.layoutOptions,
         series: this.props.series,
@@ -90,7 +93,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     private renderLineChart(): ReactElement<any> {
         return createElement(PlotlyChart,
             {
-                type: this.props.type || "line",
+                type: this.props.type,
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 layout: this.getLayoutOptions(this.props),
