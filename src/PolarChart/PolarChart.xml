@@ -107,10 +107,15 @@
                         <enumerationValue key="spline">Curved line (spline)</enumerationValue>
                     </enumerationValues>
                 </property>
-                <property key="color" type="string" required="false">
+                <property key="lineColor" type="string" required="false">
                     <caption>Line color</caption>
                     <category>Appearance</category>
-                    <description>Color of the bubbles e.g. green, #00FF00, rgb(0,255,0)</description>
+                    <description>Color of the line e.g. green, #00FF00, rgb(0,255,0)</description>
+                </property>
+                <property key="fillColor" type="string" required="false">
+                    <caption>Fill color</caption>
+                    <category>Appearance</category>
+                    <description>By default, the line color with transparency is used</description>
                 </property>
                 <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
                     <caption>On click</caption>

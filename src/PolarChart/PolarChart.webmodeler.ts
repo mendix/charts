@@ -9,6 +9,7 @@ import { ScatterData } from "plotly.js";
 import { Container } from "../utils/namespaces";
 import LineChartContainerProps = Container.LineChartContainerProps;
 import LineMode = Container.LineMode;
+import { defaultColours } from "../utils/style";
 
 // tslint:disable-next-line class-name
 export class preview extends Component<LineChartContainerProps, {}> {
@@ -19,6 +20,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
             ),
             createElement(LineChart, {
                 ...this.props as LineChartContainerProps,
+                devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
                 scatterData: preview.getData(this.props),
                 type: "polar"
             })
@@ -27,27 +29,27 @@ export class preview extends Component<LineChartContainerProps, {}> {
 
     static getData(props: LineChartContainerProps): ScatterData[] {
         if (props.series.length) {
-            return props.series.map(series => {
+            return props.series.map((series, index) => {
                 const seriesOptions = props.devMode !== "basic" && series.seriesOptions.trim()
                     ? JSON.parse(series.seriesOptions)
                     : {};
-                const sampleData = preview.getSampleTraces();
+                const color = series.lineColor || defaultColours()[index];
 
                 return deepMerge.all([ {
                     connectgaps: true,
                     hoveron: "points",
                     hoverinfo: "none",
                     line: {
-                        color: series.lineColor,
+                        color,
                         shape: series.lineStyle
                     },
                     mode: series.mode ? series.mode.replace("X", "+") as LineMode : "lines",
                     name: series.name,
                     type: "scatterpolar",
                     fill: "toself",
-                    r: sampleData.r || [],
-                    theta: sampleData.theta || [],
-                    series: {}
+                    series: {},
+                    marker: { color },
+                    ...preview.getSampleTraces()
                 }, seriesOptions ]);
             });
         }
@@ -55,15 +57,19 @@ export class preview extends Component<LineChartContainerProps, {}> {
         return [ {
             name: "Sample",
             type: "scatterpolar",
+            hoveron: "points",
+            hoverinfo: "none",
             series: {},
             fill: "toself",
+            line: { color: defaultColours()[0] },
+            marker: {  color: defaultColours()[0] },
             ...preview.getSampleTraces()
         } as any ];
     }
 
     private static getSampleTraces(): { r: (string | number)[], theta: (string | number)[] } {
         return {
-            r: [ 39, 28, 8, 7, 28, 39 ],
+            r: getRandomNumbers(6, 100),
             theta: [ "A", "B", "C", "D", "E", "A" ]
         };
     }
