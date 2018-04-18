@@ -120,7 +120,13 @@ export default class LineChartContainer extends Component<LineChartContainerProp
     private createScatterData({ data, series }: Data.SeriesData<Data.LineSeriesProps>, index: number, devMode = false): ScatterData {
         const rawOptions = devMode && series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
         const color: string | undefined = series.lineColor || defaultColours(series.mode === ("bubble" as any) ? 0.7 : 1)[index];
-        const traces = getSeriesTraces({ data, series });
+        let traces = getSeriesTraces({ data, series });
+        if (this.props.type === "polar") {
+            traces = {
+                r: (traces.y as number[]).concat(traces.y[0] as number),
+                theta: traces.x.concat(traces.x[0])
+            } as Data.ScatterTrace;
+        }
 
         return {
             ...deepMerge.all<ScatterData>([
@@ -131,9 +137,9 @@ export default class LineChartContainer extends Component<LineChartContainerProp
                     line: color ? { color } : {},
                     marker: color ? { color } : {},
                     text: traces.marker ? traces.marker.size : "", // show the size value on hover,
-                    mode: series.mode === ("bubble" as any) ? "markers" : series.mode,
-                    ...this.props.type === "polar" ? { r: traces.y, theta: traces.x } : traces
+                    mode: series.mode === ("bubble" as any) ? "markers" : series.mode
                 },
+                traces,
                 rawOptions
             ]),
             customdata: data // each array element shall be returned as the custom data of a corresponding point

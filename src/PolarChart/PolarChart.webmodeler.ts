@@ -9,10 +9,10 @@ import { ScatterData } from "plotly.js";
 import { Container } from "../utils/namespaces";
 import LineChartContainerProps = Container.LineChartContainerProps;
 import LineMode = Container.LineMode;
-import { defaultColours } from "../utils/style";
+import { defaultColours, fillColours } from "../utils/style";
 
 // tslint:disable-next-line class-name
-export class preview extends Component<LineChartContainerProps, {}> {
+export class preview extends Component<Container.PolarChartContainerProps, {}> {
     render() {
         return createElement("div", {},
             createElement(Alert, { className: "widget-charts-polar-alert" },
@@ -22,7 +22,19 @@ export class preview extends Component<LineChartContainerProps, {}> {
                 ...this.props as LineChartContainerProps,
                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
                 scatterData: preview.getData(this.props),
-                type: "polar"
+                type: "polar",
+                polar: {
+                    radialaxis: {
+                        rangemode: this.props.rangeMode,
+                        showgrid: this.props.showGrid,
+                        gridcolor: "#d7d7d7",
+                        tickcolor: "#d7d7d7"
+                    },
+                    angularaxis: {
+                        linecolor: "#d7d7d7",
+                        tickcolor: "#d7d7d7"
+                    }
+                }
             })
         );
     }
@@ -47,6 +59,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                     name: series.name,
                     type: "scatterpolar",
                     fill: "toself",
+                    fillcolor: series.fillColor || fillColours[index],
                     series: {},
                     marker: { color },
                     ...preview.getSampleTraces()
@@ -61,6 +74,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
             hoverinfo: "none",
             series: {},
             fill: "toself",
+            fillcolor: fillColours[0],
             line: { color: defaultColours()[0] },
             marker: {  color: defaultColours()[0] },
             ...preview.getSampleTraces()
@@ -68,8 +82,10 @@ export class preview extends Component<LineChartContainerProps, {}> {
     }
 
     private static getSampleTraces(): { r: (string | number)[], theta: (string | number)[] } {
+        const randomNumbers = getRandomNumbers(6, 100);
+
         return {
-            r: getRandomNumbers(6, 100),
+            r: randomNumbers.concat(randomNumbers[0]),
             theta: [ "A", "B", "C", "D", "E", "A" ]
         };
     }

@@ -207,7 +207,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     public static defaultLayoutConfigs(props: LineChartProps): Partial<Layout> {
-        return {
+        const sharedConfigs: Partial<Layout> = {
             font: {
                 family: "Open Sans",
                 size: 14,
@@ -216,27 +216,6 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             autosize: true,
             hovermode: "closest",
             showlegend: props.showLegend,
-            xaxis: {
-                fixedrange: props.xAxisType !== "date",
-                gridcolor: "#d7d7d7",
-                rangeslider: {
-                    visible: props.showRangeSlider || false
-                },
-                showgrid: props.grid === "vertical" || props.grid === "both",
-                title: props.xAxisLabel,
-                type: props.xAxisType,
-                zeroline: true,
-                zerolinecolor: "#d7d7d7"
-            },
-            yaxis: {
-                rangemode: props.rangeMode || "tozero",
-                zeroline: true,
-                zerolinecolor: "#d7d7d7",
-                gridcolor: "#d7d7d7",
-                title: props.yAxisLabel,
-                showgrid: props.grid === "horizontal" || props.grid === "both",
-                fixedrange: true
-            },
             hoverlabel: {
                 bgcolor: "#888",
                 bordercolor: "#888",
@@ -252,6 +231,38 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 pad: 10
             }
         };
+
+        if (props.type === "line") {
+            const lineConfigs: Partial<Layout> = {
+                xaxis: {
+                    fixedrange: props.xAxisType !== "date",
+                    gridcolor: "#d7d7d7",
+                    rangeslider: {
+                        visible: props.showRangeSlider || false
+                    },
+                    showgrid: props.grid === "vertical" || props.grid === "both",
+                    title: props.xAxisLabel,
+                    type: props.xAxisType,
+                    zeroline: true,
+                    zerolinecolor: "#d7d7d7"
+                },
+                yaxis: {
+                    rangemode: props.rangeMode || "tozero",
+                    zeroline: true,
+                    zerolinecolor: "#d7d7d7",
+                    gridcolor: "#d7d7d7",
+                    title: props.yAxisLabel,
+                    showgrid: props.grid === "horizontal" || props.grid === "both",
+                    fixedrange: true
+                }
+            };
+
+            return { ...sharedConfigs, ...lineConfigs };
+        } else if (props.type === "polar" && props.polar) {
+            return { ...sharedConfigs, polar: props.polar } as Partial<Layout>;
+        }
+
+        return sharedConfigs;
     }
 
     public static getConfigOptions(props: LineChartProps): Partial<Config> {

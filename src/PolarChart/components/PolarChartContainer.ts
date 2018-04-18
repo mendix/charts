@@ -2,11 +2,26 @@ let __webpack_public_path__;
 import { SFC, createElement } from "react";
 import LineChartContainer from "../../LineChart/components/LineChartContainer";
 import { Container } from "../../utils/namespaces";
-import LineChartContainerProps = Container.LineChartContainerProps;
 
 __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
-const PolarChartContainer: SFC<LineChartContainerProps> = props =>
-    createElement(LineChartContainer, { ...props as LineChartContainerProps, fill: true, type: "polar" });
+const PolarChartContainer: SFC<Container.PolarChartContainerProps> = props =>
+    createElement(LineChartContainer, {
+        ...props as Container.LineChartContainerProps,
+        fill: true,
+        type: "polar",
+        polar: {
+            radialaxis: {
+                rangemode: props.rangeMode,
+                showgrid: props.showGrid,
+                gridcolor: "#d7d7d7",
+                tickcolor: "#d7d7d7"
+            },
+            angularaxis: {
+                linecolor: "#d7d7d7",
+                tickcolor: "#d7d7d7"
+            }
+        }
+    });
 
 export { PolarChartContainer as default };
