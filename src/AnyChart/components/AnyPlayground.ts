@@ -151,8 +151,10 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
         }
         this.timeoutId = window.setTimeout(() => {
             try {
-                if (this.isValid && JSON.parse(value)) {
+                if (this.isValid) {
                     this.updateChart(source, JSON.stringify(JSON.parse(value), null, 2));
+                } else {
+                    this.updateChart(source, Playground.convertJSToJSON(value));
                 }
             } catch (error) {
                 this.isValid = false;
