@@ -49,8 +49,10 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         if (!this.state.loading) {
             this.setState({ loading: true });
         }
-        this.fetchData(newProps.mxObject);
-        this.setRefreshInterval(newProps.refreshInterval, newProps.mxObject);
+        if (!this.state.alertMessage) {
+            this.fetchData(newProps.mxObject);
+            this.setRefreshInterval(newProps.refreshInterval, newProps.mxObject);
+        }
     }
 
     componentWillUnmount() {

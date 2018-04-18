@@ -42,8 +42,10 @@ export default class AnyChartContainer extends Component<AnyChartContainerProps,
 
     componentWillReceiveProps(newProps: AnyChartContainerProps) {
         this.resetSubscriptions(newProps.mxObject);
-        this.setState({ loading: true });
-        this.fetchData(newProps.mxObject);
+        if (!this.state.alertMessage) {
+            this.setState({ loading: true });
+            this.fetchData(newProps.mxObject);
+        }
     }
 
     private fetchData(mxObject?: mendix.lib.MxObject) {
