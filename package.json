@@ -126,7 +126,7 @@
     "element-resize-detector": "^1.1.14",
     "fast-json-patch": "^2.0.6",
     "json-source-map": "^0.4.0",
-    "plotly.js": "~1.34.0",
+    "plotly.js": "^1.36.0",
     "react-ace": "^5.9.0"
   }
 }
