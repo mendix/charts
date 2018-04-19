@@ -92,7 +92,15 @@ Layout options control the general appearance of the chart. Common options inclu
   }
 }
 ```
-
+### Configurations options (all charts)
+Configurations options control the appearnce of the chart beyond the layout options. Common options include; displayModeBar, doubleClick etc
+```json
+{
+  "displayModeBar": true,
+  "doubleClick": true,
+  "displaylogo": false
+}
+```
 For more details: [Developer cheat sheet](/AdvancedCheatSheet.md)
 
 ### Data options (pie chart)
