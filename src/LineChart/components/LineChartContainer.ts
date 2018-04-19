@@ -42,7 +42,8 @@ export default class LineChartContainer extends Component<LineChartContainerProp
                 loading: this.state.loading,
                 alertMessage: this.state.alertMessage,
                 onClick: handleOnClick,
-                onHover: BarChartContainer.openTooltipForm
+                onHover: BarChartContainer.openTooltipForm,
+                onClickREST: this.handleOnClickREST
             })
         );
     }
@@ -161,6 +162,25 @@ export default class LineChartContainer extends Component<LineChartContainerProp
             ]),
             customdata: data || [] // each array element shall be returned as the custom data of a corresponding point
         };
+    }
+
+    private handleOnClickREST = (points: any, type: "click" | "hover", tooltipNode?: HTMLDivElement) => {
+        window.mx.data.create({
+            entity: points.data.series.dataEntity,
+            callback: mxObject => this.handleOnClick(mxObject, points, type, tooltipNode),
+            error: error => mx.ui.error(`An error while creating ${points.data.series.dataEntity} object : ${error.message}`)
+        });
+    }
+
+    private handleOnClick = (mxObject: mendix.lib.MxObject, points: any, type: "click" | "hover", tooltipNode?: HTMLDivElement) => {
+        mxObject.set(points.data.series.xValueAttribute, points.x);
+        mxObject.set(points.data.series.yValueAttribute, points.y);
+        if (type === "click") {
+            handleOnClick(points.data.series, mxObject, this.props.mxform);
+        }
+        if (tooltipNode && type === "hover") {
+            BarChartContainer.openTooltipForm(tooltipNode, points.data.series.tooltipForm, mxObject);
+        }
     }
 }
 

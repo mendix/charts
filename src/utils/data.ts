@@ -35,12 +35,6 @@ export const validateSeriesProps = <T extends Partial<SeriesProps>>(dataSeries: 
                 if (!series.restUrl) {
                     errorMessage.push(`\n'Data source type' in ${identifier} is set to 'REST' but no REST URL is specified.`);
                 }
-                if (series.onClickEvent !== "doNothing") {
-                    errorMessage.push(`\n'Data source type' in ${identifier} is set to 'REST' but does not support 'On click' events`);
-                }
-                if (series.tooltipForm) {
-                    errorMessage.push(`\n'Data source type' in ${identifier} is set to 'REST' but does not support 'Tooltip form'`);
-                }
             }
             if (series.seriesOptions && series.seriesOptions.trim()) {
                 const error = validateAdvancedOptions(series.seriesOptions.trim());
@@ -240,7 +234,12 @@ export const getSeriesTraces = ({ data, jsonData, series }: SeriesData): Scatter
     } else if (jsonData) {
         xData = jsonData.map((dataValue: any) => dataValue[series.xValueAttribute]);
         yData = jsonData.map((dataValue: any) => dataValue[series.yValueAttribute]);
-        // TODO add markerSizeData, and sortData
+        markerSizeData = series.markerSizeAttribute
+            ? jsonData.map((dataValue: any) => dataValue[series.markerSizeAttribute as string])
+            : undefined;
+        sortData = series.xValueSortAttribute
+            ? jsonData.map((dataValue: any) => dataValue[series.xValueSortAttribute])
+            : [];
     }
     const sortDataError = xData.length !== yData.length || xData.length !== sortData.length;
     const alreadySorted = series.dataSourceType === "XPath" && series.xValueSortAttribute && series.xValueSortAttribute.split("/").length === 1;

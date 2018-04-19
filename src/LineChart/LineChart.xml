@@ -34,9 +34,9 @@
                     </enumerationValues>
                 </property>
                 <property key="restUrl" type="string" required="false">
-                    <caption>Rest URL</caption>
+                    <caption>REST URL</caption>
                     <category>Data source</category>
-                    <description>Relative or full URL to Rest endpoint</description>
+                    <description>Relative or full URL to REST endpoint</description>
                 </property>
                 <property key="entityConstraint" type="entityConstraint" entityProperty="dataEntity" required="false">
                     <caption>XPath constraint</caption>
@@ -223,7 +223,7 @@
         <property key="restParameters" type="object" isList="true" required="false">
             <caption>REST parameters</caption>
             <category>REST</category>
-            <description>Add parameters to rest request, The contextId, and Series name are provided by default</description>
+            <description>Add parameters to REST request, The contextId, and series name are provided by default</description>
             <properties>
                 <property key="parameterAttribute" type="attribute">
                     <caption>Attribute</caption>

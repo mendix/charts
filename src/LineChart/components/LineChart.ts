@@ -28,6 +28,7 @@ export interface LineChartProps extends LineChartContainerProps {
     themeConfigs: { layout: {}, configuration: {}, data: {} };
     onClick?: (series: SeriesProps, dataObject: mendix.lib.MxObject, mxform: mxui.lib.form._FormBase) => void;
     onHover?: (node: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) => void;
+    onClickREST?: (points: any, type: "click" | "hover", tooltipNode?: HTMLDivElement) => void;
 }
 
 interface LineChartState {
@@ -188,8 +189,11 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     private onClick = ({ points }: ScatterHoverData<mendix.lib.MxObject>) => {
-        if (this.props.onClick) {
-            this.props.onClick(points[0].data.series, points[0].customdata, this.props.mxform);
+        const serie = points[0].data.series;
+        if (this.props.onClick && serie.dataSourceType !== "REST") {
+            this.props.onClick(serie, points[0].customdata, this.props.mxform);
+        } else if (this.props.onClickREST) {
+            this.props.onClickREST(points[0], "click");
         }
     }
 
@@ -201,7 +205,12 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             if (coordinates) {
                 setTooltipPosition(this.tooltipNode, coordinates);
                 if (data.series.tooltipForm && this.props.onHover) {
-                    this.props.onHover(this.tooltipNode, data.series.tooltipForm, customdata);
+                    this.tooltipNode.innerHTML = "";
+                    if (data.series.dataSourceType !== "REST") {
+                        this.props.onHover(this.tooltipNode, data.series.tooltipForm, customdata);
+                    } else if (this.props.onClickREST) {
+                        this.props.onClickREST(points[0], "hover", this.tooltipNode);
+                    }
                 } else if (points[0].data.hoverinfo === "none" as any) {
                     render(createElement(HoverTooltip, { text: text || y || r }), this.tooltipNode);
                 } else {
