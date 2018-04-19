@@ -18,8 +18,8 @@ const widgetConfig = {
         PieChart: "./src/PieChart/components/PieChartContainer.ts",
         TimeSeries: "./src/TimeSeries/components/TimeSeriesContainer.ts",
         HeatMap: "./src/HeatMap/components/HeatMapContainer.ts",
-        BubbleChart: "./src/BubbleChart/components/BubbleChartContainer.ts",
-        PolarChart: "./src/PolarChart/components/PolarChartContainer.ts"
+        BubbleChart: "./src/BubbleChart/components/BubbleChartContainer.ts"
+        // PolarChart: "./src/PolarChart/components/PolarChartContainer.ts"
     },
     output: {
         jsonpFunction: "webpack3Jsonp",
@@ -135,8 +135,8 @@ const previewConfig = {
         PieChart: "./src/PieChart/PieChart.webmodeler.ts",
         TimeSeries: "./src/TimeSeries/TimeSeries.webmodeler.ts",
         HeatMap:  "./src/HeatMap/HeatMap.webmodeler.ts",
-        BubbleChart: "./src/BubbleChart/BubbleChart.webmodeler.ts",
-        PolarChart: "./src/PolarChart/PolarChart.webmodeler.ts"
+        BubbleChart: "./src/BubbleChart/BubbleChart.webmodeler.ts"
+        // PolarChart: "./src/PolarChart/PolarChart.webmodeler.ts"
     },
     output: {
         path: path.resolve(__dirname, "dist/tmp"),

@@ -3,8 +3,7 @@ const webpack = require("webpack");
 const webpackConfig = require("./webpack.config");
 const merge = require("webpack-merge");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
-const widgetNames = [ "LineChart", "AreaChart", "PieChart", "ColumnChart", "BarChart",
-    "TimeSeries", "HeatMap", "BubbleChart" ];
+const widgetNames = Object.keys(webpackConfig[0].entry);
 
 const webpackConfigRelease = webpackConfig.map(config => merge(config, {
     devtool: false,
