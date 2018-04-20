@@ -108,13 +108,15 @@ describe("LineChart", () => {
                 {
                     type: "line",
                     style: { width: "100%", height: "100px" },
-                    layout: LineChart.defaultLayoutConfigs(defaultProps as LineChartProps),
+                    layout: jasmine.any(Object) as any,
                     data: [],
                     config: { displayModeBar: false, doubleClick: false },
                     onClick: jasmine.any(Function),
                     onHover: jasmine.any(Function),
                     onRestyle: jasmine.any(Function),
-                    getTooltipNode: jasmine.any(Function)
+                    getTooltipNode: jasmine.any(Function),
+                    onRender: jasmine.any(Function),
+                    onResize: jasmine.any(Function)
                 }
             )
         );
@@ -190,6 +192,7 @@ describe("LineChart", () => {
         defaultProps.devMode = "basic";
         const chart = renderShallowChart(defaultProps as LineChartProps);
         const chartInstance: any = chart.instance();
+        chartInstance.chartNode = document.createElement("div");
 
         expect(chartInstance.getData(defaultProps)).toEqual([
             { ...defaultProps.scatterData[0], visible: true, customdata: undefined }
@@ -202,6 +205,7 @@ describe("LineChart", () => {
         defaultProps.devMode = "advanced";
         const chart = renderShallowChart(defaultProps as LineChartProps);
         const chartInstance: any = chart.instance();
+        chartInstance.chartNode = document.createElement("div");
 
         expect(chartInstance.getData(defaultProps)).toEqual([
             { ...defaultProps.scatterData[0], mode: "markers", visible: true, customdata: undefined }
@@ -214,6 +218,7 @@ describe("LineChart", () => {
         defaultProps.devMode = "developer";
         const chart = renderShallowChart(defaultProps as LineChartProps);
         const chartInstance: any = chart.instance();
+        chartInstance.chartNode = document.createElement("div");
 
         expect(chartInstance.getData(defaultProps)).toEqual([
             { ...defaultProps.scatterData[0], mode: "lines", visible: true, customdata: undefined }
@@ -224,9 +229,22 @@ describe("LineChart", () => {
         const stackedAreaSpy = spyOn(LineChart, "getStackedArea" as any).and.callThrough();
         defaultProps.area = "stacked";
         defaultProps.scatterData = getData(defaultProps as LineChartProps);
-        const chart = renderShallowChart(defaultProps as LineChartProps);
+        const chart = renderFullChart(defaultProps as LineChartProps);
 
         expect(stackedAreaSpy).toHaveBeenCalled();
+    });
+
+    xit("with the devMode developer calculates bubble size scale if serie mode is bubble", () => {
+        defaultProps.scatterData = getData(defaultProps as LineChartProps);
+        defaultProps.seriesOptions = [ "{ \"mode\": \"lines\" }" ];
+        defaultProps.devMode = "developer";
+        const chart = renderShallowChart(defaultProps as LineChartProps);
+        const chartInstance: any = chart.instance();
+        chartInstance.chartNode = document.createElement("div");
+
+        expect(chartInstance.getData(defaultProps)).toEqual([
+            { ...defaultProps.scatterData[0], mode: "lines", visible: true, customdata: undefined }
+        ]);
     });
 
     describe("event handler", () => {
