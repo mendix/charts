@@ -76,7 +76,7 @@ const anyChartConfig = {
         AnyChart: "./src/AnyChart/components/AnyChartContainer.ts"
     },
     output: {
-        jsonpFunction: "webpack3Jsonp",
+        jsonpFunction: "webpack3JsonpAnyChart",
         path: path.resolve(__dirname, "dist/tmp/AnyChart"),
         filename: "com/mendix/widget/custom/[name]/[name].js",
         chunkFilename: `com/mendix/widget/custom/AnyChart/chunk[chunkhash].js`,
