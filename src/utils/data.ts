@@ -100,13 +100,31 @@ export const fetchSeriesData = <S extends SeriesProps = SeriesProps>(mxObject: m
                 });
                 const url = series.restUrl + "?" + parameters.join("&");
                 fetchByRest(url)
-                    .then(jsonData => resolve({ jsonData, series }))
+                    .then(jsonData => {
+                        const attributes = [ series.xValueAttribute, series.yValueAttribute, series.markerSizeAttribute, series.xValueSortAttribute ] as string[];
+                        const validationString = validateJsonData(jsonData, series.name, attributes);
+                        if (validationString) {
+                            reject(validationString);
+                        } else {
+                            resolve({ jsonData, series });
+                        }
+                    })
                     .catch(reject);
             }
         } else {
             resolve();
         }
     });
+
+const validateJsonData = (data: any, seriesName: string, attributes: string[]): string => {
+    for (const attribute of attributes) {
+        if (data.length > 1 && !data[0].hasOwnProperty(attribute) && attribute) {
+            return `JSON result for ${seriesName} does not contain attribute ${attribute}`;
+        }
+    }
+
+    return "";
+};
 
 const getReferences = (series: SeriesProps): ReferencesSpec => {
     let references: ReferencesSpec = { attributes: [] };
