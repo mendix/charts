@@ -1,15 +1,17 @@
-class PolarChart {
+import { DefaultPage } from "../../DefaultPage/home.page";
+
+class PolarChart extends DefaultPage {
 
     public get polar() {
-        return browser.element(".mx-name-polarChart3.js-plotly-plot > div.plot-container.plotly > div > svg:nth-child(1)");
+        return browser.element(".mx-name-polarChart1.js-plotly-plot");
     }
 
-    public get series() {
-        return browser.element(".mx-name-polarChart3.js-plotly-plot > div.plot-container.plotly > div > svg:nth-child(3) > g.infolayer > g.legend > g > g");
+    public get traces() {
+        return browser.elements(".mx-name-polarChart1.js-plotly-plot svg .legend .groups .traces .traces");
     }
 
-    public get serie1() {
-        return browser.element(".mx-name-polarChart3.js-plotly-plot > div.plot-container.plotly > div > svg:nth-child(3) > g.infolayer > g.legend > g > g > g:nth-child(1)");
+    public get trace1() {
+        return browser.element(".mx-name-polarChart1.js-plotly-plot svg .legend .groups .traces .traces");
     }
 }
 

@@ -13,9 +13,8 @@ describe("Pie chart", () => {
     });
 
     it("should have multiple slices", () => {
-        chart.pieLayer.waitForExist();
-        const slices = chart.pieLayer.getAttribute("childElementCount");
+        chart.slices.waitForExist();
 
-        expect(slices).toBe("10");
+        expect(chart.slices.value.length).toBeGreaterThan(1);
     });
 });

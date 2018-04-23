@@ -1,9 +1,8 @@
-import defaultPage from "./../DefaultPage/default.page";
-import chart from "./pages/default.page";
+import chart from "./pages/area.page";
 
 describe("Area chart", () => {
     beforeAll(() => {
-        defaultPage.open();
+        chart.open();
     });
 
     it("should generate a chart", () => {
@@ -13,9 +12,9 @@ describe("Area chart", () => {
         expect(isExist).toBeTruthy();
     });
 
-    it("should be generated with two series", () => {
-        const series = chart.series.getAttribute("childElementCount");
+    it("should be generated with two traces", () => {
+        chart.traces.waitForValue();
 
-        expect(series).toBe("2");
+        expect(chart.traces.value.length).toBe(2);
     });
 });
