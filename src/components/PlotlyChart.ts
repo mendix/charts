@@ -50,12 +50,8 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
     componentDidMount() {
         if (this.chartNode && this.chartNode.parentElement) {
             this.chartNode.parentElement.classList.add("widget-charts-wrapper");
-            if (this.props.onRender) {
-                this.props.onRender(this.chartNode);
-            }
         }
-        this.renderChart(this.props);
-        this.addResizeListener();
+        this.loadPlotlyAPI();
     }
 
     componentDidUpdate() {
@@ -80,24 +76,19 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
     }
 
     private async renderChart({ config, data, layout, onClick, onHover, onRestyle }: PlotlyChartProps) {
-        if (this.chartNode) {
+        if (this.chartNode && !this.state.loading && this.newPlot) {
             const layoutOptions = deepMerge.all([ layout, getDimensionsFromNode(this.chartNode) ]);
-            this.loadPlotlyAPI()
-                .then(() => {
-                    if (!this.state.loading && this.newPlot && this.chartNode) {
-                        this.newPlot(this.chartNode, data as Data[], layoutOptions, config)
-                            .then(myPlot => {
-                                if (onClick) {
-                                    myPlot.on("plotly_click", onClick as any);
-                                }
-                                if (onHover) {
-                                    myPlot.on("plotly_hover", onHover as any);
-                                }
-                                myPlot.on("plotly_unhover", this.clearTooltip);
-                                if (onRestyle) {
-                                    myPlot.on("plotly_restyle", onRestyle as any);
-                                }
-                            });
+            this.newPlot(this.chartNode, data as Data[], layoutOptions, config)
+                .then(myPlot => {
+                    if (onClick) {
+                        myPlot.on("plotly_click", onClick as any);
+                    }
+                    if (onHover) {
+                        myPlot.on("plotly_hover", onHover as any);
+                    }
+                    myPlot.on("plotly_unhover", this.clearTooltip);
+                    if (onRestyle) {
+                        myPlot.on("plotly_restyle", onRestyle as any);
                     }
                 });
         }
@@ -127,6 +118,10 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
                 this.purge = purge;
             }
         }
+        if (this.props.onRender && this.chartNode) {
+            this.props.onRender(this.chartNode);
+        }
+        this.addResizeListener();
         if (this.state.loading) {
             this.setState({ loading: false });
         }

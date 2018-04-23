@@ -8,6 +8,7 @@ import { HoverTooltip } from "../../components/HoverTooltip";
 import { Container } from "../../utils/namespaces";
 import HeatMapContainerProps = Container.HeatMapContainerProps;
 
+import { configs } from "../../utils/configs";
 import deepMerge from "deepmerge";
 import { PiePlayground } from "../../PieChart/components/PiePlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
@@ -212,13 +213,7 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
     }
 
     public static getDefaultLayoutOptions(props: HeatMapProps): Partial<Layout> {
-        return {
-            font: {
-                family: "Open Sans",
-                size: 14,
-                color: "#555"
-            },
-            autosize: true,
+        const defaultConfigs: Partial<Layout> = {
             showarrow: false,
             xaxis: {
                 fixedrange: true,
@@ -229,15 +224,10 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
                 fixedrange: true,
                 title: props.yAxisLabel,
                 ticks: ""
-            },
-            margin: {
-                l: 80,
-                r: 60,
-                b: 60,
-                t: 10,
-                pad: 10
             }
         };
+
+        return deepMerge.all([ configs.layout, defaultConfigs ]);
     }
 
     public static getDefaultConfigOptions(): Partial<Config> {

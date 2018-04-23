@@ -7,6 +7,7 @@ import { HoverTooltip } from "../../components/HoverTooltip";
 import { SeriesPlayground } from "../../components/SeriesPlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
+import { configs } from "../../utils/configs";
 import { getRuntimeTraces, getSeriesTraces } from "../../utils/data";
 import deepMerge from "deepmerge";
 import { Container, Data } from "../../utils/namespaces";
@@ -101,7 +102,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     private renderLineChart(): ReactElement<any> {
         return createElement(PlotlyChart,
             {
-                type: this.props.type,
+                type: this.props.type === "bubble" ? "line" : this.props.type,
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 layout: this.getLayoutOptions(this.props),
@@ -159,7 +160,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                     visible: data.visible || true
                 } ]);
                 const series = this.props.series[index];
-                if (series.mode === ("bubble" as any)) {
+                if (props.type === "bubble") {
                     return {
                         ...deepMerge.all<ScatterData>([ scatterData, {
                             marker: {
@@ -175,9 +176,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 return { ...scatterData, customdata: data.customdata };
             });
 
-            return props.area === "stacked"
-                ? LineChart.getStackedArea(lineData)
-                : lineData;
+            return props.area === "stacked" ? LineChart.getStackedArea(lineData) : lineData;
         }
 
         return [];
@@ -191,13 +190,12 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
 
     private onHover = ({ event, points }: ScatterHoverData<mendix.lib.MxObject>) => {
         const { customdata, data, r, y, text } = points[0];
-        if (event && this.tooltipNode) {
+        if (event && this.tooltipNode && this.tooltipNode.style.opacity !== "1") {
             unmountComponentAtNode(this.tooltipNode);
             const coordinates = getTooltipCoordinates(event, this.tooltipNode);
             if (coordinates) {
                 setTooltipPosition(this.tooltipNode, coordinates);
                 if (data.series.tooltipForm && this.props.onHover) {
-                    this.tooltipNode.innerHTML = "";
                     this.props.onHover(this.tooltipNode, data.series.tooltipForm, customdata);
                 } else if (points[0].data.hoverinfo === "none" as any) {
                     render(createElement(HoverTooltip, { text: text || y || r }), this.tooltipNode);
@@ -236,32 +234,16 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     public static defaultLayoutConfigs(props: LineChartProps): Partial<Layout> {
-        const sharedConfigs: Partial<Layout> = {
-            font: {
-                family: "Open Sans",
-                size: 14,
-                color: "#555"
-            },
-            autosize: true,
-            hovermode: "closest",
+        const derivedSharedConfigs: Partial<Layout> = {
             showlegend: props.showLegend,
-            hoverlabel: {
-                bgcolor: "#888",
-                bordercolor: "#888",
-                font: {
-                    color: "#FFF"
-                }
-            },
             margin: {
-                l: 60,
-                r: 60,
-                b: 60,
-                t: props.type === "polar" ? 60 : 10,
-                pad: 10
+                t: props.type === "polar" ? 60 : 10
             }
         };
 
-        if (props.type === "line") {
+        const sharedConfigs: Partial<Layout> = deepMerge.all([ derivedSharedConfigs, configs.layout ]);
+
+        if (props.type !== "polar") {
             const lineConfigs: Partial<Layout> = {
                 xaxis: {
                     fixedrange: props.xAxisType !== "date",
@@ -314,13 +296,13 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 color: series.lineColor,
                 shape: series.lineStyle
             },
-            mode: series.mode ? series.mode.replace("X", "+").replace("bubble", "markers") as LineMode : "lines",
+            mode: series.mode ? series.mode.replace("X", "+") as LineMode : "lines",
             name: series.name,
             type: props.type === "line" ? "scatter" : "scatterpolar" as any,
             fill: props.fill || series.fill
                 ? props.type === "polar" ? "toself" : "tonexty"
                 : "none",
-            marker: series.mode === ("bubble" as any) ? { line: { width: 0 } } : {}
+            marker: props.type === "bubble" ? { line: { width: 0 } } : {}
         };
     }
 
@@ -335,13 +317,13 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         return traces;
     }
 
-    public static getMarkerSizeReference(props: LineChartProps, series: LineSeriesProps, markerSize: number[], dimensions?: { width: number; height: number }): number {
+    public static getMarkerSizeReference(props: LineChartProps, series: LineSeriesProps, markerSize: number[], dimensions?: Dimensions): number {
         if (series.autoBubbleSize) {
             const width = dimensions ? dimensions.width : 0;
             const height = dimensions ? dimensions.height : 0;
-            let sizeRef = 0;
+            let sizeRef = 1;
             const averageSize = (width + height) / 2;
-            const percentageSize = averageSize / 10;
+            const percentageSize = averageSize / (1 / (series.markerSizeReference / 100));
 
             if (markerSize.length > 0) {
                 sizeRef = Math.max(...markerSize) / percentageSize;

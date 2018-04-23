@@ -9,14 +9,14 @@ export default class BubbleChartContainer extends Component<Container.LineChartC
     render() {
         return createElement(LineChartContainer, {
             ...this.props as Container.LineChartContainerProps,
-            ...{ series: this.setSeriesMode() }
+            ...{ series: this.setSeriesMode() },
+            type: "bubble"
         });
     }
 
     private setSeriesMode(): Data.LineSeriesProps[] {
         return this.props.series.map(series => ({
             ...series,
-            mode: "bubble" as Container.LineMode,
             lineColor: series.color || ""
         }));
     }

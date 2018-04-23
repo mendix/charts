@@ -7,6 +7,7 @@ import { HoverTooltip } from "../../components/HoverTooltip";
 import { SeriesPlayground } from "../../components/SeriesPlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
+import { configs } from "../../utils/configs";
 import { getRuntimeTraces, getSeriesTraces } from "../../utils/data";
 import deepMerge from "deepmerge";
 import { Container, Data } from "../../utils/namespaces";
@@ -201,15 +202,8 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     }
 
     public static defaultLayoutConfigs(props: BarChartProps): Partial<Layout> {
-        return {
-            font: {
-                family: "Open Sans",
-                size: 14,
-                color: "#555"
-            },
-            autosize: true,
+        const defaultConfigs: Partial<Layout> = {
             barmode: props.barMode,
-            hovermode: "closest",
             showlegend: props.showLegend,
             xaxis: {
                 gridcolor: "#d7d7d7",
@@ -227,14 +221,9 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                 title: props.yAxisLabel,
                 showgrid: props.grid === "horizontal" || props.grid === "both",
                 fixedrange: true
-            },
-            margin: {
-                l: 60,
-                r: 60,
-                b: 60,
-                t: 10,
-                pad: 10
             }
         };
+
+        return deepMerge.all([ configs.layout, defaultConfigs ]);
     }
 }

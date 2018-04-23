@@ -14,6 +14,7 @@ import { defaultColours, getDimensions, getTooltipCoordinates, parseStyle, setTo
 import PieChartContainerProps = Container.PieChartContainerProps;
 
 import "../../ui/Charts.scss";
+import { configs } from "../../utils/configs";
 
 export interface PieChartProps extends PieChartContainerProps {
     data?: mendix.lib.MxObject[];
@@ -204,13 +205,10 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
     }
 
     public static getDefaultLayoutOptions(props: PieChartProps): Partial<Layout> {
-        return {
+        const defaultConfigs: Partial<Layout> = {
             font: {
-                family: "Open Sans, sans-serif",
-                size: 12,
-                color: "#FFF"
+                size: 12
             },
-            autosize: true,
             showlegend: props.showLegend,
             legend: {
                 font: {
@@ -220,13 +218,11 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 }
             },
             margin: {
-                l: 60,
-                r: 60,
-                b: 60,
-                t: 10,
-                pad: 10
+                t: 10
             }
         };
+
+        return deepMerge.all([ configs.layout, defaultConfigs ]);
     }
 
     public static getDefaultDataOptions(props: PieChartProps): Partial<PieData> {

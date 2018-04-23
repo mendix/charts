@@ -138,6 +138,9 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
     public static openTooltipForm(domNode: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) {
         const context = new mendix.lib.MxContext();
         context.setContext(dataObject.getEntity(), dataObject.getGuid());
+        while (domNode.firstChild) {
+            domNode.removeChild(domNode.firstChild);
+        }
         window.mx.ui.openForm(tooltipForm, { domNode, context });
     }
 }
