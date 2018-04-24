@@ -10,6 +10,7 @@ import { ScatterData } from "plotly.js";
 import { defaultColours, getDimensions, parseStyle } from "../../utils/style";
 import BarChartContainerProps = Container.BarChartContainerProps;
 import BarChartContainerState = Container.BarChartContainerState;
+import { fetchThemeConfigs } from "../../utils/configs";
 
 __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
@@ -19,7 +20,8 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         alertMessage: validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions),
         data: [],
         seriesOptions: [],
-        loading: true
+        loading: true,
+        themeConfigs: { layout: {}, configuration: {}, data: {} }
     };
     private subscriptionHandle?: number;
     private intervalID?: number;
@@ -38,10 +40,18 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
                 seriesOptions: this.state.seriesOptions,
                 loading: this.state.loading,
                 alertMessage: this.state.alertMessage,
+                themeConfigs: this.state.themeConfigs,
                 onClick: handleOnClick,
                 onHover: BarChartContainer.openTooltipForm
             })
         );
+    }
+
+    componentDidMount() {
+        if (this.props.devMode !== "basic") {
+            fetchThemeConfigs(this.props.orientation === "bar" ? "BarChart" : "ColumnChart")
+                .then(themeConfigs => this.setState({ themeConfigs }));
+        }
     }
 
     componentWillReceiveProps(newProps: BarChartContainerProps) {
@@ -122,7 +132,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
 
         return {
             ...deepMerge.all<ScatterData>([
-                BarChart.getDefaultSeriesOptions(series, this.props),
+                BarChart.getDefaultSeriesOptions(series, this.props as BarChartProps),
                 {
                     x: bar ? traces.y : traces.x,
                     y: bar ? traces.x : traces.y,

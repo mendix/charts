@@ -8,7 +8,7 @@ import { HoverTooltip } from "../../components/HoverTooltip";
 import { Container } from "../../utils/namespaces";
 import HeatMapContainerProps = Container.HeatMapContainerProps;
 
-import { configs } from "../../utils/configs";
+import { ChartConfigs, arrayMerge, configs, fetchThemeConfigs } from "../../utils/configs";
 import deepMerge from "deepmerge";
 import { PiePlayground } from "../../PieChart/components/PiePlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
@@ -22,6 +22,7 @@ export interface HeatMapProps extends HeatMapContainerProps {
     defaultData?: HeatMapData;
     alertMessage?: ReactChild;
     loading?: boolean;
+    themeConfigs: ChartConfigs;
     onClick?: (x: string, y: string, z: number) => void;
     onHover?: (node: HTMLDivElement, x: string, y: string, z: number) => void;
 }
@@ -100,14 +101,21 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
 
     private renderPlayground(): ReactElement<any> | null {
         if (this.Playground) {
+            const modelerLayoutConfigs = deepMerge.all(
+                [ HeatMap.getDefaultLayoutOptions(this.props), this.props.themeConfigs.layout ]
+            );
+            const modelerDataConfigs = deepMerge.all(
+                [ HeatMap.getDefaultDataOptions(this.props), this.props.themeConfigs.data ], { arrayMerge }
+            );
+
             return createElement(this.Playground, {
                 dataOptions: this.state.dataOptions || "{\n\n}",
-                modelerDataConfigs: JSON.stringify(HeatMap.getDefaultDataOptions(this.props), null, 4),
+                modelerDataConfigs: JSON.stringify(modelerDataConfigs, null, 2),
                 onChange: this.onRuntimeUpdate,
                 layoutOptions: this.state.layoutOptions || "{\n\n}",
                 configurationOptions: this.state.configurationOptions || "{\n\n}",
                 configurationOptionsDefault: JSON.stringify(HeatMap.getDefaultConfigOptions(), null, 2),
-                modelerLayoutConfigs: JSON.stringify(HeatMap.getDefaultLayoutOptions(this.props), null, 4)
+                modelerLayoutConfigs: JSON.stringify(modelerLayoutConfigs, null, 2)
             }, this.renderChart());
         }
 
@@ -116,9 +124,9 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
 
     private getData(props: HeatMapProps): HeatMapData[] {
         if (this.props.data) {
-            const advancedOptions = props.devMode !== "basic" && this.state.dataOptions
-                ? JSON.parse(this.state.dataOptions)
-                : {};
+            const { dataOptions } = this.state;
+            const advancedOptions = props.devMode !== "basic" && dataOptions ? JSON.parse(dataOptions) : {};
+            const dataThemeConfigs = props.devMode !== "basic" ? this.props.themeConfigs.data : {};
 
             const data: HeatMapData = deepMerge.all([
                 {
@@ -129,8 +137,9 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
                     text: this.props.data.z.map((row, i) => row.map((item, j) => `${item}`)),
                     zsmooth: props.smoothColor ? "best" : false
                 },
+                dataThemeConfigs,
                 advancedOptions
-            ]);
+            ], { arrayMerge });
             data.colorscale = advancedOptions.colorscale || data.colorscale;
 
             return [ data ];
@@ -140,9 +149,9 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
     }
 
     private getLayoutOptions(props: HeatMapProps): Partial<Layout> {
-        const advancedOptions = props.devMode !== "basic" && this.state.layoutOptions
-            ? JSON.parse(this.state.layoutOptions)
-            : {};
+        const { layoutOptions } = this.state;
+        const advancedOptions = props.devMode !== "basic" && layoutOptions ? JSON.parse(layoutOptions) : {};
+        const themeLayoutConfigs = props.devMode !== "basic" ? this.props.themeConfigs.layout : {};
 
         return deepMerge.all([
             HeatMap.getDefaultLayoutOptions(props),
@@ -151,6 +160,7 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
                     ? this.getTextAnnotations(props.data || props.defaultData, props.valuesColor)
                     : undefined
             },
+            themeLayoutConfigs,
             advancedOptions
         ]);
     }
@@ -238,7 +248,11 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
         const parsedConfig = props.devMode !== "basic" && this.state.configurationOptions
             ? JSON.parse(this.state.configurationOptions)
             : {};
-        return deepMerge.all([ HeatMap.getDefaultConfigOptions(), parsedConfig ]);
+
+        return deepMerge.all(
+            [ { displayModeBar: false, doubleClick: false }, props.themeConfigs.configuration, parsedConfig ],
+            { arrayMerge }
+        );
     }
 
     public static getDefaultDataOptions(props: HeatMapProps): Partial<HeatMapData> {

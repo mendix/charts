@@ -7,7 +7,7 @@ import { HoverTooltip } from "../../components/HoverTooltip";
 import { SeriesPlayground } from "../../components/SeriesPlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
-import { configs } from "../../utils/configs";
+import { ChartConfigs, configs, fetchThemeConfigs } from "../../utils/configs";
 import { getRuntimeTraces, getSeriesTraces } from "../../utils/data";
 import deepMerge from "deepmerge";
 import { Container, Data } from "../../utils/namespaces";
@@ -27,13 +27,14 @@ export interface LineChartProps extends LineChartContainerProps {
     seriesOptions?: string[];
     loading?: boolean;
     alertMessage?: ReactChild;
+    themeConfigs: { layout: {}, configuration: {}, data: {} };
     onClick?: (series: SeriesProps, dataObject: mendix.lib.MxObject, mxform: mxui.lib.form._FormBase) => void;
     onHover?: (node: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) => void;
 }
 
 interface LineChartState {
     layoutOptions: string;
-    series?: LineSeriesProps[];
+    series: LineSeriesProps[];
     scatterData?: ScatterData[];
     seriesOptions?: string[];
     configurationOptions: string;
@@ -70,6 +71,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             this.loadPlaygroundComponent();
         }
     }
+
     render() {
         if (this.props.alertMessage) {
             return createElement(Alert, { className: "widget-charts-line-alert" }, this.props.alertMessage);
@@ -102,7 +104,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     private renderLineChart(): ReactElement<any> {
         return createElement(PlotlyChart,
             {
-                type: this.props.type === "bubble" ? "line" : this.props.type,
+                type: LineChart.getChartType(this.props.type),
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 layout: this.getLayoutOptions(this.props),
@@ -120,17 +122,23 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
 
     private renderPlayground(): ReactElement<any> | null {
         if (this.Playground) {
+            const modelerLayoutConfigs = deepMerge.all(
+                [ LineChart.defaultLayoutConfigs(this.props), this.props.themeConfigs.layout ]
+            );
+            const modelerSeriesConfigs = this.state.series ? this.state.series.map(_series => deepMerge.all([
+                LineChart.getDefaultSeriesOptions(_series, this.props),
+                this.props.themeConfigs.data
+            ])) : [];
+
             return createElement(this.Playground, {
-                series: this.state.series,
+                series: this.props.series,
                 seriesOptions: this.state.seriesOptions || [],
-                modelerSeriesConfigs: this.state.series && this.state.series.map(series =>
-                    JSON.stringify(LineChart.getDefaultSeriesOptions(series as LineSeriesProps, this.props), null, 2)
-                ),
+                modelerSeriesConfigs: modelerSeriesConfigs.map(config => JSON.stringify(config, null, 2)),
                 onChange: this.onRuntimeUpdate,
                 layoutOptions: this.state.layoutOptions || "{\n\n}",
                 configurationOptions: this.state.configurationOptions || "{\n\n}",
-                configurationOptionsDefault: JSON.stringify(LineChart.getDefaultConfigOptions(), null, 2),
-                modelerLayoutConfigs: JSON.stringify(LineChart.defaultLayoutConfigs(this.props), null, 2)
+                configurationOptionsDefault: JSON.stringify(LineChart.getDefaultConfigOptions(this.props), null, 2),
+                modelerLayoutConfigs: JSON.stringify(modelerLayoutConfigs, null, 2)
             }, this.renderLineChart());
         }
 
@@ -142,31 +150,30 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     private getLayoutOptions(props: LineChartProps): Partial<Layout> {
-        const advancedOptions = props.devMode !== "basic" && this.state.layoutOptions
-            ? JSON.parse(this.state.layoutOptions)
-            : {};
+        const { layoutOptions } = this.state;
+        const advancedOptions = props.devMode !== "basic" && layoutOptions ? JSON.parse(layoutOptions) : {};
+        const themeLayoutConfigs = props.devMode !== "basic" ? this.props.themeConfigs.layout : {};
 
-        return deepMerge.all([ LineChart.defaultLayoutConfigs(props), advancedOptions ]);
+        return deepMerge.all([ LineChart.defaultLayoutConfigs(props), themeLayoutConfigs, advancedOptions ]);
     }
 
     private getData(props: LineChartProps): ScatterData[] {
         if (this.state.scatterData && this.chartNode) {
+            const { seriesOptions: options } = this.state;
+            const dataThemeConfigs = props.devMode !== "basic" ? props.themeConfigs.data : {};
             const dimensions = getDimensionsFromNode(this.chartNode);
             const lineData: ScatterData[] = this.state.scatterData.map((data, index) => {
-                const parsedOptions = props.devMode !== "basic" && this.state.seriesOptions
-                    ? JSON.parse(this.state.seriesOptions[index])
-                    : {};
-                const scatterData = deepMerge.all<ScatterData>([ data, parsedOptions, {
-                    visible: data.visible || true
-                } ]);
-                const series = this.props.series[index];
+                const parsedOptions = props.devMode !== "basic" && options ? JSON.parse(options[index]) : {};
+                const scatterData = deepMerge.all<ScatterData>(
+                    [ data, dataThemeConfigs, parsedOptions, { visible: data.visible || true } ]
+                );
+                const series = this.state.series[index];
                 if (props.type === "bubble") {
+                    const sizeref = LineChart.getMarkerSizeReference(props, series, data.marker.size as number[], dimensions);
+
                     return {
                         ...deepMerge.all<ScatterData>([ scatterData, {
-                            marker: {
-                                sizemode: "diameter",
-                                sizeref: LineChart.getMarkerSizeReference(props, series, data.marker.size as number[], dimensions)
-                            }
+                            marker: { sizemode: "diameter", sizeref }
                         } ]),
                         customdata: data.customdata
                     };
@@ -233,6 +240,10 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         this.forceUpdate();
     }
 
+    public static getChartType(type: string): "line" | "polar" {
+        return type !== "polar" ? "line" : "polar";
+    }
+
     public static defaultLayoutConfigs(props: LineChartProps): Partial<Layout> {
         const derivedSharedConfigs: Partial<Layout> = {
             showlegend: props.showLegend,
@@ -276,15 +287,16 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         return sharedConfigs;
     }
 
-    public static getDefaultConfigOptions(): Partial<Config> {
-        return { displayModeBar: false, doubleClick: false };
+    public static getDefaultConfigOptions(props: LineChartProps): Partial<Config> {
+        return { displayModeBar: false, doubleClick: props.xAxisType === "date" ? "reset" : false };
     }
 
     public getConfigOptions(props: LineChartProps): Partial<Config> {
         const parsedConfig = props.devMode !== "basic" && this.state.configurationOptions
             ? JSON.parse(this.state.configurationOptions)
             : {};
-        return deepMerge.all([ LineChart.getDefaultConfigOptions() , parsedConfig ]);
+
+        return deepMerge.all([ LineChart.getDefaultConfigOptions(props), props.themeConfigs.configuration, parsedConfig ]);
     }
 
     public static getDefaultSeriesOptions(series: LineSeriesProps, props: LineChartProps): Partial<ScatterData> {
@@ -298,7 +310,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             },
             mode: series.mode ? series.mode.replace("X", "+") as LineMode : "lines",
             name: series.name,
-            type: props.type === "line" ? "scatter" : "scatterpolar" as any,
+            type: LineChart.getChartType(props.type) === "line" ? "scatter" : "scatterpolar" as any,
             fill: props.fill || series.fill
                 ? props.type === "polar" ? "toself" : "tonexty"
                 : "none",

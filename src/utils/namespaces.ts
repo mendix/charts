@@ -1,5 +1,6 @@
 import { AxisType, BarMode, Datum, ScatterData, ScatterMarker } from "plotly.js";
 import { ReactChild } from "react";
+import { ChartConfigs } from "./configs";
 
 export namespace Container {
     import SeriesProps = Data.SeriesProps;
@@ -65,11 +66,12 @@ export namespace Container {
         scatterData?: ScatterData[];
         seriesOptions: string[];
         loading?: boolean;
+        themeConfigs: ChartConfigs;
     }
 
     export interface LineChartContainerProps extends WrapperProps, Style.Dimensions, Style.Appearance, LineLayoutProps {
         series: Data.LineSeriesProps[];
-        type: "line" | "bubble" | "polar";
+        type: "line" | "bubble" | "polar" | "area" | "timeseries";
     }
 
     export interface LineChartContainerState {
@@ -78,6 +80,7 @@ export namespace Container {
         scatterData?: ScatterData[];
         seriesOptions: string[];
         loading?: boolean;
+        themeConfigs: ChartConfigs;
     }
 
     export type PieChartType = "pie" | "donut";
@@ -115,27 +118,6 @@ export namespace Container {
         configurationOptions: string;
         dataOptions: string;
         devMode: "basic" | "advanced" | "developer";
-    }
-
-    export interface BubbleChartContainerProps extends Data.DataSourceProps, LayoutProps, Style.Dimensions, Data.EventProps, WrapperProps {
-        series: Data.SeriesProps[];
-        showLegend: boolean;
-        serieColor: string;
-        xAxisLabel: string;
-        yAxisLabel: string;
-        layoutOptions: string;
-        dataOptions: string;
-        devMode: "basic" | "advanced" | "developer";
-        refreshInterval: number;
-        showRangeSlider: boolean;
-    }
-
-    export interface BubbleChartContainerState {
-        alertMessage?: ReactChild;
-        data?: Data.SeriesData<Data.SeriesProps>[];
-        scatterData?: ScatterData[];
-        seriesOptions: string[];
-        loading?: boolean;
     }
 
     export interface PolarChartContainerProps extends LineChartContainerProps {

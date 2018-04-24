@@ -1,9 +1,10 @@
 let __webpack_public_path__;
 import { Component, ReactChild, createElement } from "react";
 
-import { PieChart } from "./PieChart";
+import { ChartConfigs, fetchThemeConfigs } from "../../utils/configs";
 import { fetchByMicroflow, fetchByXPath, handleOnClick, validateSeriesProps } from "../../utils/data";
 import { Container } from "../../utils/namespaces";
+import { PieChart } from "./PieChart";
 import { getDimensions, parseStyle } from "../../utils/style";
 import PieChartContainerProps = Container.PieChartContainerProps;
 
@@ -13,28 +14,31 @@ interface PieChartContainerState {
     alertMessage?: ReactChild;
     data: mendix.lib.MxObject[];
     loading?: boolean;
+    themeConfigs: ChartConfigs;
 }
 
 export default class PieChartContainer extends Component<PieChartContainerProps, PieChartContainerState> {
+    state: PieChartContainerState = {
+        data: [],
+        alertMessage: validateSeriesProps(
+            [ { ...this.props, seriesOptions: this.props.dataOptions } ], this.props.friendlyId, this.props.layoutOptions
+        ),
+        loading: true,
+        themeConfigs: { layout: {}, configuration: {}, data: {} }
+    };
     private subscriptionHandle?: number;
     private intervalID?: number;
-
-    constructor(props: PieChartContainerProps) {
-        super(props);
-
-        this.state = {
-            data: [],
-            alertMessage: validateSeriesProps([ { ...props, seriesOptions: props.dataOptions } ], props.friendlyId, props.layoutOptions),
-            loading: true
-        };
-        this.fetchData = this.fetchData.bind(this);
-        this.openTooltipForm = this.openTooltipForm.bind(this);
-    }
 
     render() {
         return createElement("div", {
             style: this.state.loading ? { ...getDimensions(this.props), ...parseStyle(this.props.style) } : undefined
         }, this.getContent());
+    }
+
+    componentDidMount() {
+        if (this.props.devMode !== "basic") {
+            fetchThemeConfigs("PieChart").then(themeConfigs => this.setState({ themeConfigs }));
+        }
     }
 
     componentWillReceiveProps(newProps: PieChartContainerProps) {
@@ -75,6 +79,7 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
             alertMessage: this.state.alertMessage,
             loading: this.state.loading,
             data: this.state.data,
+            themeConfigs: this.state.themeConfigs,
             onClick: handleOnClick,
             onHover: this.props.tooltipForm ? this.openTooltipForm : undefined
         });
@@ -93,7 +98,7 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         }
     }
 
-    private fetchData(mxObject?: mendix.lib.MxObject) {
+    private fetchData = (mxObject?: mendix.lib.MxObject) => {
         if (!this.state.loading) {
             this.setState({ loading: true });
         }
@@ -119,7 +124,7 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         }
     }
 
-    private openTooltipForm(domNode: HTMLDivElement, dataObject: mendix.lib.MxObject) {
+    private openTooltipForm = (domNode: HTMLDivElement, dataObject: mendix.lib.MxObject) => {
         const context = new mendix.lib.MxContext();
         context.setContext(dataObject.getEntity(), dataObject.getGuid());
         window.mx.ui.openForm(this.props.tooltipForm, { domNode, context });

@@ -23,6 +23,7 @@ export class preview extends Component<Container.PolarChartContainerProps, {}> {
                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
                 scatterData: preview.getData(this.props),
                 type: "polar",
+                themeConfigs: { layout: {}, configuration: {}, data: {} },
                 polar: {
                     radialaxis: {
                         rangemode: this.props.rangeMode,

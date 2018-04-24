@@ -7,7 +7,7 @@ import { HoverTooltip } from "../../components/HoverTooltip";
 import { SeriesPlayground } from "../../components/SeriesPlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
-import { configs } from "../../utils/configs";
+import { ChartConfigs, configs, fetchThemeConfigs } from "../../utils/configs";
 import { getRuntimeTraces, getSeriesTraces } from "../../utils/data";
 import deepMerge from "deepmerge";
 import { Container, Data } from "../../utils/namespaces";
@@ -21,6 +21,7 @@ export interface BarChartProps extends Container.BarChartContainerProps {
     loading?: boolean;
     scatterData?: ScatterData[];
     seriesOptions?: string[];
+    themeConfigs: { layout: {}, configuration: {}, data: {} };
     onClick?: (series: Data.SeriesProps, dataObject: mendix.lib.MxObject, mxform: mxui.lib.form._FormBase) => void;
     onHover?: (node: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) => void;
 }
@@ -105,17 +106,24 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
 
     private renderPlayground(): ReactElement<any> | null {
         if (this.Playground) {
+            const { series } = this.state;
+            const modelerLayoutConfigs = deepMerge.all(
+                [ BarChart.defaultLayoutConfigs(this.props), this.props.themeConfigs.layout ]
+            );
+            const modelerSeriesConfigs = series ? series.map(_series => deepMerge.all([
+                BarChart.getDefaultSeriesOptions(_series, this.props),
+                this.props.themeConfigs.data
+            ])) : [];
+
             return createElement(this.Playground, {
-                series: this.state.series,
+                series,
                 seriesOptions: this.state.seriesOptions || [],
-                modelerSeriesConfigs: this.state.series && this.state.series.map(series =>
-                    JSON.stringify(BarChart.getDefaultSeriesOptions(series, this.props), null, 2)
-                ),
+                modelerSeriesConfigs: modelerSeriesConfigs.map(config => JSON.stringify(config, null, 2)),
                 onChange: this.onRuntimeUpdate,
                 layoutOptions: this.state.layoutOptions || "{\n\n}",
                 configurationOptions: this.state.configurationOptions || "{\n\n}",
                 configurationOptionsDefault: JSON.stringify(BarChart.getDefaultConfigOptions(), null, 2),
-                modelerLayoutConfigs: JSON.stringify(BarChart.defaultLayoutConfigs(this.props), null, 2)
+                modelerLayoutConfigs: JSON.stringify(modelerLayoutConfigs, null, 2)
             }, this.renderChart());
         }
 
@@ -123,23 +131,23 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     }
 
     private getLayoutOptions(props: BarChartProps): Partial<Layout> {
-        const advancedOptions = props.devMode !== "basic" && this.state.layoutOptions
-            ? JSON.parse(this.state.layoutOptions)
-            : {};
+        const { layoutOptions } = this.state;
+        const advancedOptions = props.devMode !== "basic" && layoutOptions ? JSON.parse(layoutOptions) : {};
+        const themeLayoutConfigs = props.devMode !== "basic" ? this.props.themeConfigs.layout : {};
 
-        return deepMerge.all([ BarChart.defaultLayoutConfigs(props), advancedOptions ]);
+        return deepMerge.all([ BarChart.defaultLayoutConfigs(props), themeLayoutConfigs, advancedOptions ]);
     }
 
     private getData(props: BarChartProps): ScatterData[] {
-        if (props.scatterData && this.state.seriesOptions && props.devMode !== "basic") {
+        if (props.scatterData && this.state.seriesOptions) {
+            const { seriesOptions: options } = this.state;
+            const dataThemeConfigs = props.devMode !== "basic" ? this.props.themeConfigs.data : {};
             return props.scatterData.map((data, index) => {
-                const parsedOptions = props.devMode !== "basic" && this.state.seriesOptions
-                    ? JSON.parse(this.state.seriesOptions[index])
-                    : {};
+                const parsedOptions = props.devMode !== "basic" && options ? JSON.parse(options[index]) : {};
 
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
                 return {
-                    ...deepMerge.all<ScatterData>([ data, parsedOptions ]),
+                    ...deepMerge.all<ScatterData>([ data, dataThemeConfigs, parsedOptions ]),
                     customdata: data.customdata
                 };
             });
@@ -187,7 +195,8 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
         const parsedConfig = props.devMode !== "basic" && this.state.configurationOptions
             ? JSON.parse(this.state.configurationOptions)
             : {};
-        return deepMerge.all([ BarChart.getDefaultConfigOptions(), parsedConfig ]);
+
+        return deepMerge.all([ BarChart.getDefaultConfigOptions(), props.themeConfigs.configuration, parsedConfig ]);
     }
 
     public static getDefaultSeriesOptions(series: Data.SeriesProps, props: BarChartProps): Partial<ScatterData> {

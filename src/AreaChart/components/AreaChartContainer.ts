@@ -7,6 +7,10 @@ import LineChartContainerProps = Container.LineChartContainerProps;
 __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
 const AreaChartContainer: SFC<LineChartContainerProps> = props =>
-    createElement(LineChartContainer, { ...props as LineChartContainerProps, fill: true });
+    createElement(LineChartContainer, {
+        ...props as LineChartContainerProps,
+        fill: true,
+        type: "area"
+    });
 
 export { AreaChartContainer as default };

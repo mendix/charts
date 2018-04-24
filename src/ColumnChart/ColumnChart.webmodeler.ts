@@ -20,7 +20,8 @@ export class preview extends Component<BarChartContainerProps, {}> {
             createElement(BarChart, {
                 ...this.props as BarChartContainerProps,
                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-                scatterData: this.getData(this.props)
+                scatterData: this.getData(this.props),
+                themeConfigs: { layout: {}, configuration: {}, data: {} }
             })
         );
     }

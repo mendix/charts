@@ -1,5 +1,6 @@
 import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
+import deepMerge from "deepmerge";
 
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
@@ -7,20 +8,20 @@ import { HoverTooltip } from "../../components/HoverTooltip";
 import { PiePlayground } from "./PiePlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
-import deepMerge from "deepmerge";
+import { ChartConfigs, arrayMerge, configs, fetchThemeConfigs } from "../../utils/configs";
 import { Container } from "../../utils/namespaces";
 import { Config, Layout, PieData, PieHoverData, ScatterHoverData } from "plotly.js";
 import { defaultColours, getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 import PieChartContainerProps = Container.PieChartContainerProps;
 
 import "../../ui/Charts.scss";
-import { configs } from "../../utils/configs";
 
 export interface PieChartProps extends PieChartContainerProps {
     data?: mendix.lib.MxObject[];
     defaultData?: PieData[];
     alertMessage?: ReactChild;
     loading?: boolean;
+    themeConfigs: { layout: {}, configuration: {}, data: {} };
     onClick?: (props: PieChartProps, dataObject: mendix.lib.MxObject, mxform: mxui.lib.form._FormBase) => void;
     onHover?: (node: HTMLDivElement, dataObject: mendix.lib.MxObject) => void;
 }
@@ -98,17 +99,35 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         );
     }
 
+    private renderPlayground(): ReactElement<any> | null {
+        if (this.Playground) {
+            const { themeConfigs } = this.props;
+            const modelerLayoutConfigs = deepMerge.all(
+                [ PieChart.getDefaultLayoutOptions(this.props), themeConfigs.layout ]
+            );
+            const modelerDataConfigs = deepMerge.all([ PieChart.getDefaultDataOptions(this.props), themeConfigs.data ]);
+
+            return createElement(this.Playground, {
+                dataOptions: this.state.dataOptions || "{\n\n}",
+                modelerDataConfigs: JSON.stringify(modelerDataConfigs, null, 2),
+                onChange: this.onRuntimeUpdate,
+                layoutOptions: this.state.layoutOptions || "{\n\n}",
+                modelerLayoutConfigs: JSON.stringify(modelerLayoutConfigs, null, 2),
+                configurationOptions: this.state.configurationOptions || "{\n\n}",
+                configurationOptionsDefault: JSON.stringify(PieChart.getDefaultConfigOptions(), null, 2)
+            }, this.renderChart());
+        }
+
+        return null;
+    }
+
     private getData(props: PieChartProps): PieData[] {
         if (props.data && props.data.length) {
-            const advancedOptions = props.devMode !== "basic" && this.state.dataOptions
-                ? JSON.parse(this.state.dataOptions)
-                : {};
-
-            const arrayMerge = (_destinationArray: any[], sourceArray: any[]) => {
-                return sourceArray;
-            };
-
+            const { dataOptions } = this.state;
+            const advancedOptions = props.devMode !== "basic" && dataOptions ? JSON.parse(dataOptions) : {};
+            const dataThemeConfigs = props.devMode !== "basic" ? props.themeConfigs.data : {};
             const traces = this.getTraces(props.data);
+
             return [
                 deepMerge.all(
                     [
@@ -118,6 +137,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                             values: traces.values,
                             marker: { colors: traces.colors }
                         },
+                        dataThemeConfigs,
                         advancedOptions
                     ],
                     { arrayMerge }
@@ -128,28 +148,12 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         return props.defaultData || [];
     }
 
-    private renderPlayground(): ReactElement<any> | null {
-        if (this.Playground) {
-            return createElement(this.Playground, {
-                dataOptions: this.state.dataOptions || "{\n\n}",
-                modelerDataConfigs: JSON.stringify(PieChart.getDefaultDataOptions(this.props), null, 4),
-                onChange: this.onRuntimeUpdate,
-                layoutOptions: this.state.layoutOptions || "{\n\n}",
-                configurationOptions: this.state.configurationOptions || "{\n\n}",
-                configurationOptionsDefault: JSON.stringify(PieChart.getDefaultConfigOptions(), null, 2),
-                modelerLayoutConfigs: JSON.stringify(PieChart.getDefaultLayoutOptions(this.props), null, 4)
-            }, this.renderChart());
-        }
-
-        return null;
-    }
-
     private getLayoutOptions(props: PieChartProps): Partial<Layout> {
-        const advancedOptions = props.devMode !== "basic" && this.state.layoutOptions
-            ? JSON.parse(this.state.layoutOptions)
-            : {};
+        const { layoutOptions } = this.state;
+        const advancedOptions = props.devMode !== "basic" && layoutOptions ? JSON.parse(layoutOptions) : {};
+        const themeLayoutConfigs = props.devMode !== "basic" ? props.themeConfigs.layout : {};
 
-        return deepMerge.all([ PieChart.getDefaultLayoutOptions(props), advancedOptions ]);
+        return deepMerge.all([ PieChart.getDefaultLayoutOptions(props), themeLayoutConfigs, advancedOptions ]);
     }
 
     private getTraces(data?: mendix.lib.MxObject[]): PieTraces {
@@ -201,7 +205,8 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         const parsedConfig = props.devMode !== "basic" && this.state.configurationOptions
             ? JSON.parse(this.state.configurationOptions)
             : {};
-        return deepMerge.all([ PieChart.getDefaultConfigOptions(), parsedConfig ]);
+
+        return deepMerge.all([ PieChart.getDefaultConfigOptions(), props.themeConfigs.configuration, parsedConfig ]);
     }
 
     public static getDefaultLayoutOptions(props: PieChartProps): Partial<Layout> {

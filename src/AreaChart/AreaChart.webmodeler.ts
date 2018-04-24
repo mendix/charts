@@ -21,7 +21,8 @@ export class preview extends Component<LineChartContainerProps, {}> {
                 ...this.props as LineChartContainerProps,
                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
                 fill: true,
-                scatterData: this.getData(this.props)
+                scatterData: this.getData(this.props),
+                themeConfigs: { layout: {}, configuration: {}, data: {} }
             })
         );
     }
