@@ -86,15 +86,17 @@ export class AnyChart extends Component<AnyChartProps, { alertMessage?: ReactChi
 
     private onClick = ({ points }: any) => {
         if (this.props.onClick) {
-            this.props.onClick(this.copyPoints(points));
+            this.props.onClick(this.extractRelevantPointData(points));
         }
     }
 
-    private copyPoints(points: any[]): any[] {
+    private extractRelevantPointData(points: any[]): any[] {
+        const excludedKeys = [ "fullData", "xaxis", "yaxis", "data" ];
+
         return points.map((point) => {
             const result: any = {};
             for (const key in point) {
-                if (key !== "fullData" && key !== "xaxis" && key !== "yaxis" && point.hasOwnProperty(key)) {
+                if (excludedKeys.indexOf(key) === -1 && point.hasOwnProperty(key)) {
                     result[key] = point[key];
                 }
             }
