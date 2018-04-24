@@ -25,7 +25,8 @@ describe("PieChart", () => {
             widthUnit: "percentage",
             height: 100,
             heightUnit: "pixels",
-            layoutOptions: "{}"
+            layoutOptions: "{}",
+            themeConfigs: { layout: {}, configuration: {}, data: {} }
         };
         window.mendix = mockMendix as any;
     });

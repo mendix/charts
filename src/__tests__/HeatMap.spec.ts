@@ -26,7 +26,8 @@ describe("HeatMap", () => {
             height: 100,
             heightUnit: "pixels",
             layoutOptions: "{}",
-            scaleColors: []
+            scaleColors: [],
+            themeConfigs: { layout: {}, configuration: {}, data: {} }
         };
         window.mendix = mockMendix as any;
     });

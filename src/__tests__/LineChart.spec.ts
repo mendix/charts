@@ -43,7 +43,9 @@ describe("LineChart", () => {
             height: 100,
             heightUnit: "pixels",
             layoutOptions: "{}",
-            series: sampleSeries as LineSeriesProps[]
+            configurationOptions: "{}",
+            series: sampleSeries as LineSeriesProps[],
+            themeConfigs: { layout: {}, configuration: {}, data: {} }
         };
         window.mendix = mockMendix as any;
     });
@@ -146,6 +148,7 @@ describe("LineChart", () => {
             series: defaultProps.series,
             seriesOptions: defaultProps.seriesOptions,
             scatterData: defaultProps.scatterData,
+            configurationOptions: defaultProps.configurationOptions,
             playgroundLoaded: false,
             hiddenTraces: []
         });
@@ -227,9 +230,11 @@ describe("LineChart", () => {
 
     it("that is configured as stacked generates the stacked chart data", () => {
         const stackedAreaSpy = spyOn(LineChart, "getStackedArea" as any).and.callThrough();
-        defaultProps.area = "stacked";
         defaultProps.scatterData = getData(defaultProps as LineChartProps);
         const chart = renderFullChart(defaultProps as LineChartProps);
+        const chartInstance: any = chart.instance();
+        chartInstance.chartNode = document.createElement("div");
+        chart.setProps({ area: "stacked" });
 
         expect(stackedAreaSpy).toHaveBeenCalled();
     });

@@ -45,7 +45,9 @@ describe("BarChart", () => {
             heightUnit: "pixels",
             layoutOptions: "{}",
             seriesOptions: [ "{}" ],
-            orientation: "bar"
+            configurationOptions: "{}",
+            orientation: "bar",
+            themeConfigs: { layout: {}, configuration: {}, data: {} }
         };
         window.mendix = mockMendix as any;
     });
@@ -142,6 +144,7 @@ describe("BarChart", () => {
             series: defaultProps.series,
             seriesOptions: defaultProps.seriesOptions,
             scatterData: defaultProps.scatterData,
+            configurationOptions: defaultProps.configurationOptions,
             playgroundLoaded: false
         });
     });
@@ -281,7 +284,8 @@ const getData = (props: Container.BarChartContainerProps): ScatterData[] => {
                 type: "bar",
                 orientation: "h",
                 x: sampleData.x || [],
-                y: sampleData.y || []
+                y: sampleData.y || [],
+                customdata: undefined
             }, seriesOptions ]);
         });
     }
