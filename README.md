@@ -29,7 +29,7 @@ Plot and compare your data across different charts.
 A line (scatter) chart should have one or more series, each displaying commonly grouped data points.
 ![LineChartProperties](/assets/LineChart_ChartProperties.png)
 
-Data can be retrieved either from the database, or from a microflow.
+Data can be retrieved from the database, from a microflow, or from REST endpoint.
 Below are the properties for configuring series data:
 
 * `name`[required] - Caption for series, shown on hover & on the legend.
@@ -37,6 +37,9 @@ Below are the properties for configuring series data:
 * `X-axis data attribute`[required] - The attribute that contains the data point X value.
 * `Y-axis data attribute`[required] - The attribute that contains the data point Y value.
 * `X-axis sort attribute` - The attribute to use for sorting the x-axis data.
+* `REST URL` - The URL used to retrieve data. Only used when the datasource is REST endpoint.
+
+For more details: [REST endpoint](/RESTEndpoint.md)
 
 NB: The line chart's x-axis provides support for dates and thus the line chart can be configured as a time series.
 
