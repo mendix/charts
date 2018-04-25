@@ -220,7 +220,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         }
     }
 
-    private onRuntimeUpdate = (layoutOptions: string, seriesOptions: string[]) => {
+    private onRuntimeUpdate = (layoutOptions: string, seriesOptions: string[], configurationOptions: string) => {
         const updatedScatterData = seriesOptions.map((option, index) => {
             const rawOptions = option ? JSON.parse(option) : {};
             if (rawOptions.visible) {
@@ -232,7 +232,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
 
             return (this.state.scatterData as any)[index];
         });
-        this.setState({ layoutOptions, seriesOptions, scatterData: updatedScatterData });
+        this.setState({ layoutOptions, seriesOptions, scatterData: updatedScatterData, configurationOptions });
     }
 
     private onLoadAndResize = (node: HTMLDivElement) => {
