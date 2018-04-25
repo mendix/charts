@@ -14,7 +14,6 @@ import * as style from "../utils/style";
 import deepMerge from "deepmerge";
 import { ScatterData, ScatterHoverData } from "plotly.js";
 import LineSeriesProps = Data.LineSeriesProps;
-import SeriesData = Data.SeriesData;
 
 describe("LineChart", () => {
     const renderShallowChart = (props: LineChartProps) => shallow(createElement(LineChart, props));
@@ -25,12 +24,6 @@ describe("LineChart", () => {
             name: "Series 1",
             seriesOptions: "",
             tooltipForm: "myTooltipForm.xml"
-        }
-    ];
-    const mockData: SeriesData<LineSeriesProps>[] = [
-        {
-            data: [ mockMendix.lib.MxObject() ] as any,
-            series: sampleSeries[0] as LineSeriesProps
         }
     ];
 
@@ -82,7 +75,7 @@ describe("LineChart", () => {
     it("whose dev mode is advanced does not render the playground", (done) => {
         defaultProps.devMode = "advanced";
         const renderPlaygroundSpy = spyOn(LineChart.prototype, "renderPlayground" as any).and.callThrough();
-        const chart = renderShallowChart(defaultProps as LineChartProps);
+        renderShallowChart(defaultProps as LineChartProps);
 
         window.setTimeout(() => {
             expect(renderPlaygroundSpy).not.toHaveBeenCalled();
@@ -94,7 +87,7 @@ describe("LineChart", () => {
     it("whose dev mode is basic does not render the playground", (done) => {
         defaultProps.devMode = "basic";
         const renderPlaygroundSpy = spyOn(LineChart.prototype, "renderPlayground" as any).and.callThrough();
-        const chart = renderShallowChart(defaultProps as LineChartProps);
+        renderShallowChart(defaultProps as LineChartProps);
 
         window.setTimeout(() => {
             expect(renderPlaygroundSpy).not.toHaveBeenCalled();

@@ -2,12 +2,9 @@ import { Component, ReactElement, createElement } from "react";
 
 import { Panel, PanelProps } from "./Panel";
 import { Playground } from "./Playground";
-import { Select, SelectOption, SelectProps } from "./Select";
+import { Select, SelectOption } from "./Select";
 
 import { Data } from "../utils/namespaces";
-import { ScatterData } from "plotly.js";
-import ScatterTrace = Data.ScatterTrace;
-import SeriesData = Data.SeriesData;
 import SeriesProps = Data.SeriesProps;
 import { SidebarHeaderTools } from "./SidebarHeaderTools";
 
@@ -21,7 +18,7 @@ export interface SeriesPlaygroundProps {
     configurationOptions?: string;
     modelerLayoutConfigs: string;
 }
-type PlaygroundSeriesTrace = ({ name: string } & ScatterTrace);
+
 interface SeriesPlaygroundState {
     activeOption: string;
 }

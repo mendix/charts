@@ -8,7 +8,6 @@ import { Panel } from "../components/Panel";
 import { Playground, RenderAceEditorOptions } from "../components/Playground";
 import { PlaygroundInfo } from "../components/PlaygroundInfo";
 import { PlotlyChart } from "../components/PlotlyChart";
-import { Select } from "../components/Select";
 import { Sidebar } from "../components/Sidebar";
 import { SidebarContent } from "../components/SidebarContent";
 import { SidebarHeader } from "../components/SidebarHeader";

@@ -1,12 +1,11 @@
 import { Component, ReactElement, createElement } from "react";
 import { Playground } from "../../components/Playground";
 import { SidebarHeaderTools } from "../../components/SidebarHeaderTools";
-import { MendixButton } from "../../components/MendixButton";
 
 import { Alert } from "../../components/Alert";
 import { AnyChart, AnyChartProps } from "./AnyChart";
 import { Panel, PanelProps } from "../../components/Panel";
-import { Select, SelectProps } from "../../components/Select";
+import { Select } from "../../components/Select";
 
 interface AnyPlaygroundState {
     staticData: string;

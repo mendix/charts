@@ -14,7 +14,6 @@ import deepMerge from "deepmerge";
 import { mockMendix } from "../../tests/mocks/Mendix";
 import { Container, Data } from "../utils/namespaces";
 import SeriesProps = Data.SeriesProps;
-import SeriesData = Data.SeriesData;
 
 describe("BarChart", () => {
     const renderShallowBarChart = (props: BarChartProps) => shallow(createElement(BarChart, props));
@@ -25,12 +24,6 @@ describe("BarChart", () => {
             name: "Series 1",
             seriesOptions: "{}",
             tooltipForm: "myTooltipForm.xml"
-        }
-    ];
-    const mockData: SeriesData[] = [
-        {
-            data: [ mockMendix.lib.MxObject() ] as any,
-            series: sampleSeries[0] as SeriesProps
         }
     ];
 
@@ -84,7 +77,7 @@ describe("BarChart", () => {
     it("whose dev mode is basic does not renders the playground", (done) => {
         defaultProps.devMode = "basic";
         const renderPlaygroundSpy = spyOn(BarChart.prototype, "renderPlayground" as any).and.callThrough();
-        const chart = renderShallowBarChart(defaultProps as BarChartProps);
+        renderShallowBarChart(defaultProps as BarChartProps);
 
         window.setTimeout(() => {
             expect(renderPlaygroundSpy).not.toHaveBeenCalled();
@@ -96,7 +89,7 @@ describe("BarChart", () => {
     it("whose dev mode is advanced does not renders the playground", () => {
         const renderPlaygroundSpy = spyOn(BarChart.prototype, "renderPlayground" as any).and.callThrough();
         defaultProps.devMode = "advanced";
-        const chart = renderShallowBarChart(defaultProps as BarChartProps);
+        renderShallowBarChart(defaultProps as BarChartProps);
 
         expect(renderPlaygroundSpy).not.toHaveBeenCalled();
     });

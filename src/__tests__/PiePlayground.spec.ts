@@ -1,7 +1,6 @@
 import { shallow } from "enzyme";
 import { createElement } from "react";
 
-// import { mockMendix } from "../../tests/mocks/Mendix";
 import AceEditor from "react-ace";
 import { Playground } from "../components/Playground";
 import { PiePlayground, PiePlaygroundProps } from "../PieChart/components/PiePlayground";

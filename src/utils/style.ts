@@ -45,7 +45,7 @@ export const getDimensionsFromNode = (node: HTMLDivElement) => {
 };
 
 export const defaultColours = (opacity = 1) => [
-     // Mendix defaults
+    // Mendix defaults
     `rgba(5, 149, 219, ${opacity})`,
     `rgba(23, 52, 123, ${opacity})`,
     `rgba(118, 202, 2, ${opacity})`,

@@ -7,8 +7,7 @@ import { HoverTooltip } from "../../components/HoverTooltip";
 import { SeriesPlayground } from "../../components/SeriesPlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
-import { ChartConfigs, configs, fetchThemeConfigs } from "../../utils/configs";
-import { getRuntimeTraces, getSeriesTraces } from "../../utils/data";
+import { configs } from "../../utils/configs";
 import deepMerge from "deepmerge";
 import { Container, Data } from "../../utils/namespaces";
 import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
@@ -164,7 +163,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     }
 
     private onHover = ({ event, points }: ScatterHoverData<mendix.lib.MxObject>) => {
-        const { customdata, data, x, y, text } = points[0];
+        const { customdata, data, x, y } = points[0];
         if (event && this.tooltipNode) {
             unmountComponentAtNode(this.tooltipNode);
             const coordinates = getTooltipCoordinates(event, this.tooltipNode);
@@ -200,8 +199,6 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     }
 
     public static getDefaultSeriesOptions(series: Data.SeriesProps, props: BarChartProps): Partial<ScatterData> {
-        const hoverinfo = (props.orientation === "bar" ? "x" : "y") as any;
-
         return {
             name: series.name,
             type: "bar",

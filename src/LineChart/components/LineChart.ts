@@ -7,14 +7,12 @@ import { HoverTooltip } from "../../components/HoverTooltip";
 import { SeriesPlayground } from "../../components/SeriesPlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
-import { ChartConfigs, configs, fetchThemeConfigs } from "../../utils/configs";
-import { getRuntimeTraces, getSeriesTraces } from "../../utils/data";
+import { configs } from "../../utils/configs";
 import deepMerge from "deepmerge";
 import { Container, Data } from "../../utils/namespaces";
 import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
 import { getDimensions, getDimensionsFromNode, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 
-import SeriesData = Data.SeriesData;
 import LineChartContainerProps = Container.LineChartContainerProps;
 import SeriesProps = Data.SeriesProps;
 import LineMode = Container.LineMode;
@@ -169,7 +167,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 );
                 const series = this.state.series[index];
                 if (props.type === "bubble") {
-                    const sizeref = LineChart.getMarkerSizeReference(props, series, data.marker.size as number[], dimensions);
+                    const sizeref = LineChart.getMarkerSizeReference(series, data.marker.size as number[], dimensions);
 
                     return {
                         ...deepMerge.all<ScatterData>([ scatterData, {
@@ -319,7 +317,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     public static getStackedArea(traces: ScatterData[]) {
-        const visibleTraces = traces.filter((data, index) => data.visible === true);
+        const visibleTraces = traces.filter(data => data.visible === true);
         for (let i = 1; i < visibleTraces.length; i++) {
             for (let j = 0; j < (Math.min(visibleTraces[i].y.length, visibleTraces[i - 1].y.length)); j++) {
                 (visibleTraces[i].y[j] as any) += visibleTraces[i - 1].y[j];
@@ -329,7 +327,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         return traces;
     }
 
-    public static getMarkerSizeReference(props: LineChartProps, series: LineSeriesProps, markerSize: number[], dimensions?: Dimensions): number {
+    public static getMarkerSizeReference(series: LineSeriesProps, markerSize: number[], dimensions?: Dimensions): number {
         if (series.autoBubbleSize) {
             const width = dimensions ? dimensions.width : 0;
             const height = dimensions ? dimensions.height : 0;

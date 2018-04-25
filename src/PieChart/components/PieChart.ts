@@ -8,7 +8,7 @@ import { HoverTooltip } from "../../components/HoverTooltip";
 import { PiePlayground } from "./PiePlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
-import { ChartConfigs, arrayMerge, configs, fetchThemeConfigs } from "../../utils/configs";
+import { arrayMerge, configs } from "../../utils/configs";
 import { Container } from "../../utils/namespaces";
 import { Config, Layout, PieData, PieHoverData, ScatterHoverData } from "plotly.js";
 import { defaultColours, getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";

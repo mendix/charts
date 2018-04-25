@@ -1,5 +1,5 @@
-let __webpack_public_path__;
-import { Component, SFC, createElement } from "react";
+let __webpack_public_path__: string;
+import { Component, createElement } from "react";
 import { Container, Data } from "../../utils/namespaces";
 import LineChartContainer from "../../LineChart/components/LineChartContainer";
 
@@ -21,3 +21,5 @@ export default class BubbleChartContainer extends Component<Container.LineChartC
         }));
     }
 }
+
+export { __webpack_public_path__ };

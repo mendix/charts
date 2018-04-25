@@ -1,4 +1,4 @@
-let __webpack_public_path__;
+let __webpack_public_path__: string;
 import { Component, ReactChild, createElement } from "react";
 
 import { fetchByMicroflow, fetchByXPath, handleOnClick, validateSeriesProps } from "../../utils/data";
@@ -239,3 +239,5 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
             : [ [ 0, "#17347B" ], [ 0.5, "#0595DB" ], [ 1, "#76CA02" ] ];
     }
 }
+
+export { __webpack_public_path__ };

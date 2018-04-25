@@ -2,7 +2,6 @@ import { CSSProperties, Component, createElement } from "react";
 import * as classNames from "classnames";
 
 import { ChartLoading } from "./ChartLoading";
-import { HoverTooltip } from "./HoverTooltip";
 import deepMerge from "deepmerge";
 import * as elementResize from "element-resize-detector";
 import {

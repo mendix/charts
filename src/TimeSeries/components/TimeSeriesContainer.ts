@@ -1,4 +1,4 @@
-let __webpack_public_path__;
+let __webpack_public_path__: string;
 import { SFC, createElement } from "react";
 import LineChartContainer from "../../LineChart/components/LineChartContainer";
 import { Container } from "../../utils/namespaces";
@@ -11,4 +11,4 @@ const TimeSeriesContainer: SFC<Container.LineChartContainerProps> = props =>
         xAxisType: "date"
     });
 
-export { TimeSeriesContainer as default };
+export { TimeSeriesContainer as default, __webpack_public_path__ };

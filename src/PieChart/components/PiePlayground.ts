@@ -2,7 +2,7 @@ import { Component, ReactElement, createElement } from "react";
 
 import { Playground } from "../../components/Playground";
 import { Panel, PanelProps } from "../../components/Panel";
-import { Select, SelectProps } from "../../components/Select";
+import { Select } from "../../components/Select";
 import { SidebarHeaderTools } from "../../components/SidebarHeaderTools";
 
 export interface PiePlaygroundProps {

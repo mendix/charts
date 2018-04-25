@@ -1,4 +1,4 @@
-let __webpack_public_path__;
+let __webpack_public_path__: string;
 import { Component, ReactChild, createElement } from "react";
 
 import { AnyChart, AnyChartProps } from "./AnyChart";
@@ -176,3 +176,5 @@ export default class AnyChartContainer extends Component<AnyChartContainerProps,
         return "";
     }
 }
+
+export { __webpack_public_path__ };

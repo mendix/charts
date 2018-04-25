@@ -1,7 +1,6 @@
 import { shallow } from "enzyme";
-import { ReactChild, createElement } from "react";
+import { createElement } from "react";
 
-import { Alert, AlertProps } from "../components/Alert";
 import { HoverTooltip } from "../components/HoverTooltip";
 
 describe("HoverTooltip", () => {

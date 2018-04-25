@@ -8,7 +8,7 @@ import { HoverTooltip } from "../../components/HoverTooltip";
 import { Container } from "../../utils/namespaces";
 import HeatMapContainerProps = Container.HeatMapContainerProps;
 
-import { ChartConfigs, arrayMerge, configs, fetchThemeConfigs } from "../../utils/configs";
+import { ChartConfigs, arrayMerge, configs } from "../../utils/configs";
 import deepMerge from "deepmerge";
 import { PiePlayground } from "../../PieChart/components/PiePlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
@@ -134,7 +134,7 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
                     x: this.props.data.x,
                     y: this.props.data.y,
                     z: this.props.data.z,
-                    text: this.props.data.z.map((row, i) => row.map((item, j) => `${item}`)),
+                    text: this.props.data.z.map(row => row.map(item => `${item}`)),
                     zsmooth: props.smoothColor ? "best" : false
                 },
                 dataThemeConfigs,
@@ -170,9 +170,6 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
         if (data) {
             for (let i = 0; i < data.y.length; i++) {
                 for (let j = 0; j < data.x.length; j++) {
-                    const currentValue = data.z[ i ][ j ];
-                    // TODO: use contrast suggestion Andries made
-                    const textColor = currentValue !== 0.0 ? "white" : "black";
                     const result = {
                         xref: "x1",
                         yref: "y1",
@@ -182,7 +179,7 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
                         font: {
                             family: "Open Sans",
                             size: 14,
-                            color: this.props.valuesColor || "#555"
+                            color: valuesColor || "#555"
                         },
                         showarrow: false
                     };
@@ -201,7 +198,7 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
     }
 
     private onHover = ({ points, event }: ScatterHoverData<any>) => {
-        const { x, xaxis, y, yaxis, z, text } = points[0];
+        const { x, y, z, text } = points[0];
         if (event && this.tooltipNode) {
             unmountComponentAtNode(this.tooltipNode);
             const coordinates = getTooltipCoordinates(event, this.tooltipNode);

@@ -2,7 +2,6 @@ import { Component, ReactChild, createElement } from "react";
 
 import { AnyChart } from "./components/AnyChart";
 import { Container } from "../utils/namespaces";
-import { Alert } from "../components/Alert";
 import { validateAdvancedOptions } from "../utils/data";
 
 // tslint:disable-next-line class-name

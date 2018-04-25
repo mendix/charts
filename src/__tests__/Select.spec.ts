@@ -50,7 +50,7 @@ describe("Select", () => {
         // const onChangeSpy = defaultProps.onChange = jasmine.createSpy("onChange");
         const switcher = shallow(createElement(Select, defaultProps));
         const instance = switcher.instance();
-        const onChangeSpy = spyOn(instance, "onChange" as any);
+        spyOn(instance, "onChange" as any);
         // switcher.simulate("change");
 
         expect(switcher.simulate("change")).toThrowError("TypeError: Cannot read property 'currentTarget' of undefined");

@@ -1,7 +1,6 @@
-let __webpack_public_path__;
-import { Component, ReactElement, createElement } from "react";
+let __webpack_public_path__: string;
+import { Component, createElement } from "react";
 
-import { Alert, AlertProps } from "../../components/Alert";
 import { BarChart, BarChartProps } from "./BarChart";
 import { fetchSeriesData, getSeriesTraces, handleOnClick, validateSeriesProps } from "../../utils/data";
 import deepMerge from "deepmerge";
@@ -154,3 +153,5 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         window.mx.ui.openForm(tooltipForm, { domNode, context });
     }
 }
+
+export { __webpack_public_path__ };

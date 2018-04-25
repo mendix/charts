@@ -1,4 +1,4 @@
-let __webpack_public_path__;
+let __webpack_public_path__: string;
 import { Component, ReactChild, createElement } from "react";
 
 import { ChartConfigs, fetchThemeConfigs } from "../../utils/configs";
@@ -130,3 +130,5 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         window.mx.ui.openForm(this.props.tooltipForm, { domNode, context });
     }
 }
+
+export { __webpack_public_path__ };

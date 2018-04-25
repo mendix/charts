@@ -1,4 +1,4 @@
-let __webpack_public_path__;
+let __webpack_public_path__: string;
 import { Component, createElement } from "react";
 import deepMerge from "deepmerge";
 
@@ -25,7 +25,6 @@ export default class LineChartContainer extends Component<LineChartContainerProp
     };
     private subscriptionHandle?: number;
     private intervalID?: number;
-    private markerSize?: number[];
 
     render() {
         return createElement("div",
@@ -166,3 +165,5 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         };
     }
 }
+
+export { __webpack_public_path__ };
