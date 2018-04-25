@@ -22,7 +22,7 @@ const widgetConfig = {
         // PolarChart: "./src/PolarChart/components/PolarChartContainer.ts"
     },
     output: {
-        jsonpFunction: "webpack3Jsonp",
+        jsonpFunction: "webpackJsonpCharts",
         path: path.resolve(__dirname, "dist/tmp/src"),
         filename: "com/mendix/widget/custom/[name]/[name].js",
         chunkFilename: `com/mendix/widget/custom/${widgetName.toLowerCase()}/chunk[chunkhash].js`,
@@ -76,7 +76,7 @@ const anyChartConfig = {
         AnyChart: "./src/AnyChart/components/AnyChartContainer.ts"
     },
     output: {
-        jsonpFunction: "webpack3JsonpAnyChart",
+        jsonpFunction: "webpackJsonpAnyChart",
         path: path.resolve(__dirname, "dist/tmp/AnyChart"),
         filename: "com/mendix/widget/custom/[name]/[name].js",
         chunkFilename: `com/mendix/widget/custom/AnyChart/chunk[chunkhash].js`,
