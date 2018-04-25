@@ -47,11 +47,12 @@ describe("PieChart", () => {
         expect(chart).toBeElement(createElement(ChartLoading));
     });
 
-    xit("whose dev mode is developer renders the playground", (done) => {
+    it("whose dev mode is developer renders the playground when loaded", (done) => {
         defaultProps.data = [];
+        defaultProps.devMode = "developer";
         const renderPlaygroundSpy = spyOn(PieChart.prototype, "renderPlayground" as any).and.callThrough();
         const chart = renderShallowChart(defaultProps as PieChartProps);
-        chart.setProps({ devMode: "developer" });
+        chart.setState({ playgroundLoaded: "true" });
 
         window.setTimeout(() => {
             expect(renderPlaygroundSpy).toHaveBeenCalled();

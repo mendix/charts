@@ -68,10 +68,11 @@ describe("BarChart", () => {
         expect(chart).toBeElement(createElement(ChartLoading));
     });
 
-    it("whose dev mode is developer renders the playground", (done) => {
+    it("whose dev mode is developer renders the playground when loaded", (done) => {
         const renderPlaygroundSpy = spyOn(BarChart.prototype, "renderPlayground" as any).and.callThrough();
         defaultProps.devMode = "developer";
         const chart = renderShallowBarChart(defaultProps as BarChartProps);
+        chart.setState({ playgroundLoaded: true });
 
         window.setTimeout(() => {
             expect(renderPlaygroundSpy).toHaveBeenCalled();

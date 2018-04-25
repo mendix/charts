@@ -48,11 +48,12 @@ describe("HeatMap", () => {
         expect(chart).toBeElement(createElement(ChartLoading));
     });
 
-    it("whose dev mode is developer renders the playground", (done) => {
+    it("whose dev mode is developer renders the playground when loaded", (done) => {
         defaultProps.data = getData(defaultProps as HeatMapProps);
         const renderPlaygroundSpy = spyOn(HeatMap.prototype, "renderPlayground" as any).and.callThrough();
         defaultProps.devMode = "developer";
         const chart = renderShallowChart(defaultProps as HeatMapProps);
+        chart.setState({ playgroundLoaded: true });
 
         window.setTimeout(() => {
             expect(renderPlaygroundSpy).toHaveBeenCalled();

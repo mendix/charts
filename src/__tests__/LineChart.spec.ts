@@ -66,10 +66,11 @@ describe("LineChart", () => {
         expect(chart).toBeElement(createElement(ChartLoading));
     });
 
-    it("whose dev mode is developer renders the playground", (done) => {
+    it("whose dev mode is developer renders the playground when loaded", (done) => {
         defaultProps.devMode = "developer";
         const renderPlaygroundSpy = spyOn(LineChart.prototype, "renderPlayground" as any).and.callThrough();
         const chart = renderShallowChart(defaultProps as LineChartProps);
+        chart.setState({ playgroundLoaded: true });
 
         window.setTimeout(() => {
             expect(renderPlaygroundSpy).toHaveBeenCalled();
