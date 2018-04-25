@@ -93,7 +93,7 @@ Layout options control the general appearance of the chart. Common options inclu
 }
 ```
 ### Configurations options (all charts)
-Configurations options control the appearnce of the chart beyond the layout options. Common options include; displayModeBar, doubleClick etc
+Configurations options control the appearance of the chart beyond the layout options. Common options include; displayModeBar, doubleClick etc
 ```json
 {
   "displayModeBar": true,
@@ -116,6 +116,59 @@ For more details: [Developer cheat sheet](/AdvancedCheatSheet.md)
 The series options control the appearance of a specific series on the line or column chart. Options include line color, line shape e.t.c
 
 Full Plotly API reference: [https://plot.ly/javascript/reference/](https://plot.ly/javascript/reference/)
+
+### Theme based advanced configuration
+The settings above can also be added in a global context via the theme folder of your mendix project root directory.
+
+To the theme folder, add a new folder named `widgets` to which you should add a `.json` file named `com.mendix.charts`. The JSON should be in the following format:
+
+``` json
+{
+  "layout": {
+    // Add shared layout options here (for all charts)
+  },
+  "configuration": {
+    // Add shared configuration options here (for all charts)
+  },
+  "charts": {
+    "com.mendix.widget.custom.LineChart.LineChart": {
+      "layout": {
+        // Add line chart only layout options here
+      },
+      "data": {
+        // Add line chart only data options here
+      },
+      "configuration": {
+          // Add line chart only configuration options here
+      }
+    },
+    "com.mendix.widget.custom.AreaChart.AreaChart": {
+      // Same arrangement as the line chart
+    },
+    "com.mendix.widget.custom.BubbleChart.BubbleChart": {
+      // Same arrangement as the line chart
+    },
+    "com.mendix.widget.custom.TimeSeries.TimeSeries": {
+      // Same arrangement as the line chart
+    },
+    "com.mendix.widget.custom.ColumnChart.ColumnChart": {
+      // Same arrangement as the line chart
+    },
+    "com.mendix.widget.custom.BarChart.BarChart": {
+      // Same arrangement as the line chart
+    },
+    "com.mendix.widget.custom.PieChart.PieChart": {
+      // Same arrangement as the line chart
+    },
+    "com.mendix.widget.custom.HeatMap.HeatMap": {
+      // Same arrangement as the line chart
+    }
+  }
+}
+```
+
+Please use with caution, as the configs set up here shall be applied to every instance of the charts in your application.  
+Only the advanced configurations set up in the widget itself have a higher precendence.
 
 ## Issues, suggestions and feature requests
 We are actively maintaining this widget, please report any issues or suggestion for improvement at [https://github.com/mendixlabs/charts/issues](https://github.com/mendixlabs/charts/issues)
