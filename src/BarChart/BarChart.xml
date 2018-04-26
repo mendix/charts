@@ -116,6 +116,7 @@
                         <enumerationValue key="doNothing">Do nothing</enumerationValue>
                         <enumerationValue key="showPage">Show a page</enumerationValue>
                         <enumerationValue key="callMicroflow">Call a microflow</enumerationValue>
+                        <enumerationValue key="callNanoflow">Call a nanoflow</enumerationValue>
                     </enumerationValues>
                 </property>
                 <property key="onClickPage" type="form" required="false">
@@ -127,6 +128,12 @@
                     <caption>On click microflow</caption>
                     <category>Events</category>
                     <description>The microflow that will be executed on click</description>
+                    <returnType type="Void" />
+                </property>
+                <property key="onClickNanoflow" type="nanoflow" required="false" entityProperty="dataEntity">
+                    <caption>On click nanoflow</caption>
+                    <category>Events</category>
+                    <description>The nanoflow that will be executed on click</description>
                     <returnType type="Void" />
                 </property>
                 <property key="tooltipForm" type="form" required="false">

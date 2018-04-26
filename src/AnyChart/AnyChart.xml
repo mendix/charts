@@ -102,6 +102,12 @@
             <description>The microflow that will be executed on click</description>
             <returnType type="Void" />
         </property>
+        <property key="onClickNanoflow" type="nanoflow" required="false" entityProperty="eventEntity">
+            <caption>On click nanoflow</caption>
+            <category>Events</category>
+            <description>The nanoflow that will be executed on click</description>
+            <returnType type="Void" />
+        </property>
         <property key="tooltipEntity" type="entity" allowNonPersistableEntities="true" required="false">
             <caption>Tooltip form entity</caption>
             <category>Events</category>

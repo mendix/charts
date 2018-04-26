@@ -60,16 +60,14 @@ export function getVisibleProperties(valueMap: HeatMapContainerProps, visibility
         visibilityMap.horizontalSortOrder = false;
         visibilityMap.verticalSortOrder = false;
     }
+
     visibilityMap.layoutOptions = false;
     visibilityMap.devMode = false;
     visibilityMap.dataOptions = false;
-    if (valueMap.onClickEvent === "doNothing") {
-        visibilityMap.onClickPage = visibilityMap.onClickMicroflow = false;
-    } else if (valueMap.onClickEvent === "callMicroflow") {
-        visibilityMap.onClickPage = false;
-    } else if (valueMap.onClickEvent === "showPage") {
-        visibilityMap.onClickMicroflow = false;
-    }
+
+    visibilityMap.onClickMicroflow = valueMap.onClickEvent === "callMicroflow";
+    visibilityMap.onClickNanoflow = valueMap.onClickEvent === "callNanoflow";
+    visibilityMap.onClickPage = valueMap.onClickEvent === "showPage";
 
     return visibilityMap;
 }

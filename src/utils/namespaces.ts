@@ -144,6 +144,7 @@ export namespace Container {
         eventEntity: string;
         eventDataAttribute: string;
         onClickMicroflow: string;
+        onClickNanoflow: Data.Nanoflow;
         tooltipEntity: string;
         tooltipMicroflow: string;
         tooltipForm: string;
@@ -215,9 +216,10 @@ export namespace Data {
     export type SortOrder = "asc" | "desc";
 
     export interface EventProps {
-        onClickEvent: "doNothing" | "showPage" | "callMicroflow";
+        onClickEvent: "doNothing" | "showPage" | "callMicroflow" | "callNanoflow";
         onClickPage: string;
         onClickMicroflow: string;
+        onClickNanoflow: Nanoflow;
         tooltipForm: string;
     }
 
@@ -272,6 +274,11 @@ export namespace Data {
         references?: {
             [ index: string ]: ReferencesSpec;
         };
+    }
+
+    export interface Nanoflow {
+        nanoflow: object[];
+        paramsSpec: { Progress: string };
     }
 }
 

@@ -95,8 +95,9 @@ export default class AnyChartContainer extends Component<AnyChartContainerProps,
         }
     }
 
-    private onClick = (data: any) => {
-        const { eventEntity, eventDataAttribute, onClickMicroflow } = this.props;
+    private onClick(data: any) {
+        const { eventEntity, eventDataAttribute, onClickMicroflow, onClickNanoflow, mxform } = this.props;
+
         if (eventEntity && eventDataAttribute && onClickMicroflow) {
             mx.data.create({
                 entity: eventEntity,
@@ -105,6 +106,24 @@ export default class AnyChartContainer extends Component<AnyChartContainerProps,
                     mx.ui.action(onClickMicroflow, {
                         params: { applyto: "selection", guids: [ object.getGuid() ] },
                         error: error => window.mx.ui.error(`Error executing on click microflow ${onClickMicroflow} : ${error.message}`)
+                    });
+                },
+                error: error => window.mx.ui.error(`Error creating event entity ${eventEntity} : ${error.message}`)
+            });
+        }
+
+        if (onClickNanoflow.nanoflow) {
+            const context = new mendix.lib.MxContext();
+            mx.data.create({
+                entity: eventEntity,
+                callback: object => {
+                    object.set(eventDataAttribute, JSON.stringify(data));
+                    context.setContext(eventEntity, object.getGuid());
+                    mx.data.callNanoflow({
+                        context,
+                        error: error => mx.ui.error(`Error executing nanoflow ${onClickNanoflow} : ${error.message}`),
+                        nanoflow: onClickNanoflow,
+                        origin: mxform
                     });
                 },
                 error: error => window.mx.ui.error(`Error creating event entity ${eventEntity} : ${error.message}`)
