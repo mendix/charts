@@ -98,7 +98,7 @@ export const fetchSeriesData = <S extends SeriesProps = SeriesProps>(mxObject: m
                 restParameters.forEach(parameter => {
                     parameters.push(parameter.parameterAttribute + "=" + mxObject.get(parameter.parameterAttribute));
                 });
-                const url = series.restUrl + "?" + parameters.join("&");
+                const url = series.restUrl + (series.restUrl.indexOf("?") >= 0 ? "&" : "?") + parameters.join("&");
                 fetchByRest(url)
                     .then(jsonData => {
                         const attributes = [ series.xValueAttribute, series.yValueAttribute, series.markerSizeAttribute, series.xValueSortAttribute ] as string[];
