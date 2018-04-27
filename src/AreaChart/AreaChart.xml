@@ -30,7 +30,13 @@
                     <enumerationValues>
                         <enumerationValue key="XPath">Database</enumerationValue>
                         <enumerationValue key="microflow">Microflow</enumerationValue>
+                        <enumerationValue key="REST">REST endpoint</enumerationValue>
                     </enumerationValues>
+                </property>
+                <property key="restUrl" type="string" required="false">
+                    <caption>REST URL</caption>
+                    <category>Data source</category>
+                    <description>Relative or full URL to REST endpoint</description>
                 </property>
                 <property key="entityConstraint" type="entityConstraint" entityProperty="dataEntity" required="false">
                     <caption>XPath constraint</caption>
@@ -218,6 +224,26 @@
             <caption>Height</caption>
             <category>Appearance</category>
             <description/>
+        </property>
+        <property key="restParameters" type="object" isList="true" required="false">
+            <caption>REST parameters</caption>
+            <category>REST</category>
+            <description>Add parameters to REST request, The contextId, and series name are provided by default</description>
+            <properties>
+                <property key="parameterAttribute" type="attribute">
+                    <caption>Attribute</caption>
+                    <category>Attribute</category>
+                    <description/>
+                    <attributeTypes>
+                        <attributeType name="String"/>
+                        <attributeType name="Decimal"/>
+                        <attributeType name="Long"/>
+                        <attributeType name="Integer"/>
+                        <attributeType name="DateTime"/>
+                        <attributeType name="Enum"/>
+                    </attributeTypes>
+                </property>
+            </properties>
         </property>
         <property key="devMode" type="enumeration" defaultValue="basic">
             <caption>Mode</caption>

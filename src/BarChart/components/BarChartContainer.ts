@@ -100,7 +100,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
 
     private fetchData = (mxObject?: mendix.lib.MxObject) => {
         if (mxObject && this.props.series.length) {
-            Promise.all(this.props.series.map(series => fetchSeriesData(mxObject, series, [])))
+            Promise.all(this.props.series.map(series => fetchSeriesData(mxObject, series, this.props.restParameters)))
                 .then(seriesData => {
                     this.setState({
                         loading: false,
@@ -124,9 +124,9 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         );
     }
 
-    private createScatterData({ data, series }: Data.SeriesData, bar: boolean, index: number, devMode = false): ScatterData {
+    private createScatterData({ data, jsonData, series }: Data.SeriesData, bar: boolean, index: number, devMode = false): ScatterData {
         const rawOptions = devMode && series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
-        const traces = getSeriesTraces({ data, series });
+        const traces = getSeriesTraces({ data, jsonData, series });
         const color: string | undefined = series.barColor || defaultColours()[index];
 
         return {

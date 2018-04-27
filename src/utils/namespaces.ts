@@ -58,6 +58,7 @@ export namespace Container {
 
     export interface BarChartContainerProps extends WrapperProps, Style.Dimensions, Style.Appearance, BarLayoutProps {
         series: Data.SeriesProps[];
+        restParameters: RestParameter[];
     }
 
     export interface BarChartContainerState {
