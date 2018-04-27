@@ -162,6 +162,35 @@ export namespace Container {
 }
 
 export namespace Data {
+    export interface FetchedData<T> {
+        mxObjects?: mendix.lib.MxObject[];
+        restData?: any;
+        customData?: T;
+    }
+
+    export interface FetchDataOptions<S> {
+        type: "XPath" | "microflow" | "REST";
+        entity: string;
+        guid: string;
+        constraint?: string;
+        sortAttribute?: string;
+        sortOrder?: SortOrder;
+        attributes?: string[];
+        microflow?: string;
+        url?: string;
+        customData?: S; // Usage: when used in a loop, could hold a value specific to each item e.g series
+    }
+
+    export interface FetchByXPathOptions {
+        guid: string;
+        entity: string;
+        constraint: string;
+        sortAttribute?: string;
+        sortOrder?: SortOrder;
+        attributes?: string[];
+        references?: any;
+    }
+
     export interface DataSourceProps {
         dataSourceMicroflow: string;
         dataSourceType: "XPath" | "microflow" | "REST";
@@ -206,7 +235,7 @@ export namespace Data {
 
     export interface SeriesData<T extends SeriesProps = SeriesProps> {
         data?: mendix.lib.MxObject[];
-        jsonData?: any;
+        restData?: any;
         series: T;
     }
 

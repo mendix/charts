@@ -8,6 +8,11 @@ import SortOrder = Data.SortOrder;
 import EventProps = Data.EventProps;
 import ScatterTrace = Data.ScatterTrace;
 import ReferencesSpec = Data.ReferencesSpec;
+import FetchedData = Data.FetchedData;
+import FetchDataOptions = Data.FetchDataOptions;
+import FetchByXPathOptions = Data.FetchByXPathOptions;
+
+type MxO = mendix.lib.MxObject;
 
 export const validateSeriesProps = <T extends Partial<SeriesProps>>(dataSeries: T[], widgetId: string, layoutOptions: string): ReactChild => { // tslint:disable-line max-line-length
     if (dataSeries && dataSeries.length) {
@@ -78,35 +83,80 @@ export const validateAdvancedOptions = (rawData: string): string => {
     return "";
 };
 
-export const fetchSeriesData = <S extends SeriesProps = SeriesProps>(mxObject: mendix.lib.MxObject, series: S, restParameters: Container.RestParameter[]): Promise<SeriesData<S>> =>
+export const fetchData = <S>(options: FetchDataOptions<S>): Promise<FetchedData<S>> =>
+    new Promise<FetchedData<S>>((resolve, reject) => {
+        const { guid, entity, sortAttribute, sortOrder, attributes, customData } = options;
+        if (entity && guid) {
+            if (options.type === "XPath") {
+                const references = getReferences(options.attributes || []);
+                fetchByXPath({
+                    guid,
+                    entity,
+                    constraint: options.constraint || "",
+                    sortAttribute,
+                    sortOrder,
+                    attributes: references.attributes,
+                    references: references.references
+                }).then(mxObjects => resolve({ mxObjects, customData })).catch(reject);
+            } else if (options.type === "microflow" && options.microflow) {
+                fetchByMicroflow(options.microflow, guid)
+                    .then(mxObjects => resolve({ mxObjects, customData }))
+                    .catch(reject);
+            } else if (options.type === "REST" && options.url && attributes) {
+                fetchByREST(options.url)
+                    .then(restData => {
+                        const validationString = validateJSONData(restData, attributes, customData as any || "");
+                        if (validationString) {
+                            reject(validationString);
+                        } else {
+                            resolve({ restData, customData });
+                        }
+                    })
+                    .catch(reject);
+            }
+        } else {
+            reject("entity & guid are required");
+        }
+    });
+
+export const fetchSeriesData = <S extends SeriesProps = SeriesProps>(mxObject: MxO, series: S, restParameters: Container.RestParameter[] = []): Promise<SeriesData<S>> =>
     new Promise<SeriesData<S>>((resolve, reject) => {
         if (series.dataEntity) {
             if (series.dataSourceType === "XPath") {
-                const references = getReferences(series);
+                const attributes = [ series.xValueAttribute, series.yValueAttribute, series.xValueSortAttribute ];
+                if (series.markerSizeAttribute) {
+                    attributes.push(series.markerSizeAttribute);
+                }
+
+                const references = getReferences(attributes);
                 const sortAttribute = series.xValueSortAttribute || series.xValueAttribute;
-                fetchByXPath(mxObject.getGuid(), series.dataEntity, series.entityConstraint, sortAttribute, series.sortOrder || "asc", references.attributes, references.references)
-                    .then(mxObjects => resolve({ data: mxObjects, series }))
-                    .catch(reject);
+                fetchByXPath({
+                    guid: mxObject.getGuid(),
+                    entity: series.dataEntity,
+                    constraint: series.entityConstraint,
+                    sortAttribute,
+                    sortOrder: series.sortOrder,
+                    attributes: references.attributes,
+                    references: references.references
+                }).then(mxObjects => resolve({ data: mxObjects, series })).catch(reject);
             } else if (series.dataSourceType === "microflow" && series.dataSourceMicroflow) {
                 fetchByMicroflow(series.dataSourceMicroflow, mxObject.getGuid())
                     .then(mxObjects => resolve({ data: mxObjects, series }))
                     .catch(reject);
             } else if (series.dataSourceType === "REST" && series.restUrl) {
-                const parameters: string[] = [];
-                parameters.push("contextId=" + mxObject.getGuid());
-                parameters.push("seriesName=" + series.name);
-                restParameters.forEach(parameter => {
-                    parameters.push(parameter.parameterAttribute + "=" + mxObject.get(parameter.parameterAttribute));
-                });
-                const url = series.restUrl + (series.restUrl.indexOf("?") >= 0 ? "&" : "?") + parameters.join("&");
-                fetchByRest(url)
-                    .then(jsonData => {
-                        const attributes = [ series.xValueAttribute, series.yValueAttribute, series.markerSizeAttribute, series.xValueSortAttribute ] as string[];
-                        const validationString = validateJsonData(jsonData, series.name, attributes);
+                const parameters: string[] = [ `contextId=${mxObject.getGuid()}`, `seriesName=${series.name}` ];
+                parameters.push(...restParameters.map(parameter =>
+                    `${parameter.parameterAttribute}=${mxObject.get(parameter.parameterAttribute)}`)
+                );
+                const url = `${series.restUrl}${(series.restUrl.indexOf("?") >= 0 ? "&" : "?")}${parameters.join("&")}`;
+                fetchByREST(url)
+                    .then(restData => {
+                        const attributes: string[] = [ series.xValueAttribute, series.yValueAttribute ];
+                        const validationString = validateJSONData(restData, attributes, series.name);
                         if (validationString) {
                             reject(validationString);
                         } else {
-                            resolve({ jsonData, series });
+                            resolve({ restData, series });
                         }
                     })
                     .catch(reject);
@@ -116,24 +166,30 @@ export const fetchSeriesData = <S extends SeriesProps = SeriesProps>(mxObject: m
         }
     });
 
-const validateJsonData = (data: any, seriesName: string, attributes: string[]): string => {
+export const generateRESTURL = (mxObject: MxO, endpoint: string, parameters: Container.RestParameter[]) => {
+    const parameterString = [ `contextId=${mxObject.getGuid()}` ].concat(parameters.map(parameter =>
+        `${parameter.parameterAttribute}=${mxObject.get(parameter.parameterAttribute)}`
+    )).join("&");
+
+    return `${endpoint}${(endpoint.indexOf("?") >= 0 ? "&" : "?")}${parameterString}`;
+};
+
+const validateJSONData = (data: any, attributes: string[], source: string): string => {
     for (const attribute of attributes) {
         if (data.length > 1 && !data[0].hasOwnProperty(attribute) && attribute) {
-            return `JSON result for ${seriesName} does not contain attribute ${attribute}`;
+            return `JSON result for ${source} does not contain attribute ${attribute}`;
         }
     }
 
     return "";
 };
 
-const getReferences = (series: SeriesProps): ReferencesSpec => {
+const getReferences = (attributePaths: string[]): ReferencesSpec => {
     let references: ReferencesSpec = { attributes: [] };
-    references = addPathReference(references, series.xValueAttribute);
-    references = addPathReference(references, series.yValueAttribute);
-    references = addPathReference(references, series.xValueSortAttribute || series.xValueAttribute);
-    if (series.markerSizeAttribute) {
-        references = addPathReference(references, series.markerSizeAttribute);
-    }
+    attributePaths.forEach(attribute => {
+        references = addPathReference(references, attribute);
+    });
+
     return references;
 };
 
@@ -151,58 +207,51 @@ const addPathReference = (references: ReferencesSpec, path: string): ReferencesS
             if (pathParts.length - 1 === index) {
                 // Skip empty attributes
                 if (part) {
-                    if (parent.attributes) {
-                        parent.attributes.push(part);
-                    } else {
-                        parent.attributes = [ part ];
-                    }
+                    parent.attributes = parent.attributes ? parent.attributes.concat(part) : [ part ];
                 }
-            } else {
-                if (!parent.references) {
-                    parent.references = { [part]: { } };
-                } else if (!parent.references[part]) {
-                    parent.references[part] = {};
-                }
+            } else if (!parent.references) {
+                parent.references = { [part]: {} };
+            } else if (!parent.references[part]) {
+                parent.references[part] = {};
             }
         }
+
         return referenceSet;
     }, references);
 
-export const fetchByXPath = (guid: string, entity: string, constraint: string, sortBy?: string, sortOrder: SortOrder = "asc", attributes?: string[], references?: any /* ReferencesSpec */): Promise<mendix.lib.MxObject[]> =>
-    new Promise((resolve, reject) => {
-        const entityPath = entity.split("/");
-        const entityName = entityPath.length > 1 ? entityPath[entityPath.length - 1] : entity;
-        const xpath = "//" + entityName + constraint.split("[%CurrentObject%]").join(guid);
-        window.mx.data.get({
-            callback: resolve,
-            error: error => reject(`An error occurred while retrieving data via XPath (${xpath}): ${error.message}`),
-            xpath,
-            filter: {
-                sort: sortBy && sortBy.indexOf("/") === -1 ? [ [ sortBy, sortOrder ] ] : [],
-                references,
-                attributes
-            }
-        });
-    });
+export const fetchByXPath = (options: FetchByXPathOptions): Promise<MxO[]> => new Promise<MxO[]>((resolve, reject) => {
+    const { guid, entity, constraint, sortAttribute, sortOrder, attributes, references } = options;
+    const entityPath = entity.split("/");
+    const entityName = entityPath.length > 1 ? entityPath[entityPath.length - 1] : entity;
+    const xpath = "//" + entityName + constraint.split("[%CurrentObject%]").join(guid);
 
-export const fetchByMicroflow = (actionname: string, guid: string): Promise<mendix.lib.MxObject[]> =>
+    window.mx.data.get({
+        callback: resolve,
+        error: error => reject(`An error occurred while retrieving data via XPath (${xpath}): ${error.message}`),
+        filter: {
+            sort: sortAttribute && sortAttribute.indexOf("/") === -1 ? [ [ sortAttribute, sortOrder || "asc" ] ] : [],
+            references,
+            attributes
+        },
+        xpath
+    });
+});
+
+export const fetchByMicroflow = (actionname: string, guid: string): Promise<MxO[]> =>
     new Promise((resolve, reject) => {
         const errorMessage = `An error occurred while retrieving data by microflow (${actionname}): `;
         window.mx.ui.action(actionname, {
-            callback: (mxObjects: mendix.lib.MxObject[]) => resolve(mxObjects),
+            callback: (mxObjects: MxO[]) => resolve(mxObjects),
             error: error => reject(`${errorMessage} ${error.message}`),
             params: { applyto: "selection", guids: [ guid ] }
         });
     });
 
-export const fetchByRest = (url: string): Promise<any> =>
-new Promise((resolve, reject) => {
+export const fetchByREST = (url: string): Promise<any> => new Promise((resolve, reject) => {
     const errorMessage = `An error occurred while retrieving data via REST endpoint (${url}): `;
     window.fetch(url, {
         credentials: "include",
-        headers: {
-            "X-Csrf-Token" : mx.session.getConfig("csrftoken")
-        }
+        headers: { "X-Csrf-Token" : mx.session.getConfig("csrftoken") }
     }).then((data) => {
         if (data.ok) {
             resolve(data.json());
@@ -212,7 +261,7 @@ new Promise((resolve, reject) => {
     }).catch(error => reject(`${errorMessage} ${error.message}`));
 });
 
-export const handleOnClick = <T extends EventProps>(options: T, mxObject?: mendix.lib.MxObject, mxform?: mxui.lib.form._FormBase) => {
+export const handleOnClick = <T extends EventProps>(options: T, mxObject?: MxO, mxform?: mxui.lib.form._FormBase) => {
     if (!mxObject || options.onClickEvent === "doNothing") {
         return;
     }
@@ -235,7 +284,7 @@ export const handleOnClick = <T extends EventProps>(options: T, mxObject?: mendi
     }
 };
 
-export const getSeriesTraces = ({ data, jsonData, series }: SeriesData): ScatterTrace => {
+export const getSeriesTraces = ({ data, restData, series }: SeriesData): ScatterTrace => {
     let xData: Datum[] = [];
     let yData: number[] = [];
     let markerSizeData: number[] | undefined = [];
@@ -249,14 +298,14 @@ export const getSeriesTraces = ({ data, jsonData, series }: SeriesData): Scatter
         sortData = series.xValueSortAttribute
             ? data.map(mxObject => getAttributeValue(mxObject, series.xValueSortAttribute))
             : [];
-    } else if (jsonData) {
-        xData = jsonData.map((dataValue: any) => dataValue[series.xValueAttribute]);
-        yData = jsonData.map((dataValue: any) => dataValue[series.yValueAttribute]);
+    } else if (restData) {
+        xData = restData.map((dataValue: any) => dataValue[series.xValueAttribute]);
+        yData = restData.map((dataValue: any) => dataValue[series.yValueAttribute]);
         markerSizeData = series.markerSizeAttribute
-            ? jsonData.map((dataValue: any) => dataValue[series.markerSizeAttribute as string])
+            ? restData.map((dataValue: any) => dataValue[series.markerSizeAttribute as string])
             : undefined;
         sortData = series.xValueSortAttribute
-            ? jsonData.map((dataValue: any) => dataValue[series.xValueSortAttribute])
+            ? restData.map((dataValue: any) => dataValue[series.xValueSortAttribute])
             : [];
     }
     const sortDataError = xData.length !== yData.length || xData.length !== sortData.length;
@@ -308,7 +357,7 @@ export const getSeriesTraces = ({ data, jsonData, series }: SeriesData): Scatter
 export const getRuntimeTraces = ({ data, series }: SeriesData): ({ name: string } & ScatterTrace) =>
     ({ name: series.name, ...getSeriesTraces({ data, series }) });
 
-export const getAttributeValue = (mxObject: mendix.lib.MxObject, attribute: string): Datum => {
+export const getAttributeValue = (mxObject: MxO, attribute: string): Datum => {
     let valueObject = mxObject;
     const path = attribute.split("/");
     const attributeName = path[path.length - 1];

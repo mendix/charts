@@ -2,7 +2,7 @@ let __webpack_public_path__: string;
 import { Component, ReactChild, createElement } from "react";
 
 import { ChartConfigs, fetchThemeConfigs } from "../../utils/configs";
-import { fetchByMicroflow, fetchByXPath, handleOnClick, validateSeriesProps } from "../../utils/data";
+import { fetchByMicroflow, fetchData, handleOnClick, validateSeriesProps } from "../../utils/data";
 import { Container } from "../../utils/namespaces";
 import { PieChart } from "./PieChart";
 import { getDimensions, parseStyle } from "../../utils/style";
@@ -104,21 +104,21 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         }
         const { dataEntity, dataSourceMicroflow, dataSourceType, entityConstraint, sortAttribute, sortOrder } = this.props;
         if (mxObject && dataEntity) {
-            if (dataSourceType === "XPath") {
-                fetchByXPath(mxObject.getGuid(), dataEntity, entityConstraint, sortAttribute, sortOrder)
-                    .then(data => this.setState({ data, loading: false }))
-                    .catch(reason => {
-                        window.mx.ui.error(`An error occurred while retrieving chart data: ${reason}`);
-                        this.setState({ data: [], loading: false });
-                    });
-            } else if (dataSourceType === "microflow" && dataSourceMicroflow) {
-                fetchByMicroflow(dataSourceMicroflow, mxObject.getGuid())
-                    .then(data => this.setState({ data, loading: false }))
-                    .catch(reason => {
-                        window.mx.ui.error(`An error occurred while retrieving chart data: ${reason}`);
-                        this.setState({ data: [], loading: false });
-                    });
-            }
+            fetchData({
+                guid: mxObject.getGuid(),
+                entity: dataEntity,
+                constraint: entityConstraint,
+                sortAttribute,
+                sortOrder,
+                type: dataSourceType,
+                attributes: [ this.props.nameAttribute, this.props.valueAttribute, sortAttribute ],
+                microflow: dataSourceMicroflow
+            }).then(({ mxObjects }) => {
+                this.setState({ data: mxObjects || [], loading: false });
+            }).catch(reason => {
+                window.mx.ui.error(`An error occurred while retrieving chart data: ${reason}`);
+                this.setState({ data: [], loading: false });
+            });
         } else {
             this.setState({ loading: false, data: [] });
         }

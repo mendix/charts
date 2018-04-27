@@ -4,7 +4,7 @@ import deepMerge from "deepmerge";
 
 import BarChartContainer from "../../BarChart/components/BarChartContainer";
 import { fetchThemeConfigs } from "../../utils/configs";
-import { fetchSeriesData, getSeriesTraces, handleOnClick, validateSeriesProps } from "../../utils/data";
+import { fetchData, generateRESTURL, getSeriesTraces, handleOnClick, validateSeriesProps } from "../../utils/data";
 import { LineChart, LineChartProps } from "./LineChart";
 import { Container, Data } from "../../utils/namespaces";
 import { ScatterData } from "plotly.js";
@@ -113,17 +113,41 @@ export default class LineChartContainer extends Component<LineChartContainerProp
 
     private fetchData = (mxObject?: mendix.lib.MxObject) => {
         if (mxObject && this.props.series.length) {
-            Promise.all(this.props.series.map(series => fetchSeriesData<Data.LineSeriesProps>(mxObject, series, this.props.restParameters)))
-                .then(seriesData => this.setState({
-                    loading: false,
-                    data: seriesData,
-                    scatterData: this.getData(seriesData),
-                    seriesOptions: seriesData.map(({ series }) => series.seriesOptions || "{\n\n}")
-                }))
-                .catch(reason => {
-                    window.mx.ui.error(reason);
-                    this.setState({ loading: false, data: [], scatterData: [] });
+            Promise.all(this.props.series.map(series => {
+                const attributes = [ series.xValueAttribute, series.yValueAttribute, series.xValueSortAttribute ];
+                if (series.mode === "bubble" as Container.LineMode && series.markerSizeAttribute) {
+                    attributes.push(series.markerSizeAttribute);
+                }
+                const url = series.restUrl && generateRESTURL(mxObject, series.restUrl, this.props.restParameters);
+
+                return fetchData<Data.LineSeriesProps>({
+                    guid: mxObject.getGuid(),
+                    entity: series.dataEntity,
+                    constraint: series.entityConstraint,
+                    sortAttribute: series.xValueSortAttribute,
+                    sortOrder: series.sortOrder,
+                    type: series.dataSourceType,
+                    attributes,
+                    microflow: series.dataSourceMicroflow,
+                    url: url && `${url}&seriesName=${series.name}`,
+                    customData: series
                 });
+            })).then(seriesData => {
+                const data = seriesData.map(({ mxObjects, restData, customData }) => ({
+                    data: mxObjects,
+                    restData,
+                    series: customData as Data.LineSeriesProps
+                }));
+                this.setState({
+                    loading: false,
+                    data,
+                    scatterData: this.getData(data),
+                    seriesOptions: data.map(({ series }) => series.seriesOptions || "{\n\n}")
+                });
+            }).catch(reason => {
+                window.mx.ui.error(reason);
+                this.setState({ loading: false, data: [], scatterData: [] });
+            });
         } else {
             this.setState({ loading: false, data: [], scatterData: [] });
         }
@@ -135,10 +159,10 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         );
     }
 
-    private createScatterData({ data, jsonData, series }: Data.SeriesData<Data.LineSeriesProps>, index: number, devMode = false): ScatterData {
+    private createScatterData({ data, restData, series }: Data.SeriesData<Data.LineSeriesProps>, index: number, devMode = false): ScatterData {
         const rawOptions = devMode && series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
         const color: string | undefined = series.lineColor || defaultColours(this.props.type === "bubble" ? 0.7 : 1)[index];
-        let traces = getSeriesTraces({ data, jsonData, series });
+        let traces = getSeriesTraces({ data, restData, series });
         if (this.props.type === "polar") {
             traces = {
                 r: (traces.y as number[]).concat(traces.y[0] as number),

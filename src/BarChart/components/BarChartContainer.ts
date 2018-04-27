@@ -124,9 +124,9 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         );
     }
 
-    private createScatterData({ data, jsonData, series }: Data.SeriesData, bar: boolean, index: number, devMode = false): ScatterData {
+    private createScatterData({ data, restData, series }: Data.SeriesData, bar: boolean, index: number, devMode = false): ScatterData {
         const rawOptions = devMode && series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
-        const traces = getSeriesTraces({ data, jsonData, series });
+        const traces = getSeriesTraces({ data, restData, series });
         const color: string | undefined = series.barColor || defaultColours()[index];
 
         return {

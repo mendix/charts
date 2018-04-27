@@ -138,33 +138,42 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
 
     private fetchSortedData(mxObject: mendix.lib.MxObject) {
         const { dataEntity, entityConstraint, horizontalSortAttribute, horizontalSortOrder } = this.props;
-        fetchByXPath(mxObject.getGuid(), dataEntity, entityConstraint, horizontalSortAttribute, horizontalSortOrder)
-            .then(horizontalData => {
-                this.rawData = horizontalData;
-                const horizontalValues = this.getValues(horizontalData, this.props.horizontalNameAttribute);
-                const { verticalSortAttribute, verticalSortOrder } = this.props;
-                fetchByXPath(mxObject.getGuid(), dataEntity, entityConstraint, verticalSortAttribute, verticalSortOrder)
-                    .then(verticalData => {
-                        const verticalValues = this.getValues(verticalData, this.props.verticalNameAttribute);
-                        this.setState({
-                            loading: false,
-                            data: {
-                                x: horizontalValues,
-                                y: verticalValues,
-                                z: this.processZData(verticalData, verticalValues, horizontalValues),
-                                zsmooth: this.props.smoothColor ? "best" : false,
-                                colorscale: HeatMapContainer.processColorScale(this.props.scaleColors),
-                                showscale: this.props.showScale,
-                                type: "heatmap"
-                            }
-                        });
-                    });
-
-            })
-            .catch(reason => {
-                window.mx.ui.error(`An error occurred while retrieving sorted chart data: ${reason}`);
-                this.setState({ data: undefined, loading: false });
+        const fetchOptions = {
+            guid: mxObject.getGuid(),
+            entity: dataEntity,
+            constraint: entityConstraint
+        };
+        fetchByXPath({
+            ...fetchOptions,
+            sortAttribute: horizontalSortAttribute,
+            sortOrder: horizontalSortOrder
+        }).then(horizontalData => {
+            this.rawData = horizontalData;
+            const horizontalValues = this.getValues(horizontalData, this.props.horizontalNameAttribute);
+            const { verticalSortAttribute, verticalSortOrder } = this.props;
+            fetchByXPath({
+                ...fetchOptions,
+                sortAttribute: verticalSortAttribute,
+                sortOrder: verticalSortOrder
+            }).then(verticalData => {
+                const verticalValues = this.getValues(verticalData, this.props.verticalNameAttribute);
+                this.setState({
+                    loading: false,
+                    data: {
+                        x: horizontalValues,
+                        y: verticalValues,
+                        z: this.processZData(verticalData, verticalValues, horizontalValues),
+                        zsmooth: this.props.smoothColor ? "best" : false,
+                        colorscale: HeatMapContainer.processColorScale(this.props.scaleColors),
+                        showscale: this.props.showScale,
+                        type: "heatmap"
+                    }
+                });
             });
+        }).catch(reason => {
+            window.mx.ui.error(`An error occurred while retrieving sorted chart data: ${reason}`);
+            this.setState({ data: undefined, loading: false });
+        });
     }
 
     private processZData(data: mendix.lib.MxObject[], verticalValues: string[], horizontalValues: string[]): number[][] {
