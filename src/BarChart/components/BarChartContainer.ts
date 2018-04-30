@@ -2,7 +2,7 @@ let __webpack_public_path__: string;
 import { Component, createElement } from "react";
 
 import { BarChart, BarChartProps } from "./BarChart";
-import { fetchSeriesData, getSeriesTraces, handleOnClick, validateSeriesProps } from "../../utils/data";
+import { fetchData, generateRESTURL, getSeriesTraces, handleOnClick, validateSeriesProps } from "../../utils/data";
 import deepMerge from "deepmerge";
 import { Container, Data } from "../../utils/namespaces";
 import { ScatterData } from "plotly.js";
@@ -100,19 +100,54 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
 
     private fetchData = (mxObject?: mendix.lib.MxObject) => {
         if (mxObject && this.props.series.length) {
-            Promise.all(this.props.series.map(series => fetchSeriesData(mxObject, series, this.props.restParameters)))
-                .then(seriesData => {
-                    this.setState({
-                        loading: false,
-                        data: seriesData,
-                        scatterData: this.getData(seriesData),
-                        seriesOptions: seriesData.map(({ series }) => series.seriesOptions || "{\n\n}")
-                    });
-                })
-                .catch(reason => {
-                    window.mx.ui.error(reason);
-                    this.setState({ loading: false, data: [], scatterData: [] });
+            Promise.all(this.props.series.map(series => {
+                const attributes = [ series.xValueAttribute, series.yValueAttribute ];
+                if (series.xValueSortAttribute) {
+                    attributes.push(series.xValueSortAttribute);
+                }
+                const url = series.restUrl && generateRESTURL(mxObject, series.restUrl, this.props.restParameters);
+
+                return fetchData<Data.SeriesProps>({
+                    guid: mxObject.getGuid(),
+                    entity: series.dataEntity,
+                    constraint: series.entityConstraint,
+                    sortAttribute: series.xValueSortAttribute,
+                    sortOrder: series.sortOrder,
+                    type: series.dataSourceType,
+                    attributes,
+                    microflow: series.dataSourceMicroflow,
+                    url: url && `${url}&seriesName=${series.name}`,
+                    customData: series
                 });
+            })).then(seriesData => {
+                const data = seriesData.map(({ mxObjects, restData, customData }) => ({
+                    data: mxObjects,
+                    restData,
+                    series: customData as Data.LineSeriesProps
+                }));
+                this.setState({
+                    loading: false,
+                    data,
+                    scatterData: this.getData(data),
+                    seriesOptions: data.map(({ series }) => series.seriesOptions || "{\n\n}")
+                });
+            }).catch(reason => {
+                window.mx.ui.error(reason);
+                this.setState({ loading: false, data: [], scatterData: [] });
+            });
+            // Promise.all(this.props.series.map(series => fetchSeriesData(mxObject, series, this.props.restParameters)))
+            //     .then(seriesData => {
+            //         this.setState({
+            //             loading: false,
+            //             data: seriesData,
+            //             scatterData: this.getData(seriesData),
+            //             seriesOptions: seriesData.map(({ series }) => series.seriesOptions || "{\n\n}")
+            //         });
+            //     })
+            //     .catch(reason => {
+            //         window.mx.ui.error(reason);
+            //         this.setState({ loading: false, data: [], scatterData: [] });
+            //     });
         } else {
             this.setState({ loading: false, data: [], scatterData: [] });
         }

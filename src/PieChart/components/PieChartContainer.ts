@@ -2,17 +2,19 @@ let __webpack_public_path__: string;
 import { Component, ReactChild, createElement } from "react";
 
 import { ChartConfigs, fetchThemeConfigs } from "../../utils/configs";
-import { fetchByMicroflow, fetchData, handleOnClick, validateSeriesProps } from "../../utils/data";
-import { Container } from "../../utils/namespaces";
-import { PieChart } from "./PieChart";
-import { getDimensions, parseStyle } from "../../utils/style";
+import { fetchByMicroflow, fetchData, generateRESTURL, handleOnClick, validateSeriesProps } from "../../utils/data";
+import deepMerge from "deepmerge";
+import { Container, Data } from "../../utils/namespaces";
+import { PieChart, PieChartProps, PieTraces } from "./PieChart";
+import { defaultColours, getDimensions, parseStyle } from "../../utils/style";
+import { PieData } from "plotly.js";
 import PieChartContainerProps = Container.PieChartContainerProps;
 
 __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
 interface PieChartContainerState {
     alertMessage?: ReactChild;
-    data: mendix.lib.MxObject[];
+    data: PieData[];
     loading?: boolean;
     themeConfigs: ChartConfigs;
 }
@@ -104,19 +106,26 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         }
         const { dataEntity, dataSourceMicroflow, dataSourceType, entityConstraint, sortAttribute, sortOrder } = this.props;
         if (mxObject && dataEntity) {
-            fetchData({
+            const attributes = [ this.props.nameAttribute, this.props.valueAttribute ];
+            if (sortAttribute) {
+                attributes.push(sortAttribute);
+            }
+            const url = this.props.restUrl && generateRESTURL(mxObject, this.props.restUrl, this.props.restParameters);
+
+            fetchData<string>({
                 guid: mxObject.getGuid(),
                 entity: dataEntity,
                 constraint: entityConstraint,
                 sortAttribute,
                 sortOrder,
                 type: dataSourceType,
-                attributes: [ this.props.nameAttribute, this.props.valueAttribute, sortAttribute ],
-                microflow: dataSourceMicroflow
-            }).then(({ mxObjects }) => {
-                this.setState({ data: mxObjects || [], loading: false });
-            }).catch(reason => {
-                window.mx.ui.error(`An error occurred while retrieving chart data: ${reason}`);
+                attributes,
+                microflow: dataSourceMicroflow,
+                url
+            }).then(data => {
+                this.setState({ data: this.getData(data), loading: false });
+            }).catch(error => {
+                window.mx.ui.error(`An error occurred while retrieving data in ${this.props.friendlyId}:\n ${error.message}`);
                 this.setState({ data: [], loading: false });
             });
         } else {
@@ -124,7 +133,60 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         }
     }
 
-    private openTooltipForm = (domNode: HTMLDivElement, dataObject: mendix.lib.MxObject) => {
+    private getData(data: Data.FetchedData<string>): PieData[] {
+        if ((data.mxObjects && data.mxObjects.length) || (data.restData && data.restData.length)) {
+            const advancedOptions = this.props.devMode !== "basic" && this.props.dataOptions
+                ? JSON.parse(this.props.dataOptions)
+                : {};
+
+            const arrayMerge = (_destinationArray: any[], sourceArray: any[]) => sourceArray;
+
+            const traces = this.getTraces(data);
+            return [
+                {
+                    ...deepMerge.all(
+                        [
+                            PieChart.getDefaultDataOptions(this.props as PieChartProps),
+                            {
+                                labels: traces.labels,
+                                values: traces.values,
+                                marker: { colors: traces.colors }
+                            },
+                            advancedOptions
+                        ],
+                        { arrayMerge }
+                    ),
+                    customdata: data.mxObjects || []
+                }
+            ];
+        }
+
+        return [];
+    }
+
+    private getTraces(data: Data.FetchedData<string>): PieTraces {
+        const colors = this.props.colors && this.props.colors.length
+            ? this.props.colors.map(color => color.color)
+            : defaultColours();
+        if (data.mxObjects) {
+            return {
+                colors,
+                labels: data.mxObjects.map(mxObject => mxObject.get(this.props.nameAttribute) as string),
+                values: data.mxObjects.map(mxObject => parseFloat(mxObject.get(this.props.valueAttribute) as string))
+            };
+        }
+        if (data.restData) {
+            return {
+                colors,
+                labels: data.restData.map((point: any) => point[this.props.nameAttribute]),
+                values: data.restData.map((point: any) => point[this.props.valueAttribute])
+            };
+        }
+
+        return { labels: [], values: [], colors: [] };
+    }
+
+    private openTooltipForm(domNode: HTMLDivElement, dataObject: mendix.lib.MxObject) {
         const context = new mendix.lib.MxContext();
         context.setContext(dataObject.getEntity(), dataObject.getGuid());
         window.mx.ui.openForm(this.props.tooltipForm, { domNode, context });

@@ -52,7 +52,7 @@ declare module "plotly.js" {
         color: string;
     }
 
-    export interface PieHoverData {
+    export interface PieHoverData<T = any> {
         event: MouseEvent;
         points: Array<{
             cx: number;
@@ -63,6 +63,7 @@ declare module "plotly.js" {
             color: string;
             label: string;
             text: string;
+            customdata: T;
         }>;
     }
 
@@ -84,6 +85,7 @@ declare module "plotly.js" {
             colors: string[];
         };
         sort?: boolean; // default: true
+        customdata: any[];
     }
 
     export interface HeatMapData {

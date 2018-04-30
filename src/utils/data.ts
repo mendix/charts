@@ -97,17 +97,19 @@ export const fetchData = <S>(options: FetchDataOptions<S>): Promise<FetchedData<
                     sortOrder,
                     attributes: references.attributes,
                     references: references.references
-                }).then(mxObjects => resolve({ mxObjects, customData })).catch(reject);
+                })
+                .then(mxObjects => resolve({ mxObjects, customData }))
+                .catch(message => reject({ message, customData: options.customData }));
             } else if (options.type === "microflow" && options.microflow) {
                 fetchByMicroflow(options.microflow, guid)
                     .then(mxObjects => resolve({ mxObjects, customData }))
-                    .catch(reject);
+                    .catch(message => reject({ message, customData: options.customData }));
             } else if (options.type === "REST" && options.url && attributes) {
                 fetchByREST(options.url)
                     .then(restData => {
-                        const validationString = validateJSONData(restData, attributes, customData as any || "");
+                        const validationString = validateJSONData(restData, attributes);
                         if (validationString) {
-                            reject(validationString);
+                            reject({ message: validationString, customData: options.customData });
                         } else {
                             resolve({ restData, customData });
                         }
@@ -152,7 +154,7 @@ export const fetchSeriesData = <S extends SeriesProps = SeriesProps>(mxObject: M
                 fetchByREST(url)
                     .then(restData => {
                         const attributes: string[] = [ series.xValueAttribute, series.yValueAttribute ];
-                        const validationString = validateJSONData(restData, attributes, series.name);
+                        const validationString = validateJSONData(restData, attributes);
                         if (validationString) {
                             reject(validationString);
                         } else {
@@ -174,10 +176,10 @@ export const generateRESTURL = (mxObject: MxO, endpoint: string, parameters: Con
     return `${endpoint}${(endpoint.indexOf("?") >= 0 ? "&" : "?")}${parameterString}`;
 };
 
-const validateJSONData = (data: any, attributes: string[], source: string): string => {
+const validateJSONData = (data: any, attributes: string[]): string => {
     for (const attribute of attributes) {
         if (data.length > 1 && !data[0].hasOwnProperty(attribute) && attribute) {
-            return `JSON result for ${source} does not contain attribute ${attribute}`;
+            return `JSON result for REST data source does not contain attribute ${attribute}`;
         }
     }
 

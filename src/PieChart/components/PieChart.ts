@@ -17,7 +17,7 @@ import PieChartContainerProps = Container.PieChartContainerProps;
 import "../../ui/Charts.scss";
 
 export interface PieChartProps extends PieChartContainerProps {
-    data?: mendix.lib.MxObject[];
+    data?: PieData[];
     defaultData?: PieData[];
     alertMessage?: ReactChild;
     loading?: boolean;
@@ -126,22 +126,19 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
             const { dataOptions } = this.state;
             const advancedOptions = props.devMode !== "basic" && dataOptions ? JSON.parse(dataOptions) : {};
             const dataThemeConfigs = props.devMode !== "basic" ? props.themeConfigs.data : {};
-            const traces = this.getTraces(props.data);
 
             return [
-                deepMerge.all(
-                    [
-                        PieChart.getDefaultDataOptions(this.props),
-                        {
-                            labels: traces.labels,
-                            values: traces.values,
-                            marker: { colors: traces.colors }
-                        },
-                        dataThemeConfigs,
-                        advancedOptions
-                    ],
-                    { arrayMerge }
-                )
+                {
+                    ...deepMerge.all(
+                        [
+                            props.data[0],
+                            dataThemeConfigs,
+                            advancedOptions
+                        ],
+                        { arrayMerge }
+                    ),
+                    customdata: props.data[0].customdata
+                }
             ];
         }
 
@@ -156,34 +153,20 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         return deepMerge.all([ PieChart.getDefaultLayoutOptions(props), themeLayoutConfigs, advancedOptions ]);
     }
 
-    private getTraces(data?: mendix.lib.MxObject[]): PieTraces {
-        if (data) {
-            return {
-                labels: data.map(mxObject => mxObject.get(this.props.nameAttribute) as string),
-                colors: this.props.colors && this.props.colors.length
-                    ? this.props.colors.map(color => color.color)
-                    : defaultColours(),
-                values: data.map(mxObject => parseFloat(mxObject.get(this.props.valueAttribute) as string))
-            };
-        }
-
-        return { labels: [], values: [], colors: [] };
-    }
-
-    private onClick = ({ points }: ScatterHoverData<any> | PieHoverData) => {
+    private onClick = ({ points }: ScatterHoverData<any> | PieHoverData<mendix.lib.MxObject[]>) => {
         if (this.props.onClick && this.props.data) {
-            this.props.onClick(this.props, this.props.data[points[0].pointNumber], this.props.mxform);
+            this.props.onClick(this.props, points[0].customdata[0], this.props.mxform);
         }
     }
 
-    private onHover = ({ event, points }: PieHoverData) => {
+    private onHover = ({ event, points }: PieHoverData<mendix.lib.MxObject[]>) => {
         if (event && this.tooltipNode) {
             unmountComponentAtNode(this.tooltipNode);
             const coordinates = getTooltipCoordinates(event, this.tooltipNode);
             if (coordinates) {
                 setTooltipPosition(this.tooltipNode, coordinates);
                 if (this.props.onHover && this.props.data) {
-                    this.props.onHover(this.tooltipNode, this.props.data[points[0].pointNumber]);
+                    this.props.onHover(this.tooltipNode, points[0].customdata[0]);
                 } else if (points[0].data.hoverinfo === "none") {
                     render(createElement(HoverTooltip, { text: points[0].label }), this.tooltipNode);
                 } else {

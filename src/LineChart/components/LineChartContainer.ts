@@ -114,7 +114,10 @@ export default class LineChartContainer extends Component<LineChartContainerProp
     private fetchData = (mxObject?: mendix.lib.MxObject) => {
         if (mxObject && this.props.series.length) {
             Promise.all(this.props.series.map(series => {
-                const attributes = [ series.xValueAttribute, series.yValueAttribute, series.xValueSortAttribute ];
+                const attributes = [ series.xValueAttribute, series.yValueAttribute ];
+                if (series.xValueSortAttribute) {
+                    attributes.push(series.xValueSortAttribute);
+                }
                 if (series.mode === "bubble" as Container.LineMode && series.markerSizeAttribute) {
                     attributes.push(series.markerSizeAttribute);
                 }
@@ -144,8 +147,8 @@ export default class LineChartContainer extends Component<LineChartContainerProp
                     scatterData: this.getData(data),
                     seriesOptions: data.map(({ series }) => series.seriesOptions || "{\n\n}")
                 });
-            }).catch(reason => {
-                window.mx.ui.error(reason);
+            }).catch(error => {
+                window.mx.ui.error(`Error in ${this.props.friendlyId} ${error.customData.name}:\n${error.message}`);
                 this.setState({ loading: false, data: [], scatterData: [] });
             });
         } else {

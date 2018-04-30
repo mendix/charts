@@ -1,9 +1,16 @@
 let __webpack_public_path__: string;
 import { Component, ReactChild, createElement } from "react";
 
-import { fetchByMicroflow, fetchByXPath, handleOnClick, validateSeriesProps } from "../../utils/data";
+import {
+    fetchByMicroflow,
+    fetchByXPath,
+    fetchData,
+    generateRESTURL,
+    handleOnClick,
+    validateSeriesProps
+} from "../../utils/data";
 import { HeatMap } from "./HeatMap";
-import { Container } from "../../utils/namespaces";
+import { Container, Data } from "../../utils/namespaces";
 import { HeatMapData } from "plotly.js";
 import { getDimensions, parseStyle } from "../../utils/style";
 import HeatMapContainerProps = Container.HeatMapContainerProps;
@@ -103,7 +110,7 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
         if (!this.state.loading) {
             this.setState({ loading: true });
         }
-        const { dataEntity, dataSourceMicroflow, dataSourceType } = this.props;
+        const { dataEntity, dataSourceMicroflow, dataSourceType, restUrl } = this.props;
         if (mxObject && dataEntity) {
             if (dataSourceType === "XPath") {
                 this.fetchSortedData(mxObject);
@@ -111,13 +118,13 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
                 fetchByMicroflow(dataSourceMicroflow, mxObject.getGuid())
                     .then(data => {
                         this.rawData = data;
-                        const horizontalValues = this.getValues(data, this.props.horizontalNameAttribute);
-                        const verticalValues = this.getValues(data, this.props.verticalNameAttribute);
+                        const horizontalValues = this.getValues(this.props.horizontalNameAttribute, data);
+                        const verticalValues = this.getValues(this.props.verticalNameAttribute, data);
                         this.setState({
                             data: {
                                 x: horizontalValues,
                                 y: verticalValues,
-                                z: this.processZData(data, verticalValues, horizontalValues),
+                                z: this.processZData(verticalValues, horizontalValues, data),
                                 zsmooth: this.props.smoothColor ? "best" : false,
                                 colorscale: HeatMapContainer.processColorScale(this.props.scaleColors),
                                 showscale: this.props.showScale,
@@ -130,6 +137,44 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
                         window.mx.ui.error(`An error occurred while retrieving chart data: ${reason}`);
                         this.setState({ data: undefined, loading: false });
                     });
+            } else if (dataSourceType === "REST" && restUrl) {
+                const attributes = [
+                    this.props.valueAttribute,
+                    this.props.horizontalNameAttribute,
+                    this.props.verticalNameAttribute
+                ];
+                if (this.props.horizontalSortAttribute) {
+                    attributes.push(this.props.horizontalSortAttribute);
+                }
+                if (this.props.verticalSortAttribute) {
+                    attributes.push(this.props.verticalSortAttribute);
+                }
+                const url = this.props.restUrl && generateRESTURL(mxObject, this.props.restUrl, this.props.restParameters);
+                fetchData<string>({
+                    guid: mxObject.getGuid(),
+                    entity: dataEntity,
+                    type: "REST",
+                    attributes,
+                    url
+                }).then(data => {
+                    const x = this.getValues(this.props.horizontalNameAttribute, [], data.restData);
+                    const y = this.getValues(this.props.verticalNameAttribute, [], data.restData);
+                    this.setState({
+                        data: {
+                            x,
+                            y,
+                            z: this.processZData(y, x, [], data.restData),
+                            zsmooth: this.props.smoothColor ? "best" : false,
+                            colorscale: HeatMapContainer.processColorScale(this.props.scaleColors),
+                            showscale: this.props.showScale,
+                            type: "heatmap"
+                        },
+                        loading: false
+                    });
+                }).catch(error => {
+                    window.mx.ui.error(`An error occurred while retrieving data in ${this.props.friendlyId}:\n ${error.message}`);
+                    this.setState({ data: undefined, loading: false });
+                });
             }
         } else {
             this.setState({ loading: false, data: undefined });
@@ -149,20 +194,20 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
             sortOrder: horizontalSortOrder
         }).then(horizontalData => {
             this.rawData = horizontalData;
-            const horizontalValues = this.getValues(horizontalData, this.props.horizontalNameAttribute);
+            const horizontalValues = this.getValues(this.props.horizontalNameAttribute, horizontalData);
             const { verticalSortAttribute, verticalSortOrder } = this.props;
             fetchByXPath({
                 ...fetchOptions,
                 sortAttribute: verticalSortAttribute,
                 sortOrder: verticalSortOrder
             }).then(verticalData => {
-                const verticalValues = this.getValues(verticalData, this.props.verticalNameAttribute);
+                const verticalValues = this.getValues(this.props.verticalNameAttribute, verticalData);
                 this.setState({
                     loading: false,
                     data: {
                         x: horizontalValues,
                         y: verticalValues,
-                        z: this.processZData(verticalData, verticalValues, horizontalValues),
+                        z: this.processZData(verticalValues, horizontalValues, verticalData),
                         zsmooth: this.props.smoothColor ? "best" : false,
                         colorscale: HeatMapContainer.processColorScale(this.props.scaleColors),
                         showscale: this.props.showScale,
@@ -176,19 +221,35 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
         });
     }
 
-    private processZData(data: mendix.lib.MxObject[], verticalValues: string[], horizontalValues: string[]): number[][] {
+    private processZData(vertical: string[], horizontal: string[], data: mendix.lib.MxObject[], restData?: Data.RESTData): number[][] {
         const verticalAttribute = this.getAttributeName(this.props.verticalNameAttribute);
         const horizontalAttribute = this.getAttributeName(this.props.horizontalNameAttribute);
 
-        return verticalValues.map(vertical =>
-            horizontalValues.map(horizontal => {
-                const zData = data.find(value =>
-                    value.get(verticalAttribute) === vertical && value.get(horizontalAttribute) === horizontal
-                );
+        if (data && data.length) {
+            return vertical.map(verticalValues =>
+                horizontal.map(horizontalValues => {
+                    const zData = data.find(value =>
+                        value.get(verticalAttribute) === verticalValues &&
+                        value.get(horizontalAttribute) === horizontalValues
+                    );
 
-                return zData ? Number(zData.get(this.props.valueAttribute)) : 0;
-            })
-        );
+                    return zData ? Number(zData.get(this.props.valueAttribute)) : 0;
+                })
+            );
+        } else if (restData && restData.length) {
+            return vertical.map(verticalValues =>
+                horizontal.map(horizontalValues => {
+                    const zData = restData.find(value =>
+                        value[verticalAttribute] === verticalValues &&
+                        value[horizontalAttribute] === horizontalValues
+                    );
+
+                    return zData ? Number(zData[this.props.valueAttribute]) : 0;
+                })
+            );
+        }
+
+        return [];
     }
 
     private getAttributeName(attributePath: string): string {
@@ -197,12 +258,19 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
         return attributeSplit[attributeSplit.length - 1];
     }
 
-    private getValues(data: mendix.lib.MxObject[], attribute: string): string[] {
+    private getValues(attribute: string, data: mendix.lib.MxObject[], restData?: Data.RESTData): string[] {
         const values: string[] = [];
         const attributeName = this.getAttributeName(attribute);
-        if (data.length) {
+        if (data && data.length) {
             data.forEach(item => {
                 const value = item.get(attributeName) as string;
+                if (values.indexOf(value) === -1) {
+                    values.push(value);
+                }
+            });
+        } else if (restData && restData.length) {
+            restData.forEach(item => {
+                const value = item[attributeName] as string;
                 if (values.indexOf(value) === -1) {
                     values.push(value);
                 }

@@ -73,7 +73,7 @@ export namespace Container {
     export interface LineChartContainerProps extends WrapperProps, Style.Dimensions, Style.Appearance, LineLayoutProps {
         series: Data.LineSeriesProps[];
         type: "line" | "bubble" | "polar" | "area" | "timeseries";
-        restParameters: RestParameter[];
+        restParameters: Container.RestParameter[];
     }
 
     export interface RestParameter {
@@ -164,9 +164,11 @@ export namespace Container {
 export namespace Data {
     export interface FetchedData<T> {
         mxObjects?: mendix.lib.MxObject[];
-        restData?: any;
+        restData?: RESTData;
         customData?: T;
     }
+
+    export type RESTData = { [ key: string ]: string | number }[];
 
     export interface FetchDataOptions<S> {
         type: "XPath" | "microflow" | "REST";
@@ -195,6 +197,7 @@ export namespace Data {
         dataSourceMicroflow: string;
         dataSourceType: "XPath" | "microflow" | "REST";
         restUrl: string;
+        restParameters: Container.RestParameter[];
         entityConstraint: string;
         dataEntity: string;
     }
