@@ -221,6 +221,21 @@ export namespace Data {
         tooltipForm: string;
     }
 
+    export interface OnClickOptions<T = any, O extends EventProps = EventProps> {
+        mxObject?: mendix.lib.MxObject;
+        trace?: T;
+        mxForm: mxui.lib.form._FormBase;
+        options: O;
+    }
+
+    export interface OnHoverOptions<T = any, O extends DataSourceProps = DataSourceProps> {
+        mxObject?: mendix.lib.MxObject;
+        options: O;
+        tooltipForm: string;
+        tooltipNode: HTMLDivElement;
+        trace?: T;
+    }
+
     export interface SeriesProps extends SeriesDataSourceProps, EventProps {
         name: string;
         seriesOptions: string;

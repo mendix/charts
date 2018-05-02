@@ -5,7 +5,7 @@ import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
 import { HoverTooltip } from "../../components/HoverTooltip";
 
-import { Container } from "../../utils/namespaces";
+import { Container, Data } from "../../utils/namespaces";
 import HeatMapContainerProps = Container.HeatMapContainerProps;
 
 import { ChartConfigs, arrayMerge, configs } from "../../utils/configs";
@@ -23,8 +23,8 @@ export interface HeatMapProps extends HeatMapContainerProps {
     alertMessage?: ReactChild;
     loading?: boolean;
     themeConfigs: ChartConfigs;
-    onClick?: (x: string, y: string, z: number) => void;
-    onHover?: (node: HTMLDivElement, x: string, y: string, z: number) => void;
+    onClick?: (options: Data.OnClickOptions<{ x: string, y: string, z: number }, HeatMapContainerProps>) => void;
+    onHover?: (options: Data.OnHoverOptions<{ x: string, y: string, z: number }, HeatMapContainerProps>) => void;
 }
 
 interface HeatMapState {
@@ -193,7 +193,16 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
 
     private onClick = ({ points }: ScatterHoverData<any>) => {
         if (this.props.onClick) {
-            this.props.onClick(points[ 0 ].x as string, points[ 0 ].y as string, points[ 0 ].z as number);
+            const point = points[0];
+            this.props.onClick({
+                options: this.props,
+                mxForm: this.props.mxform,
+                trace: {
+                    x: point.x as string,
+                    y: point.y as string,
+                    z: point.z as number
+                }
+            });
         }
     }
 
@@ -205,7 +214,17 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
             if (coordinates) {
                 setTooltipPosition(this.tooltipNode, coordinates);
                 if (this.props.onHover) {
-                    this.props.onHover(this.tooltipNode, x as string, y as string, z as number);
+                    const point = points[0];
+                    this.props.onHover({
+                        tooltipForm: this.props.tooltipForm,
+                        tooltipNode: this.tooltipNode,
+                        options: this.props,
+                        trace: {
+                            x: point.x as string,
+                            y: point.y as string,
+                            z: point.z as number
+                        }
+                    });
                 } else if (points[0].data.hoverinfo === "none" as any) {
                     render(createElement(HoverTooltip, { text: text || z }), this.tooltipNode);
                 } else {

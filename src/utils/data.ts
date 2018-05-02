@@ -286,6 +286,12 @@ export const handleOnClick = <T extends EventProps>(options: T, mxObject?: MxO, 
     }
 };
 
+export const openTooltipForm = (domNode: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) => {
+    const context = new mendix.lib.MxContext();
+    context.setContext(dataObject.getEntity(), dataObject.getGuid());
+    window.mx.ui.openForm(tooltipForm, { domNode, context });
+};
+
 export const getSeriesTraces = ({ data, restData, series }: SeriesData): ScatterTrace => {
     let xData: Datum[] = [];
     let yData: number[] = [];

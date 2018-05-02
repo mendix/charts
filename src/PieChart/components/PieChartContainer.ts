@@ -2,7 +2,7 @@ let __webpack_public_path__: string;
 import { Component, ReactChild, createElement } from "react";
 
 import { ChartConfigs, fetchThemeConfigs } from "../../utils/configs";
-import { fetchByMicroflow, fetchData, generateRESTURL, handleOnClick, validateSeriesProps } from "../../utils/data";
+import { fetchData, generateRESTURL, handleOnClick, openTooltipForm, validateSeriesProps } from "../../utils/data";
 import deepMerge from "deepmerge";
 import { Container, Data } from "../../utils/namespaces";
 import { PieChart, PieChartProps, PieTraces } from "./PieChart";
@@ -82,8 +82,8 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
             loading: this.state.loading,
             data: this.state.data,
             themeConfigs: this.state.themeConfigs,
-            onClick: handleOnClick,
-            onHover: this.props.tooltipForm ? this.openTooltipForm : undefined
+            onClick: this.handleOnClick,
+            onHover: this.props.tooltipForm ? this.handleOnHover : undefined
         });
     }
 
@@ -186,10 +186,38 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         return { labels: [], values: [], colors: [] };
     }
 
-    private openTooltipForm(domNode: HTMLDivElement, dataObject: mendix.lib.MxObject) {
-        const context = new mendix.lib.MxContext();
-        context.setContext(dataObject.getEntity(), dataObject.getGuid());
-        window.mx.ui.openForm(this.props.tooltipForm, { domNode, context });
+    private handleOnClick = (options: Data.OnClickOptions<{ label: string, value: number }, PieChartContainerProps>) => {
+        if (options.mxObject) {
+            handleOnClick(options.options, options.mxObject, options.mxForm);
+        } else if (options.trace) {
+            this.createDataPoint(options.options, options.trace)
+                .then(mxObject => handleOnClick(options.options, mxObject, options.mxForm))
+                .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
+        }
+    }
+
+    private handleOnHover = (options: Data.OnHoverOptions<{ label: string, value: number }, PieChartContainerProps>) => {
+        if (options.mxObject) {
+            openTooltipForm(options.tooltipNode, options.tooltipForm, options.mxObject);
+        } else if (options.trace && options.options.dataEntity) {
+            this.createDataPoint(options.options, options.trace)
+                .then(mxObject => openTooltipForm(options.tooltipNode, options.tooltipForm, mxObject))
+                .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
+        }
+    }
+
+    private createDataPoint(props: PieChartContainerProps, trace: { label: string, value: number }) {
+        return new Promise<mendix.lib.MxObject>((resolve, reject) => {
+            window.mx.data.create({
+                entity: props.dataEntity,
+                callback: mxObject => {
+                    mxObject.set(props.nameAttribute, trace.label);
+                    mxObject.set(props.valueAttribute, trace.value);
+                    resolve(mxObject);
+                },
+                error: error => reject(error.message)
+            });
+        });
     }
 }
 

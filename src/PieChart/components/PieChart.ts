@@ -9,7 +9,7 @@ import { PiePlayground } from "./PiePlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
 
 import { arrayMerge, configs } from "../../utils/configs";
-import { Container } from "../../utils/namespaces";
+import { Container, Data } from "../../utils/namespaces";
 import { Config, Layout, PieData, PieHoverData, ScatterHoverData } from "plotly.js";
 import { defaultColours, getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 import PieChartContainerProps = Container.PieChartContainerProps;
@@ -22,8 +22,8 @@ export interface PieChartProps extends PieChartContainerProps {
     alertMessage?: ReactChild;
     loading?: boolean;
     themeConfigs: { layout: {}, configuration: {}, data: {} };
-    onClick?: (props: PieChartProps, dataObject: mendix.lib.MxObject, mxform: mxui.lib.form._FormBase) => void;
-    onHover?: (node: HTMLDivElement, dataObject: mendix.lib.MxObject) => void;
+    onClick?: (options: Data.OnClickOptions<{ label: string, value: number }, PieChartContainerProps>) => void;
+    onHover?: (options: Data.OnHoverOptions<{ label: string, value: number }, PieChartContainerProps>) => void;
 }
 
 interface PieChartState {
@@ -153,9 +153,18 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         return deepMerge.all([ PieChart.getDefaultLayoutOptions(props), themeLayoutConfigs, advancedOptions ]);
     }
 
-    private onClick = ({ points }: ScatterHoverData<any> | PieHoverData<mendix.lib.MxObject[]>) => {
+    private onClick = ({ points }: PieHoverData<mendix.lib.MxObject[]>) => {
         if (this.props.onClick && this.props.data) {
-            this.props.onClick(this.props, points[0].customdata[0], this.props.mxform);
+            const point = points[0];
+            this.props.onClick({
+                mxObject: point.customdata[0],
+                options: this.props,
+                mxForm: this.props.mxform,
+                trace: {
+                    label: point.label,
+                    value: point.value
+                }
+            });
         }
     }
 
@@ -166,7 +175,17 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
             if (coordinates) {
                 setTooltipPosition(this.tooltipNode, coordinates);
                 if (this.props.onHover && this.props.data) {
-                    this.props.onHover(this.tooltipNode, points[0].customdata[0]);
+                    const point = points[0];
+                    this.props.onHover({
+                        tooltipForm: this.props.tooltipForm,
+                        tooltipNode: this.tooltipNode,
+                        mxObject: point.customdata[0],
+                        options: this.props,
+                        trace: {
+                            label: point.label,
+                            value: point.value
+                        }
+                    });
                 } else if (points[0].data.hoverinfo === "none") {
                     render(createElement(HoverTooltip, { text: points[0].label }), this.tooltipNode);
                 } else {

@@ -2,7 +2,7 @@ let __webpack_public_path__: string;
 import { Component, createElement } from "react";
 
 import { BarChart, BarChartProps } from "./BarChart";
-import { fetchData, generateRESTURL, getSeriesTraces, handleOnClick, validateSeriesProps } from "../../utils/data";
+import { fetchData, generateRESTURL, getSeriesTraces, handleOnClick, openTooltipForm, validateSeriesProps } from "../../utils/data";
 import deepMerge from "deepmerge";
 import { Container, Data } from "../../utils/namespaces";
 import { ScatterData } from "plotly.js";
@@ -40,8 +40,8 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
                 loading: this.state.loading,
                 alertMessage: this.state.alertMessage,
                 themeConfigs: this.state.themeConfigs,
-                onClick: handleOnClick,
-                onHover: BarChartContainer.openTooltipForm
+                onClick: this.handleOnClick,
+                onHover: this.handleOnHover
             })
         );
     }
@@ -135,19 +135,6 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
                 window.mx.ui.error(reason);
                 this.setState({ loading: false, data: [], scatterData: [] });
             });
-            // Promise.all(this.props.series.map(series => fetchSeriesData(mxObject, series, this.props.restParameters)))
-            //     .then(seriesData => {
-            //         this.setState({
-            //             loading: false,
-            //             data: seriesData,
-            //             scatterData: this.getData(seriesData),
-            //             seriesOptions: seriesData.map(({ series }) => series.seriesOptions || "{\n\n}")
-            //         });
-            //     })
-            //     .catch(reason => {
-            //         window.mx.ui.error(reason);
-            //         this.setState({ loading: false, data: [], scatterData: [] });
-            //     });
         } else {
             this.setState({ loading: false, data: [], scatterData: [] });
         }
@@ -179,13 +166,38 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         };
     }
 
-    public static openTooltipForm(domNode: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) {
-        const context = new mendix.lib.MxContext();
-        context.setContext(dataObject.getEntity(), dataObject.getGuid());
-        while (domNode.firstChild) {
-            domNode.removeChild(domNode.firstChild);
+    private handleOnClick = (options: Data.OnClickOptions<{ x: string, y: number }, Data.SeriesProps>) => {
+        if (options.mxObject) {
+            handleOnClick(options.options, options.mxObject, options.mxForm);
+        } else if (options.trace) {
+            this.createDataPoint(options.options, options.trace)
+                .then(mxObject => handleOnClick(options.options, mxObject, options.mxForm))
+                .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
         }
-        window.mx.ui.openForm(tooltipForm, { domNode, context });
+    }
+
+    private handleOnHover = (options: Data.OnHoverOptions<{ x: string, y: number }, Data.SeriesProps>) => {
+        if (options.mxObject) {
+            openTooltipForm(options.tooltipNode, options.tooltipForm, options.mxObject);
+        } else if (options.trace && options.options.dataEntity) {
+            this.createDataPoint(options.options, options.trace)
+                .then(mxObject => openTooltipForm(options.tooltipNode, options.tooltipForm, mxObject))
+                .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
+        }
+    }
+
+    private createDataPoint(seriesProps: Data.SeriesProps, trace: { x: string, y: number }) {
+        return new Promise<mendix.lib.MxObject>((resolve, reject) => {
+            window.mx.data.create({
+                entity: seriesProps.dataEntity,
+                callback: mxObject => {
+                    mxObject.set(seriesProps.xValueAttribute, trace.x);
+                    mxObject.set(seriesProps.yValueAttribute, trace.y);
+                    resolve(mxObject);
+                },
+                error: error => reject(error.message)
+            });
+        });
     }
 }
 

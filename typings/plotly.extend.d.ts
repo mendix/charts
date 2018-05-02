@@ -62,7 +62,7 @@ declare module "plotly.js" {
             curveNumber: number;
             color: string;
             label: string;
-            text: string;
+            value: number;
             customdata: T;
         }>;
     }

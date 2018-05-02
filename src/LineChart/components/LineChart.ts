@@ -26,9 +26,8 @@ export interface LineChartProps extends LineChartContainerProps {
     loading?: boolean;
     alertMessage?: ReactChild;
     themeConfigs: { layout: {}, configuration: {}, data: {} };
-    onClick?: (series: SeriesProps, dataObject: mendix.lib.MxObject, mxform: mxui.lib.form._FormBase) => void;
-    onHover?: (node: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) => void;
-    onClickREST?: (points: any, type: "click" | "hover", tooltipNode?: HTMLDivElement) => void;
+    onClick?: (options: Data.OnClickOptions<{ x: string, y: number, size: number }, Data.LineSeriesProps>) => void;
+    onHover?: (options: Data.OnHoverOptions<{ x: string, y: number, size: number }, Data.LineSeriesProps>) => void;
 }
 
 interface LineChartState {
@@ -90,7 +89,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             layoutOptions: newProps.layoutOptions,
             series: newProps.series,
             seriesOptions: newProps.seriesOptions,
-            scatterData: newProps.scatterData
+            scatterData: this.getData(newProps)
         });
     }
 
@@ -107,7 +106,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 layout: this.getLayoutOptions(this.props),
-                data: this.getData(this.props),
+                data: this.state.scatterData || [],
                 config: this.getConfigOptions(this.props),
                 onClick: this.onClick,
                 onHover: this.onHover,
@@ -157,11 +156,11 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     private getData(props: LineChartProps): ScatterData[] {
-        if (this.state.scatterData && this.chartNode) {
+        if (props.scatterData && this.chartNode) {
             const { seriesOptions: options } = this.state;
             const dataThemeConfigs = props.devMode !== "basic" ? props.themeConfigs.data : {};
             const dimensions = getDimensionsFromNode(this.chartNode);
-            const lineData: ScatterData[] = this.state.scatterData.map((data, index) => {
+            const lineData: ScatterData[] = props.scatterData.map((data, index) => {
                 const parsedOptions = props.devMode !== "basic" && options ? JSON.parse(options[index]) : {};
                 const scatterData = deepMerge.all<ScatterData>(
                     [ data, dataThemeConfigs, parsedOptions, { visible: data.visible || true } ]
@@ -189,28 +188,41 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     private onClick = ({ points }: ScatterHoverData<mendix.lib.MxObject>) => {
-        const serie = points[0].data.series;
-        if (this.props.onClick && serie.dataSourceType !== "REST") {
-            this.props.onClick(serie, points[0].customdata, this.props.mxform);
-        } else if (this.props.onClickREST) {
-            this.props.onClickREST(points[0], "click");
+        const { customdata, data, x, y } = points[0];
+        if (this.props.onClick) {
+            this.props.onClick({
+                mxObject: customdata,
+                options: data.series,
+                mxForm: this.props.mxform,
+                trace: {
+                    x: x as string,
+                    y: y as number,
+                    size: (points[0] as any)["marker.size"]
+                }
+            });
         }
     }
 
     private onHover = ({ event, points }: ScatterHoverData<mendix.lib.MxObject>) => {
-        const { customdata, data, r, y, text } = points[0];
-        if (event && this.tooltipNode && this.tooltipNode.style.opacity !== "1") {
+        const { customdata, data, r, x, y, text } = points[0];
+        if (event && this.tooltipNode) {
             unmountComponentAtNode(this.tooltipNode);
             const coordinates = getTooltipCoordinates(event, this.tooltipNode);
             if (coordinates) {
                 setTooltipPosition(this.tooltipNode, coordinates);
                 if (data.series.tooltipForm && this.props.onHover) {
                     this.tooltipNode.innerHTML = "";
-                    if (data.series.dataSourceType !== "REST") {
-                        this.props.onHover(this.tooltipNode, data.series.tooltipForm, customdata);
-                    } else if (this.props.onClickREST) {
-                        this.props.onClickREST(points[0], "hover", this.tooltipNode);
-                    }
+                    this.props.onHover({
+                        tooltipForm: data.series.tooltipForm,
+                        tooltipNode: this.tooltipNode,
+                        mxObject: customdata,
+                        options: data.series,
+                        trace: {
+                            x: x as string,
+                            y: y as number,
+                            size: (points[0] as any)["marker.size"]
+                        }
+                    });
                 } else if (points[0].data.hoverinfo === "none" as any) {
                     render(createElement(HoverTooltip, { text: text || y || r }), this.tooltipNode);
                 } else {
@@ -243,8 +255,10 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     private onLoadAndResize = (node: HTMLDivElement) => {
-        this.chartNode = node;
-        this.forceUpdate();
+        if (node && !this.chartNode) {
+            this.chartNode = node;
+            this.setState({ scatterData: this.getData(this.props) });
+        }
     }
 
     public static getChartType(type: string): "line" | "polar" {

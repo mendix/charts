@@ -7,6 +7,7 @@ import {
     fetchData,
     generateRESTURL,
     handleOnClick,
+    openTooltipForm,
     validateSeriesProps
 } from "../../utils/data";
 import { HeatMap } from "./HeatMap";
@@ -89,7 +90,7 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
             data: this.state.data,
             themeConfigs: this.state.themeConfigs,
             onClick: this.handleOnClick,
-            onHover: this.props.tooltipForm ? this.openTooltipForm : undefined
+            onHover: this.props.tooltipForm ? this.handleOnHover : undefined
         });
     }
 
@@ -280,13 +281,45 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
         return values;
     }
 
-    private handleOnClick = (x: string, y: string, z: number) => {
-        const object = this.findSourceObject(x, y, z);
-        if (object) {
-            handleOnClick(this.props, object, this.props.mxform);
-        } else {
-            console.log("Couldn't find matching a object for the chart values"); // tslint:disable-line
+    private handleOnClick = (options: Data.OnClickOptions<{ x: string, y: string, z: number }, HeatMapContainerProps>) => {
+        if (options.trace) {
+            const mxObject = this.findSourceObject(options.trace.x, options.trace.y, options.trace.z);
+            if (mxObject) {
+                handleOnClick(options.options, mxObject, options.mxForm);
+            } else {
+                this.createDataPoint(options.options, options.trace)
+                    .then(newMxObject => handleOnClick(options.options, newMxObject, options.mxForm))
+                    .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
+            }
         }
+    }
+
+    private handleOnHover = (options: Data.OnHoverOptions<{ x: string, y: string, z: number }, HeatMapContainerProps>) => {
+        if (options.trace) {
+            const mxObject = this.findSourceObject(options.trace.x, options.trace.y, options.trace.z);
+            if (mxObject) {
+                openTooltipForm(options.tooltipNode, options.tooltipForm, mxObject);
+            } else {
+                this.createDataPoint(options.options, options.trace)
+                    .then(newMxObject => openTooltipForm(options.tooltipNode, options.tooltipForm, newMxObject))
+                    .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
+            }
+        }
+    }
+
+    private createDataPoint(props: HeatMapContainerProps, trace: { x: string, y: string, z: number }) {
+        return new Promise<mendix.lib.MxObject>((resolve, reject) => {
+            window.mx.data.create({
+                entity: props.dataEntity,
+                callback: mxObject => {
+                    mxObject.set(props.horizontalNameAttribute, trace.x);
+                    mxObject.set(props.verticalNameAttribute, trace.y);
+                    mxObject.set(props.valueAttribute, trace.z);
+                    resolve(mxObject);
+                },
+                error: error => reject(error.message)
+            });
+        });
     }
 
     private findSourceObject(x: string, y: string, z: number): mendix.lib.MxObject | undefined {

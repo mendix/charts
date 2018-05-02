@@ -4,7 +4,7 @@ import deepMerge from "deepmerge";
 
 import BarChartContainer from "../../BarChart/components/BarChartContainer";
 import { fetchThemeConfigs } from "../../utils/configs";
-import { fetchData, generateRESTURL, getSeriesTraces, handleOnClick, validateSeriesProps } from "../../utils/data";
+import { fetchData, generateRESTURL, getSeriesTraces, handleOnClick, openTooltipForm, validateSeriesProps } from "../../utils/data";
 import { LineChart, LineChartProps } from "./LineChart";
 import { Container, Data } from "../../utils/namespaces";
 import { ScatterData } from "plotly.js";
@@ -41,9 +41,8 @@ export default class LineChartContainer extends Component<LineChartContainerProp
                 themeConfigs: this.state.themeConfigs,
                 loading: this.state.loading,
                 alertMessage: this.state.alertMessage,
-                onClick: handleOnClick,
-                onHover: BarChartContainer.openTooltipForm,
-                onClickREST: this.handleOnClickREST
+                onClick: this.handleOnClick,
+                onHover: this.handleOnHover
             })
         );
     }
@@ -118,7 +117,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
                 if (series.xValueSortAttribute) {
                     attributes.push(series.xValueSortAttribute);
                 }
-                if (series.mode === "bubble" as Container.LineMode && series.markerSizeAttribute) {
+                if (this.props.type === "bubble" && series.markerSizeAttribute) {
                     attributes.push(series.markerSizeAttribute);
                 }
                 const url = series.restUrl && generateRESTURL(mxObject, series.restUrl, this.props.restParameters);
@@ -191,23 +190,41 @@ export default class LineChartContainer extends Component<LineChartContainerProp
         };
     }
 
-    private handleOnClickREST = (points: any, type: "click" | "hover", tooltipNode?: HTMLDivElement) => {
-        window.mx.data.create({
-            entity: points.data.series.dataEntity,
-            callback: mxObject => this.handleOnClick(mxObject, points, type, tooltipNode),
-            error: error => mx.ui.error(`An error while creating ${points.data.series.dataEntity} object : ${error.message}`)
-        });
+    private handleOnClick = (options: Data.OnClickOptions<{ x: string, y: number, size: number }, Data.LineSeriesProps>) => {
+        if (options.mxObject) {
+            handleOnClick(options.options, options.mxObject, options.mxForm);
+        } else if (options.trace) {
+            this.createDataPoint(options.options, options.trace)
+                .then(mxObject => handleOnClick(options.options, mxObject, options.mxForm))
+                .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
+        }
     }
 
-    private handleOnClick = (mxObject: mendix.lib.MxObject, points: any, type: "click" | "hover", tooltipNode?: HTMLDivElement) => {
-        mxObject.set(points.data.series.xValueAttribute, points.x);
-        mxObject.set(points.data.series.yValueAttribute, points.y);
-        if (type === "click") {
-            handleOnClick(points.data.series, mxObject, this.props.mxform);
+    private handleOnHover = (options: Data.OnHoverOptions<{ x: string, y: number, size: number }, Data.LineSeriesProps>) => {
+        if (options.mxObject) {
+            openTooltipForm(options.tooltipNode, options.tooltipForm, options.mxObject);
+        } else if (options.trace && options.options.dataEntity) {
+            this.createDataPoint(options.options, options.trace)
+                .then(mxObject => openTooltipForm(options.tooltipNode, options.tooltipForm, mxObject))
+                .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
         }
-        if (tooltipNode && type === "hover") {
-            BarChartContainer.openTooltipForm(tooltipNode, points.data.series.tooltipForm, mxObject);
-        }
+    }
+
+    private createDataPoint(seriesProps: Data.LineSeriesProps, trace: { x: string, y: number, size: number }) {
+        return new Promise<mendix.lib.MxObject>((resolve, reject) => {
+            window.mx.data.create({
+                entity: seriesProps.dataEntity,
+                callback: mxObject => {
+                    mxObject.set(seriesProps.xValueAttribute, trace.x);
+                    mxObject.set(seriesProps.yValueAttribute, trace.y);
+                    if (this.props.type === "bubble" && seriesProps.markerSizeAttribute) {
+                        mxObject.set(seriesProps.markerSizeAttribute, trace.size);
+                    }
+                    resolve(mxObject);
+                },
+                error: error => reject(error.message)
+            });
+        });
     }
 }
 

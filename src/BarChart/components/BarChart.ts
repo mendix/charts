@@ -21,8 +21,8 @@ export interface BarChartProps extends Container.BarChartContainerProps {
     scatterData?: ScatterData[];
     seriesOptions?: string[];
     themeConfigs: { layout: {}, configuration: {}, data: {} };
-    onClick?: (series: Data.SeriesProps, dataObject: mendix.lib.MxObject, mxform: mxui.lib.form._FormBase) => void;
-    onHover?: (node: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) => void;
+    onClick?: (options: Data.OnClickOptions<{ x: string, y: number }, Data.SeriesProps>) => void;
+    onHover?: (options: Data.OnHoverOptions<{ x: string, y: number }, Data.SeriesProps>) => void;
 }
 
 interface BarChartState {
@@ -155,22 +155,40 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
         return props.scatterData || [];
     }
 
-    private onClick = (data: ScatterHoverData<mendix.lib.MxObject>) => {
-        const pointClicked = data.points[0];
+    private onClick = ({ points }: ScatterHoverData<mendix.lib.MxObject>) => {
+        const { customdata, data, x, y } = points[0];
         if (this.props.onClick) {
-            this.props.onClick(pointClicked.data.series, pointClicked.customdata, this.props.mxform);
+            this.props.onClick({
+                mxObject: customdata,
+                options: data.series,
+                mxForm: this.props.mxform,
+                trace: {
+                    x: this.props.orientation === "bar" ? y as string : x as string,
+                    y: this.props.orientation === "bar" ? x as number : y as number
+                }
+            });
         }
     }
 
     private onHover = ({ event, points }: ScatterHoverData<mendix.lib.MxObject>) => {
-        const { customdata, data, x, y } = points[0];
-        if (event && this.tooltipNode) {
+        const { customdata, data, x, y, text } = points[0];
+        if (event && this.tooltipNode && this.tooltipNode.style.opacity !== "1") {
             unmountComponentAtNode(this.tooltipNode);
             const coordinates = getTooltipCoordinates(event, this.tooltipNode);
             if (coordinates) {
                 setTooltipPosition(this.tooltipNode, coordinates);
                 if (data.series.tooltipForm && this.props.onHover) {
-                    this.props.onHover(this.tooltipNode, data.series.tooltipForm, customdata);
+                    this.tooltipNode.innerHTML = "";
+                    this.props.onHover({
+                        tooltipForm: data.series.tooltipForm,
+                        tooltipNode: this.tooltipNode,
+                        mxObject: customdata,
+                        options: data.series,
+                        trace: {
+                            x: this.props.orientation === "bar" ? y as string : x as string,
+                            y: this.props.orientation === "bar" ? x as number : y as number
+                        }
+                    });
                 } else if (points[0].data.hoverinfo === "none" as any) {
                     render(createElement(HoverTooltip, {
                         text: this.props.orientation === "bar" ? x : y
