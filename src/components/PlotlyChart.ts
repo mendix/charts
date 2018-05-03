@@ -77,7 +77,10 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
     private async renderChart({ config, data, layout, onClick, onHover, onRestyle }: PlotlyChartProps) {
         if (this.chartNode && !this.state.loading && this.newPlot) {
             const layoutOptions = deepMerge.all([ layout, getDimensionsFromNode(this.chartNode) ]);
-            this.newPlot(this.chartNode, data as Data[], layoutOptions, config)
+            const plotlyConfig = window.dojo && window.dojo.locale
+                ? { ...config, locale: window.dojo.locale }
+                : config;
+            this.newPlot(this.chartNode, data as Data[], layoutOptions, plotlyConfig)
                 .then(myPlot => {
                     if (onClick) {
                         myPlot.on("plotly_click", onClick as any);
