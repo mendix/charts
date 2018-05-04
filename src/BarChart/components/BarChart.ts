@@ -1,19 +1,16 @@
+import deepMerge from "deepmerge";
+import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
 import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
-
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
 import { HoverTooltip } from "../../components/HoverTooltip";
-import { SeriesPlayground } from "../../components/SeriesPlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
-
-import { configs } from "../../utils/configs";
-import deepMerge from "deepmerge";
-import { Container, Data } from "../../utils/namespaces";
-import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
-import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
-
+import { SeriesPlayground } from "../../components/SeriesPlayground";
 import "../../ui/Charts.scss";
+import { configs } from "../../utils/configs";
+import { Container, Data } from "../../utils/namespaces";
+import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 
 export interface BarChartProps extends Container.BarChartContainerProps {
     alertMessage?: ReactChild;
@@ -171,7 +168,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     }
 
     private onHover = ({ event, points }: ScatterHoverData<mendix.lib.MxObject>) => {
-        const { customdata, data, x, y, text } = points[0];
+        const { customdata, data, x, y } = points[0];
         if (event && this.tooltipNode && this.tooltipNode.style.opacity !== "1") {
             unmountComponentAtNode(this.tooltipNode);
             const coordinates = getTooltipCoordinates(event, this.tooltipNode);

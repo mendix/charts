@@ -1,24 +1,20 @@
+import deepMerge from "deepmerge";
+import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
 import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
-
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
 import { HoverTooltip } from "../../components/HoverTooltip";
-import { SeriesPlayground } from "../../components/SeriesPlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
-
+import { SeriesPlayground } from "../../components/SeriesPlayground";
+import "../../ui/Charts.scss";
 import { configs } from "../../utils/configs";
-import deepMerge from "deepmerge";
 import { Container, Data } from "../../utils/namespaces";
-import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
 import { getDimensions, getDimensionsFromNode, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 
 import LineChartContainerProps = Container.LineChartContainerProps;
-import SeriesProps = Data.SeriesProps;
 import LineMode = Container.LineMode;
 import LineSeriesProps = Data.LineSeriesProps;
-
-import "../../ui/Charts.scss";
 
 export interface LineChartProps extends LineChartContainerProps {
     scatterData?: ScatterData[];

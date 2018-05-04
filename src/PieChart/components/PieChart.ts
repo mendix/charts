@@ -1,20 +1,18 @@
+import deepMerge from "deepmerge";
+import { Config, Layout, PieData, PieHoverData } from "plotly.js";
 import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
-import deepMerge from "deepmerge";
-
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
 import { HoverTooltip } from "../../components/HoverTooltip";
-import { PiePlayground } from "./PiePlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
-
+import "../../ui/Charts.scss";
 import { arrayMerge, configs } from "../../utils/configs";
 import { Container, Data } from "../../utils/namespaces";
-import { Config, Layout, PieData, PieHoverData, ScatterHoverData } from "plotly.js";
-import { defaultColours, getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
-import PieChartContainerProps = Container.PieChartContainerProps;
+import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
+import { PiePlayground } from "./PiePlayground";
 
-import "../../ui/Charts.scss";
+import PieChartContainerProps = Container.PieChartContainerProps;
 
 export interface PieChartProps extends PieChartContainerProps {
     data?: PieData[];

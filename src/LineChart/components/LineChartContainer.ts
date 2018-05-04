@@ -1,14 +1,13 @@
 let __webpack_public_path__: string;
-import { Component, createElement } from "react";
 import deepMerge from "deepmerge";
-
-import BarChartContainer from "../../BarChart/components/BarChartContainer";
+import { ScatterData } from "plotly.js";
+import { Component, createElement } from "react";
 import { fetchThemeConfigs } from "../../utils/configs";
 import { fetchData, generateRESTURL, getSeriesTraces, handleOnClick, openTooltipForm, validateSeriesProps } from "../../utils/data";
-import { LineChart, LineChartProps } from "./LineChart";
 import { Container, Data } from "../../utils/namespaces";
-import { ScatterData } from "plotly.js";
 import { defaultColours, fillColours, getDimensions, parseStyle } from "../../utils/style";
+import { LineChart, LineChartProps } from "./LineChart";
+
 import LineChartContainerProps = Container.LineChartContainerProps;
 import LineChartContainerState = Container.LineChartContainerState;
 

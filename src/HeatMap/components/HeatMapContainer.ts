@@ -330,17 +330,6 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
         );
     }
 
-    private openTooltipForm = (domNode: HTMLDivElement, x: string, y: string, z: number) => {
-        const dataObject = this.findSourceObject(x, y, z);
-        if (dataObject) {
-            const context = new mendix.lib.MxContext();
-            context.setContext(dataObject.getEntity(), dataObject.getGuid());
-            window.mx.ui.openForm(this.props.tooltipForm, { domNode, context });
-        } else {
-            console.log("Failed to open tooltip: couldn't find matching object for the chart values"); // tslint:disable-line
-        }
-    }
-
     public static processColorScale(scaleColors: Container.ScaleColors[]): (string | number)[][] {
         return scaleColors.length > 1
             ? scaleColors

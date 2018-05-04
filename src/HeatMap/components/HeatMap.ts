@@ -1,21 +1,18 @@
+import deepMerge from "deepmerge";
+import { Config, HeatMapData, Layout, ScatterHoverData } from "plotly.js";
 import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
-
+import { PiePlayground } from "../../PieChart/components/PiePlayground";
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
 import { HoverTooltip } from "../../components/HoverTooltip";
-
-import { Container, Data } from "../../utils/namespaces";
-import HeatMapContainerProps = Container.HeatMapContainerProps;
-
-import { ChartConfigs, arrayMerge, configs } from "../../utils/configs";
-import deepMerge from "deepmerge";
-import { PiePlayground } from "../../PieChart/components/PiePlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
-import { Config, HeatMapData, Layout, ScatterHoverData } from "plotly.js";
+import "../../ui/Charts.scss";
+import { ChartConfigs, arrayMerge, configs } from "../../utils/configs";
+import { Container, Data } from "../../utils/namespaces";
 import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 
-import "../../ui/Charts.scss";
+import HeatMapContainerProps = Container.HeatMapContainerProps;
 
 export interface HeatMapProps extends HeatMapContainerProps {
     data?: HeatMapData;
@@ -214,15 +211,14 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
             if (coordinates) {
                 setTooltipPosition(this.tooltipNode, coordinates);
                 if (this.props.onHover) {
-                    const point = points[0];
                     this.props.onHover({
                         tooltipForm: this.props.tooltipForm,
                         tooltipNode: this.tooltipNode,
                         options: this.props,
                         trace: {
-                            x: point.x as string,
-                            y: point.y as string,
-                            z: point.z as number
+                            x: x as string,
+                            y: y as string,
+                            z: z as number
                         }
                     });
                 } else if (points[0].data.hoverinfo === "none" as any) {

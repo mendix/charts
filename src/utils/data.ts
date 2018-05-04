@@ -4,7 +4,6 @@ import { Datum } from "plotly.js";
 import { Container, Data } from "./namespaces";
 import SeriesProps = Data.SeriesProps;
 import SeriesData = Data.SeriesData;
-import SortOrder = Data.SortOrder;
 import EventProps = Data.EventProps;
 import ScatterTrace = Data.ScatterTrace;
 import ReferencesSpec = Data.ReferencesSpec;
