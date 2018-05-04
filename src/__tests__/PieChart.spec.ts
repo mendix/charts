@@ -1,13 +1,12 @@
-import { createElement } from "react";
 import { mount, shallow } from "enzyme";
+import { ScatterHoverData } from "plotly.js";
+import { createElement } from "react";
 import { mockMendix } from "../../tests/mocks/Mendix";
-
-import { Alert } from "../components/Alert";
-import { ChartLoading } from "../components/ChartLoading";
 import { PieChart, PieChartProps } from "../PieChart/components/PieChart";
 import "../PieChart/components/PiePlayground";
+import { Alert } from "../components/Alert";
+import { ChartLoading } from "../components/ChartLoading";
 import { PlotlyChart } from "../components/PlotlyChart";
-import { ScatterHoverData } from "plotly.js";
 import * as style from "../utils/style";
 
 describe("PieChart", () => {
@@ -84,7 +83,7 @@ describe("PieChart", () => {
     describe("event handler", () => {
         const plotlyEventData: ScatterHoverData<any> = {
             event: { clientY: 300, clientX: 400 } as any,
-            points: [ { pointNumber: "customData" } as any ]
+            points: [ { pointNumber: 0, customdata: [ {} ] } as any ]
         };
 
         it("#onClick() calls the parent onClick handler", () => {
