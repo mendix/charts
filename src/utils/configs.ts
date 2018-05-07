@@ -28,8 +28,6 @@ export const configs: SharedConfigs = {
     configuration: { displayModeBar: false, doubleClick: false }
 };
 
-const getChartID = (type: ChartType): string => `com.mendix.widget.custom.${type}.${type}`;
-
 export const fetchThemeConfigs = (type: ChartType): Promise<ChartConfigs> =>
     new Promise<ChartConfigs>((resolve, reject) => {
         try {
@@ -60,7 +58,7 @@ export const processChartConfigs = (type: ChartType, themeConfigs: ThemeConfigs)
     const sharedConfiguration = themeConfigs.configuration || {};
     const { charts } = themeConfigs;
     if (charts) {
-        const chartConfigs = (charts as any)[getChartID(type)];
+        const chartConfigs = (charts as any)[type];
 
         return {
             layout: deepMerge.all([ sharedLayout, (chartConfigs && chartConfigs.layout) || {} ]),
@@ -85,14 +83,14 @@ interface SharedConfigs {
 export type ChartConfigs = SharedConfigs & { data: Partial<{}> };
 export interface ThemeConfigs extends SharedConfigs {
     charts?: {
-        "com.mendix.widget.custom.LineChart.LineChart"?: ChartConfigs;
-        "com.mendix.widget.custom.BarChart.BarChart"?: ChartConfigs;
-        "com.mendix.widget.custom.ColumnChart.ColumnChart"?: ChartConfigs;
-        "com.mendix.widget.custom.TimeSeries.TimeSeries"?: ChartConfigs;
-        "com.mendix.widget.custom.AreaChart.AreaChart"?: ChartConfigs;
-        "com.mendix.widget.custom.PieChart.PieChart"?: ChartConfigs;
-        "com.mendix.widget.custom.PolarChart.PolarChart"?: ChartConfigs;
-        "com.mendix.widget.custom.HeatMap.HeatMap"?: ChartConfigs;
-        "com.mendix.widget.custom.BubbleChart.BubbleChart"?: ChartConfigs;
+        LineChart?: ChartConfigs;
+        BarChart?: ChartConfigs;
+        ColumnChart?: ChartConfigs;
+        TimeSeries?: ChartConfigs;
+        AreaChart?: ChartConfigs;
+        PieChart?: ChartConfigs;
+        PolarChart?: ChartConfigs;
+        HeatMap?: ChartConfigs;
+        BubbleChart?: ChartConfigs;
     };
 }

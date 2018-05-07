@@ -134,7 +134,7 @@ To the theme folder, add a new folder named `widgets` to which you should add a 
     // Add shared configuration options here (for all charts)
   },
   "charts": {
-    "com.mendix.widget.custom.LineChart.LineChart": {
+    "LineChart": {
       "layout": {
         // Add line chart only layout options here
       },
@@ -145,25 +145,25 @@ To the theme folder, add a new folder named `widgets` to which you should add a 
           // Add line chart only configuration options here
       }
     },
-    "com.mendix.widget.custom.AreaChart.AreaChart": {
+    "AreaChart": {
       // Same arrangement as the line chart
     },
-    "com.mendix.widget.custom.BubbleChart.BubbleChart": {
+    "BubbleChart": {
       // Same arrangement as the line chart
     },
-    "com.mendix.widget.custom.TimeSeries.TimeSeries": {
+    "TimeSeries": {
       // Same arrangement as the line chart
     },
-    "com.mendix.widget.custom.ColumnChart.ColumnChart": {
+    "ColumnChart": {
       // Same arrangement as the line chart
     },
-    "com.mendix.widget.custom.BarChart.BarChart": {
+    "BarChart": {
       // Same arrangement as the line chart
     },
-    "com.mendix.widget.custom.PieChart.PieChart": {
+    "PieChart": {
       // Same arrangement as the line chart
     },
-    "com.mendix.widget.custom.HeatMap.HeatMap": {
+    "HeatMap": {
       // Same arrangement as the line chart
     }
   }
