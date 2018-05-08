@@ -1,83 +1,48 @@
-import deepMerge from "deepmerge";
 import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
+import "../../ui/Charts.scss";
 import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
 import { HoverTooltip } from "../../components/HoverTooltip";
 import { PlotlyChart } from "../../components/PlotlyChart";
-import { SeriesPlayground } from "../../components/SeriesPlayground";
-import "../../ui/Charts.scss";
-import { configs } from "../../utils/configs";
-import { Container, Data } from "../../utils/namespaces";
+import deepMerge from "deepmerge";
+import { parseAdvancedOptions } from "../../utils/data";
+import { Data } from "../../utils/namespaces";
 import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
+import { BarChartState } from "../store/BarChartReducer";
+import { store } from "../store/store";
+import { getCustomLayoutOptions, getCustomSeriesOptions, getDefaultConfigOptions, getDefaultLayoutOptions, getDefaultSeriesOptions } from "../utils/configs";
+import { BarChartDataHandlerProps } from "./BarChartDataHandler";
 
-export interface BarChartProps extends Container.BarChartContainerProps {
+export interface BarChartProps extends BarChartDataHandlerProps {
     alertMessage?: ReactChild;
     loading?: boolean;
-    scatterData?: ScatterData[];
-    seriesOptions?: string[];
-    themeConfigs: { layout: {}, configuration: {}, data: {} };
     onClick?: (options: Data.OnClickOptions<{ x: string, y: number }, Data.SeriesProps>) => void;
     onHover?: (options: Data.OnHoverOptions<{ x: string, y: number }, Data.SeriesProps>) => void;
 }
 
-interface BarChartState {
-    layoutOptions: string;
-    series?: Data.SeriesProps[];
-    seriesOptions?: string[];
-    scatterData?: ScatterData[];
-    playgroundLoaded: boolean;
-    configurationOptions: string;
-}
-
-export class BarChart extends Component<BarChartProps, BarChartState> {
-    state: BarChartState = {
-        layoutOptions: this.props.layoutOptions,
-        series: this.props.series,
-        configurationOptions: this.props.configurationOptions,
-        seriesOptions: this.props.seriesOptions,
-        scatterData: this.props.scatterData,
-        playgroundLoaded: false
-    };
+export class BarChart extends Component<BarChartProps & BarChartState> {
     private tooltipNode?: HTMLDivElement;
-    private Playground?: typeof SeriesPlayground;
-
-    constructor(props: BarChartProps) {
-        super(props);
-
-        if (props.devMode === "developer") {
-            this.loadPlaygroundComponent();
-        }
-    }
 
     render() {
         if (this.props.alertMessage) {
             return createElement(Alert, { className: "widget-charts-bar-alert" }, this.props.alertMessage);
         }
-        if (this.props.loading || (this.props.devMode === "developer" && !this.state.playgroundLoaded)) {
+        if (this.props.loading || (this.props.devMode === "developer" && !this.props.playground)) {
             return createElement(ChartLoading);
         }
-        if (this.props.devMode === "developer" && this.state.playgroundLoaded) {
+        if (this.props.devMode === "developer" && this.props.playground) {
             return this.renderPlayground();
         }
 
         return this.renderChart();
     }
 
-    componentWillReceiveProps(newProps: BarChartProps) {
-        this.setState({
-            layoutOptions: newProps.layoutOptions,
-            series: newProps.series,
-            seriesOptions: newProps.seriesOptions,
-            scatterData: newProps.scatterData
-        });
-    }
-
-    private async loadPlaygroundComponent() {
-        const { SeriesPlayground: PlaygroundImport } = await import("../../components/SeriesPlayground");
-        this.Playground = PlaygroundImport;
-        this.setState({ playgroundLoaded: true });
+    componentDidMount() {
+        if (this.props.devMode === "developer" && this.props.loadPlayground) {
+            store.dispatch(this.props.loadPlayground());
+        }
     }
 
     private getTooltipNodeRef = (node: HTMLDivElement) => {
@@ -91,7 +56,7 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 layout: this.getLayoutOptions(this.props),
-                data: this.getData(this.props),
+                data: this.props.scatterData || [],
                 config: this.getConfigOptions(this.props),
                 onClick: this.onClick,
                 onHover: this.onHover,
@@ -101,25 +66,22 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     }
 
     private renderPlayground(): ReactElement<any> | null {
-        if (this.Playground) {
-            const { series } = this.state;
-            const modelerLayoutConfigs = deepMerge.all(
-                [ BarChart.defaultLayoutConfigs(this.props), this.props.themeConfigs.layout ]
-            );
-            const modelerSeriesConfigs = series ? series.map(_series => deepMerge.all([
-                BarChart.getDefaultSeriesOptions(_series, this.props),
-                this.props.themeConfigs.data
-            ])) : [];
+        if (this.props.playground) {
+            const { series } = this.props;
+            // const modelerSeriesConfigs = series ? series.map(_series => deepMerge.all([
+            //     BarChart.getDefaultSeriesOptions(_series, this.props),
+            //     this.props.themeConfigs.data
+            // ])) : [];
 
-            return createElement(this.Playground, {
+            return createElement(this.props.playground, {
                 series,
-                seriesOptions: this.state.seriesOptions || [],
-                modelerSeriesConfigs: modelerSeriesConfigs.map(config => JSON.stringify(config, null, 2)),
+                seriesOptions: this.props.seriesOptions || [],
+                modelerSeriesConfigs: this.getModelerSeriesOptions(this.props),
                 onChange: this.onRuntimeUpdate,
-                layoutOptions: this.state.layoutOptions || "{\n\n}",
-                configurationOptions: this.state.configurationOptions || "{\n\n}",
-                configurationOptionsDefault: JSON.stringify(BarChart.getDefaultConfigOptions(), null, 2),
-                modelerLayoutConfigs: JSON.stringify(modelerLayoutConfigs, null, 2)
+                layoutOptions: this.props.layoutOptions || "{\n\n}",
+                configurationOptions: this.props.configurationOptions || "{\n\n}",
+                configurationOptionsDefault: JSON.stringify(getDefaultConfigOptions(), null, 2),
+                modelerLayoutConfigs: JSON.stringify(this.getModelerLayoutOptions(this.props), null, 2)
             }, this.renderChart());
         }
 
@@ -127,31 +89,35 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     }
 
     private getLayoutOptions(props: BarChartProps): Partial<Layout> {
-        const { layoutOptions } = this.state;
-        const advancedOptions = props.devMode !== "basic" && layoutOptions ? JSON.parse(layoutOptions) : {};
-        const themeLayoutConfigs = props.devMode !== "basic" ? this.props.themeConfigs.layout : {};
+        const advancedOptions = parseAdvancedOptions(props.devMode, props.layoutOptions);
 
-        return deepMerge.all([ BarChart.defaultLayoutConfigs(props), themeLayoutConfigs, advancedOptions ]);
+        return deepMerge.all([ this.getModelerLayoutOptions(props), advancedOptions ]);
     }
 
-    private getData(props: BarChartProps): ScatterData[] {
-        if (props.scatterData && this.state.seriesOptions) {
-            const { seriesOptions: options } = this.state;
-            const dataThemeConfigs = props.devMode !== "basic" ? this.props.themeConfigs.data : {};
-            return props.scatterData.map((data, index) => {
-                const parsedOptions = props.devMode !== "basic" && options && options.length
-                    ? JSON.parse(options[index])
-                    : {};
+    private getModelerLayoutOptions(props: BarChartProps): Partial<Layout> {
+        const themeLayoutOptions = props.devMode !== "basic" ? props.themeConfigs.layout : {};
 
-                // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
-                return {
-                    ...deepMerge.all<ScatterData>([ data, dataThemeConfigs, parsedOptions ]),
-                    customdata: data.customdata
-                };
-            });
-        }
+        return deepMerge.all([
+            getDefaultLayoutOptions(),
+            getCustomLayoutOptions(props),
+            themeLayoutOptions
+        ]);
+    }
 
-        return props.scatterData || [];
+    public getConfigOptions(props: BarChartProps): Partial<Config> {
+        const advancedOptions = parseAdvancedOptions(props.devMode, this.props.configurationOptions);
+
+        return deepMerge.all([ getDefaultConfigOptions(), props.themeConfigs.configuration, advancedOptions ]);
+    }
+
+    private getModelerSeriesOptions(props: BarChartProps): string[] {
+        const themeSeriesOptions = props.devMode !== "basic" ? props.themeConfigs.data : {};
+        return props.series ? props.series.map((series, index) => {
+            const customOptions = getCustomSeriesOptions(series, props.orientation, index);
+            const seriesOptions = deepMerge.all([ getDefaultSeriesOptions(), customOptions, themeSeriesOptions ]);
+
+            return JSON.stringify(seriesOptions, null, 2);
+        }) : [];
     }
 
     private onClick = ({ points }: ScatterHoverData<mendix.lib.MxObject>) => {
@@ -200,19 +166,9 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     }
 
     private onRuntimeUpdate = (layoutOptions: string, seriesOptions: string[], configurationOptions: string) => {
-        this.setState({ layoutOptions, seriesOptions, configurationOptions });
-    }
-
-    private static getDefaultConfigOptions(): Partial<Config> {
-        return { displayModeBar: false, doubleClick: false };
-    }
-
-    public getConfigOptions(props: BarChartProps): Partial<Config> {
-        const parsedConfig = props.devMode !== "basic" && this.state.configurationOptions
-            ? JSON.parse(this.state.configurationOptions)
-            : {};
-
-        return deepMerge.all([ BarChart.getDefaultConfigOptions(), props.themeConfigs.configuration, parsedConfig ]);
+        if (this.props.scatterData) {
+            this.props.updateDataFromPlayground(this.props.scatterData, layoutOptions, seriesOptions, configurationOptions);
+        }
     }
 
     public static getDefaultSeriesOptions(series: Data.SeriesProps, props: BarChartProps): Partial<ScatterData> {
@@ -222,31 +178,5 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
             hoverinfo: "none" as any, // typings don't have a hoverinfo value of "y"
             orientation: props.orientation === "bar" ? "h" : "v"
         };
-    }
-
-    public static defaultLayoutConfigs(props: BarChartProps): Partial<Layout> {
-        const defaultConfigs: Partial<Layout> = {
-            barmode: props.barMode,
-            showlegend: props.showLegend,
-            xaxis: {
-                gridcolor: "#d7d7d7",
-                zerolinecolor: "#d7d7d7",
-                zeroline: props.orientation === "bar" ? true : false,
-                title: props.xAxisLabel,
-                showgrid: props.grid === "vertical" || props.grid === "both",
-                fixedrange: true
-            },
-            yaxis: {
-                rangemode: "tozero",
-                zeroline: true,
-                zerolinecolor: "#d7d7d7",
-                gridcolor: "#d7d7d7",
-                title: props.yAxisLabel,
-                showgrid: props.grid === "horizontal" || props.grid === "both",
-                fixedrange: true
-            }
-        };
-
-        return deepMerge.all([ configs.layout, defaultConfigs ]);
     }
 }

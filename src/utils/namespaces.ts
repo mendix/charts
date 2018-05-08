@@ -22,8 +22,10 @@ export namespace Container {
         yAxisLabel: string;
         layoutOptions: string;
         configurationOptions: string;
-        devMode: "basic" | "advanced" | "developer";
+        devMode: DevMode;
     }
+
+    export type DevMode = "basic" | "advanced" | "developer";
 
     export interface BarLayoutProps extends LayoutProps {
         barMode: BarMode;
@@ -67,6 +69,7 @@ export namespace Container {
         scatterData?: ScatterData[];
         seriesOptions: string[];
         loading?: boolean;
+        fetchingConfigs: boolean;
         themeConfigs: ChartConfigs;
     }
 
@@ -102,7 +105,7 @@ export namespace Container {
         layoutOptions: string;
         configurationOptions: string;
         dataOptions: string;
-        devMode: "basic" | "advanced" | "developer";
+        devMode: DevMode;
     }
 
     export interface HeatMapContainerProps extends Data.DataSourceProps, Style.Dimensions, Style.Appearance, Data.EventProps, WrapperProps {
@@ -123,7 +126,7 @@ export namespace Container {
         layoutOptions: string;
         configurationOptions: string;
         dataOptions: string;
-        devMode: "basic" | "advanced" | "developer";
+        devMode: DevMode;
     }
 
     export interface PolarChartContainerProps extends LineChartContainerProps {

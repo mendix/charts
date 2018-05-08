@@ -310,6 +310,18 @@ export const openTooltipForm = (domNode: HTMLDivElement, tooltipForm: string, da
     window.mx.ui.openForm(tooltipForm, { domNode, context, location: "node" });
 };
 
+export const isContextChanged = (currentContext?: mendix.lib.MxObject, newContext?: mendix.lib.MxObject): boolean => {
+    return (!currentContext && !!newContext) ||
+        (!!currentContext && !newContext) ||
+        ((!!currentContext && currentContext.getGuid()) !== (!!newContext && newContext.getGuid()));
+};
+
+export const setRefreshAction = (refreshInterval: number, mxObject?: mendix.lib.MxObject) => (callback: () => void) => {
+    if (refreshInterval > 0 && mxObject) {
+        return window.setInterval(callback, refreshInterval);
+    }
+};
+
 export const getSeriesTraces = ({ data, restData, series }: SeriesData): ScatterTrace => {
     let xData: Datum[] = [];
     let yData: number[] = [];
@@ -461,3 +473,6 @@ export const arrayMerge = (target: any[], source: any[], options: any) => {
 
     return destination;
 };
+
+export const parseAdvancedOptions = (devMode: Container.DevMode, options: string) =>
+    devMode !== "basic" && options ? JSON.parse(options) : {};
