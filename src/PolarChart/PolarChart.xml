@@ -133,6 +133,17 @@
                         <enumerationValue key="callMicroflow">Call a microflow</enumerationValue>
                     </enumerationValues>
                 </property>
+                <property key="pageOption" type="enumeration" defaultValue="content">
+                    <caption>Page options</caption>
+                    <category>Events</category>
+                    <description/>
+                    <enumerationValues>
+                        <enumerationValue key="popup">Popup</enumerationValue>
+                        <enumerationValue key="modal">Modal</enumerationValue>
+                        <enumerationValue key="content">Content</enumerationValue>
+                        <enumerationValue key="node">Node</enumerationValue>
+                    </enumerationValues>
+                </property>
                 <property key="onClickPage" type="form" required="false">
                     <caption>On click page</caption>
                     <category>Events</category>

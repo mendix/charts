@@ -283,12 +283,13 @@ export const handleOnClick = <T extends EventProps>(options: T, mxObject?: MxO, 
     } else if (options.onClickEvent === "showPage" && options.onClickPage) {
         window.mx.ui.openForm(options.onClickPage, {
             context,
-            error: error => window.mx.ui.error(`Error while opening page ${options.onClickPage}: ${error.message}`)
+            error: error => window.mx.ui.error(`Error while opening page ${options.onClickPage}: ${error.message}`),
+            location: options.pageOption
         });
-    } else if (options.onClickEvent === "callNanoflow" && options.onClickNanoflow && mxform && context) {
+    } else if (options.onClickEvent === "callNanoflow" && options.onClickNanoflow.nanoflow && mxform && context) {
         window.mx.data.callNanoflow({
             context,
-            error: error => mx.ui.error(`Error executing nanoflow ${options.onClickNanoflow} : ${error.message}`),
+            error: error => mx.ui.error(`Error executing the on click nanoflow ${error.message}`),
             nanoflow: options.onClickNanoflow,
             origin: mxform
         });
@@ -298,7 +299,7 @@ export const handleOnClick = <T extends EventProps>(options: T, mxObject?: MxO, 
 export const openTooltipForm = (domNode: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) => {
     const context = new mendix.lib.MxContext();
     context.setContext(dataObject.getEntity(), dataObject.getGuid());
-    window.mx.ui.openForm(tooltipForm, { domNode, context });
+    window.mx.ui.openForm(tooltipForm, { domNode, context, location: "node" });
 };
 
 export const getSeriesTraces = ({ data, restData, series }: SeriesData): ScatterTrace => {
