@@ -130,21 +130,20 @@
                         <enumerationValue key="callNanoflow">Call a nanoflow</enumerationValue>
                     </enumerationValues>
                 </property>
-                <property key="pageOption" type="enumeration" defaultValue="content">
-                    <caption>Page options</caption>
-                    <category>Events</category>
-                    <description/>
-                    <enumerationValues>
-                        <enumerationValue key="popup">Popup</enumerationValue>
-                        <enumerationValue key="modal">Modal</enumerationValue>
-                        <enumerationValue key="content">Content</enumerationValue>
-                        <enumerationValue key="node">Node</enumerationValue>
-                    </enumerationValues>
-                </property>
                 <property key="onClickPage" type="form" required="false">
                     <caption>On click page</caption>
                     <category>Events</category>
                     <description>The page that will be opened on click</description>
+                </property>
+                <property key="openPageLocaton" type="enumeration" defaultValue="content">
+                    <caption>Open page as</caption>
+                    <category>Events</category>
+                    <description/>
+                    <enumerationValues>
+                        <enumerationValue key="content">Full page</enumerationValue>
+                        <enumerationValue key="popup">Popup</enumerationValue>
+                        <enumerationValue key="modal">Blocking popup</enumerationValue>
+                    </enumerationValues>
                 </property>
                 <property key="onClickMicroflow" type="microflow" required="false" entityProperty="dataEntity">
                     <caption>On click microflow</caption>

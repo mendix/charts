@@ -152,7 +152,7 @@ export default class AnyChartContainer extends Component<AnyChartContainerProps,
     private openTooltipForm(domNode: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) {
         const context = new mendix.lib.MxContext();
         context.setContext(dataObject.getEntity(), dataObject.getGuid());
-        window.mx.ui.openForm(tooltipForm, { domNode, context });
+        window.mx.ui.openForm(tooltipForm, { domNode, context, location: "node" });
     }
 
     public static validateSeriesProps(props: AnyChartContainerProps): ReactChild {

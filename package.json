@@ -90,7 +90,7 @@
     "karma-remap-istanbul": "^0.6.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^3.0.0",
-    "mendix-client": "^7.13.2",
+    "mendix-client": "^7.13.3",
     "mendix-widget-build-script": "^1.0.0",
     "node-sass": "^4.7.2",
     "pre-commit": "^1.2.2",

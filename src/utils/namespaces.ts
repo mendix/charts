@@ -217,7 +217,7 @@ export namespace Data {
 
     export interface EventProps {
         onClickEvent: "doNothing" | "showPage" | "callMicroflow" | "callNanoflow";
-        pageOption: "popup" | "modal" | "content" | "node";
+        openPageLocaton: "popup" | "modal" | "content";
         onClickPage: string;
         onClickMicroflow: string;
         onClickNanoflow: Nanoflow;
