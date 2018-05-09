@@ -3,7 +3,7 @@ import * as classNames from "classnames";
 
 import { ChartLoading } from "./ChartLoading";
 import deepMerge from "deepmerge";
-import * as elementResize from "element-resize-detector";
+import ReactResizeDetector from "react-resize-detector";
 import {
     Config, Data, HeatMapData, Layout, PieData, PieHoverData,
     PlotlyHTMLElement, Root, ScatterData, ScatterHoverData
@@ -25,14 +25,18 @@ export interface PlotlyChartProps {
     onResize?: (node: HTMLDivElement) => void;
 }
 
+interface Plotly {
+    newPlot: (root: Root, data: Data[], layout?: Partial<Layout>, config?: Partial<Config>) => Promise<PlotlyHTMLElement>;
+    purge: (root: Root) => void;
+    relayout?: (root: Root, layout: Partial<Layout>) => Promise<PlotlyHTMLElement>;
+}
+
 export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean }> {
     state = { loading: true };
     private chartNode?: HTMLDivElement;
     private tooltipNode?: HTMLDivElement;
     private timeoutId?: number;
-    private resizeDetector = elementResize({ strategy: "scroll" });
-    private newPlot?: (root: Root, data: Data[], layout?: Partial<Layout>, config?: Partial<Config>) => Promise<PlotlyHTMLElement>;
-    private purge?: (root: Root) => void;
+    private plotly?: Plotly;
 
     render() {
         return createElement("div",
@@ -41,6 +45,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
                 ref: this.getPlotlyNodeRef,
                 style: this.props.style
             },
+            createElement(ReactResizeDetector, { handleWidth: true, handleHeight: true, onResize: this.onResize }),
             createElement("div", { className: "widget-charts-tooltip", ref: this.getTooltipNodeRef }),
             this.state.loading ? createElement(ChartLoading) : null
         );
@@ -50,21 +55,32 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         if (this.chartNode && this.chartNode.parentElement) {
             this.chartNode.parentElement.classList.add("widget-charts-wrapper");
         }
-        this.loadPlotlyAPI();
+        this.fetchPlotly()
+            .then(plotly => {
+                this.plotly = plotly;
+                if (this.props.onRender && this.chartNode) {
+                    this.props.onRender(this.chartNode);
+                }
+                this.setState({ loading: false });
+            });
     }
 
     componentDidUpdate() {
-        this.renderChart(this.props);
+        if (this.plotly) {
+            this.renderChart(this.props, this.plotly);
+        }
     }
 
     componentWillUnmount() {
-        if (this.chartNode && this.purge) {
-            this.purge(this.chartNode);
+        if (this.chartNode && this.plotly) {
+            this.plotly.purge(this.chartNode);
         }
     }
 
     private getPlotlyNodeRef = (node: HTMLDivElement) => {
-        this.chartNode = node;
+        if (node) {
+            this.chartNode = node;
+        }
     }
 
     private getTooltipNodeRef = (node: HTMLDivElement) => {
@@ -74,13 +90,13 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         }
     }
 
-    private async renderChart({ config, data, layout, onClick, onHover, onRestyle }: PlotlyChartProps) {
-        if (this.chartNode && !this.state.loading && this.newPlot) {
+    private renderChart({ config, data, layout, onClick, onHover, onRestyle }: PlotlyChartProps, plotly: Plotly) {
+        if (this.chartNode && !this.state.loading) {
             const layoutOptions = deepMerge.all([ layout, getDimensionsFromNode(this.chartNode) ]);
             const plotlyConfig = window.dojo && window.dojo.locale
                 ? { ...config, locale: window.dojo.locale }
                 : config;
-            this.newPlot(this.chartNode, data as Data[], layoutOptions, plotlyConfig)
+            plotly.newPlot(this.chartNode, data as Data[], layoutOptions, plotlyConfig)
                 .then(myPlot => {
                     if (onClick) {
                         myPlot.on("plotly_click", onClick as any);
@@ -96,43 +112,24 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         }
     }
 
-    private async loadPlotlyAPI() {
-        if (!this.newPlot || this.purge) {
-            if (this.props.type === "full") {
-                const { newPlot, purge } = await import("plotly.js/dist/plotly");
-                this.newPlot = newPlot;
-                this.purge = purge;
-            } else {
-                const { newPlot, purge, register } = await import("../PlotlyCustom");
-                if (this.props.type === "pie") {
-                    register([ await import("plotly.js/lib/pie") ]);
-                }
-                if (this.props.type === "bar" || this.props.type === "line") {
-                    register([ await import("plotly.js/lib/bar"), await import("plotly.js/lib/scatter") ]);
-                }
-                if (this.props.type === "heatmap") {
-                    register([ await import("plotly.js/lib/heatmap") ]);
-                }
-                if (this.props.type === "polar") {
-                    register([ await import("plotly.js/lib/scatterpolar") ]);
-                }
-                this.newPlot = newPlot;
-                this.purge = purge;
-            }
-        }
-        if (this.props.onRender && this.chartNode) {
-            this.props.onRender(this.chartNode);
-        }
-        this.addResizeListener();
-        if (this.state.loading) {
-            this.setState({ loading: false });
-        }
-    }
+    private async fetchPlotly(): Promise<Plotly> {
+        if (this.props.type === "full") {
+            const { newPlot, purge } = await import("plotly.js/dist/plotly");
 
-    private addResizeListener() {
-        if (this.chartNode && this.chartNode.parentElement) {
-            this.resizeDetector.removeListener(this.chartNode.parentElement, this.onResize);
-            this.resizeDetector.listenTo(this.chartNode.parentElement, this.onResize);
+            return { newPlot, purge };
+        } else {
+            const { newPlot, purge, register } = await import("../PlotlyCustom");
+            if (this.props.type === "pie") {
+                register([ await import("plotly.js/lib/pie") ]);
+            }
+            if (this.props.type === "bar" || this.props.type === "line") {
+                register([ await import("plotly.js/lib/bar"), await import("plotly.js/lib/scatter") ]);
+            }
+            if (this.props.type === "heatmap") {
+                register([ await import("plotly.js/lib/heatmap") ]);
+            }
+
+            return { newPlot, purge };
         }
     }
 
@@ -142,19 +139,17 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         }
     }
 
-    private onResize = async () => {
+    private onResize = () => {
         if (this.timeoutId) {
             clearTimeout(this.timeoutId);
         }
         this.timeoutId = window.setTimeout(() => {
-            if (this.chartNode && this.purge) {
-                this.purge(this.chartNode);
-                this.renderChart(this.props);
+            if (this.plotly && this.chartNode) {
+                this.renderChart(this.props, this.plotly);
                 if (this.props.onResize) {
                     this.props.onResize(this.chartNode);
                 }
             }
-            this.timeoutId = 0;
         }, 100);
     }
 }

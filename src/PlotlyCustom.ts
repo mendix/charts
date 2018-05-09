@@ -1,1 +1,1 @@
-export { Plots, newPlot, purge, register, update } from "plotly.js/lib/core";
+export { Plots, newPlot, purge, relayout, register } from "plotly.js/lib/core";

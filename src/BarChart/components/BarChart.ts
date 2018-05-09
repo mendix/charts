@@ -68,16 +68,11 @@ export class BarChart extends Component<BarChartProps & BarChartState> {
     private renderPlayground(): ReactElement<any> | null {
         if (this.props.playground) {
             const { series } = this.props;
-            // const modelerSeriesConfigs = series ? series.map(_series => deepMerge.all([
-            //     BarChart.getDefaultSeriesOptions(_series, this.props),
-            //     this.props.themeConfigs.data
-            // ])) : [];
-
             return createElement(this.props.playground, {
                 series,
                 seriesOptions: this.props.seriesOptions || [],
                 modelerSeriesConfigs: this.getModelerSeriesOptions(this.props),
-                onChange: this.onRuntimeUpdate,
+                onChange: this.onOptionsUpdate,
                 layoutOptions: this.props.layoutOptions || "{\n\n}",
                 configurationOptions: this.props.configurationOptions || "{\n\n}",
                 configurationOptionsDefault: JSON.stringify(getDefaultConfigOptions(), null, 2),
@@ -165,7 +160,7 @@ export class BarChart extends Component<BarChartProps & BarChartState> {
         }
     }
 
-    private onRuntimeUpdate = (layoutOptions: string, seriesOptions: string[], configurationOptions: string) => {
+    private onOptionsUpdate = (layoutOptions: string, seriesOptions: string[], configurationOptions: string) => {
         if (this.props.scatterData) {
             this.props.updateDataFromPlayground(this.props.scatterData, layoutOptions, seriesOptions, configurationOptions);
         }

@@ -53,8 +53,17 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
                 this.intervalID = setRefreshAction(newProps.refreshInterval, newProps.mxObject)(this.onRefresh);
             }
         } else {
+            // TODO:determine if this is OK
             this.clearRefreshInterval();
         }
+    }
+
+    shouldComponentUpdate(nextProps: BarChartDataHandlerProps) {
+        return nextProps.loading !== this.props.loading
+            || nextProps.playground !== this.props.playground
+            || nextProps.layoutOptions !== this.props.layoutOptions
+            || nextProps.seriesOptions.join(" ") !== this.props.seriesOptions.join(" ")
+            || nextProps.configurationOptions !== this.props.configurationOptions;
     }
 
     componentWillUnmount() {

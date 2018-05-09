@@ -71,7 +71,7 @@ export const barChartReducer: Reducer<BarChartReducerState> = (state = defaultSt
                 ...state,
                 layoutOptions: action.layoutOptions,
                 scatterData: action.scatterData,
-                seriesOptions: action.seriesOptions,
+                seriesOptions: action.seriesOptions.slice(),
                 configurationOptions: action.configurationOptions
             };
         case ALERT_MESSAGE:
