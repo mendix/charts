@@ -76,6 +76,7 @@ export function getVisibleProperties(valueMap: PieChartContainerProps, visibilit
     visibilityMap.onClickMicroflow = valueMap.onClickEvent === "callMicroflow";
     visibilityMap.onClickNanoflow = valueMap.onClickEvent === "callNanoflow";
     visibilityMap.onClickPage = valueMap.onClickEvent === "showPage";
+    visibilityMap.openPageLocation = valueMap.onClickEvent === "showPage";
 
     return visibilityMap;
 }

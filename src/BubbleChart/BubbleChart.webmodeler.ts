@@ -111,7 +111,7 @@ export function getVisibleProperties(valueMap: LineChartContainerProps, visibili
             visibilityMap.series[index].onClickNanoflow = series.onClickEvent === "callNanoflow";
             visibilityMap.series[index].onClickPage = series.onClickEvent === "showPage";
 
-            visibilityMap.series[index].openPageLocaton = series.onClickEvent === "showPage";
+            visibilityMap.series[index].openPageLocation = series.onClickEvent === "showPage";
         });
     }
     visibilityMap.devMode = false;

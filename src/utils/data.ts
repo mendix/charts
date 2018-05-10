@@ -284,7 +284,7 @@ export const handleOnClick = <T extends EventProps>(options: T, mxObject?: MxO, 
         window.mx.ui.openForm(options.onClickPage, {
             context,
             error: error => window.mx.ui.error(`Error while opening page ${options.onClickPage}: ${error.message}`),
-            location: options.openPageLocaton
+            location: options.openPageLocation
         });
     } else if (options.onClickEvent === "callNanoflow" && options.onClickNanoflow.nanoflow && mxform && context) {
         window.mx.data.callNanoflow({

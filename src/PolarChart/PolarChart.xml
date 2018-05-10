@@ -138,7 +138,7 @@
                     <category>Events</category>
                     <description>The page that will be opened on click</description>
                 </property>
-                <property key="openPageLocaton" type="enumeration" defaultValue="content">
+                <property key="openPageLocation" type="enumeration" defaultValue="content">
                     <caption>Open page as</caption>
                     <category>Events</category>
                     <description/>

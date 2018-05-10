@@ -89,7 +89,7 @@ export function getVisibleProperties(valueMap: BarChartContainerProps, visibilit
             visibilityMap.series[index].onClickNanoflow = series.onClickEvent === "callNanoflow";
             visibilityMap.series[index].onClickPage = series.onClickEvent === "showPage";
 
-            visibilityMap.series[index].openPageLocaton = series.onClickEvent === "showPage";
+            visibilityMap.series[index].openPageLocation = series.onClickEvent === "showPage";
         });
     }
     visibilityMap.layoutOptions = false;
