@@ -125,7 +125,7 @@ export default class LineChartContainer extends Component<LineChartContainerProp
                     guid: mxObject.getGuid(),
                     entity: series.dataEntity,
                     constraint: series.entityConstraint,
-                    sortAttribute: series.xValueSortAttribute,
+                    sortAttribute: series.xValueSortAttribute || series.xValueAttribute,
                     sortOrder: series.sortOrder,
                     type: series.dataSourceType,
                     attributes,
