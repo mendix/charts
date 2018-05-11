@@ -301,3 +301,19 @@ Layout
   }
 }
 ```
+Configurations options (all charts)
+```json
+{
+  "displayModeBar": true,
+  "displaylogo": false,
+  "modeBarButtonsToRemove": [ "sendDataToCloud", "lasso2d",  "select2d", "hoverClosestCartesian", "hoverCompareCartesian", "toggleSpikelines" ],
+  "locale": "nl",
+  "locales": {
+    "nl": {
+      "dictionary": {
+        "Download plot as a png": "Opslaan als PNG"  
+      }
+    }
+  }
+ }
+```

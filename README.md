@@ -29,7 +29,7 @@ Plot and compare your data across different charts.
 A line (scatter) chart should have one or more series, each displaying commonly grouped data points.
 ![LineChartProperties](/assets/LineChart_ChartProperties.png)
 
-Data can be retrieved either from the database, or from a microflow.
+Data can be retrieved from the database, from a microflow, or from REST endpoint.
 Below are the properties for configuring series data:
 
 * `name`[required] - Caption for series, shown on hover & on the legend.
@@ -37,6 +37,9 @@ Below are the properties for configuring series data:
 * `X-axis data attribute`[required] - The attribute that contains the data point X value.
 * `Y-axis data attribute`[required] - The attribute that contains the data point Y value.
 * `X-axis sort attribute` - The attribute to use for sorting the x-axis data.
+* `REST URL` - The URL used to retrieve data. Only used when the datasource is REST endpoint.
+
+For more details: [REST endpoint](/RESTEndpoint.md)
 
 NB: The line chart's x-axis provides support for dates and thus the line chart can be configured as a time series.
 
@@ -92,7 +95,15 @@ Layout options control the general appearance of the chart. Common options inclu
   }
 }
 ```
-
+### Configurations options (all charts)
+Configurations options control the appearance of the chart beyond the layout options. Common options include; displayModeBar, doubleClick etc
+```json
+{
+  "displayModeBar": true,
+  "doubleClick": true,
+  "displaylogo": false
+}
+```
 For more details: [Developer cheat sheet](/AdvancedCheatSheet.md)
 
 ### Data options (pie chart)
@@ -108,6 +119,59 @@ For more details: [Developer cheat sheet](/AdvancedCheatSheet.md)
 The series options control the appearance of a specific series on the line or column chart. Options include line color, line shape e.t.c
 
 Full Plotly API reference: [https://plot.ly/javascript/reference/](https://plot.ly/javascript/reference/)
+
+### Theme based advanced configuration
+The settings above can also be added in a global context via the theme folder of your mendix project root directory.
+
+To the theme folder, add a new folder named `widgets` to which you should add a `.json` file named `com.mendix.charts`. The JSON should be in the following format:
+
+``` json
+{
+  "layout": {
+    // Add shared layout options here (for all charts)
+  },
+  "configuration": {
+    // Add shared configuration options here (for all charts)
+  },
+  "charts": {
+    "LineChart": {
+      "layout": {
+        // Add line chart only layout options here
+      },
+      "data": {
+        // Add line chart only data options here
+      },
+      "configuration": {
+          // Add line chart only configuration options here
+      }
+    },
+    "AreaChart": {
+      // Same arrangement as the line chart
+    },
+    "BubbleChart": {
+      // Same arrangement as the line chart
+    },
+    "TimeSeries": {
+      // Same arrangement as the line chart
+    },
+    "ColumnChart": {
+      // Same arrangement as the line chart
+    },
+    "BarChart": {
+      // Same arrangement as the line chart
+    },
+    "PieChart": {
+      // Same arrangement as the line chart
+    },
+    "HeatMap": {
+      // Same arrangement as the line chart
+    }
+  }
+}
+```
+
+Please use with caution, as the configs set up here shall be applied to every instance of the charts in your application.  
+Only the advanced configurations set up in the widget itself have a higher precendence.
 
 ## Issues, suggestions and feature requests
 We are actively maintaining this widget, please report any issues or suggestion for improvement at [https://github.com/mendixlabs/charts/issues](https://github.com/mendixlabs/charts/issues)

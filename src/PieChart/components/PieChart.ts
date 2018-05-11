@@ -1,33 +1,34 @@
+import deepMerge from "deepmerge";
+import { Config, Layout, PieData, PieHoverData } from "plotly.js";
 import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
-
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
 import { HoverTooltip } from "../../components/HoverTooltip";
-import { PiePlayground } from "./PiePlayground";
 import { PlotlyChart } from "../../components/PlotlyChart";
+import "../../ui/Charts.scss";
+import { arrayMerge, configs } from "../../utils/configs";
+import { Container, Data } from "../../utils/namespaces";
+import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
+import { PiePlayground } from "./PiePlayground";
 
-import deepMerge from "deepmerge";
-import { Container } from "../../utils/namespaces";
-import { Config, Layout, PieData, PieHoverData, ScatterHoverData } from "plotly.js";
-import { defaultColours, getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 import PieChartContainerProps = Container.PieChartContainerProps;
 
-import "../../ui/Charts.scss";
-
 export interface PieChartProps extends PieChartContainerProps {
-    data?: mendix.lib.MxObject[];
+    data?: PieData[];
     defaultData?: PieData[];
     alertMessage?: ReactChild;
     loading?: boolean;
-    onClick?: (props: PieChartProps, dataObject: mendix.lib.MxObject, mxform: mxui.lib.form._FormBase) => void;
-    onHover?: (node: HTMLDivElement, dataObject: mendix.lib.MxObject) => void;
+    themeConfigs: { layout: {}, configuration: {}, data: {} };
+    onClick?: (options: Data.OnClickOptions<{ label: string, value: number }, PieChartContainerProps>) => void;
+    onHover?: (options: Data.OnHoverOptions<{ label: string, value: number }, PieChartContainerProps>) => void;
 }
 
 interface PieChartState {
     layoutOptions: string;
     dataOptions: string;
     playgroundLoaded: boolean;
+    configurationOptions: string;
 }
 
 export interface PieTraces {
@@ -40,6 +41,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
     state: PieChartState = {
         layoutOptions: this.props.layoutOptions,
         dataOptions: this.props.dataOptions,
+        configurationOptions: this.props.configurationOptions,
         playgroundLoaded: false
     };
     private tooltipNode?: HTMLDivElement;
@@ -87,7 +89,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 layout: this.getLayoutOptions(this.props),
                 data: this.getData(this.props),
-                config: PieChart.getConfigOptions(),
+                config: this.getConfigOptions(this.props),
                 onClick: this.onClick,
                 onHover: this.onHover,
                 getTooltipNode: this.getTooltipNodeRef
@@ -95,86 +97,93 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         );
     }
 
-    private getData(props: PieChartProps): PieData[] {
-        if (props.data) {
-            const advancedOptions = props.devMode !== "basic" && this.state.dataOptions
-                ? JSON.parse(this.state.dataOptions)
-                : {};
-
-            const arrayMerge = (_destinationArray: any[], sourceArray: any[]) => {
-                return sourceArray;
-            };
-
-            const traces = this.getTraces(props.data);
-            return [
-                deepMerge.all(
-                    [
-                        PieChart.getDefaultDataOptions(this.props),
-                        {
-                            labels: traces.labels,
-                            values: traces.values,
-                            marker: { colors: traces.colors }
-                        },
-                        advancedOptions
-                    ],
-                    { arrayMerge }
-                )
-            ];
-        }
-
-        return props.defaultData || [];
-    }
-
     private renderPlayground(): ReactElement<any> | null {
         if (this.Playground) {
+            const { themeConfigs } = this.props;
+            const modelerLayoutConfigs = deepMerge.all(
+                [ PieChart.getDefaultLayoutOptions(this.props), themeConfigs.layout ]
+            );
+            const modelerDataConfigs = deepMerge.all([ PieChart.getDefaultDataOptions(this.props), themeConfigs.data ]);
+
             return createElement(this.Playground, {
                 dataOptions: this.state.dataOptions || "{\n\n}",
-                modelerDataConfigs: JSON.stringify(PieChart.getDefaultDataOptions(this.props), null, 4),
+                modelerDataConfigs: JSON.stringify(modelerDataConfigs, null, 2),
                 onChange: this.onRuntimeUpdate,
                 layoutOptions: this.state.layoutOptions || "{\n\n}",
-                modelerLayoutConfigs: JSON.stringify(PieChart.getDefaultLayoutOptions(this.props), null, 4)
+                modelerLayoutConfigs: JSON.stringify(modelerLayoutConfigs, null, 2),
+                configurationOptions: this.state.configurationOptions || "{\n\n}",
+                configurationOptionsDefault: JSON.stringify(PieChart.getDefaultConfigOptions(), null, 2)
             }, this.renderChart());
         }
 
         return null;
     }
 
+    private getData(props: PieChartProps): PieData[] {
+        if (props.data && props.data.length) {
+            const { dataOptions } = this.state;
+            const advancedOptions = props.devMode !== "basic" && dataOptions ? JSON.parse(dataOptions) : {};
+            const dataThemeConfigs = props.devMode !== "basic" ? props.themeConfigs.data : {};
+
+            return [
+                {
+                    ...deepMerge.all(
+                        [
+                            props.data[0],
+                            dataThemeConfigs,
+                            advancedOptions
+                        ],
+                        { arrayMerge }
+                    ),
+                    customdata: props.data[0].customdata
+                }
+            ];
+        }
+
+        return props.defaultData || [];
+    }
+
     private getLayoutOptions(props: PieChartProps): Partial<Layout> {
-        const advancedOptions = props.devMode !== "basic" && this.state.layoutOptions
-            ? JSON.parse(this.state.layoutOptions)
-            : {};
+        const { layoutOptions } = this.state;
+        const advancedOptions = props.devMode !== "basic" && layoutOptions ? JSON.parse(layoutOptions) : {};
+        const themeLayoutConfigs = props.devMode !== "basic" ? props.themeConfigs.layout : {};
 
-        return deepMerge.all([ PieChart.getDefaultLayoutOptions(props), advancedOptions ]);
+        return deepMerge.all([ PieChart.getDefaultLayoutOptions(props), themeLayoutConfigs, advancedOptions ]);
     }
 
-    private getTraces(data?: mendix.lib.MxObject[]): PieTraces {
-        if (data) {
-            return {
-                labels: data.map(mxObject => mxObject.get(this.props.nameAttribute) as string),
-                colors: this.props.colors && this.props.colors.length
-                    ? this.props.colors.map(color => color.color)
-                    : defaultColours(),
-                values: data.map(mxObject => parseFloat(mxObject.get(this.props.valueAttribute) as string))
-            };
-        }
-
-        return { labels: [], values: [], colors: [] };
-    }
-
-    private onClick = ({ points }: ScatterHoverData<any> | PieHoverData) => {
+    private onClick = ({ points }: PieHoverData<mendix.lib.MxObject[]>) => {
         if (this.props.onClick && this.props.data) {
-            this.props.onClick(this.props, this.props.data[points[0].pointNumber], this.props.mxform);
+            const point = points[0];
+            this.props.onClick({
+                mxObject: point.customdata[0],
+                options: this.props,
+                mxForm: this.props.mxform,
+                trace: {
+                    label: point.label,
+                    value: point.value
+                }
+            });
         }
     }
 
-    private onHover = ({ event, points }: PieHoverData) => {
+    private onHover = ({ event, points }: PieHoverData<mendix.lib.MxObject[]>) => {
         if (event && this.tooltipNode) {
             unmountComponentAtNode(this.tooltipNode);
             const coordinates = getTooltipCoordinates(event, this.tooltipNode);
             if (coordinates) {
                 setTooltipPosition(this.tooltipNode, coordinates);
                 if (this.props.onHover && this.props.data) {
-                    this.props.onHover(this.tooltipNode, this.props.data[points[0].pointNumber]);
+                    const point = points[0];
+                    this.props.onHover({
+                        tooltipForm: this.props.tooltipForm,
+                        tooltipNode: this.tooltipNode,
+                        mxObject: point.customdata[0],
+                        options: this.props,
+                        trace: {
+                            label: point.label,
+                            value: point.value
+                        }
+                    });
                 } else if (points[0].data.hoverinfo === "none") {
                     render(createElement(HoverTooltip, { text: points[0].label }), this.tooltipNode);
                 } else {
@@ -184,30 +193,28 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         }
     }
 
-    private onRuntimeUpdate = (layoutOptions: string, dataOptions: string) => {
-        this.setState({ layoutOptions, dataOptions });
+    private onRuntimeUpdate = (layoutOptions: string, dataOptions: string, configurationOptions: string) => {
+        this.setState({ layoutOptions, dataOptions, configurationOptions });
     }
 
-    private static getConfigOptions(): Partial<Config> {
+    private static getDefaultConfigOptions(): Partial<Config> {
         return { displayModeBar: false, doubleClick: false };
     }
 
+    public getConfigOptions(props: PieChartProps): Partial<Config> {
+        const parsedConfig = props.devMode !== "basic" && this.state.configurationOptions
+            ? JSON.parse(this.state.configurationOptions)
+            : {};
+
+        return deepMerge.all([ PieChart.getDefaultConfigOptions(), props.themeConfigs.configuration, parsedConfig ]);
+    }
+
     public static getDefaultLayoutOptions(props: PieChartProps): Partial<Layout> {
-        return {
+        const defaultConfigs: Partial<Layout> = {
             font: {
-                family: "Open Sans, sans-serif",
-                size: 12,
-                color: "#FFF"
+                size: 12
             },
-            autosize: true,
             showlegend: props.showLegend,
-            hoverlabel: {
-                bgcolor: "#888",
-                bordercolor: "#888",
-                font: {
-                    color: "#FFF"
-                }
-            },
             legend: {
                 font: {
                     family: "Open Sans",
@@ -216,13 +223,11 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 }
             },
             margin: {
-                l: 60,
-                r: 60,
-                b: 60,
-                t: 10,
-                pad: 10
+                t: 10
             }
         };
+
+        return deepMerge.all([ configs.layout, defaultConfigs ]);
     }
 
     public static getDefaultDataOptions(props: PieChartProps): Partial<PieData> {

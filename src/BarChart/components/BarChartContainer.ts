@@ -1,15 +1,15 @@
-let __webpack_public_path__;
-import { Component, ReactElement, createElement } from "react";
+let __webpack_public_path__: string;
+import { Component, createElement } from "react";
 
-import { Alert, AlertProps } from "../../components/Alert";
 import { BarChart, BarChartProps } from "./BarChart";
-import { fetchSeriesData, getSeriesTraces, handleOnClick, validateSeriesProps } from "../../utils/data";
+import { fetchData, generateRESTURL, getSeriesTraces, handleOnClick, openTooltipForm, validateSeriesProps } from "../../utils/data";
 import deepMerge from "deepmerge";
 import { Container, Data } from "../../utils/namespaces";
 import { ScatterData } from "plotly.js";
 import { defaultColours, getDimensions, parseStyle } from "../../utils/style";
 import BarChartContainerProps = Container.BarChartContainerProps;
 import BarChartContainerState = Container.BarChartContainerState;
+import { fetchThemeConfigs } from "../../utils/configs";
 
 __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
@@ -19,7 +19,8 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         alertMessage: validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions),
         data: [],
         seriesOptions: [],
-        loading: true
+        loading: true,
+        themeConfigs: { layout: {}, configuration: {}, data: {} }
     };
     private subscriptionHandle?: number;
     private intervalID?: number;
@@ -38,10 +39,18 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
                 seriesOptions: this.state.seriesOptions,
                 loading: this.state.loading,
                 alertMessage: this.state.alertMessage,
-                onClick: handleOnClick,
-                onHover: BarChartContainer.openTooltipForm
+                themeConfigs: this.state.themeConfigs,
+                onClick: this.handleOnClick,
+                onHover: this.handleOnHover
             })
         );
+    }
+
+    componentDidMount() {
+        if (this.props.devMode !== "basic") {
+            fetchThemeConfigs(this.props.orientation === "bar" ? "BarChart" : "ColumnChart")
+                .then(themeConfigs => this.setState({ themeConfigs }));
+        }
     }
 
     componentWillReceiveProps(newProps: BarChartContainerProps) {
@@ -49,8 +58,10 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         if (!this.state.loading) {
             this.setState({ loading: true });
         }
-        this.fetchData(newProps.mxObject);
-        this.setRefreshInterval(newProps.refreshInterval, newProps.mxObject);
+        if (!this.state.alertMessage) {
+            this.fetchData(newProps.mxObject);
+            this.setRefreshInterval(newProps.refreshInterval, newProps.mxObject);
+        }
     }
 
     componentWillUnmount() {
@@ -89,19 +100,41 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
 
     private fetchData = (mxObject?: mendix.lib.MxObject) => {
         if (mxObject && this.props.series.length) {
-            Promise.all(this.props.series.map(series => fetchSeriesData(mxObject, series)))
-                .then(seriesData => {
-                    this.setState({
-                        loading: false,
-                        data: seriesData,
-                        scatterData: this.getData(seriesData),
-                        seriesOptions: seriesData.map(({ series }) => series.seriesOptions || "{\n\n}")
-                    });
-                })
-                .catch(reason => {
-                    window.mx.ui.error(reason);
-                    this.setState({ loading: false, data: [], scatterData: [] });
+            Promise.all(this.props.series.map(series => {
+                const attributes = [ series.xValueAttribute, series.yValueAttribute ];
+                if (series.xValueSortAttribute) {
+                    attributes.push(series.xValueSortAttribute);
+                }
+                const url = series.restUrl && generateRESTURL(mxObject, series.restUrl, this.props.restParameters);
+
+                return fetchData<Data.SeriesProps>({
+                    guid: mxObject.getGuid(),
+                    entity: series.dataEntity,
+                    constraint: series.entityConstraint,
+                    sortAttribute: series.xValueSortAttribute || series.xValueAttribute,
+                    sortOrder: series.sortOrder,
+                    type: series.dataSourceType,
+                    attributes,
+                    microflow: series.dataSourceMicroflow,
+                    url: url && `${url}&seriesName=${series.name}`,
+                    customData: series
                 });
+            })).then(seriesData => {
+                const data = seriesData.map(({ mxObjects, restData, customData }) => ({
+                    data: mxObjects,
+                    restData,
+                    series: customData as Data.LineSeriesProps
+                }));
+                this.setState({
+                    loading: false,
+                    data,
+                    scatterData: this.getData(data),
+                    seriesOptions: data.map(({ series }) => series.seriesOptions || "{\n\n}")
+                });
+            }).catch(reason => {
+                window.mx.ui.error(reason);
+                this.setState({ loading: false, data: [], scatterData: [] });
+            });
         } else {
             this.setState({ loading: false, data: [], scatterData: [] });
         }
@@ -113,14 +146,14 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         );
     }
 
-    private createScatterData({ data, series }: Data.SeriesData, bar: boolean, index: number, devMode = false): ScatterData {
+    private createScatterData({ data, restData, series }: Data.SeriesData, bar: boolean, index: number, devMode = false): ScatterData {
         const rawOptions = devMode && series.seriesOptions ? JSON.parse(series.seriesOptions) : {};
-        const traces = getSeriesTraces({ data, series });
+        const traces = getSeriesTraces({ data, restData, series });
         const color: string | undefined = series.barColor || defaultColours()[index];
 
         return {
             ...deepMerge.all<ScatterData>([
-                BarChart.getDefaultSeriesOptions(series, this.props),
+                BarChart.getDefaultSeriesOptions(series, this.props as BarChartProps),
                 {
                     x: bar ? traces.y : traces.x,
                     y: bar ? traces.x : traces.y,
@@ -129,13 +162,43 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
                 },
                 rawOptions
             ]),
-            customdata: data // each array element shall be returned as the custom data of a corresponding point
+            customdata: data || [] // each array element shall be returned as the custom data of a corresponding point
         };
     }
 
-    public static openTooltipForm(domNode: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) {
-        const context = new mendix.lib.MxContext();
-        context.setContext(dataObject.getEntity(), dataObject.getGuid());
-        window.mx.ui.openForm(tooltipForm, { domNode, context });
+    private handleOnClick = (options: Data.OnClickOptions<{ x: string, y: number }, Data.SeriesProps>) => {
+        if (options.mxObject) {
+            handleOnClick(options.options, options.mxObject, options.mxForm);
+        } else if (options.trace) {
+            this.createDataPoint(options.options, options.trace)
+                .then(mxObject => handleOnClick(options.options, mxObject, options.mxForm))
+                .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
+        }
+    }
+
+    private handleOnHover = (options: Data.OnHoverOptions<{ x: string, y: number }, Data.SeriesProps>) => {
+        if (options.mxObject) {
+            openTooltipForm(options.tooltipNode, options.tooltipForm, options.mxObject);
+        } else if (options.trace && options.options.dataEntity) {
+            this.createDataPoint(options.options, options.trace)
+                .then(mxObject => openTooltipForm(options.tooltipNode, options.tooltipForm, mxObject))
+                .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
+        }
+    }
+
+    private createDataPoint(seriesProps: Data.SeriesProps, trace: { x: string, y: number }) {
+        return new Promise<mendix.lib.MxObject>((resolve, reject) => {
+            window.mx.data.create({
+                entity: seriesProps.dataEntity,
+                callback: mxObject => {
+                    mxObject.set(seriesProps.xValueAttribute, trace.x);
+                    mxObject.set(seriesProps.yValueAttribute, trace.y);
+                    resolve(mxObject);
+                },
+                error: error => reject(error.message)
+            });
+        });
     }
 }
+
+export { __webpack_public_path__ };

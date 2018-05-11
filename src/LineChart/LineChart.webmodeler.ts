@@ -21,7 +21,8 @@ export class preview extends Component<LineChartContainerProps, {}> {
             createElement(LineChart, {
                 ...this.props as LineChartContainerProps,
                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-                scatterData: preview.getData(this.props)
+                scatterData: preview.getData(this.props),
+                themeConfigs: { layout: {}, configuration: {}, data: {} }
             })
         );
     }
@@ -33,12 +34,13 @@ export class preview extends Component<LineChartContainerProps, {}> {
                     ? JSON.parse(series.seriesOptions)
                     : {};
                 const sampleData = preview.getSampleTraces();
+                const color = series.lineColor || defaultColours()[index];
 
                 return deepMerge.all([ {
                     connectgaps: true,
                     hoverinfo: "none",
                     line: {
-                        color: series.lineColor || defaultColours()[index],
+                        color,
                         shape: series.lineStyle
                     },
                     mode: series.mode ? series.mode.replace("X", "+") as LineMode : "lines",
@@ -48,7 +50,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                     x: sampleData.x || [],
                     y: sampleData.y || [],
                     series: {},
-                    marker: {  color: series.lineColor || defaultColours()[index] }
+                    marker: { color }
                 }, seriesOptions ]);
             });
         }
@@ -85,19 +87,21 @@ export function getPreviewCss() {
 export function getVisibleProperties(valueMap: LineChartContainerProps, visibilityMap: VisibilityMap<LineChartContainerProps>) { // tslint:disable-line max-line-length
     if (valueMap.series && Array.isArray(valueMap.series)) {
         valueMap.series.forEach((series, index) => {
-            if (series.dataSourceType === "XPath") {
-                visibilityMap.series[index].dataSourceMicroflow = false;
-            } else if (series.dataSourceType === "microflow") {
+            if (series.dataSourceType !== "XPath") {
                 visibilityMap.series[index].entityConstraint = false;
             }
-            visibilityMap.series[index].seriesOptions = false;
-            if (series.onClickEvent === "doNothing") {
-                visibilityMap.series[index].onClickPage = visibilityMap.series[index].onClickMicroflow = false;
-            } else if (series.onClickEvent === "callMicroflow") {
-                visibilityMap.series[index].onClickPage = false;
-            } else if (series.onClickEvent === "showPage") {
-                visibilityMap.series[index].onClickMicroflow = false;
+            if (series.dataSourceType !== "microflow") {
+                visibilityMap.series[index].dataSourceMicroflow = false;
             }
+            if (series.dataSourceType !== "REST") {
+                visibilityMap.series[index].restUrl = false;
+            }
+            visibilityMap.series[index].seriesOptions = false;
+            visibilityMap.series[index].onClickMicroflow = series.onClickEvent === "callMicroflow";
+            visibilityMap.series[index].onClickNanoflow = series.onClickEvent === "callNanoflow";
+            visibilityMap.series[index].onClickPage = series.onClickEvent === "showPage";
+
+            visibilityMap.series[index].openPageLocation = series.onClickEvent === "showPage";
         });
     }
     visibilityMap.devMode = false;

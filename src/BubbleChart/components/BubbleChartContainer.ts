@@ -1,5 +1,5 @@
-let __webpack_public_path__;
-import { Component, SFC, createElement } from "react";
+let __webpack_public_path__: string;
+import { Component, createElement } from "react";
 import { Container, Data } from "../../utils/namespaces";
 import LineChartContainer from "../../LineChart/components/LineChartContainer";
 
@@ -9,15 +9,17 @@ export default class BubbleChartContainer extends Component<Container.LineChartC
     render() {
         return createElement(LineChartContainer, {
             ...this.props as Container.LineChartContainerProps,
-            ...{ series: this.setSeriesMode() }
+            ...{ series: this.setSeriesMode() },
+            type: "bubble"
         });
     }
 
     private setSeriesMode(): Data.LineSeriesProps[] {
         return this.props.series.map(series => ({
             ...series,
-            mode: "bubble" as Container.LineMode,
             lineColor: series.color || ""
         }));
     }
 }
+
+export { __webpack_public_path__ };

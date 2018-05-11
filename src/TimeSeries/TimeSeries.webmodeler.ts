@@ -21,7 +21,8 @@ export class preview extends Component<LineChartContainerProps, {}> {
                 ...this.props as LineChartContainerProps,
                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
                 fill: false,
-                scatterData: this.getData(this.props)
+                scatterData: this.getData(this.props),
+                themeConfigs: { layout: {}, configuration: {}, data: {} }
             })
         );
     }
@@ -29,7 +30,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
     private getData(props: LineChartContainerProps): ScatterData[] {
         if (props.series.length) {
             return props.series.map((series, index) => {
-                const seriesOptions = series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
+                const seriesOptions = props.devMode !== "basic" && series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
                 const sampleData = preview.getSampleTraces();
 
                 return deepMerge.all([ {
@@ -44,8 +45,8 @@ export class preview extends Component<LineChartContainerProps, {}> {
                     mode: series.mode ? series.mode.replace("X", "+") as Container.LineMode : "lines",
                     name: series.name,
                     type: "scatter",
-                    fill: "tonexty",
-                    fillcolor: fillColours[index],
+                    fill: series.fill ? "tonexty" : "none",
+                    fillcolor: series.fillColor || fillColours[index],
                     series: {},
                     x: sampleData.x || [],
                     y: sampleData.y || []
@@ -94,13 +95,11 @@ export function getVisibleProperties(valueMap: LineChartContainerProps, visibili
                 visibilityMap.series[index].xValueSortAttribute = false;
             }
             visibilityMap.series[index].seriesOptions = false;
-            if (series.onClickEvent === "doNothing") {
-                visibilityMap.series[index].onClickPage = visibilityMap.series[index].onClickMicroflow = false;
-            } else if (series.onClickEvent === "callMicroflow") {
-                visibilityMap.series[index].onClickPage = false;
-            } else if (series.onClickEvent === "showPage") {
-                visibilityMap.series[index].onClickMicroflow = false;
-            }
+            visibilityMap.series[index].onClickMicroflow = series.onClickEvent === "callMicroflow";
+            visibilityMap.series[index].onClickNanoflow = series.onClickEvent === "callNanoflow";
+            visibilityMap.series[index].onClickPage = series.onClickEvent === "showPage";
+
+            visibilityMap.series[index].openPageLocation = series.onClickEvent === "showPage";
         });
     }
     visibilityMap.layoutOptions = false;

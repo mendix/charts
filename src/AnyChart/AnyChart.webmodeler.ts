@@ -2,7 +2,6 @@ import { Component, ReactChild, createElement } from "react";
 
 import { AnyChart } from "./components/AnyChart";
 import { Container } from "../utils/namespaces";
-import { Alert } from "../components/Alert";
 import { validateAdvancedOptions } from "../utils/data";
 
 // tslint:disable-next-line class-name
@@ -43,6 +42,9 @@ export class preview extends Component<Container.AnyChartContainerProps, {}> {
         }
         if (props.onClickMicroflow && !hasEvent) {
             errorMessages.push("On click microflow requires event entity and event data attribute");
+        }
+        if (props.onClickNanoflow && !hasEvent) {
+            errorMessages.push("On click nanoflow requires event entity and event data attribute");
         }
         // TODO can we validate the context object of tooltip form to match the tooltip entity?
 

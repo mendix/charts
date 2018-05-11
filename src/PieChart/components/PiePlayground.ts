@@ -2,15 +2,17 @@ import { Component, ReactElement, createElement } from "react";
 
 import { Playground } from "../../components/Playground";
 import { Panel, PanelProps } from "../../components/Panel";
-import { Select, SelectProps } from "../../components/Select";
+import { Select } from "../../components/Select";
 import { SidebarHeaderTools } from "../../components/SidebarHeaderTools";
 
 export interface PiePlaygroundProps {
     dataOptions: string;
     modelerDataConfigs: string;
     layoutOptions: string;
+    configurationOptionsDefault?: string;
+    configurationOptions?: string;
     modelerLayoutConfigs: string;
-    onChange?: (layout: string, data: string) => void;
+    onChange?: (layout: string, data: string, config: string) => void;
 }
 interface PiePlaygroundState {
     activeOption: string;
@@ -18,8 +20,9 @@ interface PiePlaygroundState {
 
 export class PiePlayground extends Component<PiePlaygroundProps, PiePlaygroundState> {
     state = { activeOption: "layout" };
-    private newPieOptions: { layout: string, data: string } = {
+    private newPieOptions: { layout: string, data: string, config: string } = {
         layout: this.props.layoutOptions || "{}",
+        config: this.props.configurationOptions || "{}",
         data: this.props.dataOptions || "{\n\n}"
     };
     private timeoutId?: number;
@@ -36,6 +39,9 @@ export class PiePlayground extends Component<PiePlaygroundProps, PiePlaygroundSt
     private renderPanels(): (ReactElement<PanelProps> | null)[] {
         if (this.state.activeOption === "layout") {
             return this.renderLayoutPanels();
+        }
+        if (this.state.activeOption === "config") {
+            return this.renderConfigPanels();
         }
 
         return this.renderPieDataPanes();
@@ -64,6 +70,35 @@ export class PiePlayground extends Component<PiePlaygroundProps, PiePlaygroundSt
                     value: this.props.modelerLayoutConfigs,
                     readOnly: true,
                     overwriteValue: this.props.layoutOptions,
+                    onValidate: this.onValidate
+                })
+            )
+        ];
+    }
+
+    private renderConfigPanels() {
+        return [
+            createElement(Panel,
+                {
+                    key: "config",
+                    heading: "Configuration settings"
+                },
+                Playground.renderAceEditor({
+                    value: `${this.props.configurationOptions}`,
+                    onChange: value => this.onUpdate("config", value),
+                    onValidate: this.onValidate
+                })
+            ),
+            createElement(Panel,
+                {
+                    key: "default",
+                    heading: "Default configuration",
+                    headingClass: "read-only"
+                },
+                Playground.renderAceEditor({
+                    value: this.props.configurationOptionsDefault || "{}",
+                    readOnly: true,
+                    overwriteValue: this.props.configurationOptions,
                     onValidate: this.onValidate
                 })
             )
@@ -112,7 +147,8 @@ export class PiePlayground extends Component<PiePlaygroundProps, PiePlaygroundSt
                 onChange: this.updateView,
                 options: [
                     { name: "Layout", value: "layout", isDefaultSelected: true },
-                    { name: "Data", value: "data", isDefaultSelected: false }
+                    { name: "Data", value: "data", isDefaultSelected: false },
+                    { name: "Configuration", value: "config", isDefaultSelected: false }
                 ]
             })
         );
@@ -143,11 +179,13 @@ export class PiePlayground extends Component<PiePlaygroundProps, PiePlaygroundSt
         const cleanValue = Playground.removeTrailingNewLine(value);
         if (source === "layout") {
             this.newPieOptions.layout = cleanValue;
+         } else if (source === "config") {
+            this.newPieOptions.config = cleanValue;
         } else {
             this.newPieOptions.data = cleanValue;
         }
         if (this.props.onChange) {
-            this.props.onChange(this.newPieOptions.layout, this.newPieOptions.data);
+            this.props.onChange(this.newPieOptions.layout, this.newPieOptions.data, this.newPieOptions.config);
         }
     }
 

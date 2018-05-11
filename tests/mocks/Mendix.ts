@@ -20,8 +20,8 @@ class MxMock implements mx.MxInterface {
 
 class MxUiMock implements mx.ui {
     action(
-        actionname: string,
-        action: {
+        _actionname: string,
+        _action: {
             progress?: string,
             progressMsg?: string,
             params?: {
@@ -39,7 +39,7 @@ class MxUiMock implements mx.ui {
             error?: (e: Error) => void,
             onValidation?: Function,
         },
-        scope?: any
+        _scope?: any
     ): void { /* */ }
     back(): void { /* */ }
     confirmation(_args: { content: string, proceed: string, cancel: string, handler: Function }): void { /* */ }
@@ -58,16 +58,16 @@ class MxUiMock implements mx.ui {
     resize(): void { /* */ }
     isRtl(): string { return "Fake"; }
     openForm(
-        path: string,
-        args?: {
-            location?: "content" | "popup" | "modal",
+        _path: string,
+        _args?: {
+            location?: "content" | "popup" | "modal" | "node",
             domNode?: HTMLElement,
             title?: string,
             context?: mendix.lib.MxContext,
             callback?(form: mxui.lib.form._FormBase): void,
             error?(error: Error): void,
         },
-        scope?: any
+        _scope?: any
     ): void { /* */ }
     showLogin(_messageCode: number): void { /* */ }
     reload(_callback?: () => void): void { /* */ }

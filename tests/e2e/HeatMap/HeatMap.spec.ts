@@ -1,13 +1,13 @@
-import defaultFilter from "./pages/default.page";
+import heatMap from "./pages/default.page";
 
 describe("Heat map", () => {
     beforeAll(() => {
-        defaultFilter.open();
+        heatMap.open();
     });
 
     it("should generate a chart", () => {
-        defaultFilter.heatMap.waitForVisible();
-        const nodeName = defaultFilter.heatMap.getAttribute("nodeName");
+        heatMap.heatMap.waitForVisible();
+        const nodeName = heatMap.heatMap.getAttribute("nodeName");
 
         expect(nodeName).toBe("svg");
     });

@@ -2,16 +2,16 @@ import { CSSProperties, Component, createElement } from "react";
 import * as classNames from "classnames";
 
 import { ChartLoading } from "./ChartLoading";
-import { HoverTooltip } from "./HoverTooltip";
 import deepMerge from "deepmerge";
 import * as elementResize from "element-resize-detector";
 import {
     Config, Data, HeatMapData, Layout, PieData, PieHoverData,
     PlotlyHTMLElement, Root, ScatterData, ScatterHoverData
 } from "plotly.js";
+import { getDimensionsFromNode } from "../utils/style";
 
 export interface PlotlyChartProps {
-    type: "line" | "bar" | "pie" | "heatmap" | "full";
+    type: "line" | "bar" | "pie" | "heatmap" | "full" | "polar";
     layout: Partial<Layout>;
     data: ScatterData[] | PieData[] | HeatMapData[];
     config: Partial<Config>;
@@ -21,6 +21,8 @@ export interface PlotlyChartProps {
     onHover?: (data: ScatterHoverData<any> | PieHoverData) => void;
     onRestyle?: (data: any) => void;
     getTooltipNode?: (node: HTMLDivElement) => void;
+    onRender?: (node: HTMLDivElement) => void;
+    onResize?: (node: HTMLDivElement) => void;
 }
 
 export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean }> {
@@ -48,10 +50,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         if (this.chartNode && this.chartNode.parentElement) {
             this.chartNode.parentElement.classList.add("widget-charts-wrapper");
         }
-        this.renderChart(this.props);
-        this.addResizeListener();
-        // TODO: Fix mobile touch events
-        // this.registerTouchEvents();
+        this.loadPlotlyAPI();
     }
 
     componentDidUpdate() {
@@ -62,58 +61,6 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         if (this.chartNode && this.purge) {
             this.purge(this.chartNode);
         }
-        // this.removeTouchEvents();
-    }
-
-    private registerTouchEvents() {
-        [ "touchenter", "touchleave" ].forEach(eventName => {
-            if (this.chartNode) {
-                this.chartNode.addEventListener(eventName, this.touchHandler);
-            }
-        });
-        if (this.props.type !== "pie") {
-            [ "touchstart", "touchmove", "touchend" ].forEach(eventName => {
-                if (this.chartNode) {
-                    this.chartNode.addEventListener(eventName, this.touchHandler);
-                }
-            });
-        }
-    }
-
-    private removeTouchEvents() {
-        [ "touchenter", "touchleave", "touchstart", "touchmove", "touchend" ].forEach(eventName => {
-            if (this.chartNode) {
-                this.chartNode.removeEventListener(eventName, this.touchHandler);
-            }
-        });
-    }
-
-    private touchHandler = (event: TouchEvent) => {
-        const touches = event.changedTouches;
-        const touchPoint = touches[0];
-        let type = "";
-
-        if (event.type === "touchenter") {
-            type = "mouseover";
-        } else if (event.type === "touchleave") {
-            type = "mouseout";
-        } else if (event.type === "touchstart") {
-            type = "mousedown";
-        } else if (event.type === "touchmove") {
-            type = "mousemove";
-        } else if (event.type === "touchend") {
-            type = "mouseup";
-        }
-
-        const options = {
-            screenX: touchPoint.screenX,
-            screenY: touchPoint.screenY,
-            clientX: touchPoint.clientX,
-            clientY: touchPoint.clientY
-        };
-        const simulatedEvent = new MouseEvent(type, options);
-
-        touchPoint.target.dispatchEvent(simulatedEvent);
     }
 
     private getPlotlyNodeRef = (node: HTMLDivElement) => {
@@ -128,32 +75,22 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
     }
 
     private async renderChart({ config, data, layout, onClick, onHover, onRestyle }: PlotlyChartProps) {
-        if (this.chartNode) {
-            const style = window.getComputedStyle(this.chartNode);
-
-            const layoutOptions = deepMerge.all([
-                layout,
-                {
-                    width: parseFloat(style.getPropertyValue("width").replace("px", "")),
-                    height: parseFloat(style.getPropertyValue("height").replace("px", ""))
-                }
-            ]);
-            this.loadPlotlyAPI()
-                .then(() => {
-                    if (!this.state.loading && this.newPlot && this.chartNode) {
-                        this.newPlot(this.chartNode, data as Data[], layoutOptions, config)
-                            .then(myPlot => {
-                                if (onClick) {
-                                    myPlot.on("plotly_click", onClick as any);
-                                }
-                                if (onHover) {
-                                    myPlot.on("plotly_hover", onHover as any);
-                                }
-                                myPlot.on("plotly_unhover", this.clearTooltip);
-                                if (onRestyle) {
-                                    myPlot.on("plotly_restyle", onRestyle as any);
-                                }
-                            });
+        if (this.chartNode && !this.state.loading && this.newPlot) {
+            const layoutOptions = deepMerge.all([ layout, getDimensionsFromNode(this.chartNode) ]);
+            const plotlyConfig = window.dojo && window.dojo.locale
+                ? { ...config, locale: window.dojo.locale }
+                : config;
+            this.newPlot(this.chartNode, data as Data[], layoutOptions, plotlyConfig)
+                .then(myPlot => {
+                    if (onClick) {
+                        myPlot.on("plotly_click", onClick as any);
+                    }
+                    if (onHover) {
+                        myPlot.on("plotly_hover", onHover as any);
+                    }
+                    myPlot.on("plotly_unhover", this.clearTooltip);
+                    if (onRestyle) {
+                        myPlot.on("plotly_restyle", onRestyle as any);
                     }
                 });
         }
@@ -176,10 +113,17 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
                 if (this.props.type === "heatmap") {
                     register([ await import("plotly.js/lib/heatmap") ]);
                 }
+                if (this.props.type === "polar") {
+                    register([ await import("plotly.js/lib/scatterpolar") ]);
+                }
                 this.newPlot = newPlot;
                 this.purge = purge;
             }
         }
+        if (this.props.onRender && this.chartNode) {
+            this.props.onRender(this.chartNode);
+        }
+        this.addResizeListener();
         if (this.state.loading) {
             this.setState({ loading: false });
         }
@@ -206,6 +150,9 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
             if (this.chartNode && this.purge) {
                 this.purge(this.chartNode);
                 this.renderChart(this.props);
+                if (this.props.onResize) {
+                    this.props.onResize(this.chartNode);
+                }
             }
             this.timeoutId = 0;
         }, 100);

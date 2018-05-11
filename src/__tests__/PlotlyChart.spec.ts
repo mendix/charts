@@ -50,19 +50,12 @@ describe("PlotlyChart", () => {
         }, 1500);
     });
 
-    it("listens for resize events", () => {
-        const resizeListenerSpy = spyOn(PlotlyChart.prototype, "addResizeListener" as any).and.callThrough();
-        renderFullPlotlyChart(defaultProps);
-
-        expect(resizeListenerSpy).toHaveBeenCalled();
-    });
-
     it("re-renders the chart on update", () => {
         const renderChartSpy = spyOn(PlotlyChart.prototype, "renderChart" as any).and.callThrough();
         const chart = renderFullPlotlyChart(defaultProps);
         chart.setProps({ onClick: jasmine.createSpy("onClick") });
 
-        expect(renderChartSpy).toHaveBeenCalledTimes(2);
+        expect(renderChartSpy).toHaveBeenCalledTimes(1);
     });
 
     xit("destroys the chart on unmount", (done) => {

@@ -49,6 +49,11 @@
             <category>Layout options</category>
             <description>Layout options for preview. It will be merged with the 'Static' in the web modeler or at runtime when no 'Source attribute' is selected</description>
         </property>
+        <property key="configurationOptions" type="string" required="false" multiline="true">
+            <caption>Configuration options</caption>
+            <category>Configuration options</category>
+            <description>The JSON containing the Plotly configuration options</description>
+        </property>
         <property key="widthUnit" type="enumeration" defaultValue="percentage">
             <caption>Width unit</caption>
             <category>Appearance</category>
@@ -95,6 +100,12 @@
             <caption>On click microflow</caption>
             <category>Events</category>
             <description>The microflow that will be executed on click</description>
+            <returnType type="Void" />
+        </property>
+        <property key="onClickNanoflow" type="nanoflow" required="false" entityProperty="eventEntity">
+            <caption>On click nanoflow</caption>
+            <category>Events</category>
+            <description>The nanoflow that will be executed on click</description>
             <returnType type="Void" />
         </property>
         <property key="tooltipEntity" type="entity" allowNonPersistableEntities="true" required="false">

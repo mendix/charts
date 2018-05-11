@@ -12,7 +12,8 @@
     "eofline": true,
     "indent": [
       true,
-      "spaces"
+      "spaces",
+      4
     ],
     "member-ordering": [
       true,

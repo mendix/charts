@@ -16,6 +16,11 @@ declare module "plotly.js/lib/scatter" {
 
     export = Scatter;
 }
+declare module "plotly.js/lib/scatterpolar" {
+    const ScatterPolar: any;
+
+    export = ScatterPolar;
+}
 declare module "plotly.js/lib/pie" {
     const Pie: any;
 

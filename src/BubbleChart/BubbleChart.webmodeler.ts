@@ -19,8 +19,10 @@ export class preview extends Component<LineChartContainerProps, {}> {
             ),
             createElement(LineChart, {
                 ...this.props as LineChartContainerProps,
+                type: "bubble",
                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-                scatterData: preview.getData(this.props)
+                scatterData: preview.getData(this.props),
+                themeConfigs: { layout: {}, configuration: {}, data: {} }
             })
         );
     }
@@ -105,13 +107,11 @@ export function getVisibleProperties(valueMap: LineChartContainerProps, visibili
                 visibilityMap.series[index].entityConstraint = false;
             }
             visibilityMap.series[index].seriesOptions = false;
-            if (series.onClickEvent === "doNothing") {
-                visibilityMap.series[index].onClickPage = visibilityMap.series[index].onClickMicroflow = false;
-            } else if (series.onClickEvent === "callMicroflow") {
-                visibilityMap.series[index].onClickPage = false;
-            } else if (series.onClickEvent === "showPage") {
-                visibilityMap.series[index].onClickMicroflow = false;
-            }
+            visibilityMap.series[index].onClickMicroflow = series.onClickEvent === "callMicroflow";
+            visibilityMap.series[index].onClickNanoflow = series.onClickEvent === "callNanoflow";
+            visibilityMap.series[index].onClickPage = series.onClickEvent === "showPage";
+
+            visibilityMap.series[index].openPageLocation = series.onClickEvent === "showPage";
         });
     }
     visibilityMap.devMode = false;

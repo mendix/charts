@@ -1,13 +1,12 @@
-import { createElement } from "react";
 import { mount, shallow } from "enzyme";
+import { ScatterHoverData } from "plotly.js";
+import { createElement } from "react";
 import { mockMendix } from "../../tests/mocks/Mendix";
-
-import { Alert } from "../components/Alert";
-import { ChartLoading } from "../components/ChartLoading";
 import { PieChart, PieChartProps } from "../PieChart/components/PieChart";
 import "../PieChart/components/PiePlayground";
+import { Alert } from "../components/Alert";
+import { ChartLoading } from "../components/ChartLoading";
 import { PlotlyChart } from "../components/PlotlyChart";
-import { ScatterHoverData } from "plotly.js";
 import * as style from "../utils/style";
 
 describe("PieChart", () => {
@@ -25,7 +24,8 @@ describe("PieChart", () => {
             widthUnit: "percentage",
             height: 100,
             heightUnit: "pixels",
-            layoutOptions: "{}"
+            layoutOptions: "{}",
+            themeConfigs: { layout: {}, configuration: {}, data: {} }
         };
         window.mendix = mockMendix as any;
     });
@@ -46,11 +46,12 @@ describe("PieChart", () => {
         expect(chart).toBeElement(createElement(ChartLoading));
     });
 
-    xit("whose dev mode is developer renders the playground", (done) => {
+    it("whose dev mode is developer renders the playground when loaded", (done) => {
         defaultProps.data = [];
+        defaultProps.devMode = "developer";
         const renderPlaygroundSpy = spyOn(PieChart.prototype, "renderPlayground" as any).and.callThrough();
         const chart = renderShallowChart(defaultProps as PieChartProps);
-        chart.setProps({ devMode: "developer" });
+        chart.setState({ playgroundLoaded: "true" });
 
         window.setTimeout(() => {
             expect(renderPlaygroundSpy).toHaveBeenCalled();
@@ -69,17 +70,7 @@ describe("PieChart", () => {
                     type: "pie",
                     style: { width: "100%", height: "100px" },
                     layout: PieChart.getDefaultLayoutOptions(defaultProps as PieChartProps),
-                    data: [
-                        {
-                            hole: 0,
-                            hoverinfo: "none",
-                            labels: [],
-                            marker: { colors: style.defaultColours() },
-                            type: "pie",
-                            values: [],
-                            sort: false
-                        }
-                    ],
+                    data: [],
                     config: { displayModeBar: false, doubleClick: false },
                     onClick: jasmine.any(Function),
                     onHover: jasmine.any(Function),
@@ -92,7 +83,7 @@ describe("PieChart", () => {
     describe("event handler", () => {
         const plotlyEventData: ScatterHoverData<any> = {
             event: { clientY: 300, clientX: 400 } as any,
-            points: [ { pointNumber: "customData" } as any ]
+            points: [ { pointNumber: 0, customdata: [ {} ] } as any ]
         };
 
         it("#onClick() calls the parent onClick handler", () => {

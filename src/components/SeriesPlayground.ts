@@ -2,12 +2,9 @@ import { Component, ReactElement, createElement } from "react";
 
 import { Panel, PanelProps } from "./Panel";
 import { Playground } from "./Playground";
-import { Select, SelectOption, SelectProps } from "./Select";
+import { Select, SelectOption } from "./Select";
 
 import { Data } from "../utils/namespaces";
-import { ScatterData } from "plotly.js";
-import ScatterTrace = Data.ScatterTrace;
-import SeriesData = Data.SeriesData;
 import SeriesProps = Data.SeriesProps;
 import { SidebarHeaderTools } from "./SidebarHeaderTools";
 
@@ -15,19 +12,22 @@ export interface SeriesPlaygroundProps {
     modelerSeriesConfigs?: string[];
     seriesOptions?: string[];
     series?: SeriesProps[];
-    onChange?: (layout: string, seriesOptions: string[]) => void;
+    onChange?: (layout: string, seriesOptions: string[], config: string) => void;
     layoutOptions: string;
+    configurationOptionsDefault?: string;
+    configurationOptions?: string;
     modelerLayoutConfigs: string;
 }
-type PlaygroundSeriesTrace = ({ name: string } & ScatterTrace);
+
 interface SeriesPlaygroundState {
     activeOption: string;
 }
 
 export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPlaygroundState> {
     state = { activeOption: "layout" };
-    private newSeriesOptions: { layout: string, seriesOptions: string[] } = {
+    private newSeriesOptions: { layout: string, config: string, seriesOptions: string[] } = {
         layout: this.props.layoutOptions || "{}",
+        config: this.props.configurationOptions || "{}",
         seriesOptions: this.props.seriesOptions || []
     };
     private timeoutId?: number;
@@ -45,6 +45,9 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
         if (this.state.activeOption === "layout") {
             return this.renderLayoutPanels();
         }
+        if (this.state.activeOption === "config") {
+            return this.renderConfigPanels();
+        }
 
         return this.renderSeriesPanels(parseInt(this.state.activeOption, 10));
     }
@@ -61,8 +64,7 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
                     onChange: value => this.onUpdate("layout", value),
                     onValidate: this.onValidate
                 })
-            )
-            ,
+            ),
             createElement(Panel,
                 {
                     key: "modeler",
@@ -73,6 +75,35 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
                     value: this.props.modelerLayoutConfigs,
                     readOnly: true,
                     overwriteValue: this.props.layoutOptions,
+                    onValidate: this.onValidate
+                })
+            )
+        ];
+    }
+
+    private renderConfigPanels() {
+        return [
+            createElement(Panel,
+                {
+                    key: "config",
+                    heading: "Configuration settings"
+                },
+                Playground.renderAceEditor({
+                    value: `${this.props.configurationOptions}`,
+                    onChange: value => this.onUpdate("config", value),
+                    onValidate: this.onValidate
+                })
+            ),
+            createElement(Panel,
+                {
+                    key: "default",
+                    heading: "Default configuration",
+                    headingClass: "read-only"
+                },
+                Playground.renderAceEditor({
+                    value: this.props.configurationOptionsDefault || "{}",
+                    readOnly: true,
+                    overwriteValue: this.props.configurationOptions,
                     onValidate: this.onValidate
                 })
             )
@@ -98,7 +129,8 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
                 onChange: this.updateView,
                 options: [
                     { name: "Layout", value: "layout", isDefaultSelected: true },
-                    ...this.getSeriesOptions()
+                    ...this.getSeriesOptions(),
+                    { name: "Configuration", value: "config", isDefaultSelected: false }
                 ]
             })
         );
@@ -171,11 +203,13 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
         const cleanValue = Playground.removeTrailingNewLine(value);
         if (source === "layout") {
             this.newSeriesOptions.layout = cleanValue;
+        } else if (source === "config") {
+            this.newSeriesOptions.config = cleanValue;
         } else {
             (this.newSeriesOptions.seriesOptions[ parseInt(source, 10) ]) = cleanValue;
         }
         if (this.props.onChange) {
-            this.props.onChange(this.newSeriesOptions.layout, this.newSeriesOptions.seriesOptions);
+            this.props.onChange(this.newSeriesOptions.layout, this.newSeriesOptions.seriesOptions, this.newSeriesOptions.config);
         }
     }
 

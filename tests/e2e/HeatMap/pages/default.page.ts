@@ -1,7 +1,9 @@
-class DefaultFilter {
+import { DefaultPage } from "../../DefaultPage/home.page";
+
+class HeatMap extends DefaultPage {
 
     public get heatMap() {
-        return browser.element(".mx-name-heatMap1.js-plotly-plot > div.plot-container.plotly > div > svg:nth-child(1)");
+        return browser.element(".mx-name-heatMap1.js-plotly-plot svg");
     }
 
     public open(): void {
@@ -9,5 +11,5 @@ class DefaultFilter {
     }
 }
 
-const defaultFilter = new DefaultFilter();
-export default defaultFilter;
+const heatMap = new HeatMap();
+export default heatMap;

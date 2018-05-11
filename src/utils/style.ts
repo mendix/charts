@@ -35,8 +35,17 @@ export const getDimensions = <T extends Style.Dimensions>(props: T): CSSProperti
     return style;
 };
 
+export const getDimensionsFromNode = (node: HTMLDivElement) => {
+    const style = window.getComputedStyle(node);
+
+    return {
+        width: parseFloat(style.getPropertyValue("width").replace("px", "")),
+        height: parseFloat(style.getPropertyValue("height").replace("px", ""))
+    };
+};
+
 export const defaultColours = (opacity = 1) => [
-     // Mendix defaults
+    // Mendix defaults
     `rgba(5, 149, 219, ${opacity})`,
     `rgba(23, 52, 123, ${opacity})`,
     `rgba(118, 202, 2, ${opacity})`,

@@ -19,9 +19,10 @@ const widgetConfig = {
         TimeSeries: "./src/TimeSeries/components/TimeSeriesContainer.ts",
         HeatMap: "./src/HeatMap/components/HeatMapContainer.ts",
         BubbleChart: "./src/BubbleChart/components/BubbleChartContainer.ts"
+        // PolarChart: "./src/PolarChart/components/PolarChartContainer.ts"
     },
     output: {
-        jsonpFunction: "webpack3Jsonp",
+        jsonpFunction: "webpackJsonpCharts",
         path: path.resolve(__dirname, "dist/tmp/src"),
         filename: "com/mendix/widget/custom/[name]/[name].js",
         chunkFilename: `com/mendix/widget/custom/${widgetName.toLowerCase()}/chunk[chunkhash].js`,
@@ -34,7 +35,7 @@ const widgetConfig = {
             "tests": path.resolve(__dirname, "./tests")
         }
     },
-    devtool: "source-map",
+    devtool: "eval",
     module: {
         rules: [
             {
@@ -75,7 +76,7 @@ const anyChartConfig = {
         AnyChart: "./src/AnyChart/components/AnyChartContainer.ts"
     },
     output: {
-        jsonpFunction: "webpack3Jsonp",
+        jsonpFunction: "webpackJsonpAnyChart",
         path: path.resolve(__dirname, "dist/tmp/AnyChart"),
         filename: "com/mendix/widget/custom/[name]/[name].js",
         chunkFilename: `com/mendix/widget/custom/AnyChart/chunk[chunkhash].js`,
@@ -89,7 +90,7 @@ const anyChartConfig = {
             "plotly.js/dist/plotly": "plotly.js/dist/plotly.min.js"
         }
     },
-    devtool: "source-map",
+    devtool: "eval",
     module: {
         rules: [
             {
@@ -135,6 +136,7 @@ const previewConfig = {
         TimeSeries: "./src/TimeSeries/TimeSeries.webmodeler.ts",
         HeatMap:  "./src/HeatMap/HeatMap.webmodeler.ts",
         BubbleChart: "./src/BubbleChart/BubbleChart.webmodeler.ts"
+        // PolarChart: "./src/PolarChart/PolarChart.webmodeler.ts"
     },
     output: {
         path: path.resolve(__dirname, "dist/tmp"),
@@ -144,7 +146,7 @@ const previewConfig = {
     resolve: {
         extensions: [ ".ts", ".js" ]
     },
-    devtool: "inline-source-map",
+    devtool: "eval",
     module: {
         rules: [
             { test: /\.ts$/, loader: "ts-loader", options: {
@@ -178,7 +180,7 @@ const anyChartPreviewConfig = {
             "plotly.js/dist/plotly": "plotly.js/dist/plotly.min.js"
         }
     },
-    devtool: "inline-source-map",
+    devtool: "eval",
     module: {
         rules: [
             { test: /\.ts$/, loader: "ts-loader", options: {

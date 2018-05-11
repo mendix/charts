@@ -4,8 +4,8 @@ class PieChart {
         return browser.element(".mx-name-pieChart1.js-plotly-plot");
     }
 
-    public get pieLayer() {
-        return browser.element(".mx-name-pieChart1.js-plotly-plot > div.plot-container.plotly > div > svg:nth-child(1) > g.pielayer > g");
+    public get slices() {
+        return browser.elements(".mx-name-pieChart1.js-plotly-plot  svg .infolayer .legend .groups .traces");
     }
 
     public open(): void {

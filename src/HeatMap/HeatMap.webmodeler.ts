@@ -1,10 +1,11 @@
 import { Component, createElement } from "react";
 
 import { Alert } from "../components/Alert";
-import { HeatMap } from "./components/HeatMap";
+import { HeatMap, HeatMapProps } from "./components/HeatMap";
 import HeatMapContainer from "./components/HeatMapContainer";
 import { HeatMapData } from "plotly.js";
 
+import deepMerge from "deepmerge";
 import { validateSeriesProps } from "../utils/data";
 import { Container } from "../utils/namespaces";
 import HeatMapContainerProps = Container.HeatMapContainerProps;
@@ -18,8 +19,11 @@ export class preview extends Component<HeatMapContainerProps, {}> {
             ),
             createElement(HeatMap, {
                 ...this.props as HeatMapContainerProps,
+                themeConfigs: { layout: {}, configuration: {}, data: {} },
                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-                defaultData: preview.getData(this.props)
+                defaultData: deepMerge.all(
+                    [ HeatMap.getDefaultDataOptions(this.props as HeatMapProps), preview.getData(this.props) ]
+                )
             })
         );
     }
@@ -56,16 +60,15 @@ export function getVisibleProperties(valueMap: HeatMapContainerProps, visibility
         visibilityMap.horizontalSortOrder = false;
         visibilityMap.verticalSortOrder = false;
     }
+
     visibilityMap.layoutOptions = false;
     visibilityMap.devMode = false;
     visibilityMap.dataOptions = false;
-    if (valueMap.onClickEvent === "doNothing") {
-        visibilityMap.onClickPage = visibilityMap.onClickMicroflow = false;
-    } else if (valueMap.onClickEvent === "callMicroflow") {
-        visibilityMap.onClickPage = false;
-    } else if (valueMap.onClickEvent === "showPage") {
-        visibilityMap.onClickMicroflow = false;
-    }
+
+    visibilityMap.onClickMicroflow = valueMap.onClickEvent === "callMicroflow";
+    visibilityMap.onClickNanoflow = valueMap.onClickEvent === "callNanoflow";
+    visibilityMap.onClickPage = valueMap.onClickEvent === "showPage";
+    visibilityMap.openPageLocation = valueMap.onClickEvent === "showPage";
 
     return visibilityMap;
 }

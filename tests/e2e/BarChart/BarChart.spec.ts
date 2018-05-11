@@ -1,31 +1,33 @@
-import defaultPage from "./../DefaultPage/default.page";
-import chart from "./pages/default.page";
+import chart from "./pages/bar.page";
 
 describe("Bar chart", () => {
     beforeAll(() => {
-        defaultPage.open();
+        chart.open();
     });
 
     it("should generate a chart", () => {
-        chart.svgElement.waitForVisible();
-        const nodeName = chart.svgElement.getAttribute("nodeName");
+        chart.svgElement.waitForExist();
+        const isExist = chart.svgElement.isExisting();
 
-        expect(nodeName).toBe("svg");
+        expect(isExist).toBeTruthy();
     });
 
-    it("should generated with two bar series", () => {
-        const series = chart.series.getAttribute("childElementCount");
+    it("should be generated with two traces", () => {
+        chart.traces.waitForValue();
 
-        expect(series).toBe("2");
+        expect(chart.traces.value.length).toBe(2);
     });
 
     // with other drivers apart from chrome it does not autoscroll to the element in overflow:auto block
-    xit("should hide a bar serie when a serie toggle item is clicked", () => {
-        chart.serie1.click();
-        chart.serie1.waitForValue();
-        const serie1 = chart.serie1.getCssProperty("opacity");
-        const value = Number(serie1.value);
+    it("should hide a bar serie when a serie toggle item is clicked", () => {
+        chart.trace1.waitForExist();
+        chart.trace1.click();
 
-        expect(value).toBe(0.5);
+        browser.waitUntil(() => {
+            const serie1 = chart.trace1.getCssProperty("opacity");
+            const value = Number(serie1.value);
+
+            return value === 0.5;
+        }, 1000, "expected trace to hide with value 0.5");
     });
 });

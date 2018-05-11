@@ -7,7 +7,6 @@ import * as jsonMap from "json-source-map";
 import { InfoTooltip } from "./InfoTooltip";
 import { MendixButton } from "./MendixButton";
 import { Panel } from "./Panel";
-import { Select } from "./Select";
 import { PlotlyChart } from "./PlotlyChart";
 import { Sidebar } from "./Sidebar";
 import { SidebarHeader } from "./SidebarHeader";

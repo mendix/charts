@@ -16,7 +16,33 @@
             <enumerationValues>
                 <enumerationValue key="XPath">Database</enumerationValue>
                 <enumerationValue key="microflow">Microflow</enumerationValue>
+                <enumerationValue key="REST">REST endpoint</enumerationValue>
             </enumerationValues>
+        </property>
+        <property key="restUrl" type="string" required="false">
+            <caption>REST URL</caption>
+            <category>Data source</category>
+            <description>Relative or full URL to REST endpoint</description>
+        </property>
+        <property key="restParameters" type="object" isList="true" required="false">
+            <caption>REST parameters</caption>
+            <category>Data source</category>
+            <description>Add parameters to REST request, The contextId is provided by default</description>
+            <properties>
+                <property key="parameterAttribute" type="attribute">
+                    <caption>Attribute</caption>
+                    <category>Attribute</category>
+                    <description/>
+                    <attributeTypes>
+                        <attributeType name="String"/>
+                        <attributeType name="Decimal"/>
+                        <attributeType name="Long"/>
+                        <attributeType name="Integer"/>
+                        <attributeType name="DateTime"/>
+                        <attributeType name="Enum"/>
+                    </attributeTypes>
+                </property>
+            </properties>
         </property>
         <property key="entityConstraint" type="entityConstraint" entityProperty="dataEntity" required="false">
             <caption>XPath constraint</caption>
@@ -108,6 +134,7 @@
                 <enumerationValue key="doNothing">Do nothing</enumerationValue>
                 <enumerationValue key="showPage">Show a page</enumerationValue>
                 <enumerationValue key="callMicroflow">Call a microflow</enumerationValue>
+                <enumerationValue key="callNanoflow">Call a nanoflow</enumerationValue>
             </enumerationValues>
         </property>
         <property key="onClickPage" type="form" required="false">
@@ -115,10 +142,26 @@
             <category>Events</category>
             <description>The page that will be opened on click</description>
         </property>
+        <property key="openPageLocation" type="enumeration" defaultValue="content">
+            <caption>Open page as</caption>
+            <category>Events</category>
+            <description/>
+            <enumerationValues>
+                <enumerationValue key="content">Full page</enumerationValue>
+                <enumerationValue key="popup">Popup</enumerationValue>
+                <enumerationValue key="modal">Blocking popup</enumerationValue>
+            </enumerationValues>
+        </property>
         <property key="onClickMicroflow" type="microflow" required="false" entityProperty="dataEntity">
             <caption>On click microflow</caption>
             <category>Events</category>
             <description>The microflow that will be executed on click</description>
+            <returnType type="Void"/>
+        </property>
+        <property key="onClickNanoflow" type="nanoflow" required="false" entityProperty="dataEntity">
+            <caption>On click nanoflow</caption>
+            <category>Events</category>
+            <description>The nanoflow that will be executed on click</description>
             <returnType type="Void"/>
         </property>
         <property key="tooltipForm" type="form" required="false">
@@ -174,6 +217,11 @@
             <caption>Data options</caption>
             <category>Advanced</category>
             <description>The Plotly data options as JSON</description>
+        </property>
+        <property key="configurationOptions" type="string" required="false" multiline="true">
+            <caption>Configuration options</caption>
+            <category>Advanced</category>
+            <description>The JSON containing the Plotly configuration options</description>
         </property>
     </properties>
 </widget>

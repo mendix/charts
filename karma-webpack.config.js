@@ -27,7 +27,7 @@ module.exports = {
             "tests": path.resolve(__dirname, "./tests")
         }
     },
-    devtool: "inline-source-map",
+    devtool: "eval",
     module: {
         rules: [
             { test: /\.css$/, use: "raw-loader" },

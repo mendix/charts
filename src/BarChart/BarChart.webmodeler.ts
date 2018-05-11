@@ -21,7 +21,8 @@ export class preview extends Component<BarChartContainerProps, {}> {
                 ...this.props as BarChartContainerProps,
                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
                 orientation: "bar",
-                scatterData: preview.getData(this.props)
+                scatterData: preview.getData(this.props),
+                themeConfigs: { layout: {}, configuration: {}, data: {} }
             })
         );
     }
@@ -42,7 +43,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
                     x: sampleData.x || [],
                     y: sampleData.y || [],
                     series: {},
-                    marker: {  color: series.color || defaultColours()[index] }
+                    marker: {  color: series.barColor || defaultColours()[index] }
                 }, seriesOptions ]);
             });
         }
@@ -85,13 +86,12 @@ export function getVisibleProperties(valueMap: BarChartContainerProps, visibilit
                 visibilityMap.series[index].sortOrder = false;
             }
             visibilityMap.series[index].seriesOptions = false;
-            if (series.onClickEvent === "doNothing") {
-                visibilityMap.series[index].onClickPage = visibilityMap.series[index].onClickMicroflow = false;
-            } else if (series.onClickEvent === "callMicroflow") {
-                visibilityMap.series[index].onClickPage = false;
-            } else if (series.onClickEvent === "showPage") {
-                visibilityMap.series[index].onClickMicroflow = false;
-            }
+            visibilityMap.series[index].seriesOptions = false;
+            visibilityMap.series[index].onClickMicroflow = series.onClickEvent === "callMicroflow";
+            visibilityMap.series[index].onClickNanoflow = series.onClickEvent === "callNanoflow";
+            visibilityMap.series[index].onClickPage = series.onClickEvent === "showPage";
+
+            visibilityMap.series[index].openPageLocation = series.onClickEvent === "showPage";
         });
     }
     visibilityMap.layoutOptions = false;

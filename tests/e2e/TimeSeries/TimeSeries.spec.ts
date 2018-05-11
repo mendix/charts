@@ -7,9 +7,9 @@ describe("Time series", () => {
 
     it("should generate a chart", () => {
         chart.timeSeries.waitForVisible();
-        const nodeName = chart.timeSeries.getAttribute("nodeName");
+        const isExist = chart.timeSeries.isExisting();
 
-        expect(nodeName).toBe("svg");
+        expect(isExist).toBeTruthy();
     });
 
     it("should be controlled by a range slider", () => {

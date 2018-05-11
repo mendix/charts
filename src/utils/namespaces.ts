@@ -1,5 +1,6 @@
 import { AxisType, BarMode, Datum, ScatterData, ScatterMarker } from "plotly.js";
 import { ReactChild } from "react";
+import { ChartConfigs } from "./configs";
 
 export namespace Container {
     import SeriesProps = Data.SeriesProps;
@@ -20,6 +21,7 @@ export namespace Container {
         xAxisLabel: string;
         yAxisLabel: string;
         layoutOptions: string;
+        configurationOptions: string;
         devMode: "basic" | "advanced" | "developer";
     }
 
@@ -34,14 +36,29 @@ export namespace Container {
         showRangeSlider: boolean;
         xAxisType?: AxisType;
         rangeMode?: RangeMode;
+        polar?: PolarOptions;
     }
 
     export type RangeMode = "normal" | "tozero" | "nonnegative";
 
     export type LineMode = "lines" | "markers" | "lines+markers" | "none";
 
+    export interface PolarOptions {
+        radialaxis?: Partial<{
+            rangemode: RangeMode;
+            gridcolor: string;
+            showgrid: boolean;
+            tickcolor: string;
+        }>;
+        angularaxis?: Partial<{
+            linecolor: string;
+            tickcolor: string;
+        }>;
+    }
+
     export interface BarChartContainerProps extends WrapperProps, Style.Dimensions, Style.Appearance, BarLayoutProps {
         series: Data.SeriesProps[];
+        restParameters: RestParameter[];
     }
 
     export interface BarChartContainerState {
@@ -50,10 +67,17 @@ export namespace Container {
         scatterData?: ScatterData[];
         seriesOptions: string[];
         loading?: boolean;
+        themeConfigs: ChartConfigs;
     }
 
     export interface LineChartContainerProps extends WrapperProps, Style.Dimensions, Style.Appearance, LineLayoutProps {
         series: Data.LineSeriesProps[];
+        type: "line" | "bubble" | "polar" | "area" | "timeseries";
+        restParameters: Container.RestParameter[];
+    }
+
+    export interface RestParameter {
+        parameterAttribute: string;
     }
 
     export interface LineChartContainerState {
@@ -62,6 +86,7 @@ export namespace Container {
         scatterData?: ScatterData[];
         seriesOptions: string[];
         loading?: boolean;
+        themeConfigs: ChartConfigs;
     }
 
     export type PieChartType = "pie" | "donut";
@@ -75,6 +100,7 @@ export namespace Container {
         chartType: PieChartType;
         showLegend: boolean;
         layoutOptions: string;
+        configurationOptions: string;
         dataOptions: string;
         devMode: "basic" | "advanced" | "developer";
     }
@@ -95,29 +121,13 @@ export namespace Container {
         xAxisLabel: string;
         yAxisLabel: string;
         layoutOptions: string;
+        configurationOptions: string;
         dataOptions: string;
         devMode: "basic" | "advanced" | "developer";
     }
 
-    export interface BubbleChartContainerProps extends Data.DataSourceProps, LayoutProps, Style.Dimensions, Data.EventProps, WrapperProps {
-        series: Data.SeriesProps[];
-        showLegend: boolean;
-        serieColor: string;
-        xAxisLabel: string;
-        yAxisLabel: string;
-        layoutOptions: string;
-        dataOptions: string;
-        devMode: "basic" | "advanced" | "developer";
-        refreshInterval: number;
-        showRangeSlider: boolean;
-    }
-
-    export interface BubbleChartContainerState {
-        alertMessage?: ReactChild;
-        data?: Data.SeriesData<Data.SeriesProps>[];
-        scatterData?: ScatterData[];
-        seriesOptions: string[];
-        loading?: boolean;
+    export interface PolarChartContainerProps extends LineChartContainerProps {
+        showGrid: boolean;
     }
     export interface ScaleColors {
         valuePercentage: number;
@@ -129,10 +139,12 @@ export namespace Container {
         sampleData: string;
         layoutStatic: string;
         layoutAttribute: string;
+        configurationOptions: string;
         sampleLayout: string;
         eventEntity: string;
         eventDataAttribute: string;
         onClickMicroflow: string;
+        onClickNanoflow: Data.Nanoflow;
         tooltipEntity: string;
         tooltipMicroflow: string;
         tooltipForm: string;
@@ -151,9 +163,42 @@ export namespace Container {
 }
 
 export namespace Data {
+    export interface FetchedData<T> {
+        mxObjects?: mendix.lib.MxObject[];
+        restData?: RESTData;
+        customData?: T;
+    }
+
+    export type RESTData = { [ key: string ]: string | number }[];
+
+    export interface FetchDataOptions<S> {
+        type: "XPath" | "microflow" | "REST";
+        entity: string;
+        guid: string;
+        constraint?: string;
+        sortAttribute?: string;
+        sortOrder?: SortOrder;
+        attributes?: string[];
+        microflow?: string;
+        url?: string;
+        customData?: S; // Usage: when used in a loop, could hold a value specific to each item e.g series
+    }
+
+    export interface FetchByXPathOptions {
+        guid: string;
+        entity: string;
+        constraint: string;
+        sortAttribute?: string;
+        sortOrder?: SortOrder;
+        attributes?: string[];
+        references?: any;
+    }
+
     export interface DataSourceProps {
         dataSourceMicroflow: string;
-        dataSourceType: "XPath" | "microflow";
+        dataSourceType: "XPath" | "microflow" | "REST";
+        restUrl: string;
+        restParameters: Container.RestParameter[];
         entityConstraint: string;
         dataEntity: string;
     }
@@ -164,15 +209,34 @@ export namespace Data {
         sortOrder: SortOrder;
         yValueAttribute: string;
         markerSizeAttribute?: string;
+        markerSizeReference: number;
+        autoBubbleSize: boolean;
     }
 
     export type SortOrder = "asc" | "desc";
 
     export interface EventProps {
-        onClickEvent: "doNothing" | "showPage" | "callMicroflow";
+        onClickEvent: "doNothing" | "showPage" | "callMicroflow" | "callNanoflow";
+        openPageLocation: "popup" | "modal" | "content";
         onClickPage: string;
         onClickMicroflow: string;
+        onClickNanoflow: Nanoflow;
         tooltipForm: string;
+    }
+
+    export interface OnClickOptions<T = any, O extends EventProps = EventProps> {
+        mxObject?: mendix.lib.MxObject;
+        trace?: T;
+        mxForm: mxui.lib.form._FormBase;
+        options: O;
+    }
+
+    export interface OnHoverOptions<T = any, O extends DataSourceProps = DataSourceProps> {
+        mxObject?: mendix.lib.MxObject;
+        options: O;
+        tooltipForm: string;
+        tooltipNode: HTMLDivElement;
+        trace?: T;
     }
 
     export interface SeriesProps extends SeriesDataSourceProps, EventProps {
@@ -191,23 +255,31 @@ export namespace Data {
     }
 
     export interface SeriesData<T extends SeriesProps = SeriesProps> {
-        data: mendix.lib.MxObject[];
+        data?: mendix.lib.MxObject[];
+        restData?: any;
         series: T;
     }
 
     export interface ScatterTrace {
         x: Datum[];
-        y: number[] | Datum[];
+        y: Datum[];
         marker?: Partial<ScatterMarker>;
+        r?: Datum[];
+        theta?: Datum[];
     }
 
     export interface ReferencesSpec {
-            attributes?: string[];
-            amount?: number;
-            sort?: [ string, "desc" | "asc" ][];
-            references?: {
-                [index: string]: ReferencesSpec;
-            };
+        attributes?: string[];
+        amount?: number;
+        sort?: [ string, "desc" | "asc" ][];
+        references?: {
+            [ index: string ]: ReferencesSpec;
+        };
+    }
+
+    export interface Nanoflow {
+        nanoflow: object[];
+        paramsSpec: { Progress: string };
     }
 }
 

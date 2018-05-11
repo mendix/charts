@@ -27,6 +27,7 @@ declare module "plotly.js" {
             x: string | number;
             y: string | number;
             z?: number;
+            r?: string | number;
             pointNumber: number;
             curveNumber: number;
             data: ScatterData;
@@ -51,7 +52,7 @@ declare module "plotly.js" {
         color: string;
     }
 
-    export interface PieHoverData {
+    export interface PieHoverData<T = any> {
         event: MouseEvent;
         points: Array<{
             cx: number;
@@ -61,7 +62,8 @@ declare module "plotly.js" {
             curveNumber: number;
             color: string;
             label: string;
-            text: string;
+            value: number;
+            customdata: T;
         }>;
     }
 
@@ -69,6 +71,7 @@ declare module "plotly.js" {
         series: any; // custom property, not part of the official plotly.js api
         orientation?: "h" | "v";
         customdata: any[];
+        visible?: boolean | "legendonly"; // default = true
     }
 
     export interface PieData {
@@ -82,6 +85,7 @@ declare module "plotly.js" {
             colors: string[];
         };
         sort?: boolean; // default: true
+        customdata: any[];
     }
 
     export interface HeatMapData {

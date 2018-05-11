@@ -26,7 +26,8 @@ describe("HeatMap", () => {
             height: 100,
             heightUnit: "pixels",
             layoutOptions: "{}",
-            scaleColors: []
+            scaleColors: [],
+            themeConfigs: { layout: {}, configuration: {}, data: {} }
         };
         window.mendix = mockMendix as any;
     });
@@ -47,11 +48,12 @@ describe("HeatMap", () => {
         expect(chart).toBeElement(createElement(ChartLoading));
     });
 
-    it("whose dev mode is developer renders the playground", (done) => {
+    it("whose dev mode is developer renders the playground when loaded", (done) => {
         defaultProps.data = getData(defaultProps as HeatMapProps);
         const renderPlaygroundSpy = spyOn(HeatMap.prototype, "renderPlayground" as any).and.callThrough();
         defaultProps.devMode = "developer";
         const chart = renderShallowChart(defaultProps as HeatMapProps);
+        chart.setState({ playgroundLoaded: true });
 
         window.setTimeout(() => {
             expect(renderPlaygroundSpy).toHaveBeenCalled();
@@ -64,7 +66,7 @@ describe("HeatMap", () => {
         defaultProps.data = getData(defaultProps as HeatMapProps);
         const renderPlaygroundSpy = spyOn(HeatMap.prototype, "renderPlayground" as any).and.callThrough();
         defaultProps.devMode = "basic";
-        const chart = renderShallowChart(defaultProps as HeatMapProps);
+        renderShallowChart(defaultProps as HeatMapProps);
 
         window.setTimeout(() => {
             expect(renderPlaygroundSpy).not.toHaveBeenCalled();
@@ -77,7 +79,7 @@ describe("HeatMap", () => {
         defaultProps.data = getData(defaultProps as HeatMapProps);
         const renderPlaygroundSpy = spyOn(HeatMap.prototype, "renderPlayground" as any).and.callThrough();
         defaultProps.devMode = "advanced";
-        const chart = renderShallowChart(defaultProps as HeatMapProps);
+        renderShallowChart(defaultProps as HeatMapProps);
 
         window.setTimeout(() => {
             expect(renderPlaygroundSpy).not.toHaveBeenCalled();
@@ -173,7 +175,7 @@ describe("HeatMap", () => {
                 y: defaultProps.data.y,
                 z: defaultProps.data.z,
                 zsmooth: defaultProps.data.zsmooth,
-                text: defaultProps.data.z.map((row, i) => row.map((item, j) => `${item}`)),
+                text: defaultProps.data.z.map(row => row.map(item => `${item}`)),
                 colorscale: [ [ 0, "#17347B" ], [ 0.5, "#48B0F7" ], [ 1, "#76CA02" ] ]
             }
         ]);
@@ -193,7 +195,7 @@ describe("HeatMap", () => {
                 y: defaultProps.data.y,
                 z: defaultProps.data.z,
                 zsmooth: defaultProps.data.zsmooth,
-                text: defaultProps.data.z.map((row, i) => row.map((item, j) => `${item}`)),
+                text: defaultProps.data.z.map(row => row.map(item => `${item}`)),
                 colorscale: [ [ 0, "#17347B" ], [ 0.5, "#48B0F7" ], [ 1, "#76CA02" ] ],
                 showscale: true
             }
@@ -214,7 +216,7 @@ describe("HeatMap", () => {
                 y: defaultProps.data.y,
                 z: defaultProps.data.z,
                 zsmooth: defaultProps.data.zsmooth,
-                text: defaultProps.data.z.map((row, i) => row.map((item, j) => `${item}`)),
+                text: defaultProps.data.z.map(row => row.map(item => `${item}`)),
                 colorscale: [ [ 0, "#17347B" ], [ 0.5, "#48B0F7" ], [ 1, "#76CA02" ] ],
                 showscale: true
             }
