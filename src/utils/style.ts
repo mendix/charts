@@ -36,12 +36,9 @@ export const getDimensions = <T extends Style.Dimensions>(props: T): CSSProperti
 };
 
 export const getDimensionsFromNode = (node: HTMLDivElement) => {
-    const style = window.getComputedStyle(node);
+    const { width, height } = node.getBoundingClientRect();
 
-    return {
-        width: parseFloat(style.getPropertyValue("width").replace("px", "")),
-        height: parseFloat(style.getPropertyValue("height").replace("px", ""))
-    };
+    return { width, height };
 };
 
 export const defaultColours = (opacity = 1) => [
