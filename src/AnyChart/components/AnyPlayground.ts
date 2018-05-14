@@ -67,7 +67,7 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
             return this.renderConfigPanels();
         }
 
-        return this.renderPieDataPanes();
+        return this.renderDataPanes();
     }
 
     private renderLayoutPanels() {
@@ -78,7 +78,7 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
                     heading: "Dynamic"
                 },
                 Playground.renderAceEditor({
-                    value: `${this.state.attributeLayout || "{\n\n}"}`,
+                    value: this.formatJSONString(`${this.state.attributeLayout || "{\n\n}"}`),
                     onChange: value => this.onUpdate("layoutDynamic", value),
                     onValidate: this.onValidate
                 })
@@ -90,7 +90,7 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
                     headingClass: "read-only"
                 },
                 Playground.renderAceEditor({
-                    value: this.state.staticLayout || "{\n\n}",
+                    value: this.formatJSONString(this.state.staticLayout || "{\n\n}"),
                     onChange: value => this.onUpdate("layoutStatic", value),
                     overwriteValue: this.props.attributeLayout,
                     onValidate: this.onValidate
@@ -99,9 +99,8 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
         ];
     }
 
-    private renderPieDataPanes() {
+    private renderDataPanes() {
         if (this.state.attributeData) {
-
             return [
                 createElement(Panel,
                     {
@@ -110,7 +109,7 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
                         headingClass: "item-header"
                     },
                     Playground.renderAceEditor({
-                        value: `${this.state.attributeData || "{\n\n}"}`,
+                        value: this.formatJSONString(`${this.state.attributeData || "{\n\n}"}`),
                         onChange: value => this.onUpdate("dataDynamic", value),
                         onValidate: this.onValidate
                     })
@@ -122,7 +121,7 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
                         headingClass: "read-only"
                     },
                     Playground.renderAceEditor({
-                        value: this.state.staticData || "{\n\n}",
+                        value: this.formatJSONString(this.state.staticData || "{\n\n}"),
                         onChange: value => this.onUpdate("dataStatic", value),
                         overwriteValue: this.state.attributeData,
                         onValidate: this.onValidate
@@ -144,7 +143,7 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
                         heading: "Configuration settings"
                     },
                     Playground.renderAceEditor({
-                        value: `${this.state.configurationOptions || "{\n\n}"}`,
+                        value: this.formatJSONString(`${this.state.configurationOptions || "{\n\n}"}`),
                         onChange: value => this.onUpdate("config", value),
                         onValidate: this.onValidate
                     })
@@ -216,5 +215,9 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
 
     private updateView = (activeOption: string) => {
         this.setState({ activeOption });
+    }
+
+    private formatJSONString(value: string) {
+        return JSON.stringify(JSON.parse(value), null, 2);
     }
 }

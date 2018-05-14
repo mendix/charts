@@ -17,11 +17,6 @@
                 <attributeType name="String"/>
             </attributeTypes>
         </property>
-        <property key="sampleData" type="translatableString" required="false" multiline="true">
-            <caption>Sample data</caption>
-            <category>Data</category>
-            <description>Data for preview. It will be merged with the 'Static data' in the web modeler or at runtime when no 'Source attribute' is selected</description>
-        </property>
         <property key="devMode" type="enumeration" defaultValue="developer">
             <caption>Mode</caption>
             <category>Data</category>
@@ -43,11 +38,6 @@
             <attributeTypes>
                 <attributeType name="String"/>
             </attributeTypes>
-        </property>
-        <property key="sampleLayout" type="translatableString" required="false" multiline="true">
-            <caption>Sample layout</caption>
-            <category>Layout options</category>
-            <description>Layout options for preview. It will be merged with the 'Static' in the web modeler or at runtime when no 'Source attribute' is selected</description>
         </property>
         <property key="configurationOptions" type="string" required="false" multiline="true">
             <caption>Configuration options</caption>
