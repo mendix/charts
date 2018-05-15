@@ -1,6 +1,6 @@
 import heatMap from "./pages/default.page";
 
-describe("Heat map", () => {
+describe("Heat Map", () => {
     beforeAll(() => {
         heatMap.open();
     });
@@ -9,6 +9,10 @@ describe("Heat map", () => {
         heatMap.heatMap.waitForVisible();
         const nodeName = heatMap.heatMap.getAttribute("nodeName");
 
-        expect(nodeName).toBe("svg");
+        if (Array.isArray(nodeName)) {
+            expect(nodeName[0]).toBe("svg");
+        } else {
+            expect(nodeName).toBe("svg");
+        }
     });
 });
