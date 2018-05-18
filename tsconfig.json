@@ -10,7 +10,9 @@
     "types": [
       "mendix-client",
       "jasmine",
-      "core-js"
+      "core-js",
+      "redux",
+      "redux-thunk"
     ],
     "moduleResolution": "node",
     "declaration": false,

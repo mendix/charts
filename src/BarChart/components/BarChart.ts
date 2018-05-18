@@ -1,36 +1,44 @@
+import deepMerge from "deepmerge";
 import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
-import "../../ui/Charts.scss";
 import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
+import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
+import { bindActionCreators } from "redux";
+
 import { Alert } from "../../components/Alert";
-import { ChartLoading } from "../../components/ChartLoading";
 import { HoverTooltip } from "../../components/HoverTooltip";
-import { PlotlyChart } from "../../components/PlotlyChart";
-import deepMerge from "deepmerge";
+import { PlotlyReduxContainer } from "../../components/PlotlyChart";
+import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
+import { PlotlyChartState } from "../../components/reducers/PlotlyChartReducer";
 import { parseAdvancedOptions } from "../../utils/data";
 import { Data } from "../../utils/namespaces";
 import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 import { BarChartState } from "../store/BarChartReducer";
-import { store } from "../store/store";
-import { getCustomLayoutOptions, getCustomSeriesOptions, getDefaultConfigOptions, getDefaultLayoutOptions, getDefaultSeriesOptions } from "../utils/configs";
+import { ReduxStore, store } from "../store/store";
+import {
+    getCustomLayoutOptions,
+    getCustomSeriesOptions,
+    getDefaultConfigOptions,
+    getDefaultLayoutOptions,
+    getDefaultSeriesOptions
+} from "../utils/configs";
 import { BarChartDataHandlerProps } from "./BarChartDataHandler";
+import "../../ui/Charts.scss";
 
-export interface BarChartProps extends BarChartDataHandlerProps {
+interface ComponentProps extends BarChartDataHandlerProps {
     alertMessage?: ReactChild;
-    loading?: boolean;
     onClick?: (options: Data.OnClickOptions<{ x: string, y: number }, Data.SeriesProps>) => void;
     onHover?: (options: Data.OnHoverOptions<{ x: string, y: number }, Data.SeriesProps>) => void;
 }
 
-export class BarChart extends Component<BarChartProps & BarChartState> {
+export type BarChartProps = ComponentProps & { plotly: PlotlyChartState } & typeof PlotlyChartActions;
+
+class BarChart extends Component<BarChartProps & BarChartState> {
     private tooltipNode?: HTMLDivElement;
 
     render() {
         if (this.props.alertMessage) {
             return createElement(Alert, { className: "widget-charts-bar-alert" }, this.props.alertMessage);
-        }
-        if (this.props.loading || (this.props.devMode === "developer" && !this.props.playground)) {
-            return createElement(ChartLoading);
         }
         if (this.props.devMode === "developer" && this.props.playground) {
             return this.renderPlayground();
@@ -45,19 +53,35 @@ export class BarChart extends Component<BarChartProps & BarChartState> {
         }
     }
 
+    componentWillReceiveProps(newProps: BarChartProps) {
+        const doneLoading = (!newProps.fetchingData && this.props.fetchingData && !newProps.plotly.loadingAPI)
+            || (!newProps.plotly.loadingAPI && this.props.plotly.loadingAPI && !newProps.fetchingData);
+        const dataUpdated = newProps.layoutOptions !== this.props.layoutOptions
+            || newProps.seriesOptions.join(" ") !== this.props.seriesOptions.join(" ")
+            || newProps.configurationOptions !== this.props.configurationOptions
+            || (newProps.scatterData && newProps.scatterData.length) !== (this.props.scatterData && this.props.scatterData.length);
+        if (doneLoading || dataUpdated) {
+            this.props.updateData({
+                layout: this.getLayoutOptions(newProps),
+                data: newProps.scatterData || [],
+                config: this.getConfigOptions(newProps)
+            });
+        }
+        if (newProps.fetchingData && !newProps.plotly.loadingData) {
+            this.props.togglePlotlyDataLoading();
+        }
+    }
+
     private getTooltipNodeRef = (node: HTMLDivElement) => {
         this.tooltipNode = node;
     }
 
     private renderChart() {
-        return createElement(PlotlyChart,
+        return createElement(PlotlyReduxContainer,
             {
                 type: "bar",
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
-                layout: this.getLayoutOptions(this.props),
-                data: this.props.scatterData || [],
-                config: this.getConfigOptions(this.props),
                 onClick: this.onClick,
                 onHover: this.onHover,
                 getTooltipNode: this.getTooltipNodeRef
@@ -175,3 +199,9 @@ export class BarChart extends Component<BarChartProps & BarChartState> {
         };
     }
 }
+
+const mapStateToProps: MapStateToProps<{ plotly: PlotlyChartState }, ComponentProps, ReduxStore> = state =>
+    ({ plotly: state.plotly });
+const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>
+    bindActionCreators(PlotlyChartActions, dispatch);
+export const ReduxBarChart = connect(mapStateToProps, mapDispatchToProps)(BarChart);

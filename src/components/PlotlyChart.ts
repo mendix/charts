@@ -1,20 +1,18 @@
-import { CSSProperties, Component, createElement } from "react";
 import * as classNames from "classnames";
-
-import { ChartLoading } from "./ChartLoading";
 import deepMerge from "deepmerge";
+import { Config, Data, Layout, PieHoverData, PlotlyHTMLElement, Root, ScatterHoverData } from "plotly.js";
+import { CSSProperties, Component, createElement } from "react";
+import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 import ReactResizeDetector from "react-resize-detector";
-import {
-    Config, Data, HeatMapData, Layout, PieData, PieHoverData,
-    PlotlyHTMLElement, Root, ScatterData, ScatterHoverData
-} from "plotly.js";
+import { bindActionCreators } from "redux";
 import { getDimensionsFromNode } from "../utils/style";
+import { ChartLoading } from "./ChartLoading";
+import * as PlotlyChartActions from "./actions/PlotlyChartActions";
+import { PlotlyChartState } from "./reducers/PlotlyChartReducer";
+// import { store } from "../BarChart/store/store";
 
-export interface PlotlyChartProps {
+export interface ComponentProps {
     type: "line" | "bar" | "pie" | "heatmap" | "full" | "polar";
-    layout: Partial<Layout>;
-    data: ScatterData[] | PieData[] | HeatMapData[];
-    config: Partial<Config>;
     className?: string;
     style?: CSSProperties;
     onClick?: (data: ScatterHoverData<any> | PieHoverData) => void;
@@ -25,6 +23,8 @@ export interface PlotlyChartProps {
     onResize?: (node: HTMLDivElement) => void;
 }
 
+type PlotlyChartProps = ComponentProps & typeof PlotlyChartActions & PlotlyChartState;
+
 interface Plotly {
     newPlot: (root: Root, data: Data[], layout?: Partial<Layout>, config?: Partial<Config>) => Promise<PlotlyHTMLElement>;
     purge: (root: Root) => void;
@@ -34,6 +34,7 @@ interface Plotly {
 export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean }> {
     state = { loading: true };
     private chartNode?: HTMLDivElement;
+    private rootNode?: HTMLDivElement;
     private tooltipNode?: HTMLDivElement;
     private timeoutId?: number;
     private plotly?: Plotly;
@@ -42,18 +43,19 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         return createElement("div",
             {
                 className: classNames(`widget-charts widget-charts-${this.props.type}`, this.props.className),
-                ref: this.getPlotlyNodeRef,
+                ref: this.getRootNodeRef,
                 style: this.props.style
             },
+            this.renderChartNode(),
             createElement(ReactResizeDetector, { handleWidth: true, handleHeight: true, onResize: this.onResize }),
             createElement("div", { className: "widget-charts-tooltip", ref: this.getTooltipNodeRef }),
-            this.state.loading ? createElement(ChartLoading) : null
+            this.renderLoadingIndicator()
         );
     }
 
     componentDidMount() {
-        if (this.chartNode && this.chartNode.parentElement) {
-            this.chartNode.parentElement.classList.add("widget-charts-wrapper");
+        if (!this.props.loadingAPI) {
+            this.props.togglePlotlyAPILoading();
         }
         this.fetchPlotly()
             .then(plotly => {
@@ -61,12 +63,14 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
                 if (this.props.onRender && this.chartNode) {
                     this.props.onRender(this.chartNode);
                 }
-                this.setState({ loading: false });
+                if (this.props.loadingAPI) {
+                    this.props.togglePlotlyAPILoading();
+                }
             });
     }
 
     componentDidUpdate() {
-        if (this.plotly) {
+        if (!this.props.loadingAPI && !this.props.loadingData && this.plotly) {
             this.renderChart(this.props, this.plotly);
         }
     }
@@ -74,6 +78,22 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
     componentWillUnmount() {
         if (this.chartNode && this.plotly) {
             this.plotly.purge(this.chartNode);
+        }
+    }
+
+    private renderChartNode() {
+        return !this.props.loadingAPI && !this.props.loadingData
+            ? createElement("div", { ref: this.getPlotlyNodeRef })
+            : null;
+    }
+
+    private renderLoadingIndicator() {
+        return this.props.loadingAPI || this.props.loadingData ? createElement(ChartLoading) : null;
+    }
+
+    private getRootNodeRef = (node: HTMLDivElement) => {
+        if (node) {
+            this.rootNode = node;
         }
     }
 
@@ -91,8 +111,8 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
     }
 
     private renderChart({ config, data, layout, onClick, onHover, onRestyle }: PlotlyChartProps, plotly: Plotly) {
-        if (this.chartNode && !this.state.loading) {
-            const layoutOptions = deepMerge.all([ layout, getDimensionsFromNode(this.chartNode) ]);
+        if (this.chartNode && this.rootNode && !this.props.loadingAPI && layout && data && config) {
+            const layoutOptions = deepMerge.all([ layout, getDimensionsFromNode(this.rootNode) ]);
             const plotlyConfig = window.dojo && window.dojo.locale
                 ? { ...config, locale: window.dojo.locale }
                 : config;
@@ -153,3 +173,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
         }, 100);
     }
 }
+
+const mapStateToProps: MapStateToProps<PlotlyChartState, ComponentProps, { plotly: PlotlyChartState }> = state => state.plotly;
+const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch => bindActionCreators(PlotlyChartActions, dispatch);
+export const PlotlyReduxContainer = connect(mapStateToProps, mapDispatchToProps)(PlotlyChart);

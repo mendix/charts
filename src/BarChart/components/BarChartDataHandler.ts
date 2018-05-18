@@ -1,13 +1,12 @@
 import { Component, createElement } from "react";
-import { connect } from "react-redux";
-import { Dispatch, bindActionCreators } from "redux";
+import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import { handleOnClick, isContextChanged, openTooltipForm, setRefreshAction, validateSeriesProps } from "../../utils/data";
 import { Container, Data } from "../../utils/namespaces";
-import { getDimensions, parseStyle } from "../../utils/style";
 import * as BarChartContainerActions from "../store/BarChartActions";
 import { BarChartReducerState } from "../store/BarChartReducer";
-import { store } from "../store/store";
-import { BarChart } from "./BarChart";
+import { ReduxStore, store } from "../store/store";
+import { ReduxBarChart } from "./BarChart";
 
 import BarChartContainerProps = Container.BarChartContainerProps;
 
@@ -18,11 +17,8 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
     private intervalID?: number;
 
     render() {
-        return createElement("div",
-            {
-                style: this.props.loading ? { ...getDimensions(this.props), ...parseStyle(this.props.style) } : undefined
-            },
-            createElement(BarChart, {
+        return createElement("div", { className: "widget-charts-wrapper" },
+            createElement(ReduxBarChart, {
                 ...this.props as BarChartDataHandlerProps,
                 onClick: this.handleOnClick,
                 onHover: this.handleOnHover,
@@ -40,15 +36,17 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
             this.props.showAlertMessage("");
         }
         if (this.props.devMode !== "basic") {
-            store.dispatch(this.props.fetchThemeConfigs(this.props.orientation));
+            this.props.fetchThemeConfigs(this.props.orientation);
         }
     }
 
     componentWillReceiveProps(newProps: BarChartDataHandlerProps) {
         this.resetSubscriptions(newProps.mxObject);
         if (!newProps.alertMessage) {
-            if (!this.props.fetchingConfigs && isContextChanged(this.props.mxObject, newProps.mxObject)) {
-                store.dispatch(this.props.fetchData(newProps));
+            if (!this.props.mxObject && !newProps.mxObject && newProps.fetchingData) {
+                newProps.isFetching(false);
+            } else if (!newProps.fetchingConfigs && isContextChanged(this.props.mxObject, newProps.mxObject)) {
+                store.dispatch(newProps.fetchData(newProps));
                 this.clearRefreshInterval();
                 this.intervalID = setRefreshAction(newProps.refreshInterval, newProps.mxObject)(this.onRefresh);
             }
@@ -59,7 +57,7 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
     }
 
     shouldComponentUpdate(nextProps: BarChartDataHandlerProps) {
-        return nextProps.loading !== this.props.loading
+        return nextProps.fetchingData !== this.props.fetchingData
             || nextProps.playground !== this.props.playground
             || nextProps.layoutOptions !== this.props.layoutOptions
             || nextProps.seriesOptions.join(" ") !== this.props.seriesOptions.join(" ")
@@ -74,7 +72,7 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
     }
 
     private onRefresh = () => {
-        if (!this.props.loading) {
+        if (!this.props.fetchingData) {
             store.dispatch(this.props.fetchData(this.props));
         }
     }
@@ -129,8 +127,7 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
     }
 }
 
-const mapStateToProps = (state: BarChartReducerState) => state;
-// TODO: Add more specific typings i.e BarChartContainerActions
-const mapDispatchToProps = (dispatch: Dispatch<any, any>) => bindActionCreators(BarChartContainerActions, dispatch);
-
-export const ReduxContainer = connect<BarChartReducerState, typeof BarChartContainerActions>(mapStateToProps, mapDispatchToProps)(BarChartDataHandler as any);
+const mapStateToProps: MapStateToProps<BarChartReducerState, BarChartContainerProps, ReduxStore> = state => state.bar;
+const mapDispatchToProps: MapDispatchToProps<typeof BarChartContainerActions, BarChartContainerProps> =
+    dispatch => bindActionCreators(BarChartContainerActions, dispatch);
+export const ReduxContainer = connect(mapStateToProps, mapDispatchToProps)(BarChartDataHandler);

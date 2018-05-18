@@ -19,7 +19,7 @@
         z-index: 1000;
     }
 
-    &.js-plotly-plot {
+    .js-plotly-plot {
         .plotly {
             .modebar {
                 z-index: 0 !important; // Strange: styles from the library that can't be over written without this

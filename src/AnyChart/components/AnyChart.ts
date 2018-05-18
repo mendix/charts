@@ -1,19 +1,16 @@
 
 // tslint:disable no-console
+import deepMerge from "deepmerge";
+import { Config } from "plotly.js";
 import { Component, ReactChild, createElement } from "react";
-
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
-import { PlotlyChart } from "../../components/PlotlyChart";
-
-import { arrayMerge } from "../../utils/data";
-import deepMerge from "deepmerge";
+import { PlotlyReduxContainer } from "../../components/PlotlyChart";
+import "../../ui/Charts.scss";
 import { Style } from "../../utils/namespaces";
-import { Config, Layout } from "plotly.js";
 import { getDimensions, parseStyle } from "../../utils/style";
 import { WrapperProps } from "../../utils/types";
 
-import "../../ui/Charts.scss";
 // TODO improve typing by replace explicit any types
 
 export interface AnyChartProps extends WrapperProps, Style.Dimensions {
@@ -45,32 +42,32 @@ export class AnyChart extends Component<AnyChartProps, { alertMessage?: ReactChi
     }
 
     private renderChart() {
-        return createElement(PlotlyChart, {
+        return createElement(PlotlyReduxContainer, {
             type: "full",
             className: this.props.class,
             style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
-            layout: this.getLayoutOptions(this.props),
-            data: this.getData(this.props),
-            config: this.getConfigOptions(this.props),
+            // layout: this.getLayoutOptions(this.props),
+            // data: this.getData(this.props),
+            // config: this.getConfigOptions(this.props),
             onClick: this.onClick
         });
     }
 
-    private getData(props: AnyChartProps): any[] {
-        const staticData: any[] = JSON.parse(props.dataStatic || "[]");
+    // private getData(props: AnyChartProps): any[] {
+    //     const staticData: any[] = JSON.parse(props.dataStatic || "[]");
 
-        return props.attributeData
-            ? deepMerge.all([ staticData, JSON.parse(props.attributeData) ], { arrayMerge })
-            : staticData;
-    }
+    //     return props.attributeData
+    //         ? deepMerge.all([ staticData, JSON.parse(props.attributeData) ], { arrayMerge })
+    //         : staticData;
+    // }
 
-    private getLayoutOptions(props: AnyChartProps): Partial<Layout> {
-        const staticLayout = JSON.parse(props.layoutStatic || "{}");
+    // private getLayoutOptions(props: AnyChartProps): Partial<Layout> {
+    //     const staticLayout = JSON.parse(props.layoutStatic || "{}");
 
-        return props.attributeLayout
-            ? deepMerge.all([ staticLayout, JSON.parse(props.attributeLayout) ], { arrayMerge }) as Partial<Layout>
-            : staticLayout;
-    }
+    //     return props.attributeLayout
+    //         ? deepMerge.all([ staticLayout, JSON.parse(props.attributeLayout) ], { arrayMerge }) as Partial<Layout>
+    //         : staticLayout;
+    // }
 
     private onClick = ({ points }: any) => {
         if (this.props.onClick) {

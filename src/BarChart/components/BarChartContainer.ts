@@ -9,7 +9,7 @@ import BarChartContainerProps = Container.BarChartContainerProps;
 
 __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
-const BarChartContainer: SFC<BarChartContainerProps> = (props) =>
+const BarChartContainer: SFC<BarChartContainerProps> = props =>
     createElement(Provider, { store }, createElement(ReduxContainer, props));
 
 BarChartContainer.defaultProps = { orientation: "bar" };

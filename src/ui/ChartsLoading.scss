@@ -1,6 +1,7 @@
 .widget-charts-loading-wrapper {
-    position: relative;
+    position: absolute;
     top: 20%;
+    width: 100%;
 
     .widget-charts-loading-indicator {
         display: block;

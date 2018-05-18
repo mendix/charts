@@ -5,7 +5,7 @@ import { render, unmountComponentAtNode } from "react-dom";
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
 import { HoverTooltip } from "../../components/HoverTooltip";
-import { PlotlyChart } from "../../components/PlotlyChart";
+import { PlotlyReduxContainer } from "../../components/PlotlyChart";
 import { SeriesPlayground } from "../../components/SeriesPlayground";
 import "../../ui/Charts.scss";
 import { configs } from "../../utils/configs";
@@ -96,14 +96,14 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     private renderLineChart(): ReactElement<any> {
-        return createElement(PlotlyChart,
+        return createElement(PlotlyReduxContainer,
             {
                 type: LineChart.getChartType(this.props.type),
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
-                layout: this.getLayoutOptions(this.props),
-                data: this.state.scatterData || [],
-                config: this.getConfigOptions(this.props),
+                // layout: this.getLayoutOptions(this.props),
+                // data: this.state.scatterData || [],
+                // config: this.getConfigOptions(this.props),
                 onClick: this.onClick,
                 onHover: this.onHover,
                 onRestyle: this.onRestyle,
@@ -143,13 +143,13 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
         this.tooltipNode = node;
     }
 
-    private getLayoutOptions(props: LineChartProps): Partial<Layout> {
-        const { layoutOptions } = this.state;
-        const advancedOptions = props.devMode !== "basic" && layoutOptions ? JSON.parse(layoutOptions) : {};
-        const themeLayoutConfigs = props.devMode !== "basic" ? this.props.themeConfigs.layout : {};
+    // private getLayoutOptions(props: LineChartProps): Partial<Layout> {
+    //     const { layoutOptions } = this.state;
+    //     const advancedOptions = props.devMode !== "basic" && layoutOptions ? JSON.parse(layoutOptions) : {};
+    //     const themeLayoutConfigs = props.devMode !== "basic" ? this.props.themeConfigs.layout : {};
 
-        return deepMerge.all([ LineChart.defaultLayoutConfigs(props), themeLayoutConfigs, advancedOptions ]);
-    }
+    //     return deepMerge.all([ LineChart.defaultLayoutConfigs(props), themeLayoutConfigs, advancedOptions ]);
+    // }
 
     private getData(props: LineChartProps): ScatterData[] {
         if (props.scatterData && this.chartNode) {

@@ -12,9 +12,10 @@ import {
     FETCH_DATA_FAILED,
     FETCH_THEME_CONFIGS,
     FETCH_THEME_CONFIGS_COMPLETE,
-    IS_LOADING,
     LOAD_PLAYGROUND,
+    NO_CONTEXT,
     RESET,
+    TOGGLE_FETCHING_DATA,
     UPDATE_DATA_FROM_FETCH,
     UPDATE_DATA_FROM_PLAYGROUND
 } from "./BarChartReducer";
@@ -22,15 +23,15 @@ import { BarChartDataHandlerProps } from "../components/BarChartDataHandler";
 
 export const resetStore = () => ({  type: RESET });
 export const showAlertMessage = (alertMessage: ReactChild): Partial<BarChartAction> => ({ type: ALERT_MESSAGE, alertMessage });
-export const isLoading = (loading: boolean): Partial<BarChartAction> => ({ type: IS_LOADING, loading });
+export const isFetching = (fetchingData: boolean): Partial<BarChartAction> => ({ type: TOGGLE_FETCHING_DATA, fetchingData });
 
-export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatch<any, any>) => {
-    if (!props.loading) {
-        dispatch({ type: IS_LOADING, loading: true });
-    }
-
+export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatch<BarChartAction, any>) => {
     return () => {
         if (props.mxObject && props.series.length) {
+            if (!props.fetchingData) {
+                dispatch({ type: TOGGLE_FETCHING_DATA, fetchingData: true } as BarChartAction);
+            }
+
             Promise.all(props.series.map(series => {
                 const attributes = [ series.xValueAttribute, series.yValueAttribute ];
                 if (series.xValueSortAttribute) {
@@ -57,20 +58,20 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                 restData,
                 series: customData as Data.LineSeriesProps
             })))
-            .then(data => dispatch({
+            .then((data: Data.SeriesData<Data.SeriesProps>[]) => dispatch({
                 data,
                 layoutOptions: props.layoutOptions || "{\n\n}",
                 scatterData: getData(data, props),
                 seriesOptions: data.map(({ series }) => series.seriesOptions || "{\n\n}"),
                 configurationOptions: props.configurationOptions || "{\n\n}",
                 type: UPDATE_DATA_FROM_FETCH
-            }))
+            } as BarChartAction))
             .catch(reason => {
                 window.mx.ui.error(reason);
-                dispatch({ type: FETCH_DATA_FAILED, layoutOptions: props.layoutOptions || "{\n\n}" });
+                dispatch({ type: FETCH_DATA_FAILED } as BarChartAction);
             });
         } else {
-            dispatch({ type: FETCH_DATA_FAILED });
+            dispatch({ type: NO_CONTEXT } as BarChartAction);
         }
     };
 };
