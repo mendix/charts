@@ -84,6 +84,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
     private renderChart() {
         return createElement(PlotlyReduxContainer,
             {
+                widgetID: this.props.friendlyId,
                 type: "pie",
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },

@@ -9,7 +9,7 @@ import { Alert } from "../../components/Alert";
 import { HoverTooltip } from "../../components/HoverTooltip";
 import { PlotlyReduxContainer } from "../../components/PlotlyChart";
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
-import { PlotlyChartState } from "../../components/reducers/PlotlyChartReducer";
+import { PlotlyChartInstanceState, defaultPlotlyInstanceState } from "../../components/reducers/PlotlyChartReducer";
 import { parseAdvancedOptions } from "../../utils/data";
 import { Data } from "../../utils/namespaces";
 import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
@@ -31,7 +31,7 @@ interface ComponentProps extends BarChartDataHandlerProps {
     onHover?: (options: Data.OnHoverOptions<{ x: string, y: number }, Data.SeriesProps>) => void;
 }
 
-export type BarChartProps = ComponentProps & { plotly: PlotlyChartState } & typeof PlotlyChartActions;
+export type BarChartProps = ComponentProps & { plotly: PlotlyChartInstanceState } & typeof PlotlyChartActions;
 
 class BarChart extends Component<BarChartProps & BarChartState> {
     private tooltipNode?: HTMLDivElement;
@@ -49,7 +49,7 @@ class BarChart extends Component<BarChartProps & BarChartState> {
 
     componentDidMount() {
         if (this.props.devMode === "developer" && this.props.loadPlayground) {
-            store.dispatch(this.props.loadPlayground());
+            store.dispatch(this.props.loadPlayground(this.props.friendlyId));
         }
     }
 
@@ -61,14 +61,14 @@ class BarChart extends Component<BarChartProps & BarChartState> {
             || newProps.configurationOptions !== this.props.configurationOptions
             || (newProps.scatterData && newProps.scatterData.length) !== (this.props.scatterData && this.props.scatterData.length);
         if (doneLoading || dataUpdated) {
-            this.props.updateData({
+            this.props.updateData(newProps.friendlyId, {
                 layout: this.getLayoutOptions(newProps),
                 data: newProps.scatterData || [],
                 config: this.getConfigOptions(newProps)
             });
         }
         if (newProps.fetchingData && !newProps.plotly.loadingData) {
-            this.props.togglePlotlyDataLoading();
+            this.props.togglePlotlyDataLoading(newProps.friendlyId);
         }
     }
 
@@ -80,6 +80,7 @@ class BarChart extends Component<BarChartProps & BarChartState> {
         return createElement(PlotlyReduxContainer,
             {
                 type: "bar",
+                widgetID: this.props.friendlyId,
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 onClick: this.onClick,
@@ -186,7 +187,7 @@ class BarChart extends Component<BarChartProps & BarChartState> {
 
     private onOptionsUpdate = (layoutOptions: string, seriesOptions: string[], configurationOptions: string) => {
         if (this.props.scatterData) {
-            this.props.updateDataFromPlayground(this.props.scatterData, layoutOptions, seriesOptions, configurationOptions);
+            this.props.updateDataFromPlayground(this.props.friendlyId, this.props.scatterData, layoutOptions, seriesOptions, configurationOptions);
         }
     }
 
@@ -200,8 +201,11 @@ class BarChart extends Component<BarChartProps & BarChartState> {
     }
 }
 
-const mapStateToProps: MapStateToProps<{ plotly: PlotlyChartState }, ComponentProps, ReduxStore> = state =>
-    ({ plotly: state.plotly });
+const mapStateToProps: MapStateToProps<{ plotly: PlotlyChartInstanceState }, ComponentProps, ReduxStore> = (state, props) =>
+    state.plotly[props.friendlyId]
+        ? { plotly: state.plotly[props.friendlyId] }
+        : { plotly: defaultPlotlyInstanceState as PlotlyChartInstanceState };
+
 const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>
     bindActionCreators(PlotlyChartActions, dispatch);
 export const ReduxBarChart = connect(mapStateToProps, mapDispatchToProps)(BarChart);

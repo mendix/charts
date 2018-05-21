@@ -98,6 +98,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     private renderLineChart(): ReactElement<any> {
         return createElement(PlotlyReduxContainer,
             {
+                widgetID: this.props.friendlyId,
                 type: LineChart.getChartType(this.props.type),
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },

@@ -14,6 +14,7 @@ import { WrapperProps } from "../../utils/types";
 // TODO improve typing by replace explicit any types
 
 export interface AnyChartProps extends WrapperProps, Style.Dimensions {
+    friendlyId: string;
     alertMessage?: ReactChild;
     loading?: boolean;
     dataStatic: string;
@@ -43,6 +44,7 @@ export class AnyChart extends Component<AnyChartProps, { alertMessage?: ReactChi
 
     private renderChart() {
         return createElement(PlotlyReduxContainer, {
+            widgetID: this.props.friendlyId,
             type: "full",
             className: this.props.class,
             style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },

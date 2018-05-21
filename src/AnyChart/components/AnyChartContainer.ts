@@ -22,6 +22,7 @@ export default class AnyChartContainer extends Component<AnyChartContainerProps,
 
     render() {
         const anyProps: AnyChartProps = {
+            friendlyId: this.props.friendlyId,
             dataStatic: this.props.dataStatic,
             layoutStatic: this.props.layoutStatic,
             attributeData: this.state.attributeData,

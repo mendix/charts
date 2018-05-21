@@ -12,6 +12,7 @@ import {
     FETCH_DATA_FAILED,
     FETCH_THEME_CONFIGS,
     FETCH_THEME_CONFIGS_COMPLETE,
+    INITIALISE_BAR_INSTANCE,
     LOAD_PLAYGROUND,
     NO_CONTEXT,
     RESET,
@@ -21,15 +22,18 @@ import {
 } from "./BarChartReducer";
 import { BarChartDataHandlerProps } from "../components/BarChartDataHandler";
 
-export const resetStore = () => ({  type: RESET });
-export const showAlertMessage = (alertMessage: ReactChild): Partial<BarChartAction> => ({ type: ALERT_MESSAGE, alertMessage });
-export const isFetching = (fetchingData: boolean): Partial<BarChartAction> => ({ type: TOGGLE_FETCHING_DATA, fetchingData });
+export const resetStore = () => ({ type: RESET });
+export const initialiseInstanceState = (widgetID: string) => ({ type: INITIALISE_BAR_INSTANCE, widgetID });
+export const showAlertMessage = (widgetID: string, alertMessage: ReactChild): Partial<BarChartAction> =>
+    ({ type: ALERT_MESSAGE, widgetID, alertMessage });
+export const isFetching = (widgetID: string, fetchingData: boolean): Partial<BarChartAction> =>
+    ({ type: TOGGLE_FETCHING_DATA, widgetID, fetchingData });
 
 export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatch<BarChartAction, any>) => {
     return () => {
         if (props.mxObject && props.series.length) {
             if (!props.fetchingData) {
-                dispatch({ type: TOGGLE_FETCHING_DATA, fetchingData: true } as BarChartAction);
+                dispatch({ type: TOGGLE_FETCHING_DATA, widgetID: props.friendlyId, fetchingData: true } as BarChartAction);
             }
 
             Promise.all(props.series.map(series => {
@@ -64,11 +68,12 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                 scatterData: getData(data, props),
                 seriesOptions: data.map(({ series }) => series.seriesOptions || "{\n\n}"),
                 configurationOptions: props.configurationOptions || "{\n\n}",
+                widgetID: props.friendlyId,
                 type: UPDATE_DATA_FROM_FETCH
             } as BarChartAction))
             .catch(reason => {
                 window.mx.ui.error(reason);
-                dispatch({ type: FETCH_DATA_FAILED } as BarChartAction);
+                dispatch({ type: FETCH_DATA_FAILED, widgetID: props.friendlyId } as BarChartAction);
             });
         } else {
             dispatch({ type: NO_CONTEXT } as BarChartAction);
@@ -76,22 +81,23 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
     };
 };
 
-export const fetchThemeConfigs = (orientation: "bar" | "column") => (dispatch: Dispatch<any, any>) => () => {
-    dispatch({ type: FETCH_THEME_CONFIGS });
+export const fetchThemeConfigs = (widgetID: string, orientation: "bar" | "column") => (dispatch: Dispatch<any, any>) => () => {
+    dispatch({ type: FETCH_THEME_CONFIGS, widgetID });
     fetchBarThemeConfig(orientation === "bar" ? "BarChart" : "ColumnChart")
-        .then(themeConfigs => dispatch({ type: FETCH_THEME_CONFIGS_COMPLETE, themeConfigs }))
+        .then(themeConfigs => dispatch({ type: FETCH_THEME_CONFIGS_COMPLETE, widgetID, themeConfigs }))
         .catch(() => dispatch({
             type: FETCH_THEME_CONFIGS_COMPLETE,
+            widgetID,
             themeConfigs: { layout: {}, configuration: {}, data: {} }
         }));
 };
 
-export const loadPlayground = () => (dispatch: Dispatch<any, any>) => async () => {
+export const loadPlayground = (widgetID: string) => (dispatch: Dispatch<any, any>) => async () => {
     const { SeriesPlayground } = await import("../../components/SeriesPlayground");
-    dispatch({ type: LOAD_PLAYGROUND, playground: SeriesPlayground });
+    dispatch({ type: LOAD_PLAYGROUND, widgetID, playground: SeriesPlayground });
 };
 
-export const updateDataFromPlayground = (scatterData: ScatterData[], layoutOptions: string, seriesOptions: string[], configurationOptions: string): Partial<BarChartAction> => {
+export const updateDataFromPlayground = (widgetID: string, scatterData: ScatterData[], layoutOptions: string, seriesOptions: string[], configurationOptions: string): Partial<BarChartAction> => {
     if (seriesOptions && seriesOptions.length) {
         const newScatterData = scatterData.map((data, index) => {
             const parsedOptions = parseAdvancedOptions("developer", seriesOptions[index]);
@@ -102,6 +108,7 @@ export const updateDataFromPlayground = (scatterData: ScatterData[], layoutOptio
 
         return ({
             type: UPDATE_DATA_FROM_PLAYGROUND,
+            widgetID,
             scatterData: newScatterData,
             layoutOptions,
             seriesOptions,

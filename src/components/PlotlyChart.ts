@@ -8,10 +8,10 @@ import { bindActionCreators } from "redux";
 import { getDimensionsFromNode } from "../utils/style";
 import { ChartLoading } from "./ChartLoading";
 import * as PlotlyChartActions from "./actions/PlotlyChartActions";
-import { PlotlyChartState } from "./reducers/PlotlyChartReducer";
-// import { store } from "../BarChart/store/store";
+import { PlotlyChartInstanceState, PlotlyChartState, defaultPlotlyInstanceState } from "./reducers/PlotlyChartReducer";
 
 export interface ComponentProps {
+    widgetID: string;
     type: "line" | "bar" | "pie" | "heatmap" | "full" | "polar";
     className?: string;
     style?: CSSProperties;
@@ -23,7 +23,7 @@ export interface ComponentProps {
     onResize?: (node: HTMLDivElement) => void;
 }
 
-type PlotlyChartProps = ComponentProps & typeof PlotlyChartActions & PlotlyChartState;
+type PlotlyChartProps = ComponentProps & typeof PlotlyChartActions & PlotlyChartInstanceState;
 
 interface Plotly {
     newPlot: (root: Root, data: Data[], layout?: Partial<Layout>, config?: Partial<Config>) => Promise<PlotlyHTMLElement>;
@@ -54,8 +54,9 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
     }
 
     componentDidMount() {
+        this.props.initialiseInstanceState(this.props.widgetID);
         if (!this.props.loadingAPI) {
-            this.props.togglePlotlyAPILoading();
+            this.props.togglePlotlyAPILoading(this.props.widgetID);
         }
         this.fetchPlotly()
             .then(plotly => {
@@ -64,7 +65,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
                     this.props.onRender(this.chartNode);
                 }
                 if (this.props.loadingAPI) {
-                    this.props.togglePlotlyAPILoading();
+                    this.props.togglePlotlyAPILoading(this.props.widgetID);
                 }
             });
     }
@@ -174,6 +175,7 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
     }
 }
 
-const mapStateToProps: MapStateToProps<PlotlyChartState, ComponentProps, { plotly: PlotlyChartState }> = state => state.plotly;
+const mapStateToProps: MapStateToProps<PlotlyChartInstanceState, ComponentProps, { plotly: PlotlyChartState }> = (state, props) =>
+    state.plotly[props.widgetID] || defaultPlotlyInstanceState;
 const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch => bindActionCreators(PlotlyChartActions, dispatch);
 export const PlotlyReduxContainer = connect(mapStateToProps, mapDispatchToProps)(PlotlyChart);

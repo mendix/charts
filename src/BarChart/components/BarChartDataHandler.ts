@@ -4,13 +4,13 @@ import { bindActionCreators } from "redux";
 import { handleOnClick, isContextChanged, openTooltipForm, setRefreshAction, validateSeriesProps } from "../../utils/data";
 import { Container, Data } from "../../utils/namespaces";
 import * as BarChartContainerActions from "../store/BarChartActions";
-import { BarChartReducerState } from "../store/BarChartReducer";
+import { BarChartInstanceState, defaultInstanceState } from "../store/BarChartReducer";
 import { ReduxStore, store } from "../store/store";
 import { ReduxBarChart } from "./BarChart";
 
 import BarChartContainerProps = Container.BarChartContainerProps;
 
-export type BarChartDataHandlerProps = BarChartContainerProps & BarChartReducerState & typeof BarChartContainerActions;
+export type BarChartDataHandlerProps = BarChartContainerProps & BarChartInstanceState & typeof BarChartContainerActions;
 
 export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
     private subscriptionHandle?: number;
@@ -29,14 +29,15 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
     }
 
     componentDidMount() {
+        this.props.initialiseInstanceState(this.props.friendlyId);
         const validationError = validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions);
         if (validationError) {
-            this.props.showAlertMessage(validationError);
+            this.props.showAlertMessage(this.props.friendlyId, validationError);
         } else if (this.props.alertMessage) {
-            this.props.showAlertMessage("");
+            this.props.showAlertMessage(this.props.friendlyId, "");
         }
         if (this.props.devMode !== "basic") {
-            this.props.fetchThemeConfigs(this.props.orientation);
+            this.props.fetchThemeConfigs(this.props.friendlyId, this.props.orientation);
         }
     }
 
@@ -44,7 +45,7 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
         this.resetSubscriptions(newProps.mxObject);
         if (!newProps.alertMessage) {
             if (!this.props.mxObject && !newProps.mxObject && newProps.fetchingData) {
-                newProps.isFetching(false);
+                newProps.isFetching(newProps.friendlyId, false);
             } else if (!newProps.fetchingConfigs && isContextChanged(this.props.mxObject, newProps.mxObject)) {
                 store.dispatch(newProps.fetchData(newProps));
                 this.clearRefreshInterval();
@@ -65,6 +66,10 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
     }
 
     componentWillUnmount() {
+        this.unsubscribe();
+    }
+
+    private unsubscribe() {
         if (this.subscriptionHandle) {
             mx.data.unsubscribe(this.subscriptionHandle);
         }
@@ -112,7 +117,7 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
     }
 
     private resetSubscriptions(mxObject?: mendix.lib.MxObject) {
-        this.componentWillUnmount();
+        this.unsubscribe();
         if (mxObject) {
             this.subscriptionHandle = mx.data.subscribe({
                 callback: () => store.dispatch(this.props.fetchData(this.props)),
@@ -127,7 +132,13 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
     }
 }
 
-const mapStateToProps: MapStateToProps<BarChartReducerState, BarChartContainerProps, ReduxStore> = state => state.bar;
+const mapStateToProps: MapStateToProps<BarChartInstanceState, BarChartContainerProps, ReduxStore> = (state, props) => {
+    if (state.bar[props.friendlyId]) {
+        return state.bar[props.friendlyId];
+    }
+
+    return defaultInstanceState as BarChartInstanceState;
+};
 const mapDispatchToProps: MapDispatchToProps<typeof BarChartContainerActions, BarChartContainerProps> =
     dispatch => bindActionCreators(BarChartContainerActions, dispatch);
 export const ReduxContainer = connect(mapStateToProps, mapDispatchToProps)(BarChartDataHandler);

@@ -83,6 +83,7 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
     private renderChart() {
         return createElement(PlotlyReduxContainer,
             {
+                widgetID: this.props.friendlyId,
                 type: "heatmap",
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
