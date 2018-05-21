@@ -33,8 +33,6 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
         const validationError = validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions);
         if (validationError) {
             this.props.showAlertMessage(this.props.friendlyId, validationError);
-        } else if (this.props.alertMessage) {
-            this.props.showAlertMessage(this.props.friendlyId, "");
         }
         if (this.props.devMode !== "basic") {
             this.props.fetchThemeConfigs(this.props.friendlyId, this.props.orientation);
@@ -52,7 +50,6 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
                 this.intervalID = setRefreshAction(newProps.refreshInterval, newProps.mxObject)(this.onRefresh);
             }
         } else {
-            // TODO:determine if this is OK
             this.clearRefreshInterval();
         }
     }
@@ -62,7 +59,8 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
             || nextProps.playground !== this.props.playground
             || nextProps.layoutOptions !== this.props.layoutOptions
             || nextProps.seriesOptions.join(" ") !== this.props.seriesOptions.join(" ")
-            || nextProps.configurationOptions !== this.props.configurationOptions;
+            || nextProps.configurationOptions !== this.props.configurationOptions
+            || nextProps.alertMessage !== this.props.alertMessage;
     }
 
     componentWillUnmount() {

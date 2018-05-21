@@ -7,7 +7,7 @@ import * as jsonMap from "json-source-map";
 import { InfoTooltip } from "./InfoTooltip";
 import { MendixButton } from "./MendixButton";
 import { Panel } from "./Panel";
-import { PlotlyChart } from "./PlotlyChart";
+import { PlotlyReduxContainer } from "./PlotlyChart";
 import { Sidebar } from "./Sidebar";
 import { SidebarHeader } from "./SidebarHeader";
 import { SidebarContent } from "./SidebarContent";
@@ -63,11 +63,11 @@ export class Playground extends Component<{}, PlaygroundState> {
             createElement("div", { className: "widget-charts-playground-toggle" },
                 createElement(MendixButton, { onClick: this.toggleShowEditor }, "Toggle Editor")
             ),
-            this.renderContent(PlotlyChart)
+            this.renderContent(PlotlyReduxContainer)
         );
     }
 
-    private renderContent(component: typeof Panel | typeof PlotlyChart | typeof SidebarHeaderTools): ReactChild | (ReactChild | any | boolean)[] | null {
+    private renderContent(component: typeof Panel | typeof PlotlyReduxContainer | typeof SidebarHeaderTools): ReactChild | (ReactChild | any | boolean)[] | null {
         if (this.props.children && Array.isArray(this.props.children)) {
             return this.props.children.filter(child => isValidElement(child) && child.type === component);
         } else if (isValidElement(this.props.children) && this.props.children.type === component) {

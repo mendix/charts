@@ -1,4 +1,4 @@
-import { Config, HeatMapData, Layout, PieData, ScatterData } from "plotly.js";
+import { Config, Data, HeatMapData, Layout, PieData, PlotlyHTMLElement, Root, ScatterData } from "plotly.js";
 import { Action, Reducer } from "redux";
 
 export type PlotlyChartAction = Action & PlotlyChartInstanceState & { widgetID: string };
@@ -11,10 +11,17 @@ export interface ChartData {
 export interface PlotlyChartInstanceState extends ChartData {
     loadingAPI: boolean;
     loadingData: boolean;
+    plotly?: Plotly;
 }
 
 export interface PlotlyChartState {
     [ widgetID: string ]: PlotlyChartInstanceState;
+}
+
+export interface Plotly {
+    newPlot: (root: Root, data: Data[], layout?: Partial<Layout>, config?: Partial<Config>) => Promise<PlotlyHTMLElement>;
+    purge: (root: Root) => void;
+    relayout?: (root: Root, layout: Partial<Layout>) => Promise<PlotlyHTMLElement>;
 }
 
 const prefix = "PlotlyChart";
@@ -43,7 +50,14 @@ export const plotlyChartReducer: Reducer<PlotlyChartState> = (state = defaultSta
                 }
             };
         case TOGGLE_PLOTLY_API_LOADING:
-            return { ...state, [action.widgetID]: { ...state[action.widgetID], loadingAPI: !state[action.widgetID].loadingAPI } };
+            return {
+                ...state,
+                [action.widgetID]: {
+                    ...state[action.widgetID],
+                    loadingAPI: !state[action.widgetID].loadingAPI,
+                    plotly: action.plotly
+                }
+            };
         case TOGGLE_PLOTLY_DATA_LOADING:
             return { ...state, [action.widgetID]: { ...state[action.widgetID], loadingData: !state[action.widgetID].loadingData } };
         case INITIALISE_PLOTLY_INSTANCE:

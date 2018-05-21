@@ -37,6 +37,7 @@ class BarChart extends Component<BarChartProps & BarChartState> {
     private tooltipNode?: HTMLDivElement;
 
     render() {
+        console.log("BarChart.render"); // tslint:disable-line
         if (this.props.alertMessage) {
             return createElement(Alert, { className: "widget-charts-bar-alert" }, this.props.alertMessage);
         }
@@ -61,14 +62,14 @@ class BarChart extends Component<BarChartProps & BarChartState> {
             || newProps.configurationOptions !== this.props.configurationOptions
             || (newProps.scatterData && newProps.scatterData.length) !== (this.props.scatterData && this.props.scatterData.length);
         if (doneLoading || dataUpdated) {
-            this.props.updateData(newProps.friendlyId, {
+            newProps.updateData(newProps.friendlyId, {
                 layout: this.getLayoutOptions(newProps),
                 data: newProps.scatterData || [],
                 config: this.getConfigOptions(newProps)
             });
         }
         if (newProps.fetchingData && !newProps.plotly.loadingData) {
-            this.props.togglePlotlyDataLoading(newProps.friendlyId);
+            newProps.togglePlotlyDataLoading(newProps.friendlyId);
         }
     }
 

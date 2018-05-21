@@ -1,6 +1,6 @@
 import * as classNames from "classnames";
 import deepMerge from "deepmerge";
-import { Config, Data, Layout, PieHoverData, PlotlyHTMLElement, Root, ScatterHoverData } from "plotly.js";
+import { Data, PieHoverData, ScatterHoverData } from "plotly.js";
 import { CSSProperties, Component, createElement } from "react";
 import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 import ReactResizeDetector from "react-resize-detector";
@@ -8,7 +8,7 @@ import { bindActionCreators } from "redux";
 import { getDimensionsFromNode } from "../utils/style";
 import { ChartLoading } from "./ChartLoading";
 import * as PlotlyChartActions from "./actions/PlotlyChartActions";
-import { PlotlyChartInstanceState, PlotlyChartState, defaultPlotlyInstanceState } from "./reducers/PlotlyChartReducer";
+import { Plotly, PlotlyChartInstanceState, PlotlyChartState, defaultPlotlyInstanceState } from "./reducers/PlotlyChartReducer";
 
 export interface ComponentProps {
     widgetID: string;
@@ -25,19 +25,12 @@ export interface ComponentProps {
 
 type PlotlyChartProps = ComponentProps & typeof PlotlyChartActions & PlotlyChartInstanceState;
 
-interface Plotly {
-    newPlot: (root: Root, data: Data[], layout?: Partial<Layout>, config?: Partial<Config>) => Promise<PlotlyHTMLElement>;
-    purge: (root: Root) => void;
-    relayout?: (root: Root, layout: Partial<Layout>) => Promise<PlotlyHTMLElement>;
-}
-
 export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean }> {
     state = { loading: true };
     private chartNode?: HTMLDivElement;
     private rootNode?: HTMLDivElement;
     private tooltipNode?: HTMLDivElement;
     private timeoutId?: number;
-    private plotly?: Plotly;
 
     render() {
         return createElement("div",
@@ -56,29 +49,28 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
     componentDidMount() {
         this.props.initialiseInstanceState(this.props.widgetID);
         if (!this.props.loadingAPI) {
-            this.props.togglePlotlyAPILoading(this.props.widgetID);
+            this.props.togglePlotlyAPILoading(this.props.widgetID, this.props.plotly);
         }
         this.fetchPlotly()
             .then(plotly => {
-                this.plotly = plotly;
                 if (this.props.onRender && this.chartNode) {
                     this.props.onRender(this.chartNode);
                 }
                 if (this.props.loadingAPI) {
-                    this.props.togglePlotlyAPILoading(this.props.widgetID);
+                    this.props.togglePlotlyAPILoading(this.props.widgetID, plotly);
                 }
             });
     }
 
     componentDidUpdate() {
-        if (!this.props.loadingAPI && !this.props.loadingData && this.plotly) {
-            this.renderChart(this.props, this.plotly);
+        if (!this.props.loadingAPI && !this.props.loadingData && this.props.plotly) {
+            this.renderChart(this.props, this.props.plotly);
         }
     }
 
     componentWillUnmount() {
-        if (this.chartNode && this.plotly) {
-            this.plotly.purge(this.chartNode);
+        if (this.chartNode && this.props.plotly) {
+            this.props.plotly.purge(this.chartNode);
         }
     }
 
@@ -165,8 +157,8 @@ export class PlotlyChart extends Component<PlotlyChartProps, { loading: boolean 
             clearTimeout(this.timeoutId);
         }
         this.timeoutId = window.setTimeout(() => {
-            if (this.plotly && this.chartNode) {
-                this.renderChart(this.props, this.plotly);
+            if (this.props.plotly && this.chartNode) {
+                this.renderChart(this.props, this.props.plotly);
                 if (this.props.onResize) {
                     this.props.onResize(this.chartNode);
                 }
