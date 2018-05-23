@@ -101,6 +101,7 @@ export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> 
 
     private renderDataPanes() {
         if (this.state.attributeData) {
+
             return [
                 createElement(Panel,
                     {
