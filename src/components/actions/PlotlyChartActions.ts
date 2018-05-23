@@ -1,6 +1,5 @@
 import {
     ChartData,
-    INITIALISE_PLOTLY_INSTANCE,
     Plotly,
     RESET,
     TOGGLE_PLOTLY_API_LOADING,
@@ -9,8 +8,8 @@ import {
 } from "../reducers/PlotlyChartReducer";
 
 export const resetState = () => ({  type: RESET });
-export const initialiseInstanceState = (widgetID: string) => ({ type: INITIALISE_PLOTLY_INSTANCE, widgetID });
-export const togglePlotlyAPILoading = (widgetID: string, plotly?: Plotly) =>
-    ({ type: TOGGLE_PLOTLY_API_LOADING, widgetID, plotly });
-export const togglePlotlyDataLoading = (widgetID: string) => ({ type: TOGGLE_PLOTLY_DATA_LOADING, widgetID });
+export const togglePlotlyAPILoading = (widgetID: string, loadingAPI: boolean, plotly?: Plotly) =>
+    ({ type: TOGGLE_PLOTLY_API_LOADING, widgetID, loadingAPI, plotly });
+export const togglePlotlyDataLoading = (widgetID: string, loadingData: boolean) =>
+    ({ type: TOGGLE_PLOTLY_DATA_LOADING, widgetID, loadingData });
 export const updateData = (widgetID: string, data: ChartData) => ({ type: UPDATE_DATA, widgetID, ...data });

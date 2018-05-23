@@ -5,7 +5,7 @@ import { render, unmountComponentAtNode } from "react-dom";
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
 import { HoverTooltip } from "../../components/HoverTooltip";
-import { PlotlyReduxContainer } from "../../components/PlotlyChart";
+import PlotlyChart from "../../components/PlotlyChart";
 import { SeriesPlayground } from "../../components/SeriesPlayground";
 import "../../ui/Charts.scss";
 import { configs } from "../../utils/configs";
@@ -96,7 +96,7 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
     }
 
     private renderLineChart(): ReactElement<any> {
-        return createElement(PlotlyReduxContainer,
+        return createElement(PlotlyChart,
             {
                 widgetID: this.props.friendlyId,
                 type: LineChart.getChartType(this.props.type),

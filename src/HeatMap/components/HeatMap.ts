@@ -6,7 +6,7 @@ import { PiePlayground } from "../../PieChart/components/PiePlayground";
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
 import { HoverTooltip } from "../../components/HoverTooltip";
-import { PlotlyReduxContainer } from "../../components/PlotlyChart";
+import PlotlyChart from "../../components/PlotlyChart";
 import "../../ui/Charts.scss";
 import { ChartConfigs, arrayMerge, configs } from "../../utils/configs";
 import { Container, Data } from "../../utils/namespaces";
@@ -81,7 +81,7 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
     }
 
     private renderChart() {
-        return createElement(PlotlyReduxContainer,
+        return createElement(PlotlyChart,
             {
                 widgetID: this.props.friendlyId,
                 type: "heatmap",

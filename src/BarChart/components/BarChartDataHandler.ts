@@ -1,16 +1,24 @@
 import { Component, createElement } from "react";
 import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { handleOnClick, isContextChanged, openTooltipForm, setRefreshAction, validateSeriesProps } from "../../utils/data";
-import { Container, Data } from "../../utils/namespaces";
-import * as BarChartContainerActions from "../store/BarChartActions";
+
+import BarChart from "./BarChart";
+import * as BarChartActions from "../store/BarChartActions";
 import { BarChartInstanceState, defaultInstanceState } from "../store/BarChartReducer";
+import {
+    handleOnClick,
+    isContextChanged,
+    openTooltipForm,
+    setRefreshAction,
+    validateSeriesProps
+} from "../../utils/data";
+import { Container, Data } from "../../utils/namespaces";
+import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
 import { ReduxStore, store } from "../store/store";
-import { ReduxBarChart } from "./BarChart";
 
 import BarChartContainerProps = Container.BarChartContainerProps;
 
-export type BarChartDataHandlerProps = BarChartContainerProps & BarChartInstanceState & typeof BarChartContainerActions;
+export type BarChartDataHandlerProps = BarChartContainerProps & BarChartInstanceState & typeof BarChartActions & typeof PlotlyChartActions;
 
 export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
     private subscriptionHandle?: number;
@@ -18,10 +26,10 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
 
     render() {
         return createElement("div", { className: "widget-charts-wrapper" },
-            createElement(ReduxBarChart, {
+            createElement(BarChart, {
                 ...this.props as BarChartDataHandlerProps,
-                onClick: this.handleOnClick,
-                onHover: this.handleOnHover,
+                onClick: this.onClick,
+                onHover: this.onHover,
                 scatterData: this.props.scatterData,
                 series: this.props.data ? this.props.data.map(({ series }) => series) : this.props.series
             })
@@ -29,7 +37,6 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
     }
 
     componentDidMount() {
-        this.props.initialiseInstanceState(this.props.friendlyId);
         const validationError = validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions);
         if (validationError) {
             this.props.showAlertMessage(this.props.friendlyId, validationError);
@@ -42,9 +49,10 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
     componentWillReceiveProps(newProps: BarChartDataHandlerProps) {
         this.resetSubscriptions(newProps.mxObject);
         if (!newProps.alertMessage) {
-            if (!this.props.mxObject && !newProps.mxObject && newProps.fetchingData) {
-                newProps.isFetching(newProps.friendlyId, false);
+            if (!newProps.mxObject) {
+                newProps.noContext(newProps.friendlyId);
             } else if (!newProps.fetchingConfigs && isContextChanged(this.props.mxObject, newProps.mxObject)) {
+                newProps.togglePlotlyDataLoading(newProps.friendlyId, true);
                 store.dispatch(newProps.fetchData(newProps));
                 this.clearRefreshInterval();
                 this.intervalID = setRefreshAction(newProps.refreshInterval, newProps.mxObject)(this.onRefresh);
@@ -55,21 +63,33 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
     }
 
     shouldComponentUpdate(nextProps: BarChartDataHandlerProps) {
-        return nextProps.fetchingData !== this.props.fetchingData
-            || nextProps.playground !== this.props.playground
-            || nextProps.layoutOptions !== this.props.layoutOptions
+        const doneLoading = !nextProps.fetchingData && this.props.fetchingData;
+        const advancedOptionsUpdated = nextProps.layoutOptions !== this.props.layoutOptions
             || nextProps.seriesOptions.join(" ") !== this.props.seriesOptions.join(" ")
-            || nextProps.configurationOptions !== this.props.configurationOptions
-            || nextProps.alertMessage !== this.props.alertMessage;
+            || nextProps.configurationOptions !== this.props.configurationOptions;
+        const playgroundLoaded = !!nextProps.playground && !this.props.playground;
+
+        return doneLoading || advancedOptionsUpdated || playgroundLoaded || !nextProps.mxObject;
     }
 
     componentWillUnmount() {
         this.unsubscribe();
     }
 
+    private resetSubscriptions(mxObject?: mendix.lib.MxObject) {
+        this.unsubscribe();
+        if (mxObject) {
+            this.subscriptionHandle = mx.data.subscribe({
+                callback: () => store.dispatch(this.props.fetchData(this.props)),
+                guid: mxObject.getGuid()
+            });
+        }
+    }
+
     private unsubscribe() {
         if (this.subscriptionHandle) {
             mx.data.unsubscribe(this.subscriptionHandle);
+            this.subscriptionHandle = undefined;
         }
         this.clearRefreshInterval();
     }
@@ -80,7 +100,7 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
         }
     }
 
-    private handleOnClick = (options: Data.OnClickOptions<{ x: string, y: number }, Data.SeriesProps>) => {
+    private onClick = (options: Data.OnClickOptions<{ x: string, y: number }, Data.SeriesProps>) => {
         if (options.mxObject) {
             handleOnClick(options.options, options.mxObject, options.mxForm);
         } else if (options.trace) {
@@ -90,7 +110,7 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
         }
     }
 
-    private handleOnHover = (options: Data.OnHoverOptions<{ x: string, y: number }, Data.SeriesProps>) => {
+    private onHover = (options: Data.OnHoverOptions<{ x: string, y: number }, Data.SeriesProps>) => {
         if (options.mxObject) {
             openTooltipForm(options.tooltipNode, options.tooltipForm, options.mxObject);
         } else if (options.trace && options.options.dataEntity) {
@@ -114,29 +134,17 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
         });
     }
 
-    private resetSubscriptions(mxObject?: mendix.lib.MxObject) {
-        this.unsubscribe();
-        if (mxObject) {
-            this.subscriptionHandle = mx.data.subscribe({
-                callback: () => store.dispatch(this.props.fetchData(this.props)),
-                guid: mxObject.getGuid()
-            });
-        }
-    }
-
     private clearRefreshInterval() {
         window.clearInterval(this.intervalID);
         this.intervalID = undefined;
     }
 }
 
-const mapStateToProps: MapStateToProps<BarChartInstanceState, BarChartContainerProps, ReduxStore> = (state, props) => {
-    if (state.bar[props.friendlyId]) {
-        return state.bar[props.friendlyId];
-    }
-
-    return defaultInstanceState as BarChartInstanceState;
-};
-const mapDispatchToProps: MapDispatchToProps<typeof BarChartContainerActions, BarChartContainerProps> =
-    dispatch => bindActionCreators(BarChartContainerActions, dispatch);
-export const ReduxContainer = connect(mapStateToProps, mapDispatchToProps)(BarChartDataHandler);
+const mapStateToProps: MapStateToProps<BarChartInstanceState, BarChartContainerProps, ReduxStore> = (state, props) =>
+    state.bar[props.friendlyId] || defaultInstanceState as BarChartInstanceState;
+const mapDispatchToProps: MapDispatchToProps<typeof BarChartActions & typeof PlotlyChartActions, BarChartContainerProps> =
+    dispatch => ({
+        ...bindActionCreators(BarChartActions, dispatch),
+        ...bindActionCreators(PlotlyChartActions, dispatch)
+    });
+export default connect(mapStateToProps, mapDispatchToProps)(BarChartDataHandler);

@@ -5,7 +5,7 @@ import { render, unmountComponentAtNode } from "react-dom";
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
 import { HoverTooltip } from "../../components/HoverTooltip";
-import { PlotlyReduxContainer } from "../../components/PlotlyChart";
+import PlotlyChart from "../../components/PlotlyChart";
 import "../../ui/Charts.scss";
 import { configs } from "../../utils/configs";
 import { Container, Data } from "../../utils/namespaces";
@@ -82,7 +82,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
     }
 
     private renderChart() {
-        return createElement(PlotlyReduxContainer,
+        return createElement(PlotlyChart,
             {
                 widgetID: this.props.friendlyId,
                 type: "pie",

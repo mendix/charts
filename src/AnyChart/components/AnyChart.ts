@@ -5,7 +5,7 @@ import { Config } from "plotly.js";
 import { Component, ReactChild, createElement } from "react";
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
-import { PlotlyReduxContainer } from "../../components/PlotlyChart";
+import PlotlyChart from "../../components/PlotlyChart";
 import "../../ui/Charts.scss";
 import { Style } from "../../utils/namespaces";
 import { getDimensions, parseStyle } from "../../utils/style";
@@ -43,7 +43,7 @@ export class AnyChart extends Component<AnyChartProps, { alertMessage?: ReactChi
     }
 
     private renderChart() {
-        return createElement(PlotlyReduxContainer, {
+        return createElement(PlotlyChart, {
             widgetID: this.props.friendlyId,
             type: "full",
             className: this.props.class,

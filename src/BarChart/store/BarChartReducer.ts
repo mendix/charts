@@ -23,7 +23,6 @@ export interface BarChartReducerState {
 
 const prefix = "BarChart";
 export const RESET = `${prefix}.RESET`;
-export const INITIALISE_BAR_INSTANCE = `${prefix}.INITIALISE_BAR_INSTANCE`;
 export const ALERT_MESSAGE = `${prefix}.ALERT_MESSAGE`;
 export const TOGGLE_FETCHING_DATA = `${prefix}.TOGGLE_FETCHING_DATA`;
 export const UPDATE_DATA_FROM_FETCH = `${prefix}.UPDATE_DATA_FROM_FETCH`;
@@ -46,7 +45,6 @@ const defaultDataState: Partial<BarChartInstanceState> = {
 export const defaultInstanceState: Partial<BarChartInstanceState> = {
     ...defaultDataState,
     alertMessage: "",
-    fetchingData: true,
     fetchingConfigs: false,
     themeConfigs: { layout: {}, configuration: {}, data: {} }
 };
@@ -58,12 +56,18 @@ export const barChartReducer: Reducer<BarChartReducerState> = (state = defaultSt
         case FETCH_THEME_CONFIGS:
             return {
                 ...state,
-                [action.widgetID]: { ...state[action.widgetID], fetchingConfigs: false, fetchingData: true }
+                [action.widgetID]: {
+                    ...defaultInstanceState,
+                    ...state[action.widgetID],
+                    fetchingConfigs: false,
+                    fetchingData: true
+                }
             };
         case FETCH_THEME_CONFIGS_COMPLETE:
             return {
                 ...state,
                 [action.widgetID]: {
+                    ...defaultInstanceState,
                     ...state[action.widgetID],
                     themeConfigs: action.themeConfigs,
                     fetchingConfigs: false
@@ -73,6 +77,7 @@ export const barChartReducer: Reducer<BarChartReducerState> = (state = defaultSt
             return {
                 ...state,
                 [action.widgetID]: {
+                    ...defaultInstanceState,
                     ...state[action.widgetID],
                     data: action.data && action.data.slice(),
                     layoutOptions: action.layoutOptions,
@@ -84,15 +89,34 @@ export const barChartReducer: Reducer<BarChartReducerState> = (state = defaultSt
         case FETCH_DATA_FAILED:
             return { ...state, [action.widgetID]: { ...state[action.widgetID], ...defaultDataState } };
         case NO_CONTEXT:
-            return { ...state, [action.widgetID]: { ...state[action.widgetID], ...defaultDataState } };
+            return {
+                ...state,
+                [action.widgetID]: {
+                    ...defaultInstanceState,
+                    ...state[action.widgetID],
+                    ...defaultDataState
+                } };
         case TOGGLE_FETCHING_DATA:
-            return { ...state, [action.widgetID]: { ...state[action.widgetID], fetchingData: action.fetchingData } };
+            return {
+                ...state,
+                [action.widgetID]: {
+                    ...defaultInstanceState,
+                    ...state[action.widgetID],
+                    fetchingData: action.fetchingData
+                } };
         case LOAD_PLAYGROUND:
-            return { ...state, [action.widgetID]: { ...state[action.widgetID], playground: action.playground } };
+            return {
+                ...state,
+                [action.widgetID]: {
+                    ...defaultInstanceState,
+                    ...state[action.widgetID],
+                    playground: action.playground
+                } };
         case UPDATE_DATA_FROM_PLAYGROUND:
             return {
                 ...state,
                 [action.widgetID]: {
+                    ...defaultInstanceState,
                     ...state[action.widgetID],
                     layoutOptions: action.layoutOptions,
                     scatterData: action.scatterData && action.scatterData.slice(),
@@ -101,9 +125,13 @@ export const barChartReducer: Reducer<BarChartReducerState> = (state = defaultSt
                 }
             };
         case ALERT_MESSAGE:
-            return { ...state, [action.widgetID]: { ...state[action.widgetID], alertMessage: action.alertMessage } };
-        case INITIALISE_BAR_INSTANCE:
-            return { ...state, [action.widgetID]: defaultInstanceState as BarChartInstanceState };
+            return {
+                ...state,
+                [action.widgetID]: {
+                    ...defaultInstanceState,
+                    ...state[action.widgetID],
+                    alertMessage: action.alertMessage
+                } };
         case RESET:
             return defaultState as BarChartReducerState;
         default:

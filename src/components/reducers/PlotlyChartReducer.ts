@@ -1,21 +1,21 @@
 import { Config, Data, HeatMapData, Layout, PieData, PlotlyHTMLElement, Root, ScatterData } from "plotly.js";
 import { Action, Reducer } from "redux";
 
-export type PlotlyChartAction = Action & PlotlyChartInstanceState & { widgetID: string };
+export type PlotlyChartAction = Action & PlotlyChartInstance & { widgetID: string };
 
 export interface ChartData {
     layout?: Partial<Layout>;
     data?: ScatterData[] | PieData[] | HeatMapData[];
     config?: Partial<Config>;
 }
-export interface PlotlyChartInstanceState extends ChartData {
+export interface PlotlyChartInstance extends ChartData {
     loadingAPI: boolean;
     loadingData: boolean;
     plotly?: Plotly;
 }
 
 export interface PlotlyChartState {
-    [ widgetID: string ]: PlotlyChartInstanceState;
+    [ widgetID: string ]: PlotlyChartInstance;
 }
 
 export interface Plotly {
@@ -26,42 +26,49 @@ export interface Plotly {
 
 const prefix = "PlotlyChart";
 export const RESET = `${prefix}.RESET`;
-export const INITIALISE_PLOTLY_INSTANCE = `${prefix}.INITIALISE_PLOTLY_INSTANCE`;
 export const TOGGLE_PLOTLY_API_LOADING = `${prefix}.TOGGLE_PLOTLY_API_LOADING`;
 export const TOGGLE_PLOTLY_DATA_LOADING = `${prefix}.TOGGLE_PLOTLY_DATA_LOADING`;
 export const UPDATE_DATA = `${prefix}.UPDATE_DATA`;
 
-export const defaultPlotlyInstanceState: Partial<PlotlyChartInstanceState> = {
+export const defaultPlotlyInstanceState: Partial<PlotlyChartInstance> = {
     loadingAPI: true
 };
 const defaultState: Partial<PlotlyChartState> = {};
 
 export const plotlyChartReducer: Reducer<PlotlyChartState> = (state = defaultState as PlotlyChartState, action: PlotlyChartAction): PlotlyChartState => {
     switch (action.type) {
+        case TOGGLE_PLOTLY_API_LOADING:
+            return {
+                ...state,
+                [action.widgetID]: {
+                    ...defaultPlotlyInstanceState,
+                    ...state[action.widgetID],
+                    loadingAPI: action.loadingAPI,
+                    plotly: action.plotly
+                }
+            };
+        case TOGGLE_PLOTLY_DATA_LOADING:
+            return {
+                ...state,
+                [action.widgetID]: {
+                    ...defaultPlotlyInstanceState,
+                    ...state[action.widgetID],
+                    loadingData: action.loadingData
+                }
+            };
         case UPDATE_DATA:
             return {
                 ...state,
                 [action.widgetID]: {
+                    ...defaultPlotlyInstanceState,
                     ...state[action.widgetID],
+                    plotly: state[action.widgetID] && state[action.widgetID].plotly,
                     loadingData: false,
                     data: action.data,
                     layout: action.layout,
                     config: action.config
                 }
             };
-        case TOGGLE_PLOTLY_API_LOADING:
-            return {
-                ...state,
-                [action.widgetID]: {
-                    ...state[action.widgetID],
-                    loadingAPI: !state[action.widgetID].loadingAPI,
-                    plotly: action.plotly
-                }
-            };
-        case TOGGLE_PLOTLY_DATA_LOADING:
-            return { ...state, [action.widgetID]: { ...state[action.widgetID], loadingData: !state[action.widgetID].loadingData } };
-        case INITIALISE_PLOTLY_INSTANCE:
-            return { ...state, [action.widgetID]: defaultPlotlyInstanceState as PlotlyChartInstanceState };
         case RESET:
             return defaultState as PlotlyChartState;
         default:

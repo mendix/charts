@@ -12,7 +12,6 @@ import {
     FETCH_DATA_FAILED,
     FETCH_THEME_CONFIGS,
     FETCH_THEME_CONFIGS_COMPLETE,
-    INITIALISE_BAR_INSTANCE,
     LOAD_PLAYGROUND,
     NO_CONTEXT,
     RESET,
@@ -23,11 +22,11 @@ import {
 import { BarChartDataHandlerProps } from "../components/BarChartDataHandler";
 
 export const resetStore = () => ({ type: RESET });
-export const initialiseInstanceState = (widgetID: string) => ({ type: INITIALISE_BAR_INSTANCE, widgetID });
 export const showAlertMessage = (widgetID: string, alertMessage: ReactChild): Partial<BarChartAction> =>
     ({ type: ALERT_MESSAGE, widgetID, alertMessage });
 export const isFetching = (widgetID: string, fetchingData: boolean): Partial<BarChartAction> =>
     ({ type: TOGGLE_FETCHING_DATA, widgetID, fetchingData });
+export const noContext = (widgetID: string): Partial<BarChartAction> => ({ type: NO_CONTEXT, widgetID });
 
 export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatch<BarChartAction, any>) => {
     return () => {
@@ -76,7 +75,7 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                 dispatch({ type: FETCH_DATA_FAILED, widgetID: props.friendlyId } as BarChartAction);
             });
         } else {
-            dispatch({ type: NO_CONTEXT } as BarChartAction);
+            dispatch({ type: NO_CONTEXT, widgetID: props.friendlyId } as BarChartAction);
         }
     };
 };
@@ -116,5 +115,5 @@ export const updateDataFromPlayground = (widgetID: string, scatterData: ScatterD
         });
     }
 
-    return ({ type: UPDATE_DATA_FROM_PLAYGROUND, scatterData, layoutOptions, seriesOptions });
+    return ({ type: UPDATE_DATA_FROM_PLAYGROUND, widgetID, scatterData, layoutOptions, seriesOptions });
 };
