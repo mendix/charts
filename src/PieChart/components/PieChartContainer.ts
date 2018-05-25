@@ -28,7 +28,7 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
         loading: true,
         themeConfigs: { layout: {}, configuration: {}, data: {} }
     };
-    private subscriptionHandle?: number;
+    private subscriptionHandles: number[] = [];
     private intervalID?: number;
 
     render() {
@@ -52,9 +52,12 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
     }
 
     componentWillUnmount() {
-        if (this.subscriptionHandle) {
-            window.mx.data.unsubscribe(this.subscriptionHandle);
-        }
+        this.unsubscribe();
+    }
+
+    private unsubscribe() {
+        this.subscriptionHandles.map(mx.data.unsubscribe);
+        this.subscriptionHandles = [];
         this.clearRefreshInterval();
     }
 
@@ -88,15 +91,13 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
     }
 
     private resetSubscriptions(mxObject?: mendix.lib.MxObject) {
-        if (this.subscriptionHandle) {
-            window.mx.data.unsubscribe(this.subscriptionHandle);
-        }
+        this.unsubscribe();
 
         if (mxObject) {
-            this.subscriptionHandle = window.mx.data.subscribe({
+            this.subscriptionHandles.push(window.mx.data.subscribe({
                 callback: () => this.fetchData(mxObject),
                 guid: mxObject.getGuid()
-            });
+            }));
         }
     }
 
@@ -134,14 +135,21 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
     }
 
     private getData(data: Data.FetchedData<string>): PieData[] {
+        if (data.mxObjects) {
+            data.mxObjects.forEach(mxObject => {
+                this.subscriptionHandles.push(mx.data.subscribe({
+                    callback: () => {/* callback is required but not in this case */},
+                    guid: mxObject.getGuid()
+                }));
+            });
+        }
         if ((data.mxObjects && data.mxObjects.length) || (data.restData && data.restData.length)) {
             const advancedOptions = this.props.devMode !== "basic" && this.props.dataOptions
                 ? JSON.parse(this.props.dataOptions)
                 : {};
-
             const arrayMerge = (_destinationArray: any[], sourceArray: any[]) => sourceArray;
-
             const traces = this.getTraces(data);
+
             return [
                 {
                     ...deepMerge.all(

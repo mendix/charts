@@ -34,7 +34,7 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
         loading: true,
         themeConfigs: { layout: {}, configuration: {}, data: {} }
     };
-    private subscriptionHandle?: number;
+    private subscriptionHandles: number[] = [];
     private rawData: mendix.lib.MxObject[] = [];
     private intervalID?: number;
 
@@ -59,9 +59,12 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
     }
 
     componentWillUnmount() {
-        if (this.subscriptionHandle) {
-            window.mx.data.unsubscribe(this.subscriptionHandle);
-        }
+        this.unsubscribe();
+    }
+
+    private unsubscribe() {
+        this.subscriptionHandles.map(mx.data.unsubscribe);
+        this.subscriptionHandles = [];
         this.clearRefreshInterval();
     }
 
@@ -95,15 +98,13 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
     }
 
     private resetSubscriptions(mxObject?: mendix.lib.MxObject) {
-        if (this.subscriptionHandle) {
-            window.mx.data.unsubscribe(this.subscriptionHandle);
-        }
+        this.unsubscribe();
 
         if (mxObject) {
-            this.subscriptionHandle = window.mx.data.subscribe({
+            this.subscriptionHandles.push(window.mx.data.subscribe({
                 callback: () => this.fetchData(mxObject),
                 guid: mxObject.getGuid()
-            });
+            }));
         }
     }
 
@@ -119,6 +120,12 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
                 fetchByMicroflow(dataSourceMicroflow, mxObject.getGuid())
                     .then(data => {
                         this.rawData = data;
+                        data.forEach(series => {
+                            this.subscriptionHandles.push(mx.data.subscribe({
+                                callback: () => {/* callback is required but not in this case */},
+                                guid: series.getGuid()
+                            }));
+                        });
                         const horizontalValues = this.getValues(this.props.horizontalNameAttribute, data);
                         const verticalValues = this.getValues(this.props.verticalNameAttribute, data);
                         this.setState({
@@ -195,6 +202,12 @@ export default class HeatMapContainer extends Component<HeatMapContainerProps, H
             sortOrder: horizontalSortOrder
         }).then(horizontalData => {
             this.rawData = horizontalData;
+            this.rawData.forEach(data => {
+                this.subscriptionHandles.push(mx.data.subscribe({
+                    callback: () => {/* callback is required but not in this case */},
+                    guid: data.getGuid()
+                }));
+            });
             const horizontalValues = this.getValues(this.props.horizontalNameAttribute, horizontalData);
             const { verticalSortAttribute, verticalSortOrder } = this.props;
             fetchByXPath({
