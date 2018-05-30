@@ -81,7 +81,7 @@ export class PiePlayground extends Component<PiePlaygroundProps, PiePlaygroundSt
             createElement(Panel,
                 {
                     key: "config",
-                    heading: "Configuration settings"
+                    heading: "Custom settings"
                 },
                 Playground.renderAceEditor({
                     value: `${this.props.configurationOptions}`,
@@ -92,7 +92,7 @@ export class PiePlayground extends Component<PiePlaygroundProps, PiePlaygroundSt
             createElement(Panel,
                 {
                     key: "default",
-                    heading: "Default configuration",
+                    heading: "Settings from the Modeler",
                     headingClass: "read-only"
                 },
                 Playground.renderAceEditor({

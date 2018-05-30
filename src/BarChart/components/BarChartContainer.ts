@@ -22,7 +22,7 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
         loading: true,
         themeConfigs: { layout: {}, configuration: {}, data: {} }
     };
-    private subscriptionHandle?: number;
+    private subscriptionHandles: number[] = [];
     private intervalID?: number;
 
     render() {
@@ -65,9 +65,12 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
     }
 
     componentWillUnmount() {
-        if (this.subscriptionHandle) {
-            mx.data.unsubscribe(this.subscriptionHandle);
-        }
+        this.unsubscribe();
+    }
+
+    private unsubscribe() {
+        this.subscriptionHandles.map(handle => mx.data.unsubscribe(handle));
+        this.subscriptionHandles = [];
         this.clearRefreshInterval();
     }
 
@@ -89,12 +92,12 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
     }
 
     private resetSubscriptions(mxObject?: mendix.lib.MxObject) {
-        this.componentWillUnmount();
+        this.unsubscribe();
         if (mxObject) {
-            this.subscriptionHandle = mx.data.subscribe({
+            this.subscriptionHandles.push(mx.data.subscribe({
                 callback: () => this.fetchData(mxObject),
                 guid: mxObject.getGuid()
-            });
+            }));
         }
     }
 
@@ -120,11 +123,22 @@ export default class BarChartContainer extends Component<BarChartContainerProps,
                     customData: series
                 });
             })).then(seriesData => {
-                const data = seriesData.map(({ mxObjects, restData, customData }) => ({
-                    data: mxObjects,
-                    restData,
-                    series: customData as Data.LineSeriesProps
-                }));
+                const data = seriesData.map(({ mxObjects, restData, customData }) => {
+                    if (mxObjects) {
+                        mxObjects.forEach(dataObject => {
+                            this.subscriptionHandles.push(mx.data.subscribe({
+                                callback: () => {/* callback is required but not in this case */},
+                                guid: dataObject.getGuid()
+                            }));
+                        });
+                    }
+
+                    return {
+                        data: mxObjects,
+                        restData,
+                        series: customData as Data.LineSeriesProps
+                    };
+                });
                 this.setState({
                     loading: false,
                     data,

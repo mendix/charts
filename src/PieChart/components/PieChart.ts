@@ -212,6 +212,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
     public static getDefaultLayoutOptions(props: PieChartProps): Partial<Layout> {
         const defaultConfigs: Partial<Layout> = {
             font: {
+                color: "#FFF",
                 size: 12
             },
             showlegend: props.showLegend,
