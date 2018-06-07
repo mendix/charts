@@ -16,7 +16,12 @@ __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../wi
 export default class LineChartContainer extends Component<LineChartContainerProps, LineChartContainerState> {
     static defaultProps: Partial<LineChartContainerProps> = { fill: false, type: "line" };
     state: LineChartContainerState = {
-        alertMessage: validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions),
+        alertMessage: validateSeriesProps(
+            this.props.series,
+            this.props.friendlyId,
+            this.props.layoutOptions,
+            this.props.configurationOptions
+        ),
         data: [],
         seriesOptions: [],
         loading: true,

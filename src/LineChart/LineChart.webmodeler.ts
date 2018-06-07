@@ -14,17 +14,23 @@ import { defaultColours } from "../utils/style";
 // tslint:disable-next-line class-name
 export class preview extends Component<LineChartContainerProps, {}> {
     render() {
-        return createElement("div", {},
-            createElement(Alert, { className: "widget-charts-line-alert" },
-                validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions)
-            ),
-            createElement(LineChart, {
-                ...this.props as LineChartContainerProps,
-                devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-                scatterData: preview.getData(this.props),
-                themeConfigs: { layout: {}, configuration: {}, data: {} }
-            })
+        const validationAlert = validateSeriesProps(
+            this.props.series,
+            this.props.friendlyId,
+            this.props.layoutOptions,
+            this.props.configurationOptions
         );
+
+        if (validationAlert) {
+            return createElement(Alert, {}, validationAlert);
+        }
+
+        return createElement(LineChart, {
+            ...this.props as LineChartContainerProps,
+            devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
+            scatterData: preview.getData(this.props),
+            themeConfigs: { layout: {}, configuration: {}, data: {} }
+        });
     }
 
     static getData(props: LineChartContainerProps): ScatterData[] {

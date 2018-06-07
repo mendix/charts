@@ -14,30 +14,36 @@ import { defaultColours, fillColours } from "../utils/style";
 // tslint:disable-next-line class-name
 export class preview extends Component<Container.PolarChartContainerProps, {}> {
     render() {
-        return createElement("div", {},
-            createElement(Alert, { className: "widget-charts-polar-alert" },
-                validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions)
-            ),
-            createElement(LineChart, {
-                ...this.props as LineChartContainerProps,
-                devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-                scatterData: preview.getData(this.props),
-                type: "polar",
-                themeConfigs: { layout: {}, configuration: {}, data: {} },
-                polar: {
-                    radialaxis: {
-                        rangemode: this.props.rangeMode,
-                        showgrid: this.props.showGrid,
-                        gridcolor: "#d7d7d7",
-                        tickcolor: "#d7d7d7"
-                    },
-                    angularaxis: {
-                        linecolor: "#d7d7d7",
-                        tickcolor: "#d7d7d7"
-                    }
-                }
-            })
+        const validationAlert = validateSeriesProps(
+            this.props.series,
+            this.props.friendlyId,
+            this.props.layoutOptions,
+            this.props.configurationOptions
         );
+
+        if (validationAlert) {
+            return createElement(Alert, {}, validationAlert);
+        }
+
+        return createElement(LineChart, {
+            ...this.props as LineChartContainerProps,
+            devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
+            scatterData: preview.getData(this.props),
+            type: "polar",
+            themeConfigs: { layout: {}, configuration: {}, data: {} },
+            polar: {
+                radialaxis: {
+                    rangemode: this.props.rangeMode,
+                    showgrid: this.props.showGrid,
+                    gridcolor: "#d7d7d7",
+                    tickcolor: "#d7d7d7"
+                },
+                angularaxis: {
+                    linecolor: "#d7d7d7",
+                    tickcolor: "#d7d7d7"
+                }
+            }
+        });
     }
 
     static getData(props: LineChartContainerProps): ScatterData[] {

@@ -16,7 +16,12 @@ __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../wi
 export default class BarChartContainer extends Component<BarChartContainerProps, BarChartContainerState> {
     static defaultProps: Partial<BarChartContainerProps> = { orientation: "bar" };
     state: BarChartContainerState = {
-        alertMessage: validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions),
+        alertMessage: validateSeriesProps(
+            this.props.series,
+            this.props.friendlyId,
+            this.props.layoutOptions,
+            this.props.configurationOptions
+        ),
         data: [],
         seriesOptions: [],
         loading: true,

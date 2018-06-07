@@ -13,19 +13,25 @@ import HeatMapContainerProps = Container.HeatMapContainerProps;
 // tslint:disable-next-line class-name
 export class preview extends Component<HeatMapContainerProps, {}> {
     render() {
-        return createElement("div", {},
-            createElement(Alert, { className: `widget-heat-map-alert` },
-                validateSeriesProps([ { ...this.props, seriesOptions: this.props.dataOptions } ], this.props.friendlyId, this.props.layoutOptions)
-            ),
-            createElement(HeatMap, {
-                ...this.props as HeatMapContainerProps,
-                themeConfigs: { layout: {}, configuration: {}, data: {} },
-                devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-                defaultData: deepMerge.all(
-                    [ HeatMap.getDefaultDataOptions(this.props as HeatMapProps), preview.getData(this.props) ]
-                )
-            })
+        const validationAlert = validateSeriesProps(
+            [ { ...this.props, seriesOptions: this.props.dataOptions } ],
+            this.props.friendlyId,
+            this.props.layoutOptions,
+            this.props.configurationOptions
         );
+
+        if (validationAlert) {
+            return createElement(Alert, {}, validationAlert);
+        }
+
+        return createElement(HeatMap, {
+            ...this.props as HeatMapContainerProps,
+            themeConfigs: { layout: {}, configuration: {}, data: {} },
+            devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
+            defaultData: deepMerge.all(
+                [ HeatMap.getDefaultDataOptions(this.props as HeatMapProps), preview.getData(this.props) ]
+            )
+        });
     }
 
     static getData(props: HeatMapContainerProps): HeatMapData {

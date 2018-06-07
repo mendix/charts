@@ -13,17 +13,23 @@ import { defaultColours } from "../utils/style";
 // tslint:disable-next-line class-name
 export class preview extends Component<PieChartContainerProps, {}> {
     render() {
-        return createElement("div", {},
-            createElement(Alert, { className: `widget-${this.props.chartType}-chart-alert` },
-                validateSeriesProps([ { ...this.props, seriesOptions: this.props.dataOptions } ], this.props.friendlyId, this.props.layoutOptions)
-            ),
-            createElement(PieChart, {
-                ...this.props as PieChartContainerProps,
-                devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-                defaultData: preview.getData(this.props),
-                themeConfigs: { layout: {}, configuration: {}, data: {} }
-            })
+        const validationAlert = validateSeriesProps(
+            [ { ...this.props, seriesOptions: this.props.dataOptions } ],
+            this.props.friendlyId,
+            this.props.layoutOptions,
+            this.props.configurationOptions
         );
+
+        if (validationAlert) {
+            return createElement(Alert, {}, validationAlert);
+        }
+
+        return createElement(PieChart, {
+            ...this.props as PieChartContainerProps,
+            devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
+            defaultData: preview.getData(this.props),
+            themeConfigs: { layout: {}, configuration: {}, data: {} }
+        });
     }
 
     static getData(props: PieChartContainerProps): PieData[] {

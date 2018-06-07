@@ -13,17 +13,23 @@ import { defaultColours } from "../utils/style";
 // tslint:disable-next-line class-name
 export class preview extends Component<BarChartContainerProps, {}> {
     render() {
-        return createElement("div", {},
-            createElement(Alert, { className: "widget-charts-column-alert" },
-                validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions)
-            ),
-            createElement(BarChart, {
-                ...this.props as BarChartContainerProps,
-                devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-                scatterData: this.getData(this.props),
-                themeConfigs: { layout: {}, configuration: {}, data: {} }
-            })
+        const validationAlert = validateSeriesProps(
+            this.props.series,
+            this.props.friendlyId,
+            this.props.layoutOptions,
+            this.props.configurationOptions
         );
+
+        if (validationAlert) {
+            return createElement(Alert, {}, validationAlert);
+        }
+
+        return createElement(BarChart, {
+            ...this.props as BarChartContainerProps,
+            devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
+            scatterData: this.getData(this.props),
+            themeConfigs: { layout: {}, configuration: {}, data: {} }
+        });
     }
 
     private getData(props: BarChartContainerProps): ScatterData[] {

@@ -29,7 +29,10 @@ interface HeatMapContainerState {
 export default class HeatMapContainer extends Component<HeatMapContainerProps, HeatMapContainerState> {
     state: HeatMapContainerState = {
         alertMessage: validateSeriesProps(
-            [ { ...this.props, seriesOptions: this.props.dataOptions } ], this.props.friendlyId, this.props.layoutOptions
+            [ { ...this.props, seriesOptions: this.props.dataOptions } ],
+            this.props.friendlyId,
+            this.props.layoutOptions,
+            this.props.configurationOptions
         ),
         loading: true,
         themeConfigs: { layout: {}, configuration: {}, data: {} }

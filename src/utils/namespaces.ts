@@ -208,9 +208,6 @@ export namespace Data {
         xValueSortAttribute: string;
         sortOrder: SortOrder;
         yValueAttribute: string;
-        markerSizeAttribute?: string;
-        markerSizeReference: number;
-        autoBubbleSize: boolean;
     }
 
     export type SortOrder = "asc" | "desc";
@@ -252,6 +249,9 @@ export namespace Data {
         lineStyle: "linear" | "spline";
         fill?: boolean;
         fillColor?: string;
+        markerSizeAttribute?: string;
+        markerSizeReference: number;
+        autoBubbleSize: boolean;
     }
 
     export interface SeriesData<T extends SeriesProps = SeriesProps> {

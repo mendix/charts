@@ -13,9 +13,11 @@ import FetchByXPathOptions = Data.FetchByXPathOptions;
 
 type MxO = mendix.lib.MxObject;
 
-export const validateSeriesProps = <T extends Partial<SeriesProps>>(dataSeries: T[], widgetId: string, layoutOptions: string): ReactChild => { // tslint:disable-line max-line-length
+export const validateSeriesProps = <T extends Partial<SeriesProps>>(
+    dataSeries: T[], widgetId: string, layoutOptions: string, configurationOptions: string): ReactChild => {
+
+    const errorMessage: string[] = [];
     if (dataSeries && dataSeries.length) {
-        const errorMessage: string[] = [];
         dataSeries.forEach(series => {
             const identifier = series.name ? `series "${series.name}"` : "the widget";
             if (series.dataSourceType === "microflow") {
@@ -53,18 +55,24 @@ export const validateSeriesProps = <T extends Partial<SeriesProps>>(dataSeries: 
                 }
             }
         });
-        if (layoutOptions && layoutOptions.trim()) {
-            const error = validateAdvancedOptions(layoutOptions.trim());
-            if (error) {
-                errorMessage.push(`Invalid layout JSON: ${error}`);
-            }
+    }
+    if (layoutOptions && layoutOptions.trim()) {
+        const error = validateAdvancedOptions(layoutOptions.trim());
+        if (error) {
+            errorMessage.push(`Invalid layout JSON: ${error}`);
         }
-        if (errorMessage.length) {
-            return createElement("div", {},
-                `Configuration error in widget ${widgetId}:`,
-                errorMessage.map((message, key) => createElement("p", { key }, message))
-            );
+    }
+    if (configurationOptions && configurationOptions.trim()) {
+        const error = validateAdvancedOptions(configurationOptions.trim());
+        if (error) {
+            errorMessage.push(`Invalid configuration JSON: ${error}`);
         }
+    }
+    if (errorMessage.length) {
+        return createElement("div", {},
+            `Configuration error in widget ${widgetId}:`,
+            ...errorMessage.map((message, key) => createElement("p", { key }, message))
+        );
     }
 
     return "";
@@ -125,8 +133,8 @@ export const fetchSeriesData = <S extends SeriesProps = SeriesProps>(mxObject: M
         if (series.dataEntity) {
             if (series.dataSourceType === "XPath") {
                 const attributes = [ series.xValueAttribute, series.yValueAttribute, series.xValueSortAttribute ];
-                if (series.markerSizeAttribute) {
-                    attributes.push(series.markerSizeAttribute);
+                if ((series as any).markerSizeAttribute) {
+                    attributes.push((series as any).markerSizeAttribute);
                 }
 
                 const references = getReferences(attributes);
@@ -310,8 +318,8 @@ export const getSeriesTraces = ({ data, restData, series }: SeriesData): Scatter
     if (data) {
         xData = data.map(mxObject => getAttributeValue(mxObject, series.xValueAttribute));
         yData = data.map(mxObject => parseFloat(mxObject.get(series.yValueAttribute) as string));
-        markerSizeData = series.markerSizeAttribute
-            ? data.map(mxObject => parseFloat(mxObject.get(series.markerSizeAttribute as string) as string))
+        markerSizeData = (series as any).markerSizeAttribute
+            ? data.map(mxObject => parseFloat(mxObject.get((series as any).markerSizeAttribute as string) as string))
             : undefined;
         sortData = series.xValueSortAttribute
             ? data.map(mxObject => getAttributeValue(mxObject, series.xValueSortAttribute))
@@ -319,8 +327,8 @@ export const getSeriesTraces = ({ data, restData, series }: SeriesData): Scatter
     } else if (restData) {
         xData = restData.map((dataValue: any) => dataValue[series.xValueAttribute]);
         yData = restData.map((dataValue: any) => dataValue[series.yValueAttribute]);
-        markerSizeData = series.markerSizeAttribute
-            ? restData.map((dataValue: any) => dataValue[series.markerSizeAttribute as string])
+        markerSizeData = (series as any).markerSizeAttribute
+            ? restData.map((dataValue: any) => dataValue[(series as any).markerSizeAttribute as string])
             : undefined;
         sortData = series.xValueSortAttribute
             ? restData.map((dataValue: any) => dataValue[series.xValueSortAttribute])
