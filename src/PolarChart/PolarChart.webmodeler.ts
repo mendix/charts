@@ -1,6 +1,5 @@
 import { Component, createElement } from "react";
 
-import { Alert } from "../components/Alert";
 import { LineChart } from "../LineChart/components/LineChart";
 
 import { getRandomNumbers, validateSeriesProps } from "../utils/data";
@@ -14,19 +13,16 @@ import { defaultColours, fillColours } from "../utils/style";
 // tslint:disable-next-line class-name
 export class preview extends Component<Container.PolarChartContainerProps, {}> {
     render() {
-        const validationAlert = validateSeriesProps(
+        const alertMessage = validateSeriesProps(
             this.props.series,
             this.props.friendlyId,
             this.props.layoutOptions,
             this.props.configurationOptions
         );
 
-        if (validationAlert) {
-            return createElement(Alert, {}, validationAlert);
-        }
-
         return createElement(LineChart, {
             ...this.props as LineChartContainerProps,
+            alertMessage,
             devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
             scatterData: preview.getData(this.props),
             type: "polar",
@@ -49,9 +45,6 @@ export class preview extends Component<Container.PolarChartContainerProps, {}> {
     static getData(props: LineChartContainerProps): ScatterData[] {
         if (props.series.length) {
             return props.series.map((series, index) => {
-                const seriesOptions = props.devMode !== "basic" && series.seriesOptions.trim()
-                    ? JSON.parse(series.seriesOptions)
-                    : {};
                 const color = series.lineColor || defaultColours()[index];
 
                 return deepMerge.all([ {
@@ -70,7 +63,7 @@ export class preview extends Component<Container.PolarChartContainerProps, {}> {
                     series: {},
                     marker: { color },
                     ...preview.getSampleTraces()
-                }, seriesOptions ]);
+                } as any ]);
             });
         }
 

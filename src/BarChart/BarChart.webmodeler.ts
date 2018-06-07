@@ -1,6 +1,5 @@
 import { Component, createElement } from "react";
 
-import { Alert } from "../components/Alert";
 import { BarChart } from "./components/BarChart";
 
 import { getRandomNumbers, validateSeriesProps } from "../utils/data";
@@ -13,19 +12,16 @@ import { defaultColours } from "../utils/style";
 // tslint:disable-next-line class-name
 export class preview extends Component<BarChartContainerProps, {}> {
     render() {
-        const validationAlert = validateSeriesProps(
+        const alertMessage = validateSeriesProps(
             this.props.series,
             this.props.friendlyId,
             this.props.layoutOptions,
             this.props.configurationOptions
         );
 
-        if (validationAlert) {
-            return createElement(Alert, {}, validationAlert);
-        }
-
         return createElement(BarChart, {
             ...this.props as BarChartContainerProps,
+            alertMessage,
             devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
             orientation: "bar",
             scatterData: preview.getData(this.props),
@@ -36,9 +32,6 @@ export class preview extends Component<BarChartContainerProps, {}> {
     static getData(props: BarChartContainerProps): ScatterData[] {
         if (props.series.length) {
             return props.series.map((series, index) => {
-                const seriesOptions = props.devMode !== "basic" && series.seriesOptions.trim()
-                    ? JSON.parse(series.seriesOptions)
-                    : {};
                 const sampleData = preview.getSampleTraces();
 
                 return deepMerge.all([ {
@@ -50,7 +43,7 @@ export class preview extends Component<BarChartContainerProps, {}> {
                     y: sampleData.y || [],
                     series: {},
                     marker: {  color: series.barColor || defaultColours()[index] }
-                }, seriesOptions ]);
+                } as any ]);
             });
         }
 
