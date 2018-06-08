@@ -73,9 +73,11 @@ export namespace Container {
         themeConfigs: ChartConfigs;
     }
 
+    export type ScatterTypes = "line" | "area" | "bubble" | "polar" | "timeseries";
+
     export interface LineChartContainerProps extends WrapperProps, Style.Dimensions, Style.Appearance, LineLayoutProps {
         series: Data.LineSeriesProps[];
-        type: "line" | "bubble" | "polar" | "area" | "timeseries";
+        type: ScatterTypes;
         restParameters: Container.RestParameter[];
     }
 
@@ -88,7 +90,8 @@ export namespace Container {
         data?: Data.SeriesData<Data.LineSeriesProps>[];
         scatterData?: ScatterData[];
         seriesOptions: string[];
-        loading?: boolean;
+        fetchingData?: boolean;
+        fetchingConfigs: boolean;
         themeConfigs: ChartConfigs;
     }
 

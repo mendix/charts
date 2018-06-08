@@ -2,9 +2,9 @@ import { Component, createElement } from "react";
 import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
-import BarChart from "./BarChart";
-import * as BarChartActions from "../store/BarChartActions";
-import { BarChartInstanceState, defaultInstanceState } from "../store/BarChartReducer";
+import LineChart from "./LineChart";
+import * as LineChartActions from "../store/LineChartActions";
+import { LineChartInstanceState, defaultInstanceState } from "../store/LineChartReducer";
 import {
     handleOnClick,
     isContextChanged,
@@ -14,20 +14,28 @@ import {
 } from "../../utils/data";
 import { Container, Data } from "../../utils/namespaces";
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
-import { ReduxStore, store } from "../store/store";
+import { ReduxStore, store } from "../store";
 
-import BarChartContainerProps = Container.BarChartContainerProps;
+import LineChartContainerProps = Container.LineChartContainerProps;
+import { ChartType } from "../../utils/configs";
 
-export type BarChartDataHandlerProps = BarChartContainerProps & BarChartInstanceState & typeof BarChartActions & typeof PlotlyChartActions;
+export type LineChartDataHandlerProps = LineChartContainerProps & LineChartInstanceState & typeof LineChartActions & typeof PlotlyChartActions;
 
-export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
-    private subscriptionHandle?: number;
+export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
+    private subscriptionHandles: number[] = [];
     private intervalID?: number;
+    private typeMapping: { [ key in Container.ScatterTypes ]: ChartType } = {
+        line: "LineChart",
+        area: "AreaChart",
+        bubble: "BubbleChart",
+        timeseries: "TimeSeries",
+        polar: "PolarChart"
+    };
 
     render() {
         return createElement("div", { className: "widget-charts-wrapper" },
-            createElement(BarChart, {
-                ...this.props as BarChartDataHandlerProps,
+            createElement(LineChart, {
+                ...this.props as LineChartDataHandlerProps,
                 onClick: this.onClick,
                 onHover: this.onHover,
                 scatterData: this.props.scatterData,
@@ -43,27 +51,27 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
             this.props.showAlertMessage(friendlyId, validationError);
         }
         if (this.props.devMode !== "basic") {
-            store.dispatch(this.props.fetchThemeConfigs(friendlyId, this.props.orientation));
+            store.dispatch(this.props.fetchThemeConfigs(friendlyId, this.typeMapping[this.props.type]));
         }
     }
 
-    componentWillReceiveProps(newProps: BarChartDataHandlerProps) {
-        this.resetSubscriptions(newProps.mxObject);
-        if (!newProps.alertMessage) {
-            if (!newProps.mxObject) {
-                newProps.noContext(newProps.friendlyId);
-            } else if (!newProps.fetchingConfigs && isContextChanged(this.props.mxObject, newProps.mxObject)) {
-                newProps.togglePlotlyDataLoading(newProps.friendlyId, true);
-                store.dispatch(newProps.fetchData(newProps));
+    componentWillReceiveProps(nextProps: LineChartDataHandlerProps) {
+        this.resetSubscriptions(nextProps);
+        if (!nextProps.alertMessage) {
+            if (!nextProps.mxObject) {
+                nextProps.noContext(nextProps.friendlyId);
+            } else if (!nextProps.fetchingConfigs && isContextChanged(this.props.mxObject, nextProps.mxObject)) {
+                nextProps.togglePlotlyDataLoading(nextProps.friendlyId, true);
+                store.dispatch(nextProps.fetchData(nextProps));
                 this.clearRefreshInterval();
-                this.intervalID = setRefreshAction(newProps.refreshInterval, newProps.mxObject)(this.onRefresh);
+                this.intervalID = setRefreshAction(nextProps.refreshInterval, nextProps.mxObject)(this.onRefresh);
             }
         } else {
             this.clearRefreshInterval();
         }
     }
 
-    shouldComponentUpdate(nextProps: BarChartDataHandlerProps) {
+    shouldComponentUpdate(nextProps: LineChartDataHandlerProps) {
         const doneLoading = !nextProps.fetchingData && this.props.fetchingData;
         const advancedOptionsUpdated = nextProps.layoutOptions !== this.props.layoutOptions
             || nextProps.seriesOptions.join(" ") !== this.props.seriesOptions.join(" ")
@@ -77,21 +85,31 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
         this.unsubscribe();
     }
 
-    private resetSubscriptions(mxObject?: mendix.lib.MxObject) {
+    private resetSubscriptions(props: LineChartDataHandlerProps) {
         this.unsubscribe();
-        if (mxObject) {
-            this.subscriptionHandle = mx.data.subscribe({
+        if (props.mxObject) {
+            this.subscriptionHandles.push(mx.data.subscribe({
                 callback: () => store.dispatch(this.props.fetchData(this.props)),
-                guid: mxObject.getGuid()
+                guid: props.mxObject.getGuid()
+            }));
+        }
+        if (props.data && props.data.length) {
+            props.data.forEach(({ data: mxObjects }) => {
+                if (mxObjects) {
+                    mxObjects.forEach(mxObject =>
+                        this.subscriptionHandles.push(mx.data.subscribe({
+                            callback: () => {/* callback is required but not in this case */},
+                            guid: mxObject.getGuid()
+                        }))
+                    );
+                }
             });
         }
     }
 
     private unsubscribe() {
-        if (this.subscriptionHandle) {
-            mx.data.unsubscribe(this.subscriptionHandle);
-            this.subscriptionHandle = undefined;
-        }
+        this.subscriptionHandles.map(mx.data.unsubscribe);
+        this.subscriptionHandles = [];
         this.clearRefreshInterval();
     }
 
@@ -141,11 +159,11 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
     }
 }
 
-const mapStateToProps: MapStateToProps<BarChartInstanceState, BarChartContainerProps, ReduxStore> = (state, props) =>
-    state.bar[props.friendlyId] || defaultInstanceState as BarChartInstanceState;
-const mapDispatchToProps: MapDispatchToProps<typeof BarChartActions & typeof PlotlyChartActions, BarChartContainerProps> =
+const mapStateToProps: MapStateToProps<LineChartInstanceState, LineChartContainerProps, ReduxStore> = (state, props) =>
+    state.scatter[props.friendlyId] || defaultInstanceState as LineChartInstanceState;
+const mapDispatchToProps: MapDispatchToProps<typeof LineChartActions & typeof PlotlyChartActions, LineChartContainerProps> =
     dispatch => ({
-        ...bindActionCreators(BarChartActions, dispatch),
+        ...bindActionCreators(LineChartActions, dispatch),
         ...bindActionCreators(PlotlyChartActions, dispatch)
     });
-export default connect(mapStateToProps, mapDispatchToProps)(BarChartDataHandler);
+export default connect(mapStateToProps, mapDispatchToProps)(LineChartDataHandler);

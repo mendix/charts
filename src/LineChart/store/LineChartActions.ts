@@ -5,28 +5,28 @@ import { Action, Dispatch } from "redux";
 import { fetchData as fetchSeriesData, generateRESTURL, parseAdvancedOptions } from "../../utils/data";
 import { Data } from "../../utils/namespaces";
 import { getData } from "../utils/data";
-import { fetchThemeConfigs as fetchBarThemeConfig } from "../../utils/configs";
+import { ChartType, fetchThemeConfigs as fetchLineThemeConfig } from "../../utils/configs";
 import {
     ALERT_MESSAGE,
-    BarChartAction,
     FETCH_DATA_FAILED,
     FETCH_THEME_CONFIGS,
     FETCH_THEME_CONFIGS_COMPLETE,
     LOAD_PLAYGROUND,
+    LineChartAction,
     NO_CONTEXT,
     TOGGLE_FETCHING_DATA,
     UPDATE_DATA_FROM_FETCH,
     UPDATE_DATA_FROM_PLAYGROUND
-} from "./BarChartReducer";
-import { BarChartDataHandlerProps } from "../components/BarChartDataHandler";
+} from "./LineChartReducer";
+import { LineChartDataHandlerProps } from "../components/LineChartDataHandler";
 
-export const showAlertMessage = (widgetID: string, alertMessage: ReactChild): Partial<BarChartAction> =>
+export const showAlertMessage = (widgetID: string, alertMessage: ReactChild): Partial<LineChartAction> =>
     ({ type: ALERT_MESSAGE, widgetID, alertMessage });
-export const isFetching = (widgetID: string, fetchingData: boolean): Partial<BarChartAction> =>
+export const isFetching = (widgetID: string, fetchingData: boolean): Partial<LineChartAction> =>
     ({ type: TOGGLE_FETCHING_DATA, widgetID, fetchingData });
-export const noContext = (widgetID: string): Partial<BarChartAction> => ({ type: NO_CONTEXT, widgetID });
+export const noContext = (widgetID: string): Partial<LineChartAction> => ({ type: NO_CONTEXT, widgetID });
 
-export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatch<Partial<BarChartAction> & Action, any>) => {
+export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispatch<Partial<LineChartAction> & Action, any>) => {
     return () => {
         if (props.mxObject && props.series.length) {
             if (!props.fetchingData) {
@@ -57,9 +57,9 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
             .then(seriesData => seriesData.map(({ mxObjects, restData, customData }) => ({
                 data: mxObjects,
                 restData,
-                series: customData as Data.SeriesProps
+                series: customData as Data.LineSeriesProps
             })))
-            .then((data: Data.SeriesData<Data.SeriesProps>[]) => dispatch({
+            .then((data: Data.SeriesData<Data.LineSeriesProps>[]) => dispatch({
                 data,
                 layoutOptions: props.layoutOptions || "{\n\n}",
                 scatterData: getData(data, props),
@@ -78,9 +78,9 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
     };
 };
 
-export const fetchThemeConfigs = (widgetID: string, orientation: "bar" | "column") => (dispatch: Dispatch<any, any>) => () => {
+export const fetchThemeConfigs = (widgetID: string, type: ChartType) => (dispatch: Dispatch<any, any>) => () => {
     dispatch({ type: FETCH_THEME_CONFIGS, widgetID });
-    fetchBarThemeConfig(orientation === "bar" ? "BarChart" : "ColumnChart")
+    fetchLineThemeConfig(type)
         .then(themeConfigs => dispatch({ type: FETCH_THEME_CONFIGS_COMPLETE, widgetID, themeConfigs }))
         .catch(() => dispatch({
             type: FETCH_THEME_CONFIGS_COMPLETE,
@@ -94,7 +94,7 @@ export const loadPlayground = (widgetID: string) => (dispatch: Dispatch<any, any
     dispatch({ type: LOAD_PLAYGROUND, widgetID, playground: SeriesPlayground });
 };
 
-export const updateDataFromPlayground = (widgetID: string, scatterData: ScatterData[], layoutOptions: string, seriesOptions: string[], configurationOptions: string): Partial<BarChartAction> => {
+export const updateDataFromPlayground = (widgetID: string, scatterData: ScatterData[], layoutOptions: string, seriesOptions: string[], configurationOptions: string): Partial<LineChartAction> => {
     if (seriesOptions && seriesOptions.length) {
         const newScatterData = scatterData.map((data, index) => {
             const parsedOptions = parseAdvancedOptions("developer", seriesOptions[index]);

@@ -145,7 +145,8 @@
     "max-line-length": false,
     "no-submodule-imports": false,
     "no-implicit-dependencies": false,
-    "no-namespace": false
+    "no-namespace": false,
+    "newline-before-return": true
   },
   "jsRules": {
     "trailing-comma": [

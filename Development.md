@@ -3,7 +3,7 @@ Prerequisite: Install git, node package manager, webpack CLI, grunt CLI, Karma C
 
 To contribute, fork and clone.
 
-    git clone https://github.com/mendixlabs/charts
+    <!-- TODO: Add repo link here -->
 
 The code is in typescript. Use a typescript IDE of your choice, like Visual Studio Code or WebStorm.
 

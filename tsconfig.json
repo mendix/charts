@@ -23,7 +23,7 @@
     "noFallthroughCasesInSwitch": true,
     "strict": true,
     "strictFunctionTypes": false,
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },

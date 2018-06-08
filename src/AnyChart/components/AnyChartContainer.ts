@@ -193,6 +193,7 @@ export default class AnyChartContainer extends Component<AnyChartContainerProps,
                 errorMessages.map((message, key) => createElement("p", { key }, message))
             );
         }
+
         return "";
     }
 }

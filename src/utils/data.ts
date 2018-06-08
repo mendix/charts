@@ -13,69 +13,69 @@ import FetchByXPathOptions = Data.FetchByXPathOptions;
 
 type MxO = mendix.lib.MxObject;
 
-export const validateSeriesProps = <T extends Partial<SeriesProps>>(
-    dataSeries: T[], widgetId: string, layoutOptions: string, configurationOptions: string): ReactChild => {
-
-    const errorMessage: string[] = [];
-    if (dataSeries && dataSeries.length) {
-        dataSeries.forEach(series => {
-            const identifier = series.name ? `series "${series.name}"` : "the widget";
-            if (series.dataSourceType === "microflow") {
-                if (!series.dataSourceMicroflow) {
-                    errorMessage.push(`'Data source type' in ${identifier} is set to 'Microflow' but no microflow is specified.`); // tslint:disable-line max-line-length
+export const validateSeriesProps = <T extends Partial<SeriesProps>>
+    (dataSeries: T[], widgetId: string, layoutOptions: string, configurationOptions: string): ReactChild => {
+        const errorMessage: string[] = [];
+        if (dataSeries && dataSeries.length) {
+            dataSeries.forEach(series => {
+                const identifier = series.name ? `series "${series.name}"` : "the widget";
+                if (series.dataSourceType === "microflow") {
+                    if (!series.dataSourceMicroflow) {
+                        errorMessage.push(`'Data source type' in ${identifier} is set to 'Microflow' but no microflow is specified.`);
+                    }
+                    if (series.xValueAttribute && series.xValueAttribute.split("/").length > 1) {
+                        errorMessage.push(`'X-axis data attribute' in ${identifier} does not support references for data source 'Microflow'`);
+                    }
+                    if (series.xValueSortAttribute && series.xValueSortAttribute.split("/").length > 1) {
+                        errorMessage.push(`'X-axis sort attribute' in ${identifier} does not support references for data source 'Microflow'`);
+                    }
+                } else if (series.dataSourceType === "XPath") {
+                    if (series.xValueAttribute && series.xValueAttribute.split("/").length > 3) {
+                        errorMessage.push(`'X-axis data attribute' in ${identifier} supports maximal one level deep reference`);
+                    }
+                    if (series.xValueSortAttribute && series.xValueSortAttribute.split("/").length > 3) {
+                        errorMessage.push(`'X-axis sort attribute' in ${identifier} supports maximal one level deep reference`);
+                    }
+                } else if (series.dataSourceType === "REST") {
+                    if (!series.restUrl) {
+                        errorMessage.push(`\n'Data source type' in ${identifier} is set to 'REST' but no REST URL is specified.`);
+                    }
                 }
-                if (series.xValueAttribute && series.xValueAttribute.split("/").length > 1) {
-                    errorMessage.push(`'X-axis data attribute' in ${identifier} does not support references for data source 'Microflow'`);
+                if (series.seriesOptions && series.seriesOptions.trim()) {
+                    const error = validateAdvancedOptions(series.seriesOptions.trim());
+                    if (error) {
+                        errorMessage.push(`Invalid options JSON for ${identifier}: ${error}`);
+                    }
                 }
-                if (series.xValueSortAttribute && series.xValueSortAttribute.split("/").length > 1) {
-                    errorMessage.push(`'X-axis sort attribute' in ${identifier} does not support references for data source 'Microflow'`);
+                if (series.dataEntity && window.mx) {
+                    const dataEntityMeta = window.mx.meta.getEntity(series.dataEntity);
+                    if (series.dataSourceType === "XPath" && !dataEntityMeta.isPersistable()) {
+                        errorMessage.push(`Entity ${series.dataEntity} should be persistable when using Data source 'Database'`);
+                    }
                 }
-            } else if (series.dataSourceType === "XPath") {
-                if (series.xValueAttribute && series.xValueAttribute.split("/").length > 3) {
-                    errorMessage.push(`'X-axis data attribute' in ${identifier} supports maximal one level deep reference`);
-                }
-                if (series.xValueSortAttribute && series.xValueSortAttribute.split("/").length > 3) {
-                    errorMessage.push(`'X-axis sort attribute' in ${identifier} supports maximal one level deep reference`);
-                }
-            } else if (series.dataSourceType === "REST") {
-                if (!series.restUrl) {
-                    errorMessage.push(`\n'Data source type' in ${identifier} is set to 'REST' but no REST URL is specified.`);
-                }
-            }
-            if (series.seriesOptions && series.seriesOptions.trim()) {
-                const error = validateAdvancedOptions(series.seriesOptions.trim());
-                if (error) {
-                    errorMessage.push(`Invalid options JSON for ${identifier}: ${error}`);
-                }
-            }
-            if (series.dataEntity && window.mx) {
-                const dataEntityMeta = window.mx.meta.getEntity(series.dataEntity);
-                if (series.dataSourceType === "XPath" && !dataEntityMeta.isPersistable()) {
-                    errorMessage.push(`Entity ${series.dataEntity} should be persistable when using Data source 'Database'`);
-                }
-            }
-        });
-    }
-    if (layoutOptions && layoutOptions.trim()) {
-        const error = validateAdvancedOptions(layoutOptions.trim());
-        if (error) {
-            errorMessage.push(`Invalid layout JSON: ${error}`);
+            });
         }
-    }
-    if (configurationOptions && configurationOptions.trim()) {
-        const error = validateAdvancedOptions(configurationOptions.trim());
-        if (error) {
-            errorMessage.push(`Invalid configuration JSON: ${error}`);
-        }
-    }
-    if (errorMessage.length) {
-        return createElement("div", {},
-            `Configuration error in widget ${widgetId}:`,
-            ...errorMessage.map((message, key) => createElement("p", { key }, message))
-        );
-    }
 
-    return "";
+        if (layoutOptions && layoutOptions.trim()) {
+            const error = validateAdvancedOptions(layoutOptions.trim());
+            if (error) {
+                errorMessage.push(`Invalid layout JSON: ${error}`);
+            }
+        }
+        if (configurationOptions && configurationOptions.trim()) {
+            const error = validateAdvancedOptions(configurationOptions.trim());
+            if (error) {
+                errorMessage.push(`Invalid configuration JSON: ${error}`);
+            }
+        }
+        if (errorMessage.length) {
+            return createElement("div", {},
+                `Configuration error in widget ${widgetId}:`,
+                errorMessage.map((message, key) => createElement("p", { key }, message))
+            );
+        }
+
+        return "";
 };
 
 export const validateAdvancedOptions = (rawData: string): string => {
@@ -379,6 +379,7 @@ export const getSeriesTraces = ({ data, restData, series }: SeriesData): Scatter
         if (a.sort < b.sort) {
             return 1;
         }
+
         return 0;
     });
     const sortedXData = sorted.map(value => value.x);

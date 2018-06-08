@@ -9,6 +9,7 @@ export const parseStyle = (style = ""): {[key: string]: string} => { // Doesn't 
                 const name = pair[0].trim().replace(/(-.)/g, match => match[1].toUpperCase());
                 styleObject[name] = pair[1].trim();
             }
+
             return styleObject;
         }, {});
     } catch (error) {

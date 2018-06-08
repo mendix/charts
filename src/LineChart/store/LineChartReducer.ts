@@ -2,26 +2,29 @@ import { ScatterData } from "plotly.js";
 import { Action, Reducer } from "redux";
 import { SeriesPlayground } from "../../components/SeriesPlayground";
 import { Container, Data } from "../../utils/namespaces";
-import BarChartContainerState = Container.BarChartContainerState;
+import LineChartContainerState = Container.LineChartContainerState;
+import LineSeriesProps = Data.LineSeriesProps;
 
-export type BarChartAction = Action & BarChartInstanceState & { widgetID: string };
+export type LineChartAction = Action & LineChartInstanceState & { widgetID: string };
 
-export interface BarChartState {
+export interface LineChartState {
     layoutOptions: string;
-    series?: Data.SeriesProps[];
+    series?: LineSeriesProps[];
+    scatterData?: ScatterData[];
     seriesOptions?: string[];
     configurationOptions: string;
     themeConfigs: { layout: {}, configuration: {}, data: {} };
-    scatterData?: ScatterData[];
     playground?: typeof SeriesPlayground;
+    hiddenTraces: number[];
 }
 
-export type BarChartInstanceState = BarChartContainerState & BarChartState;
-export interface BarChartReducerState {
-    [ widgetID: string ]: BarChartInstanceState;
+export type LineChartInstanceState = LineChartContainerState & LineChartState;
+export interface LineChartReducerState {
+    [ widgetID: string ]: LineChartInstanceState;
 }
 
-const prefix = "BarChart";
+const prefix = "ScatterChart";
+export const RESET = `${prefix}.RESET`;
 export const ALERT_MESSAGE = `${prefix}.ALERT_MESSAGE`;
 export const TOGGLE_FETCHING_DATA = `${prefix}.TOGGLE_FETCHING_DATA`;
 export const UPDATE_DATA_FROM_FETCH = `${prefix}.UPDATE_DATA_FROM_FETCH`;
@@ -32,25 +35,25 @@ export const UPDATE_DATA_FROM_PLAYGROUND = `${prefix}.UPDATE_DATA_FROM_PLAYGROUN
 export const FETCH_THEME_CONFIGS = `${prefix}.FETCH_THEME_CONFIGS`;
 export const FETCH_THEME_CONFIGS_COMPLETE = `${prefix}.FETCH_THEME_CONFIGS_COMPLETE`;
 
-const defaultDataState: Partial<BarChartInstanceState> = {
-    configurationOptions: "{\n\n}",
+const defaultDataState: Partial<LineChartInstanceState> = {
+    // configurationOptions: "{\n\n}",
     data: [],
     fetchingData: false,
-    layoutOptions: "{\n\n}",
+    // layoutOptions: "{\n\n}",
     scatterData: [],
     seriesOptions: []
 };
 
-export const defaultInstanceState: Partial<BarChartInstanceState> = {
+export const defaultInstanceState: Partial<LineChartInstanceState> = {
     ...defaultDataState,
     alertMessage: "",
     fetchingConfigs: false,
     themeConfigs: { layout: {}, configuration: {}, data: {} }
 };
 
-const defaultState: Partial<BarChartInstanceState> = {};
+const defaultState: Partial<LineChartInstanceState> = {};
 
-export const barChartReducer: Reducer<BarChartReducerState> = (state = defaultState as BarChartReducerState, action: BarChartAction): BarChartReducerState => {
+export const scatterChartReducer: Reducer<LineChartReducerState> = (state = defaultState as LineChartReducerState, action: LineChartAction): LineChartReducerState => {
     switch (action.type) {
         case FETCH_THEME_CONFIGS:
             return {
@@ -131,6 +134,8 @@ export const barChartReducer: Reducer<BarChartReducerState> = (state = defaultSt
                     ...state[action.widgetID],
                     alertMessage: action.alertMessage
                 } };
+        case RESET:
+            return defaultState as LineChartReducerState;
         default:
             return state;
     }

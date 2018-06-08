@@ -53,12 +53,12 @@ class BarChart extends Component<BarChartProps & BarChartState> {
         }
     }
 
-    componentWillReceiveProps(newProps: BarChartProps) {
-        if (!newProps.fetchingData) {
-            newProps.updateData(newProps.friendlyId, {
-                layout: this.getLayoutOptions(newProps),
-                data: newProps.scatterData || [],
-                config: this.getConfigOptions(newProps)
+    componentWillReceiveProps(nextProps: BarChartProps) {
+        if (!nextProps.fetchingData) {
+            nextProps.updateData(nextProps.friendlyId, {
+                layout: this.getLayoutOptions(nextProps),
+                data: nextProps.scatterData || [],
+                config: this.getConfigOptions(nextProps)
             });
         }
     }
@@ -122,6 +122,7 @@ class BarChart extends Component<BarChartProps & BarChartState> {
 
     private getModelerSeriesOptions(props: BarChartProps): string[] {
         const themeSeriesOptions = props.devMode !== "basic" ? props.themeConfigs.data : {};
+
         return props.series ? props.series.map((series, index) => {
             const customOptions = getCustomSeriesOptions(series, props.orientation, index);
             const seriesOptions = deepMerge.all([ getDefaultSeriesOptions(), customOptions, themeSeriesOptions ]);
@@ -191,14 +192,6 @@ class BarChart extends Component<BarChartProps & BarChartState> {
     }
 }
 
-// const mapStateToProps: MapStateToProps<PlotlyState, ComponentProps, ReduxStore> = (state, props) =>
-//     ({
-//         plotly: {
-//             loadingData: state.plotly[props.friendlyId]
-//                 ? state.plotly[props.friendlyId].loadingData
-//                 : defaultPlotlyInstanceState.loadingData
-//         }
-//     });
 const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>
     bindActionCreators(PlotlyChartActions, dispatch);
 export default connect(null, mapDispatchToProps)(BarChart);

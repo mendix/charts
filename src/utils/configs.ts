@@ -72,7 +72,7 @@ export const processChartConfigs = (type: ChartType, themeConfigs: ThemeConfigs)
 
 export const arrayMerge = (_destinationArray: any[], sourceArray: any[]) => sourceArray;
 
-type ChartType = "LineChart" | "BubbleChart" | "PieChart" | "HeatMap" | "AnyChart" |
+export type ChartType = "LineChart" | "BubbleChart" | "PieChart" | "HeatMap" | "AnyChart" |
     "PolarChart" | "BarChart" | "AreaChart" | "TimeSeries" | "ColumnChart";
 
 interface SharedConfigs {
