@@ -139,7 +139,9 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
             const { seriesOptions: options } = this.state;
             const dataThemeConfigs = props.devMode !== "basic" ? this.props.themeConfigs.data : {};
             return props.scatterData.map((data, index) => {
-                const parsedOptions = props.devMode !== "basic" && options ? JSON.parse(options[index]) : {};
+                const parsedOptions = props.devMode !== "basic" && options && options.length
+                    ? JSON.parse(options[index])
+                    : {};
 
                 // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
                 return {

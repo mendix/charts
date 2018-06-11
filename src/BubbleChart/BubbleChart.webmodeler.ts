@@ -1,6 +1,5 @@
 import { Component, createElement } from "react";
 
-import { Alert } from "../components/Alert";
 import { LineChart } from "../LineChart/components/LineChart";
 
 import { getRandomNumbers, validateSeriesProps } from "../utils/data";
@@ -13,33 +12,33 @@ import LineChartContainerProps = Container.LineChartContainerProps;
 // tslint:disable-next-line class-name
 export class preview extends Component<LineChartContainerProps, {}> {
     render() {
-        return createElement("div", {},
-            createElement(Alert, { className: "widget-charts-bubble-alert" },
-                validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions)
-            ),
-            createElement(LineChart, {
-                ...this.props as LineChartContainerProps,
-                type: "bubble",
-                devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-                scatterData: preview.getData(this.props),
-                themeConfigs: { layout: {}, configuration: {}, data: {} }
-            })
+        const alertMessage = validateSeriesProps(
+            this.props.series,
+            this.props.friendlyId,
+            this.props.layoutOptions,
+            this.props.configurationOptions
         );
+
+        return createElement(LineChart, {
+            ...this.props as LineChartContainerProps,
+            alertMessage,
+            type: "bubble",
+            devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
+            scatterData: preview.getData(this.props),
+            themeConfigs: { layout: {}, configuration: {}, data: {} }
+        });
     }
 
     static getData(props: LineChartContainerProps): ScatterData[] {
         let sampleData = preview.getSampleTraces();
         if (props.series.length) {
             return props.series.map((series, index) => {
-                const seriesOptions = props.devMode !== "basic" && series.seriesOptions.trim()
-                    ? JSON.parse(series.seriesOptions)
-                    : {};
                 sampleData = preview.getSampleTraces();
 
                 return deepMerge.all([
                     {
                         connectgaps: true,
-                        hoverinfo: "none",
+                        hoverinfo: "none" as any,
                         hoveron: "points",
                         mode: "markers",
                         name: series.name,
@@ -51,9 +50,8 @@ export class preview extends Component<LineChartContainerProps, {}> {
                             line: { width: 0 }
                         }
 
-                    },
-                    sampleData,
-                    seriesOptions
+                    } as ScatterData,
+                    sampleData
                 ]);
             });
         }

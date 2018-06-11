@@ -1,6 +1,5 @@
 import { Component, createElement } from "react";
 
-import { Alert } from "../components/Alert";
 import { PieChart } from "./components/PieChart";
 
 import deepMerge from "deepmerge";
@@ -13,24 +12,23 @@ import { defaultColours } from "../utils/style";
 // tslint:disable-next-line class-name
 export class preview extends Component<PieChartContainerProps, {}> {
     render() {
-        return createElement("div", {},
-            createElement(Alert, { className: `widget-${this.props.chartType}-chart-alert` },
-                validateSeriesProps([ { ...this.props, seriesOptions: this.props.dataOptions } ], this.props.friendlyId, this.props.layoutOptions)
-            ),
-            createElement(PieChart, {
-                ...this.props as PieChartContainerProps,
-                devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-                defaultData: preview.getData(this.props),
-                themeConfigs: { layout: {}, configuration: {}, data: {} }
-            })
+        const alertMessage = validateSeriesProps(
+            [ { ...this.props, seriesOptions: this.props.dataOptions } ],
+            this.props.friendlyId,
+            this.props.layoutOptions,
+            this.props.configurationOptions
         );
+
+        return createElement(PieChart, {
+            ...this.props as PieChartContainerProps,
+            alertMessage,
+            devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
+            defaultData: preview.getData(this.props),
+            themeConfigs: { layout: {}, configuration: {}, data: {} }
+        });
     }
 
     static getData(props: PieChartContainerProps): PieData[] {
-        const advancedOptions = props.devMode !== "basic" && props.dataOptions
-            ? JSON.parse(props.dataOptions)
-            : {};
-
         return [
             deepMerge.all([
                 {
@@ -45,8 +43,7 @@ export class preview extends Component<PieChartContainerProps, {}> {
                             ? props.colors.map(color => color.color)
                             : defaultColours()
                     }
-                },
-                advancedOptions
+                } as PieData
             ])
         ];
     }

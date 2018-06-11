@@ -1,6 +1,5 @@
 import { Component, createElement } from "react";
 
-import { Alert } from "../components/Alert";
 import { LineChart } from "../LineChart/components/LineChart";
 
 import { getRandomNumbers, validateSeriesProps } from "../utils/data";
@@ -13,30 +12,32 @@ import { defaultColours, fillColours } from "../utils/style";
 // tslint:disable-next-line class-name
 export class preview extends Component<LineChartContainerProps, {}> {
     render() {
-        return createElement("div", {},
-            createElement(Alert, { className: "widget-charts-area-alert" },
-                validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions)
-            ),
-            createElement(LineChart, {
-                ...this.props as LineChartContainerProps,
-                devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-                fill: false,
-                scatterData: this.getData(this.props),
-                themeConfigs: { layout: {}, configuration: {}, data: {} }
-            })
+        const alertMessage = validateSeriesProps(
+            this.props.series,
+            this.props.friendlyId,
+            this.props.layoutOptions,
+            this.props.configurationOptions
         );
+
+        return createElement(LineChart, {
+            ...this.props as LineChartContainerProps,
+            alertMessage,
+            devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
+            fill: false,
+            scatterData: this.getData(this.props),
+            themeConfigs: { layout: {}, configuration: {}, data: {} }
+        });
     }
 
     private getData(props: LineChartContainerProps): ScatterData[] {
         if (props.series.length) {
             return props.series.map((series, index) => {
-                const seriesOptions = props.devMode !== "basic" && series.seriesOptions.trim() ? JSON.parse(series.seriesOptions) : {};
                 const sampleData = preview.getSampleTraces();
 
                 return deepMerge.all([ {
                     connectgaps: true,
                     hoveron: "points",
-                    hoverinfo: "none",
+                    hoverinfo: "none" as any,
                     line: {
                         color: series.lineColor || defaultColours()[index],
                         shape: series.lineStyle
@@ -50,7 +51,7 @@ export class preview extends Component<LineChartContainerProps, {}> {
                     series: {},
                     x: sampleData.x || [],
                     y: sampleData.y || []
-                }, seriesOptions ]);
+                } as ScatterData ]);
             });
         }
 

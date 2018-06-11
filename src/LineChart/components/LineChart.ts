@@ -157,7 +157,9 @@ export class LineChart extends Component<LineChartProps, LineChartState> {
             const dataThemeConfigs = props.devMode !== "basic" ? props.themeConfigs.data : {};
             const dimensions = getDimensionsFromNode(this.chartNode);
             const lineData: ScatterData[] = props.scatterData.map((data, index) => {
-                const parsedOptions = props.devMode !== "basic" && options ? JSON.parse(options[index]) : {};
+                const parsedOptions = props.devMode !== "basic" && options && options.length
+                    ? JSON.parse(options[index])
+                    : {};
                 const scatterData = deepMerge.all<ScatterData>(
                     [ data, dataThemeConfigs, parsedOptions, { visible: data.visible || true } ]
                 );

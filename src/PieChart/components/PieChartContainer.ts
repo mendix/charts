@@ -23,7 +23,10 @@ export default class PieChartContainer extends Component<PieChartContainerProps,
     state: PieChartContainerState = {
         data: [],
         alertMessage: validateSeriesProps(
-            [ { ...this.props, seriesOptions: this.props.dataOptions } ], this.props.friendlyId, this.props.layoutOptions
+            [ { ...this.props, seriesOptions: this.props.dataOptions } ],
+            this.props.friendlyId,
+            this.props.layoutOptions,
+            this.props.configurationOptions
         ),
         loading: true,
         themeConfigs: { layout: {}, configuration: {}, data: {} }

@@ -1,6 +1,5 @@
 import { Component, createElement } from "react";
 
-import { Alert } from "../components/Alert";
 import { LineChart } from "../LineChart/components/LineChart";
 
 import { getRandomNumbers, validateSeriesProps } from "../utils/data";
@@ -14,38 +13,38 @@ import { defaultColours, fillColours } from "../utils/style";
 // tslint:disable-next-line class-name
 export class preview extends Component<Container.PolarChartContainerProps, {}> {
     render() {
-        return createElement("div", {},
-            createElement(Alert, { className: "widget-charts-polar-alert" },
-                validateSeriesProps(this.props.series, this.props.friendlyId, this.props.layoutOptions)
-            ),
-            createElement(LineChart, {
-                ...this.props as LineChartContainerProps,
-                devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-                scatterData: preview.getData(this.props),
-                type: "polar",
-                themeConfigs: { layout: {}, configuration: {}, data: {} },
-                polar: {
-                    radialaxis: {
-                        rangemode: this.props.rangeMode,
-                        showgrid: this.props.showGrid,
-                        gridcolor: "#d7d7d7",
-                        tickcolor: "#d7d7d7"
-                    },
-                    angularaxis: {
-                        linecolor: "#d7d7d7",
-                        tickcolor: "#d7d7d7"
-                    }
-                }
-            })
+        const alertMessage = validateSeriesProps(
+            this.props.series,
+            this.props.friendlyId,
+            this.props.layoutOptions,
+            this.props.configurationOptions
         );
+
+        return createElement(LineChart, {
+            ...this.props as LineChartContainerProps,
+            alertMessage,
+            devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
+            scatterData: preview.getData(this.props),
+            type: "polar",
+            themeConfigs: { layout: {}, configuration: {}, data: {} },
+            polar: {
+                radialaxis: {
+                    rangemode: this.props.rangeMode,
+                    showgrid: this.props.showGrid,
+                    gridcolor: "#d7d7d7",
+                    tickcolor: "#d7d7d7"
+                },
+                angularaxis: {
+                    linecolor: "#d7d7d7",
+                    tickcolor: "#d7d7d7"
+                }
+            }
+        });
     }
 
     static getData(props: LineChartContainerProps): ScatterData[] {
         if (props.series.length) {
             return props.series.map((series, index) => {
-                const seriesOptions = props.devMode !== "basic" && series.seriesOptions.trim()
-                    ? JSON.parse(series.seriesOptions)
-                    : {};
                 const color = series.lineColor || defaultColours()[index];
 
                 return deepMerge.all([ {
@@ -64,7 +63,7 @@ export class preview extends Component<Container.PolarChartContainerProps, {}> {
                     series: {},
                     marker: { color },
                     ...preview.getSampleTraces()
-                }, seriesOptions ]);
+                } as any ]);
             });
         }
 
