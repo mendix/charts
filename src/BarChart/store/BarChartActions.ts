@@ -95,23 +95,22 @@ export const loadPlayground = (widgetID: string) => (dispatch: Dispatch<any, any
 };
 
 export const updateDataFromPlayground = (widgetID: string, scatterData: ScatterData[], layoutOptions: string, seriesOptions: string[], configurationOptions: string): Partial<BarChartAction> => {
+    let newScatterData = scatterData;
     if (seriesOptions && seriesOptions.length) {
-        const newScatterData = scatterData.map((data, index) => {
+        newScatterData = scatterData.map((data, index) => {
             const parsedOptions = parseAdvancedOptions("developer", seriesOptions[index]);
 
             // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
             return { ...deepMerge.all<ScatterData>([ data, parsedOptions ]), customdata: data.customdata };
         });
-
-        return ({
-            type: UPDATE_DATA_FROM_PLAYGROUND,
-            widgetID,
-            scatterData: newScatterData,
-            layoutOptions,
-            seriesOptions,
-            configurationOptions
-        });
     }
 
-    return ({ type: UPDATE_DATA_FROM_PLAYGROUND, widgetID, scatterData, layoutOptions, seriesOptions });
+    return ({
+        type: UPDATE_DATA_FROM_PLAYGROUND,
+        widgetID,
+        scatterData: newScatterData,
+        layoutOptions,
+        seriesOptions,
+        configurationOptions
+    });
 };

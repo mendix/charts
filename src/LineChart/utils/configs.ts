@@ -65,12 +65,12 @@ export const getDefaultSeriesOptions = (): Partial<ScatterData> => ({
     hoveron: "points"
 });
 
-export const getCustomSeriesOptions = (series: Data.LineSeriesProps, props: LineChartProps, colourIndex: number, traces?: Data.ScatterTrace) => {
+export const getCustomSeriesOptions = (series: Data.LineSeriesProps, props: LineChartProps, colourIndex: number, traces?: Data.ScatterTrace): Partial<ScatterData> => {
     const color: string | undefined = series.lineColor || defaultColours()[colourIndex];
     const mode = props.type === "bubble"
         ? "markers"
         : series.mode ? series.mode.replace("X", "+") as Container.LineMode : "lines";
-    const seriesOptions = {
+    const seriesOptions: Partial<ScatterData> = {
         line: {
             color,
             shape: series.lineStyle
@@ -89,7 +89,7 @@ export const getCustomSeriesOptions = (series: Data.LineSeriesProps, props: Line
                 ...seriesOptions,
                 r: (traces.y as number[]).concat(traces.y[0] as number),
                 theta: traces.x.concat(traces.x[0])
-            };
+            } as Partial<ScatterData>; // this is equivalent to any so handle with caution
         }
 
         return { ... seriesOptions, x: traces.x, y: traces.y };

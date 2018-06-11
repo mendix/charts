@@ -2,24 +2,25 @@ import deepMerge from "deepmerge";
 import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
 import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
-import { Alert } from "../../components/Alert";
-import { HoverTooltip } from "../../components/HoverTooltip";
-import PlotlyChart from "../../components/PlotlyChart";
-import "../../ui/Charts.scss";
-import { LineChartDataHandlerProps } from "./LineChartDataHandler";
-import { Data } from "../../utils/namespaces";
-import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
-import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
-
-// import LineMode = Container.LineMode;
-import LineSeriesProps = Data.LineSeriesProps;
-import { LineChartState } from "../store/LineChartReducer";
-import { MapDispatchToProps, connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { store } from "../store";
+import { MapDispatchToProps, connect } from "react-redux";
+
+import "../../ui/Charts.scss";
+import { getStackedArea } from "../utils/data";
 import { parseAdvancedOptions } from "../../utils/data";
 import { getCustomLayoutOptions, getCustomSeriesOptions, getDefaultLayoutOptions, getDefaultSeriesOptions } from "../utils/configs";
 import { getDefaultConfigOptions } from "../../BarChart/utils/configs";
+import { LineChartState } from "../store/LineChartReducer";
+import { Data } from "../../utils/namespaces";
+import { store } from "../store";
+import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
+
+import { Alert } from "../../components/Alert";
+import { HoverTooltip } from "../../components/HoverTooltip";
+import { LineChartDataHandlerProps } from "./LineChartDataHandler";
+import PlotlyChart from "../../components/PlotlyChart";
+import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
+import LineSeriesProps = Data.LineSeriesProps;
 
 interface ComponentProps extends LineChartDataHandlerProps {
     alertMessage?: ReactChild;
@@ -62,7 +63,9 @@ export class LineChart extends Component<LineChartProps & LineChartState> {
         if (!nextProps.alertMessage && !nextProps.fetchingData) {
             nextProps.updateData(nextProps.friendlyId, {
                 layout: this.getLayoutOptions(nextProps),
-                data: nextProps.scatterData || [],
+                data: nextProps.type === "area" && nextProps.area === "stacked"
+                    ? getStackedArea(nextProps.scatterData || [])
+                    : nextProps.scatterData || [],
                 config: this.getConfigOptions(nextProps)
             });
         }
@@ -81,7 +84,7 @@ export class LineChart extends Component<LineChartProps & LineChartState> {
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 onClick: this.onClick,
                 onHover: this.onHover,
-                // onRestyle: this.onRestyle,
+                onRestyle: this.onRestyle,
                 getTooltipNode: this.getTooltipNodeRef
                 // onRender: this.onLoadAndResize,
                 // onResize: this.onLoadAndResize
@@ -123,7 +126,7 @@ export class LineChart extends Component<LineChartProps & LineChartState> {
     }
 
     public getConfigOptions(props: LineChartProps): Partial<Config> {
-        const advancedOptions = parseAdvancedOptions(props.devMode, this.props.configurationOptions);
+        const advancedOptions = parseAdvancedOptions(props.devMode, props.configurationOptions);
 
         return deepMerge.all([ getDefaultConfigOptions(), props.themeConfigs.configuration, advancedOptions ]);
     }
@@ -218,12 +221,18 @@ export class LineChart extends Component<LineChartProps & LineChartState> {
         }
     }
 
-    // private onRestyle = (data: any[]) => {
-    //     if (this.props.scatterData) {
-    //         (this.props.scatterData as any)[data[1][0]].visible = data[0].visible[0];
-    //         this.setState({ scatterData: this.state.scatterData });
-    //     }
-    // }
+    private onRestyle = (data: any[]) => {
+        if (this.props.scatterData) {
+            const scatterData = this.props.scatterData.slice();
+            (scatterData as any)[data[1][0]].visible = data[0].visible[0];
+
+            this.props.updateData(this.props.friendlyId, {
+                layout: this.getLayoutOptions(this.props),
+                data: this.props.type === "area" ? getStackedArea(scatterData || []) : scatterData || [],
+                config: this.getConfigOptions(this.props)
+            });
+        }
+    }
 
     private onOptionsUpdate = (layoutOptions: string, seriesOptions: string[], configurationOptions: string) => {
         const updatedScatterData = seriesOptions.map((option, index) => {
@@ -257,6 +266,7 @@ export class LineChart extends Component<LineChartProps & LineChartState> {
         return type !== "polar" ? "line" : "polar";
     }
 
+    // TODO: remove when obsolete
     public static getStackedArea(traces: ScatterData[]) {
         const visibleTraces = traces.filter(data => data.visible === true);
         for (let i = 1; i < visibleTraces.length; i++) {

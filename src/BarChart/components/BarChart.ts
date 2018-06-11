@@ -115,7 +115,7 @@ class BarChart extends Component<BarChartProps & BarChartState> {
     }
 
     public getConfigOptions(props: BarChartProps): Partial<Config> {
-        const advancedOptions = parseAdvancedOptions(props.devMode, this.props.configurationOptions);
+        const advancedOptions = parseAdvancedOptions(props.devMode, props.configurationOptions);
 
         return deepMerge.all([ getDefaultConfigOptions(), props.themeConfigs.configuration, advancedOptions ]);
     }
