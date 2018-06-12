@@ -1,26 +1,36 @@
 import deepMerge from "deepmerge";
-import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
+import { Config, Layout, ScatterHoverData } from "plotly.js";
 import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { bindActionCreators } from "redux";
 import { MapDispatchToProps, connect } from "react-redux";
 
 import "../../ui/Charts.scss";
-import { getStackedArea } from "../utils/data";
+import { calculateBubbleSize, getStackedArea } from "../utils/data";
 import { parseAdvancedOptions } from "../../utils/data";
-import { getCustomLayoutOptions, getCustomSeriesOptions, getDefaultLayoutOptions, getDefaultSeriesOptions } from "../utils/configs";
+import {
+    getCustomLayoutOptions,
+    getCustomSeriesOptions,
+    getDefaultLayoutOptions,
+    getDefaultSeriesOptions
+} from "../utils/configs";
 import { getDefaultConfigOptions } from "../../BarChart/utils/configs";
 import { LineChartState } from "../store/LineChartReducer";
 import { Data } from "../../utils/namespaces";
 import { store } from "../store";
-import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
+import {
+    getDimensions,
+    getDimensionsFromNode,
+    getTooltipCoordinates,
+    parseStyle,
+    setTooltipPosition
+} from "../../utils/style";
 
 import { Alert } from "../../components/Alert";
 import { HoverTooltip } from "../../components/HoverTooltip";
 import { LineChartDataHandlerProps } from "./LineChartDataHandler";
 import PlotlyChart from "../../components/PlotlyChart";
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
-import LineSeriesProps = Data.LineSeriesProps;
 
 interface ComponentProps extends LineChartDataHandlerProps {
     alertMessage?: ReactChild;
@@ -30,17 +40,12 @@ interface ComponentProps extends LineChartDataHandlerProps {
 
 export type LineChartProps = ComponentProps & typeof PlotlyChartActions;
 
-interface Dimensions {
-    width: number;
-    height: number;
-}
-
 export class LineChart extends Component<LineChartProps & LineChartState> {
     static defaultProps: Partial<LineChartProps> = {
         type: "line"
     };
     private tooltipNode?: HTMLDivElement;
-    // private chartNode?: HTMLDivElement;
+    private chartNode?: HTMLDivElement;
 
     render() {
         if (this.props.alertMessage) {
@@ -63,9 +68,7 @@ export class LineChart extends Component<LineChartProps & LineChartState> {
         if (!nextProps.alertMessage && !nextProps.fetchingData) {
             nextProps.updateData(nextProps.friendlyId, {
                 layout: this.getLayoutOptions(nextProps),
-                data: nextProps.type === "area" && nextProps.area === "stacked"
-                    ? getStackedArea(nextProps.scatterData || [])
-                    : nextProps.scatterData || [],
+                data: this.getData(nextProps),
                 config: this.getConfigOptions(nextProps)
             });
         }
@@ -85,9 +88,8 @@ export class LineChart extends Component<LineChartProps & LineChartState> {
                 onClick: this.onClick,
                 onHover: this.onHover,
                 onRestyle: this.onRestyle,
-                getTooltipNode: this.getTooltipNodeRef
-                // onRender: this.onLoadAndResize,
-                // onResize: this.onLoadAndResize
+                getTooltipNode: this.getTooltipNodeRef,
+                onResize: this.onLoadAndResize
             }
         );
     }
@@ -107,6 +109,17 @@ export class LineChart extends Component<LineChartProps & LineChartState> {
         }
 
         return null;
+    }
+
+    private getData(props: LineChartProps) {
+        if (props.type === "area" && props.area === "stacked") {
+            return getStackedArea(props.scatterData || []);
+        }
+        if (props.type === "bubble" && this.chartNode && props.scatterData) {
+            return calculateBubbleSize(props.series, props.scatterData, getDimensionsFromNode(this.chartNode));
+        }
+
+        return props.scatterData || [];
     }
 
     private getLayoutOptions(props: LineChartProps): Partial<Layout> {
@@ -228,7 +241,7 @@ export class LineChart extends Component<LineChartProps & LineChartState> {
 
             this.props.updateData(this.props.friendlyId, {
                 layout: this.getLayoutOptions(this.props),
-                data: this.props.type === "area" ? getStackedArea(scatterData || []) : scatterData || [],
+                data: this.getData(this.props),
                 config: this.getConfigOptions(this.props)
             });
         }
@@ -255,51 +268,43 @@ export class LineChart extends Component<LineChartProps & LineChartState> {
         );
     }
 
-    // private onLoadAndResize = (node: HTMLDivElement) => {
-    //     if (node && !this.chartNode) {
-    //         this.chartNode = node;
-    //         this.setState({ scatterData: this.getData(this.props) });
-    //     }
-    // }
+    private onLoadAndResize = (node: HTMLDivElement) => {
+        if (node && !this.chartNode) {
+            this.chartNode = node;
+            this.props.updateData(this.props.friendlyId, {
+                layout: this.getLayoutOptions(this.props),
+                data: this.getData(this.props),
+                config: this.getConfigOptions(this.props)
+            });
+        }
+    }
 
     public static getChartType(type: string): "line" | "polar" {
         return type !== "polar" ? "line" : "polar";
     }
 
-    // TODO: remove when obsolete
-    public static getStackedArea(traces: ScatterData[]) {
-        const visibleTraces = traces.filter(data => data.visible === true);
-        for (let i = 1; i < visibleTraces.length; i++) {
-            for (let j = 0; j < (Math.min(visibleTraces[i].y.length, visibleTraces[i - 1].y.length)); j++) {
-                (visibleTraces[i].y[j] as any) += visibleTraces[i - 1].y[j];
-            }
-        }
+    // public static getMarkerSizeReference(series: LineSeriesProps, markerSize: number[], dimensions?: Dimensions): number {
+    //     if (series.autoBubbleSize) {
+    //         const width = dimensions ? dimensions.width : 0;
+    //         const height = dimensions ? dimensions.height : 0;
+    //         let sizeRef = 1;
+    //         const averageSize = (width + height) / 2;
+    //         const percentageSize = averageSize / (1 / (series.markerSizeReference / 100));
 
-        return traces;
-    }
+    //         if (markerSize.length > 0) {
+    //             sizeRef = Math.max(...markerSize) / percentageSize;
+    //         }
 
-    public static getMarkerSizeReference(series: LineSeriesProps, markerSize: number[], dimensions?: Dimensions): number {
-        if (series.autoBubbleSize) {
-            const width = dimensions ? dimensions.width : 0;
-            const height = dimensions ? dimensions.height : 0;
-            let sizeRef = 1;
-            const averageSize = (width + height) / 2;
-            const percentageSize = averageSize / (1 / (series.markerSizeReference / 100));
+    //         return Math.round(sizeRef * 1000) / 1000;
+    //     } else if (series.markerSizeReference > 0) {
+    //         const scale = series.markerSizeReference;
+    //         const percentageScale = scale / 100;
 
-            if (markerSize.length > 0) {
-                sizeRef = Math.max(...markerSize) / percentageSize;
-            }
+    //         return 1 / percentageScale;
+    //     }
 
-            return Math.round(sizeRef * 1000) / 1000;
-        } else if (series.markerSizeReference > 0) {
-            const scale = series.markerSizeReference;
-            const percentageScale = scale / 100;
-
-            return 1 / percentageScale;
-        }
-
-        return 1;
-    }
+    //     return 1;
+    // }
 }
 
 const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>

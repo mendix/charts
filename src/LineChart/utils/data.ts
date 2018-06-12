@@ -6,6 +6,11 @@ import { getCustomSeriesOptions, getDefaultSeriesOptions } from "./configs";
 import { LineChartDataHandlerProps } from "../components/LineChartDataHandler";
 import LineSeriesProps = Data.LineSeriesProps;
 
+interface Dimensions {
+    width: number;
+    height: number;
+}
+
 export const getData = (seriesData: Data.SeriesData<LineSeriesProps>[], props: LineChartDataHandlerProps): ScatterData[] => {
     const scatterData: ScatterData[] = seriesData.map(({ data, restData, series }, index) => {
         const advancedOptions: ScatterData = parseAdvancedOptions(props.devMode, series.seriesOptions);
@@ -58,5 +63,41 @@ const deepCopyScatterData = (traces: ScatterData[]) => {
         }
 
         return copy;
+    });
+};
+
+export const getMarkerSizeReference = (series: LineSeriesProps, markerSize: number[], dimensions?: Dimensions): number => {
+    if (series.autoBubbleSize) {
+        const width = dimensions ? dimensions.width : 0;
+        const height = dimensions ? dimensions.height : 0;
+        let sizeRef = 1;
+        const averageSize = (width + height) / 2;
+        const percentageSize = averageSize / (1 / (series.markerSizeReference / 100));
+
+        if (markerSize.length > 0) {
+            sizeRef = Math.max(...markerSize) / percentageSize;
+        }
+
+        return Math.round(sizeRef * 1000) / 1000;
+    } else if (series.markerSizeReference > 0) {
+        const scale = series.markerSizeReference;
+        const percentageScale = scale / 100;
+
+        return 1 / percentageScale;
+    }
+
+    return 1;
+};
+
+export const calculateBubbleSize = (series: LineSeriesProps[], scatterData: ScatterData[], dimensions: Dimensions) => {
+    return scatterData.map((data, index) => {
+        const sizeref = getMarkerSizeReference(series[index], data.marker.size as number[], dimensions);
+
+        return {
+            ...deepMerge.all<ScatterData>([ data, {
+                marker: { sizemode: "diameter", sizeref }
+            } ]),
+            customdata: data.customdata
+        };
     });
 };

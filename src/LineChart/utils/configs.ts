@@ -85,14 +85,25 @@ export const getCustomSeriesOptions = (series: Data.LineSeriesProps, props: Line
     };
     if (traces) {
         if (props.type === "polar") {
-            return {
-                ...seriesOptions,
-                r: (traces.y as number[]).concat(traces.y[0] as number),
-                theta: traces.x.concat(traces.x[0])
-            } as Partial<ScatterData>; // this is equivalent to any so handle with caution
+            return deepMerge.all([
+                seriesOptions,
+                traces,
+                {
+                    r: (traces.y as number[]).concat(traces.y[0] as number),
+                    theta: traces.x.concat(traces.x[0])
+                } as Partial<ScatterData> // this is equivalent to any so handle with caution
+            ]);
         }
 
-        return { ... seriesOptions, x: traces.x, y: traces.y };
+        return deepMerge.all([
+            seriesOptions,
+            traces,
+            {
+                text: traces.marker && traces.marker.size
+                    ? (traces.marker.size as number[]).map(size => `${size}`)
+                    : "" // show the size value on hover,
+            }
+        ]);
     }
 
     return seriesOptions;

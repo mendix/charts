@@ -35,9 +35,11 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
 
             Promise.all(props.series.map(series => {
                 const attributes = [ series.xValueAttribute, series.yValueAttribute ];
-                if (series.xValueSortAttribute) {
-                    attributes.push(series.xValueSortAttribute);
-                }
+                [ series.xValueSortAttribute, series.markerSizeAttribute ].forEach(attribute => {
+                    if (attribute) {
+                        attributes.push(attribute);
+                    }
+                });
                 const mxObject = props.mxObject as mendix.lib.MxObject;
                 const url = series.restUrl && generateRESTURL(mxObject, series.restUrl, props.restParameters);
 

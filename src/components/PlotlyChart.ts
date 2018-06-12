@@ -147,14 +147,16 @@ class PlotlyChart extends Component<PlotlyChartProps> {
         if (this.timeoutId) {
             clearTimeout(this.timeoutId);
         }
-        this.timeoutId = window.setTimeout(() => {
-            if (this.props.plotly && this.chartNode) {
-                this.renderChart(this.props, this.props.plotly);
-                if (this.props.onResize) {
-                    this.props.onResize(this.chartNode);
+        if (!this.props.loadingAPI && !this.props.loadingData) {
+            this.timeoutId = window.setTimeout(() => {
+                if (this.props.plotly && this.chartNode) {
+                    this.renderChart(this.props, this.props.plotly);
+                    if (this.props.onResize) {
+                        this.props.onResize(this.chartNode);
+                    }
                 }
-            }
-        }, 100);
+            }, 100);
+        }
     }
 }
 

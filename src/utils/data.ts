@@ -331,7 +331,7 @@ export const getSeriesTraces = ({ data, restData, series }: SeriesData): Scatter
         xData = data.map(mxObject => getAttributeValue(mxObject, series.xValueAttribute));
         yData = data.map(mxObject => parseFloat(mxObject.get(series.yValueAttribute) as string));
         markerSizeData = (series as any).markerSizeAttribute
-            ? data.map(mxObject => parseFloat(mxObject.get((series as any).markerSizeAttribute as string) as string))
+            ? data.map(mxObject => parseFloat(mxObject.get((series as any).markerSizeAttribute) as string))
             : undefined;
         sortData = series.xValueSortAttribute
             ? data.map(mxObject => getAttributeValue(mxObject, series.xValueSortAttribute))
