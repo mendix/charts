@@ -157,38 +157,6 @@ export class LineChart extends Component<LineChartProps & LineChartState> {
             : [];
     }
 
-    // private getData(props: LineChartProps): ScatterData[] {
-    //     if (props.scatterData && this.chartNode) {
-    //         const { seriesOptions: options } = this.state;
-    //         const dataThemeConfigs = props.devMode !== "basic" ? props.themeConfigs.data : {};
-    //         const dimensions = getDimensionsFromNode(this.chartNode);
-    //         const lineData: ScatterData[] = props.scatterData.map((data, index) => {
-    //             const parsedOptions = props.devMode !== "basic" && options ? JSON.parse(options[index]) : {};
-    //             const scatterData = deepMerge.all<ScatterData>(
-    //                 [ data, dataThemeConfigs, parsedOptions, { visible: data.visible || true } ]
-    //             );
-    //             const series = this.state.series[index];
-    //             if (props.type === "bubble") {
-    //                 const sizeref = LineChart.getMarkerSizeReference(series, data.marker.size as number[], dimensions);
-
-    //                 return {
-    //                     ...deepMerge.all<ScatterData>([ scatterData, {
-    //                         marker: { sizemode: "diameter", sizeref }
-    //                     } ]),
-    //                     customdata: data.customdata
-    //                 };
-    //             }
-
-    //             // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
-    //             return { ...scatterData, customdata: data.customdata };
-    //         });
-
-    //         return props.area === "stacked" ? LineChart.getStackedArea(lineData) : lineData;
-    //     }
-
-    //     return [];
-    // }
-
     private onClick = ({ points }: ScatterHoverData<mendix.lib.MxObject>) => {
         const { customdata, data, x, y } = points[0];
         if (this.props.onClick) {
@@ -282,29 +250,6 @@ export class LineChart extends Component<LineChartProps & LineChartState> {
     public static getChartType(type: string): "line" | "polar" {
         return type !== "polar" ? "line" : "polar";
     }
-
-    // public static getMarkerSizeReference(series: LineSeriesProps, markerSize: number[], dimensions?: Dimensions): number {
-    //     if (series.autoBubbleSize) {
-    //         const width = dimensions ? dimensions.width : 0;
-    //         const height = dimensions ? dimensions.height : 0;
-    //         let sizeRef = 1;
-    //         const averageSize = (width + height) / 2;
-    //         const percentageSize = averageSize / (1 / (series.markerSizeReference / 100));
-
-    //         if (markerSize.length > 0) {
-    //             sizeRef = Math.max(...markerSize) / percentageSize;
-    //         }
-
-    //         return Math.round(sizeRef * 1000) / 1000;
-    //     } else if (series.markerSizeReference > 0) {
-    //         const scale = series.markerSizeReference;
-    //         const percentageScale = scale / 100;
-
-    //         return 1 / percentageScale;
-    //     }
-
-    //     return 1;
-    // }
 }
 
 const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>
