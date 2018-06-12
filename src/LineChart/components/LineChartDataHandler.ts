@@ -83,6 +83,7 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
 
     componentWillUnmount() {
         this.unsubscribe();
+        this.clearRefreshInterval();
     }
 
     private resetSubscriptions(props: LineChartDataHandlerProps) {
@@ -110,7 +111,6 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
     private unsubscribe() {
         this.subscriptionHandles.map(mx.data.unsubscribe);
         this.subscriptionHandles = [];
-        this.clearRefreshInterval();
     }
 
     private onRefresh = () => {
