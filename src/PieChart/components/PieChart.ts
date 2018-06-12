@@ -2,6 +2,9 @@ import deepMerge from "deepmerge";
 import { Config, Layout, PieData, PieHoverData } from "plotly.js";
 import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
+import { MapDispatchToProps, connect } from "react-redux";
+import { bindActionCreators } from "redux";
+
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
 import { HoverTooltip } from "../../components/HoverTooltip";
@@ -10,19 +13,19 @@ import "../../ui/Charts.scss";
 import { configs } from "../../utils/configs";
 import { Container, Data } from "../../utils/namespaces";
 import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
+import { PieChartDataHandlerProps } from "./PieChartDataHandler";
 import { PiePlayground } from "./PiePlayground";
+import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
 
 import PieChartContainerProps = Container.PieChartContainerProps;
 
-export interface PieChartProps extends PieChartContainerProps {
-    data?: PieData[];
-    defaultData?: PieData[];
+interface ComponentProps extends PieChartDataHandlerProps {
     alertMessage?: ReactChild;
-    loading?: boolean;
-    themeConfigs: { layout: {}, configuration: {}, data: {} };
     onClick?: (options: Data.OnClickOptions<{ label: string, value: number }, PieChartContainerProps>) => void;
     onHover?: (options: Data.OnHoverOptions<{ label: string, value: number }, PieChartContainerProps>) => void;
 }
+
+export type PieChartProps = ComponentProps & typeof PlotlyChartActions;
 
 interface PieChartState {
     layoutOptions: string;
@@ -61,7 +64,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
                 this.props.alertMessage
             );
         }
-        if (this.props.loading || (this.props.devMode === "developer" && !this.state.playgroundLoaded)) {
+        if (this.props.fetchingData || (this.props.devMode === "developer" && !this.state.playgroundLoaded)) {
             return createElement(ChartLoading);
         }
         if (this.props.devMode === "developer" && this.state.playgroundLoaded) {
@@ -241,3 +244,7 @@ export class PieChart extends Component<PieChartProps, PieChartState> {
         };
     }
 }
+
+const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>
+    bindActionCreators(PlotlyChartActions, dispatch);
+export default connect(null, mapDispatchToProps)(PieChart);

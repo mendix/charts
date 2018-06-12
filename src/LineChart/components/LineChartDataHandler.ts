@@ -38,7 +38,6 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
                 ...this.props as LineChartDataHandlerProps,
                 onClick: this.onClick,
                 onHover: this.onHover,
-                scatterData: this.props.scatterData,
                 series: this.props.data ? this.props.data.map(({ series }) => series) : this.props.series
             })
         );

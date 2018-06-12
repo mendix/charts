@@ -1,0 +1,67 @@
+import { Action, Reducer } from "redux";
+import { PiePlayground } from "../components/PiePlayground";
+import { ReactChild } from "react";
+import { ChartConfigs } from "../../utils/configs";
+import { PieData } from "plotly.js";
+
+export type PieChartAction = Action & PieChartState & { widgetID: string };
+
+export interface PieChartState {
+    layoutOptions: string;
+    dataOptions: string;
+    configurationOptions: string;
+    playground?: typeof PiePlayground;
+    data?: PieData[];
+    alertMessage?: ReactChild;
+    fetchingData?: boolean;
+    fetchingConfigs: boolean;
+    themeConfigs: ChartConfigs;
+}
+
+export interface PieChartReducerState {
+    [ widgetID: string ]: PieChartState;
+}
+
+const prefix = "PieChart";
+export const RESET = `${prefix}.RESET`;
+export const ALERT_MESSAGE = `${prefix}.ALERT_MESSAGE`;
+export const TOGGLE_FETCHING_DATA = `${prefix}.TOGGLE_FETCHING_DATA`;
+export const UPDATE_DATA_FROM_FETCH = `${prefix}.UPDATE_DATA_FROM_FETCH`;
+export const FETCH_DATA_FAILED = `${prefix}.FETCH_DATA_FAILED`;
+export const NO_CONTEXT = `${prefix}.NO_CONTEXT`;
+export const LOAD_PLAYGROUND = `${prefix}.LOAD_PLAYGROUND`;
+export const UPDATE_DATA_FROM_PLAYGROUND = `${prefix}.UPDATE_DATA_FROM_PLAYGROUND`;
+export const FETCH_THEME_CONFIGS = `${prefix}.FETCH_THEME_CONFIGS`;
+export const FETCH_THEME_CONFIGS_COMPLETE = `${prefix}.FETCH_THEME_CONFIGS_COMPLETE`;
+
+export const defaultState: Partial<PieChartState> = {
+    data: [],
+    fetchingData: false,
+    fetchingConfigs: false,
+    themeConfigs: { layout: {}, configuration: {}, data: {} }
+};
+
+export const pieChartReducer: Reducer<PieChartReducerState> = (state = defaultState as PieChartReducerState, action: PieChartAction): PieChartReducerState => {
+    switch (action.type) {
+        case FETCH_THEME_CONFIGS:
+            return {
+                ...state,
+                [action.widgetID]: {
+                    ...defaultState,
+                    ...state[action.widgetID],
+                    fetchingConfigs: false,
+                    fetchingData: true
+                }
+            };
+        case ALERT_MESSAGE:
+            return {
+                ...state,
+                [action.widgetID]: {
+                    ...defaultState,
+                    ...state[action.widgetID],
+                    alertMessage: action.alertMessage
+                } };
+        default:
+            return state;
+    }
+};

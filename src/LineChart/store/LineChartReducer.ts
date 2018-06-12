@@ -36,10 +36,8 @@ export const FETCH_THEME_CONFIGS = `${prefix}.FETCH_THEME_CONFIGS`;
 export const FETCH_THEME_CONFIGS_COMPLETE = `${prefix}.FETCH_THEME_CONFIGS_COMPLETE`;
 
 const defaultDataState: Partial<LineChartInstanceState> = {
-    // configurationOptions: "{\n\n}",
     data: [],
     fetchingData: false,
-    // layoutOptions: "{\n\n}",
     scatterData: [],
     seriesOptions: []
 };
