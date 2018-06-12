@@ -11,7 +11,8 @@ export interface PieChartState {
     dataOptions: string;
     configurationOptions: string;
     playground?: typeof PiePlayground;
-    data?: PieData[];
+    data?: mendix.lib.MxObject[];
+    pieData?: PieData[];
     alertMessage?: ReactChild;
     fetchingData?: boolean;
     fetchingConfigs: boolean;
@@ -35,7 +36,7 @@ export const FETCH_THEME_CONFIGS = `${prefix}.FETCH_THEME_CONFIGS`;
 export const FETCH_THEME_CONFIGS_COMPLETE = `${prefix}.FETCH_THEME_CONFIGS_COMPLETE`;
 
 export const defaultState: Partial<PieChartState> = {
-    data: [],
+    pieData: [],
     fetchingData: false,
     fetchingConfigs: false,
     themeConfigs: { layout: {}, configuration: {}, data: {} }
@@ -60,6 +61,36 @@ export const pieChartReducer: Reducer<PieChartReducerState> = (state = defaultSt
                     ...defaultState,
                     ...state[action.widgetID],
                     alertMessage: action.alertMessage
+                } };
+        case TOGGLE_FETCHING_DATA:
+            return {
+                ...state,
+                [action.widgetID]: {
+                    ...defaultState,
+                    ...state[action.widgetID],
+                    fetchingData: action.fetchingData
+                } };
+        case FETCH_DATA_FAILED:
+            return { ...state, [action.widgetID]: { ...state[action.widgetID], pieData: [] } };
+        case UPDATE_DATA_FROM_FETCH:
+            return {
+                ...state,
+                [action.widgetID]: {
+                    ...defaultState,
+                    ...state[action.widgetID],
+                    data: action.data,
+                    fetchingData: false,
+                    layoutOptions: action.layoutOptions,
+                    pieData: action.pieData && action.pieData.slice()
+                }
+            };
+        case NO_CONTEXT:
+            return {
+                ...state,
+                [action.widgetID]: {
+                    ...defaultState,
+                    ...state[action.widgetID],
+                    ...defaultState
                 } };
         default:
             return state;

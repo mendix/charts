@@ -89,7 +89,7 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
         this.unsubscribe();
         if (props.mxObject) {
             this.subscriptionHandles.push(mx.data.subscribe({
-                callback: () => store.dispatch(this.props.fetchData(this.props)),
+                callback: () => store.dispatch(this.props.fetchData(props)),
                 guid: props.mxObject.getGuid()
             }));
         }
