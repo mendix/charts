@@ -9,17 +9,17 @@
             <category>Chart properties</category>
             <description>Add series and configure their properties</description>
             <properties>
-                <property key="name" type="translatableString">
-                    <caption>Series name</caption>
+                <property key="series" type="enumeration" defaultValue="static">
+                    <caption>Series</caption>
                     <category>Data source</category>
                     <description/>
-                    <translations>
-                        <translation lang="en_US">Series</translation>
-                        <translation lang="nl_NL">Serie</translation>
-                    </translations>
+                    <enumerationValues>
+                        <enumerationValue key="static">Static</enumerationValue>
+                        <enumerationValue key="dynamic">Dynamic</enumerationValue>
+                    </enumerationValues>
                 </property>
-                <property key="dataEntity" type="entity" allowNonPersistableEntities="true">
-                    <caption>Entity</caption>
+                <property key="dataEntity" type="entity" allowNonPersistableEntities="true" isPath="optional" pathType="reference" entityProperty="seriesEntity">
+                    <caption>Data entity</caption>
                     <category>Data source</category>
                     <description>The entity from which the data values will be retrieved</description>
                 </property>
@@ -112,10 +112,42 @@
                         <enumerationValue key="spline">Curved line (spline)</enumerationValue>
                     </enumerationValues>
                 </property>
+                <property key="name" type="translatableString">
+                    <caption>Series name</caption>
+                    <category>Static series</category>
+                    <description/>
+                    <translations>
+                        <translation lang="en_US">Series</translation>
+                        <translation lang="nl_NL">Serie</translation>
+                    </translations>
+                </property>
                 <property key="lineColor" type="string" required="false">
                     <caption>Line color</caption>
-                    <category>Appearance</category>
+                    <category>Static series</category>
                     <description>Color of the line e.g. green, #00FF00, rgb(0,255,0)</description>
+                </property>
+                <property key="seriesEntity" type="entity" allowNonPersistableEntities="true" isPath="yes" pathType="reference" entityProperty="dataEntity">
+                    <caption>Series entity</caption>
+                    <category>Dynamic series</category>
+                    <description>The entity from which the series values will be retrieved</description>
+                </property>
+                <property key="seriesNameAttribute" type="attribute" entityProperty="seriesEntity" required="false">
+                    <caption>Series name attribute</caption>
+                    <category>Dynamic series</category>
+                    <description/>
+                    <attributeTypes>
+                        <attributeType name="String"/>
+                        <attributeType name="Enum"/>
+                    </attributeTypes>
+                </property>
+                <property key="lineColorAttribute" type="attribute" entityProperty="seriesEntity" required="false">
+                    <caption>Line color attribute</caption>
+                    <category>Dynamic series</category>
+                    <description>Color of the line e.g. green, #00FF00, rgb(0,255,0)</description>
+                    <attributeTypes>
+                        <attributeType name="String"/>
+                        <attributeType name="Enum"/>
+                    </attributeTypes>
                 </property>
                 <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
                     <caption>On click</caption>
