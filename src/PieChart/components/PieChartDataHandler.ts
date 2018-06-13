@@ -6,7 +6,7 @@ import { handleOnClick, isContextChanged, openTooltipForm, setRefreshAction, val
 import { Container, Data } from "../../utils/namespaces";
 import PieChart from "./PieChart";
 import { ReduxStore, store } from "../store";
-import { PieChartState, defaultState } from "../store/PieChartReducer";
+import { PieChartState, defaultInstanceState } from "../store/PieChartReducer";
 import * as PieChartActions from "../store/PieChartActions";
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
 import { bindActionCreators } from "redux";
@@ -19,13 +19,13 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
     private intervalID?: number;
 
     render() {
-        return createElement("div", { className: "widget-charts-wrapper"
-            // style: this.state.loading ? { ...getDimensions(this.props), ...parseStyle(this.props.style) } : undefined
-        }, createElement(PieChart, {
-            ...this.props as PieChartDataHandlerProps,
-            onClick: this.handleOnClick,
-            onHover: this.props.tooltipForm ? this.handleOnHover : undefined
-        }));
+        return createElement("div", { className: "widget-charts-wrapper" },
+            createElement(PieChart, {
+                ...this.props as PieChartDataHandlerProps,
+                onClick: this.handleOnClick,
+                onHover: this.props.tooltipForm ? this.handleOnHover : undefined
+            })
+        );
     }
 
     componentDidMount() {
@@ -58,6 +58,16 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
         } else {
             this.clearRefreshInterval();
         }
+    }
+
+    shouldComponentUpdate(nextProps: PieChartDataHandlerProps) {
+        const doneLoading = !nextProps.fetchingData && this.props.fetchingData;
+        const advancedOptionsUpdated = nextProps.layoutOptions !== this.props.layoutOptions
+            || nextProps.dataOptions !== this.props.dataOptions
+            || nextProps.configurationOptions !== this.props.configurationOptions;
+        const playgroundLoaded = !!nextProps.playground && !this.props.playground;
+
+        return doneLoading || advancedOptionsUpdated || playgroundLoaded || !nextProps.mxObject;
     }
 
     componentWillUnmount() {
@@ -139,7 +149,7 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
 }
 
 const mapStateToProps: MapStateToProps<PieChartState, PieChartContainerProps, ReduxStore> = (state, props) =>
-    state.pie[props.friendlyId] || defaultState as PieChartState;
+    state.pie[props.friendlyId] || defaultInstanceState as PieChartState;
 const mapDispatchToProps: MapDispatchToProps<typeof PieChartActions & typeof PlotlyChartActions, PieChartContainerProps> =
     dispatch => ({
         ...bindActionCreators(PieChartActions, dispatch),

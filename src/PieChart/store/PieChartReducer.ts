@@ -35,20 +35,20 @@ export const UPDATE_DATA_FROM_PLAYGROUND = `${prefix}.UPDATE_DATA_FROM_PLAYGROUN
 export const FETCH_THEME_CONFIGS = `${prefix}.FETCH_THEME_CONFIGS`;
 export const FETCH_THEME_CONFIGS_COMPLETE = `${prefix}.FETCH_THEME_CONFIGS_COMPLETE`;
 
-export const defaultState: Partial<PieChartState> = {
+export const defaultInstanceState: Partial<PieChartState> = {
     pieData: [],
     fetchingData: false,
     fetchingConfigs: false,
     themeConfigs: { layout: {}, configuration: {}, data: {} }
 };
 
-export const pieChartReducer: Reducer<PieChartReducerState> = (state = defaultState as PieChartReducerState, action: PieChartAction): PieChartReducerState => {
+export const pieChartReducer: Reducer<PieChartReducerState> = (state = {} as PieChartReducerState, action: PieChartAction): PieChartReducerState => {
     switch (action.type) {
         case FETCH_THEME_CONFIGS:
             return {
                 ...state,
                 [action.widgetID]: {
-                    ...defaultState,
+                    ...defaultInstanceState,
                     ...state[action.widgetID],
                     fetchingConfigs: false,
                     fetchingData: true
@@ -58,7 +58,7 @@ export const pieChartReducer: Reducer<PieChartReducerState> = (state = defaultSt
             return {
                 ...state,
                 [action.widgetID]: {
-                    ...defaultState,
+                    ...defaultInstanceState,
                     ...state[action.widgetID],
                     alertMessage: action.alertMessage
                 } };
@@ -66,7 +66,7 @@ export const pieChartReducer: Reducer<PieChartReducerState> = (state = defaultSt
             return {
                 ...state,
                 [action.widgetID]: {
-                    ...defaultState,
+                    ...defaultInstanceState,
                     ...state[action.widgetID],
                     fetchingData: action.fetchingData
                 } };
@@ -76,7 +76,7 @@ export const pieChartReducer: Reducer<PieChartReducerState> = (state = defaultSt
             return {
                 ...state,
                 [action.widgetID]: {
-                    ...defaultState,
+                    ...defaultInstanceState,
                     ...state[action.widgetID],
                     data: action.data,
                     fetchingData: false,
@@ -88,10 +88,29 @@ export const pieChartReducer: Reducer<PieChartReducerState> = (state = defaultSt
             return {
                 ...state,
                 [action.widgetID]: {
-                    ...defaultState,
+                    ...defaultInstanceState,
                     ...state[action.widgetID],
-                    ...defaultState
+                    ...defaultInstanceState
                 } };
+        case LOAD_PLAYGROUND:
+            return {
+                ...state,
+                [action.widgetID]: {
+                    ...defaultInstanceState,
+                    ...state[action.widgetID],
+                    playground: action.playground
+                } };
+        case UPDATE_DATA_FROM_PLAYGROUND:
+            return {
+                ...state,
+                [action.widgetID]: {
+                    ...defaultInstanceState,
+                    ...state[action.widgetID],
+                    layoutOptions: action.layoutOptions,
+                    dataOptions: action.dataOptions,
+                    configurationOptions: action.configurationOptions
+                }
+            };
         default:
             return state;
     }

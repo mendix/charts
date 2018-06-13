@@ -5,10 +5,12 @@ import {
     FETCH_DATA_FAILED,
     FETCH_THEME_CONFIGS,
     FETCH_THEME_CONFIGS_COMPLETE,
+    LOAD_PLAYGROUND,
     NO_CONTEXT,
     PieChartAction,
     TOGGLE_FETCHING_DATA,
-    UPDATE_DATA_FROM_FETCH
+    UPDATE_DATA_FROM_FETCH,
+    UPDATE_DATA_FROM_PLAYGROUND
 } from "./PieChartReducer";
 import { fetchThemeConfigs as fetchPieThemeConfig } from "../../utils/configs";
 import { PieChartDataHandlerProps } from "../components/PieChartDataHandler";
@@ -36,6 +38,10 @@ export const fetchThemeConfigs = (widgetID: string) => (dispatch: Dispatch<any>)
 export const fetchPieData = (props: PieChartDataHandlerProps) => (dispatch: Dispatch<Partial<PieChartAction> & Action>) => {
     return () => {
         if (props.mxObject && props.dataEntity) {
+            if (!props.fetchingData) {
+                dispatch({ type: TOGGLE_FETCHING_DATA, widgetID: props.friendlyId, fetchingData: true });
+            }
+
             const attributes = [ props.nameAttribute, props.valueAttribute ];
             if (props.sortAttribute) {
                 attributes.push(props.sortAttribute);
@@ -68,3 +74,17 @@ export const fetchPieData = (props: PieChartDataHandlerProps) => (dispatch: Disp
         }
     };
 };
+
+export const loadPlayground = (widgetID: string) => (dispatch: Dispatch<any>) => async () => {
+    const { PiePlayground } = await import("../components/PiePlayground");
+    dispatch({ type: LOAD_PLAYGROUND, widgetID, playground: PiePlayground });
+};
+
+export const updateDataFromPlayground = (widgetID: string, dataOptions: string, layoutOptions: string, configurationOptions: string): Partial<PieChartAction> =>
+    ({
+        type: UPDATE_DATA_FROM_PLAYGROUND,
+        widgetID,
+        dataOptions,
+        layoutOptions,
+        configurationOptions
+    });
