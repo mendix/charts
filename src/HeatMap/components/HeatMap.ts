@@ -2,57 +2,32 @@ import deepMerge from "deepmerge";
 import { Config, HeatMapData, Layout, ScatterHoverData } from "plotly.js";
 import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
-import { PiePlayground } from "../../PieChart/components/PiePlayground";
 import { Alert } from "../../components/Alert";
-import { ChartLoading } from "../../components/ChartLoading";
 import { HoverTooltip } from "../../components/HoverTooltip";
 import PlotlyChart from "../../components/PlotlyChart";
 import "../../ui/Charts.scss";
-import { ChartConfigs, arrayMerge, configs } from "../../utils/configs";
+import { arrayMerge, configs } from "../../utils/configs";
+import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
 import { Container, Data } from "../../utils/namespaces";
 import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 
 import HeatMapContainerProps = Container.HeatMapContainerProps;
+import { HeatMapDataHandlerProps } from "./HeatMapDataHandler";
+import { HeatMapState } from "../store/HeatMapReducer";
+import { store } from "../store";
+import { MapDispatchToProps, connect } from "react-redux";
+import { bindActionCreators } from "redux";
 
-export interface HeatMapProps extends HeatMapContainerProps {
-    data?: HeatMapData;
-    defaultData?: HeatMapData;
+interface ComponentProps extends HeatMapDataHandlerProps {
     alertMessage?: ReactChild;
-    loading?: boolean;
-    themeConfigs: ChartConfigs;
     onClick?: (options: Data.OnClickOptions<{ x: string, y: string, z: number }, HeatMapContainerProps>) => void;
     onHover?: (options: Data.OnHoverOptions<{ x: string, y: string, z: number }, HeatMapContainerProps>) => void;
 }
 
-interface HeatMapState {
-    layoutOptions: string;
-    dataOptions: string;
-    playgroundLoaded: boolean;
-    configurationOptions: string;
-}
+export type HeatMapProps = ComponentProps & typeof PlotlyChartActions;
 
-export interface PieTraces {
-    labels: string[];
-    values: number[];
-}
-
-export class HeatMap extends Component<HeatMapProps, HeatMapState> {
-    state: HeatMapState = {
-        layoutOptions: this.props.layoutOptions,
-        dataOptions: this.props.dataOptions,
-        configurationOptions: this.props.configurationOptions,
-        playgroundLoaded: false
-    };
+class HeatMap extends Component<HeatMapProps & HeatMapState> {
     private tooltipNode?: HTMLDivElement;
-    private Playground?: typeof PiePlayground;
-
-    constructor(props: HeatMapProps) {
-        super(props);
-
-        if (props.devMode === "developer") {
-            this.loadPlaygroundComponent();
-        }
-    }
 
     render() {
         if (this.props.alertMessage) {
@@ -60,24 +35,31 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
                 this.props.alertMessage
             );
         }
-        if (this.props.loading || (this.props.devMode === "developer" && !this.state.playgroundLoaded)) {
-            return createElement(ChartLoading);
-        }
-        if (this.props.devMode === "developer" && this.state.playgroundLoaded) {
+        if (this.props.devMode === "developer" && this.props.playground) {
             return this.renderPlayground();
         }
 
         return this.renderChart();
     }
 
-    private getTooltipNodeRef = (node: HTMLDivElement) => {
-        this.tooltipNode = node;
+    componentDidMount() {
+        if (this.props.devMode === "developer" && this.props.loadPlayground) {
+            store.dispatch(this.props.loadPlayground(this.props.friendlyId));
+        }
     }
 
-    private async loadPlaygroundComponent() {
-        const { PiePlayground: PlaygroundImport } = await import("../../PieChart/components/PiePlayground");
-        this.Playground = PlaygroundImport;
-        this.setState({ playgroundLoaded: true });
+    componentWillReceiveProps(nextProps: HeatMapProps) {
+        if (!nextProps.alertMessage && !nextProps.fetchingData) {
+            nextProps.updateData(nextProps.friendlyId, {
+                layout: this.getLayoutOptions(nextProps),
+                data: this.getData(nextProps),
+                config: this.getConfigOptions(nextProps)
+            });
+        }
+    }
+
+    private getTooltipNodeRef = (node: HTMLDivElement) => {
+        this.tooltipNode = node;
     }
 
     private renderChart() {
@@ -87,9 +69,6 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
                 type: "heatmap",
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
-                // data: this.getData(this.props),
-                // layout: this.getLayoutOptions(this.props),
-                // config: this.getConfigOptions(this.props),
                 onClick: this.onClick,
                 onHover: this.onHover,
                 getTooltipNode: this.getTooltipNodeRef
@@ -98,7 +77,7 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
     }
 
     private renderPlayground(): ReactElement<any> | null {
-        if (this.Playground) {
+        if (this.props.playground) {
             const modelerLayoutConfigs = deepMerge.all(
                 [ HeatMap.getDefaultLayoutOptions(this.props), this.props.themeConfigs.layout ]
             );
@@ -106,12 +85,12 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
                 [ HeatMap.getDefaultDataOptions(this.props), this.props.themeConfigs.data ], { arrayMerge }
             );
 
-            return createElement(this.Playground, {
-                dataOptions: this.state.dataOptions || "{\n\n}",
+            return createElement(this.props.playground, {
+                dataOptions: this.props.dataOptions || "{\n\n}",
                 modelerDataConfigs: JSON.stringify(modelerDataConfigs, null, 2),
-                onChange: this.onRuntimeUpdate,
-                layoutOptions: this.state.layoutOptions || "{\n\n}",
-                configurationOptions: this.state.configurationOptions || "{\n\n}",
+                onChange: this.onOptionsUpdate,
+                layoutOptions: this.props.layoutOptions || "{\n\n}",
+                configurationOptions: this.props.configurationOptions || "{\n\n}",
                 configurationOptionsDefault: JSON.stringify(HeatMap.getDefaultConfigOptions(), null, 2),
                 modelerLayoutConfigs: JSON.stringify(modelerLayoutConfigs, null, 2)
             }, this.renderChart());
@@ -120,74 +99,74 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
         return null;
     }
 
-    // private getData(props: HeatMapProps): HeatMapData[] {
-    //     if (this.props.data) {
-    //         const { dataOptions } = this.state;
-    //         const advancedOptions = props.devMode !== "basic" && dataOptions ? JSON.parse(dataOptions) : {};
-    //         const dataThemeConfigs = props.devMode !== "basic" ? this.props.themeConfigs.data : {};
+    private getData(props: HeatMapProps): HeatMapData[] {
+        if (props.data) {
+            const { dataOptions } = props;
+            const advancedOptions = props.devMode !== "basic" && dataOptions ? JSON.parse(dataOptions) : {};
+            const dataThemeConfigs = props.devMode !== "basic" ? props.themeConfigs.data : {};
 
-    //         const data: HeatMapData = deepMerge.all([
-    //             {
-    //                 ...HeatMap.getDefaultDataOptions(props),
-    //                 x: this.props.data.x,
-    //                 y: this.props.data.y,
-    //                 z: this.props.data.z,
-    //                 text: this.props.data.z.map(row => row.map(item => `${item}`)),
-    //                 zsmooth: props.smoothColor ? "best" : false
-    //             },
-    //             dataThemeConfigs,
-    //             advancedOptions
-    //         ], { arrayMerge });
-    //         data.colorscale = advancedOptions.colorscale || data.colorscale;
+            const data: HeatMapData = deepMerge.all([
+                {
+                    ...HeatMap.getDefaultDataOptions(props),
+                    x: props.data.x,
+                    y: props.data.y,
+                    z: props.data.z,
+                    text: props.data.z.map(row => row.map(item => `${item}`)),
+                    zsmooth: props.smoothColor ? "best" : false
+                },
+                dataThemeConfigs,
+                advancedOptions
+            ], { arrayMerge });
+            data.colorscale = advancedOptions.colorscale || data.colorscale;
 
-    //         return [ data ];
-    //     }
+            return [ data ];
+        }
 
-    //     return this.props.defaultData ? [ { ...this.props.defaultData, type: "heatmap" } ] : [];
-    // }
+        return [];
+    }
 
-    // private getLayoutOptions(props: HeatMapProps): Partial<Layout> {
-    //     const { layoutOptions } = this.state;
-    //     const advancedOptions = props.devMode !== "basic" && layoutOptions ? JSON.parse(layoutOptions) : {};
-    //     const themeLayoutConfigs = props.devMode !== "basic" ? this.props.themeConfigs.layout : {};
+    private getLayoutOptions(props: HeatMapProps): Partial<Layout> {
+        const { layoutOptions } = props;
+        const advancedOptions = props.devMode !== "basic" && layoutOptions ? JSON.parse(layoutOptions) : {};
+        const themeLayoutConfigs = props.devMode !== "basic" ? props.themeConfigs.layout : {};
 
-    //     return deepMerge.all([
-    //         HeatMap.getDefaultLayoutOptions(props),
-    //         {
-    //             annotations: props.showValues
-    //                 ? this.getTextAnnotations(props.data || props.defaultData, props.valuesColor)
-    //                 : undefined
-    //         },
-    //         themeLayoutConfigs,
-    //         advancedOptions
-    //     ]);
-    // }
+        return deepMerge.all([
+            HeatMap.getDefaultLayoutOptions(props),
+            {
+                annotations: props.showValues
+                    ? this.getTextAnnotations(props.data, props.valuesColor)
+                    : undefined
+            },
+            themeLayoutConfigs,
+            advancedOptions
+        ]);
+    }
 
-    // private getTextAnnotations(data?: HeatMapData, valuesColor = "") {
-    //     const annotations: {}[] = [];
-    //     if (data) {
-    //         for (let i = 0; i < data.y.length; i++) {
-    //             for (let j = 0; j < data.x.length; j++) {
-    //                 const result = {
-    //                     xref: "x1",
-    //                     yref: "y1",
-    //                     x: data.x[ j ],
-    //                     y: data.y[ i ],
-    //                     text: data.z[ i ][ j ],
-    //                     font: {
-    //                         family: "Open Sans",
-    //                         size: 14,
-    //                         color: valuesColor || "#555"
-    //                     },
-    //                     showarrow: false
-    //                 };
-    //                 annotations.push(result);
-    //             }
-    //         }
-    //     }
+    private getTextAnnotations(data?: HeatMapData, valuesColor = "") {
+        const annotations: {}[] = [];
+        if (data) {
+            for (let i = 0; i < data.y.length; i++) {
+                for (let j = 0; j < data.x.length; j++) {
+                    const result = {
+                        xref: "x1",
+                        yref: "y1",
+                        x: data.x[ j ],
+                        y: data.y[ i ],
+                        text: data.z[ i ][ j ],
+                        font: {
+                            family: "Open Sans",
+                            size: 14,
+                            color: valuesColor || "#555"
+                        },
+                        showarrow: false
+                    };
+                    annotations.push(result);
+                }
+            }
+        }
 
-    //     return annotations;
-    // }
+        return annotations;
+    }
 
     private onClick = ({ points }: ScatterHoverData<any>) => {
         if (this.props.onClick) {
@@ -231,8 +210,13 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
         }
     }
 
-    private onRuntimeUpdate = (layoutOptions: string, dataOptions: string, configurationOptions: string) => {
-        this.setState({ layoutOptions, dataOptions, configurationOptions });
+    private onOptionsUpdate = (layoutOptions: string, dataOptions: string, configurationOptions: string) => {
+        this.props.updateDataFromPlayground(
+            this.props.friendlyId,
+            dataOptions,
+            layoutOptions,
+            configurationOptions
+        );
     }
 
     public static getDefaultLayoutOptions(props: HeatMapProps): Partial<Layout> {
@@ -258,8 +242,8 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
     }
 
     public getConfigOptions(props: HeatMapProps): Partial<Config> {
-        const parsedConfig = props.devMode !== "basic" && this.state.configurationOptions
-            ? JSON.parse(this.state.configurationOptions)
+        const parsedConfig = props.devMode !== "basic" && props.configurationOptions
+            ? JSON.parse(props.configurationOptions)
             : {};
 
         return deepMerge.all(
@@ -286,3 +270,7 @@ export class HeatMap extends Component<HeatMapProps, HeatMapState> {
         };
     }
 }
+
+const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>
+    bindActionCreators(PlotlyChartActions, dispatch);
+export default connect(null, mapDispatchToProps)(HeatMap);

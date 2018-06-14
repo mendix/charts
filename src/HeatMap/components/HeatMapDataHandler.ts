@@ -1,27 +1,34 @@
 import { Component, createElement } from "react";
 
-import PieChartContainerProps = Container.PieChartContainerProps;
-import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
-import { handleOnClick, isContextChanged, openTooltipForm, setRefreshAction, validateSeriesProps } from "../../utils/data";
+import {
+    handleOnClick,
+    isContextChanged,
+    openTooltipForm,
+    setRefreshAction,
+    validateSeriesProps
+} from "../../utils/data";
+import HeatMap from "./HeatMap";
 import { Container, Data } from "../../utils/namespaces";
-import PieChart from "./PieChart";
-import { ReduxStore, store } from "../store";
-import { PieChartState, defaultInstanceState } from "../store/PieChartReducer";
-import * as PieChartActions from "../store/PieChartActions";
+import HeatMapContainerProps = Container.HeatMapContainerProps;
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
+import * as HeatMapActions from "../store/HeatMapActions";
+import { HeatMapState, defaultInstanceState } from "../store/HeatMapReducer";
+import { ReduxStore, store } from "../store";
+import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import { getAttributeName } from "../utils/data";
 
-type Actions = typeof PieChartActions & typeof PlotlyChartActions;
-export type PieChartDataHandlerProps = PieChartContainerProps & PieChartState & Actions;
+type Actions = typeof HeatMapActions & typeof PlotlyChartActions;
+export type HeatMapDataHandlerProps = HeatMapContainerProps & HeatMapState & Actions;
 
-export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
+class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
     private subscriptionHandles: number[] = [];
     private intervalID?: number;
 
     render() {
         return createElement("div", { className: "widget-charts-wrapper" },
-            createElement(PieChart, {
-                ...this.props as PieChartDataHandlerProps,
+            createElement(HeatMap, {
+                ...this.props as HeatMapDataHandlerProps,
                 onClick: this.handleOnClick,
                 onHover: this.props.tooltipForm ? this.handleOnHover : undefined
             })
@@ -44,7 +51,7 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
         }
     }
 
-    componentWillReceiveProps(nextProps: PieChartDataHandlerProps) {
+    componentWillReceiveProps(nextProps: HeatMapDataHandlerProps) {
         this.resetSubscriptions(nextProps);
         if (!nextProps.alertMessage) {
             if (!nextProps.mxObject) {
@@ -60,7 +67,7 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
         }
     }
 
-    shouldComponentUpdate(nextProps: PieChartDataHandlerProps) {
+    shouldComponentUpdate(nextProps: HeatMapDataHandlerProps) {
         const doneLoading = !nextProps.fetchingData && this.props.fetchingData;
         const advancedOptionsUpdated = nextProps.layoutOptions !== this.props.layoutOptions
             || nextProps.dataOptions !== this.props.dataOptions
@@ -92,7 +99,7 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
         }
     }
 
-    private resetSubscriptions(props: PieChartDataHandlerProps) {
+    private resetSubscriptions(props: HeatMapDataHandlerProps) {
         this.unsubscribe();
 
         if (props.mxObject) {
@@ -101,8 +108,8 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
                 guid: props.mxObject.getGuid()
             }));
         }
-        if (props.data && props.data.length) {
-            props.data.forEach(mxObject => {
+        if (props.mxObjects && props.mxObjects) {
+            props.mxObjects.forEach(mxObject => {
                 if (mxObject) {
                     this.subscriptionHandles.push(mx.data.subscribe({
                         callback: () => {/* callback is required but not in this case */},
@@ -113,46 +120,61 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
         }
     }
 
-    private handleOnClick = (options: Data.OnClickOptions<{ label: string, value: number }, PieChartContainerProps>) => {
-        if (options.mxObject) {
-            handleOnClick(options.options, options.mxObject, options.mxForm);
-        } else if (options.trace) {
-            this.createDataPoint(options.options, options.trace)
-                .then(mxObject => handleOnClick(options.options, mxObject, options.mxForm))
-                .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
+    private handleOnClick = (options: Data.OnClickOptions<{ x: string, y: string, z: number }, HeatMapContainerProps>) => {
+        if (options.trace) {
+            const mxObject = this.findSourceObject(options.trace.x, options.trace.y, options.trace.z);
+            if (mxObject) {
+                handleOnClick(options.options, mxObject, options.mxForm);
+            } else {
+                this.createDataPoint(options.options, options.trace)
+                    .then(newMxObject => handleOnClick(options.options, newMxObject, options.mxForm))
+                    .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
+            }
         }
     }
 
-    private handleOnHover = (options: Data.OnHoverOptions<{ label: string, value: number }, PieChartContainerProps>) => {
-        if (options.mxObject) {
-            openTooltipForm(options.tooltipNode, options.tooltipForm, options.mxObject);
-        } else if (options.trace && options.options.dataEntity) {
-            this.createDataPoint(options.options, options.trace)
-                .then(mxObject => openTooltipForm(options.tooltipNode, options.tooltipForm, mxObject))
-                .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
+    private handleOnHover = (options: Data.OnHoverOptions<{ x: string, y: string, z: number }, HeatMapContainerProps>) => {
+        if (options.trace) {
+            const mxObject = this.findSourceObject(options.trace.x, options.trace.y, options.trace.z);
+            if (mxObject) {
+                openTooltipForm(options.tooltipNode, options.tooltipForm, mxObject);
+            } else {
+                this.createDataPoint(options.options, options.trace)
+                    .then(newMxObject => openTooltipForm(options.tooltipNode, options.tooltipForm, newMxObject))
+                    .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
+            }
         }
     }
 
-    private createDataPoint(props: PieChartContainerProps, trace: { label: string, value: number }) {
+    private createDataPoint(props: HeatMapContainerProps, trace: { x: string, y: string, z: number }) {
         return new Promise<mendix.lib.MxObject>((resolve, reject) => {
             window.mx.data.create({
                 entity: props.dataEntity,
                 callback: mxObject => {
-                    mxObject.set(props.nameAttribute, trace.label);
-                    mxObject.set(props.valueAttribute, trace.value);
+                    mxObject.set(props.horizontalNameAttribute, trace.x);
+                    mxObject.set(props.verticalNameAttribute, trace.y);
+                    mxObject.set(props.valueAttribute, trace.z);
                     resolve(mxObject);
                 },
                 error: error => reject(error.message)
             });
         });
     }
+
+    private findSourceObject(x: string, y: string, z: number): mendix.lib.MxObject | undefined {
+        return this.props.mxObjects && this.props.mxObjects.find(data =>
+            data.get(getAttributeName(this.props.horizontalNameAttribute)) === x &&
+            data.get(getAttributeName(this.props.verticalNameAttribute)) === y &&
+            Number(data.get(this.props.valueAttribute)) === z
+        );
+    }
 }
 
-const mapStateToProps: MapStateToProps<PieChartState, PieChartContainerProps, ReduxStore> = (state, props) =>
-    state.pie[props.friendlyId] || defaultInstanceState as PieChartState;
-const mapDispatchToProps: MapDispatchToProps<typeof PieChartActions & typeof PlotlyChartActions, PieChartContainerProps> =
+const mapStateToProps: MapStateToProps<HeatMapState, HeatMapContainerProps, ReduxStore> = (state, props) =>
+    state.heatmap[props.friendlyId] || defaultInstanceState as HeatMapState;
+const mapDispatchToProps: MapDispatchToProps<typeof HeatMapActions & typeof PlotlyChartActions, HeatMapContainerProps> =
     dispatch => ({
-        ...bindActionCreators(PieChartActions, dispatch),
+        ...bindActionCreators(HeatMapActions, dispatch),
         ...bindActionCreators(PlotlyChartActions, dispatch)
     });
-export default connect(mapStateToProps, mapDispatchToProps)(PieChartDataHandler);
+export default connect(mapStateToProps, mapDispatchToProps)(HeatMapDataHandler);
