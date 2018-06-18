@@ -477,3 +477,14 @@ export const arrayMerge = (target: any[], source: any[], options: any) => {
 
 export const parseAdvancedOptions = (devMode: Container.DevMode, options: string) =>
     devMode !== "basic" && options ? JSON.parse(options) : {};
+
+export const renderError = (id: string, errorMessages: string[]) => {
+    if (errorMessages.length) {
+        return createElement("div", {},
+            `Configuration error in widget ${id}:`,
+            errorMessages.map((message, key) => createElement("p", { key }, message))
+        );
+    }
+
+    return "";
+};

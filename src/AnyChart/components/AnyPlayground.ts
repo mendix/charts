@@ -7,7 +7,7 @@ import { AnyChart, AnyChartProps } from "./AnyChart";
 import { Panel, PanelProps } from "../../components/Panel";
 import { Select } from "../../components/Select";
 
-interface AnyPlaygroundState {
+interface AnyChartPlaygroundState {
     staticData: string;
     staticLayout: string;
     attributeData: string;
@@ -16,8 +16,8 @@ interface AnyPlaygroundState {
     configurationOptions: string;
 }
 
-export class AnyPlayground extends Component<AnyChartProps, AnyPlaygroundState> {
-    state: AnyPlaygroundState = {
+export class AnyChartPlayground extends Component<AnyChartProps, AnyChartPlaygroundState> {
+    state: AnyChartPlaygroundState = {
         staticData: this.props.dataStatic,
         staticLayout: this.props.layoutStatic,
         attributeLayout: this.props.attributeLayout,

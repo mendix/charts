@@ -58,7 +58,7 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
                 nextProps.noContext(nextProps.friendlyId);
             } else if (!nextProps.fetchingConfigs && isContextChanged(this.props.mxObject, nextProps.mxObject)) {
                 nextProps.togglePlotlyDataLoading(nextProps.friendlyId, true);
-                store.dispatch(nextProps.fetchPieData(nextProps));
+                store.dispatch(nextProps.fetchHeatMapData(nextProps));
                 this.clearRefreshInterval();
                 this.intervalID = setRefreshAction(nextProps.refreshInterval, nextProps.mxObject)(this.onRefresh);
             }
@@ -89,7 +89,7 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
 
     private onRefresh = () => {
         if (!this.props.fetchingData) {
-            store.dispatch(this.props.fetchPieData(this.props));
+            store.dispatch(this.props.fetchHeatMapData(this.props));
         }
     }
 
@@ -104,7 +104,7 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
 
         if (props.mxObject) {
             this.subscriptionHandles.push(window.mx.data.subscribe({
-                callback: () => store.dispatch(this.props.fetchPieData(props)),
+                callback: () => store.dispatch(this.props.fetchHeatMapData(props)),
                 guid: props.mxObject.getGuid()
             }));
         }

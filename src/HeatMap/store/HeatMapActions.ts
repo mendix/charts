@@ -35,7 +35,7 @@ export const fetchThemeConfigs = (widgetID: string) => (dispatch: Dispatch<any>)
         }));
 };
 
-export const fetchPieData = (props: HeatMapDataHandlerProps) => (dispatch: Dispatch<Partial<HeatMapAction> & Action>) => {
+export const fetchHeatMapData = (props: HeatMapDataHandlerProps) => (dispatch: Dispatch<Partial<HeatMapAction> & Action>) => {
     return () => {
         if (props.mxObject && props.dataEntity) {
             if (!props.fetchingData) {

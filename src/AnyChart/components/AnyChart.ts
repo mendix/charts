@@ -1,45 +1,48 @@
 
 // tslint:disable no-console
 import deepMerge from "deepmerge";
-import { Config } from "plotly.js";
+import { Config, Layout } from "plotly.js";
 import { Component, ReactChild, createElement } from "react";
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
 import PlotlyChart from "../../components/PlotlyChart";
 import "../../ui/Charts.scss";
-import { Style } from "../../utils/namespaces";
 import { getDimensions, parseStyle } from "../../utils/style";
-import { WrapperProps } from "../../utils/types";
+import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
+import { AnyChartDataHandlerProps } from "./AnyChartDataHandler";
+import { arrayMerge } from "../../utils/data";
+import { MapDispatchToProps, connect } from "react-redux";
+import { bindActionCreators } from "redux";
 
 // TODO improve typing by replace explicit any types
 
-export interface AnyChartProps extends WrapperProps, Style.Dimensions {
-    friendlyId: string;
+interface ComponentProps extends AnyChartDataHandlerProps {
     alertMessage?: ReactChild;
-    loading?: boolean;
-    dataStatic: string;
-    layoutStatic: string;
-    attributeData: string;
-    attributeLayout: string;
-    configurationOptions: string;
     onClick?: (data: any) => void;
     onHover?: (data: any, node: HTMLDivElement) => void;
 }
+export type AnyChartProps = ComponentProps & typeof PlotlyChartActions;
 
-export class AnyChart extends Component<AnyChartProps, { alertMessage?: ReactChild }> {
+export class AnyChart extends Component<AnyChartProps> {
     render() {
         if (this.props.alertMessage) {
             return createElement(Alert, { className: `widget-charts-any-alert` }, this.props.alertMessage);
         }
-        if (this.props.loading) {
+        if (this.props.fetchingData) {
             return createElement(ChartLoading);
         }
 
         return this.renderChart();
     }
 
-    componentWillReceiveProps(newProps: AnyChartProps) {
-        this.setState({ alertMessage: newProps.alertMessage });
+    componentWillReceiveProps(nextProps: AnyChartProps) {
+        if (!nextProps.alertMessage && !nextProps.fetchingData) {
+            nextProps.updateData(nextProps.friendlyId, {
+                layout: this.getLayoutOptions(nextProps),
+                data: this.getData(nextProps),
+                config: this.getConfigOptions(nextProps)
+            });
+        }
     }
 
     private renderChart() {
@@ -48,28 +51,25 @@ export class AnyChart extends Component<AnyChartProps, { alertMessage?: ReactChi
             type: "full",
             className: this.props.class,
             style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
-            // layout: this.getLayoutOptions(this.props),
-            // data: this.getData(this.props),
-            // config: this.getConfigOptions(this.props),
             onClick: this.onClick
         });
     }
 
-    // private getData(props: AnyChartProps): any[] {
-    //     const staticData: any[] = JSON.parse(props.dataStatic || "[]");
+    private getData(props: AnyChartProps): any[] {
+        const staticData: any[] = JSON.parse(props.dataStatic || "[]");
 
-    //     return props.attributeData
-    //         ? deepMerge.all([ staticData, JSON.parse(props.attributeData) ], { arrayMerge })
-    //         : staticData;
-    // }
+        return props.attributeData
+            ? deepMerge.all([ staticData, JSON.parse(props.attributeData) ], { arrayMerge })
+            : staticData;
+    }
 
-    // private getLayoutOptions(props: AnyChartProps): Partial<Layout> {
-    //     const staticLayout = JSON.parse(props.layoutStatic || "{}");
+    private getLayoutOptions(props: AnyChartProps): Partial<Layout> {
+        const staticLayout = JSON.parse(props.layoutStatic || "{}");
 
-    //     return props.attributeLayout
-    //         ? deepMerge.all([ staticLayout, JSON.parse(props.attributeLayout) ], { arrayMerge }) as Partial<Layout>
-    //         : staticLayout;
-    // }
+        return props.attributeLayout
+            ? deepMerge.all([ staticLayout, JSON.parse(props.attributeLayout) ], { arrayMerge }) as Partial<Layout>
+            : staticLayout;
+    }
 
     private onClick = ({ points }: any) => {
         if (this.props.onClick) {
@@ -98,3 +98,7 @@ export class AnyChart extends Component<AnyChartProps, { alertMessage?: ReactChi
         return deepMerge.all([ { displayModeBar: false, doubleClick: false }, parsedConfig ]);
     }
 }
+
+const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>
+    bindActionCreators(PlotlyChartActions, dispatch);
+export default connect(null, mapDispatchToProps)(AnyChart);
