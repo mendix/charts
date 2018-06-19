@@ -9,6 +9,7 @@ import "../../ui/Charts.scss";
 import { calculateBubbleSize, getStackedArea } from "../utils/data";
 import { parseAdvancedOptions } from "../../utils/data";
 import {
+    getChartType,
     getCustomLayoutOptions,
     getCustomSeriesOptions,
     getDefaultLayoutOptions,
@@ -40,7 +41,7 @@ interface ComponentProps extends LineChartDataHandlerProps {
 
 export type LineChartProps = ComponentProps & typeof PlotlyChartActions;
 
-export class LineChart extends Component<LineChartProps & LineChartState> {
+class LineChart extends Component<LineChartProps & LineChartState> {
     static defaultProps: Partial<LineChartProps> = {
         type: "line"
     };
@@ -81,7 +82,7 @@ export class LineChart extends Component<LineChartProps & LineChartState> {
     private renderChart(): ReactElement<any> {
         return createElement(PlotlyChart,
             {
-                type: LineChart.getChartType(this.props.type),
+                type: getChartType(this.props.type),
                 widgetID: this.props.friendlyId,
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
@@ -245,10 +246,6 @@ export class LineChart extends Component<LineChartProps & LineChartState> {
                 config: this.getConfigOptions(this.props)
             });
         }
-    }
-
-    public static getChartType(type: string): "line" | "polar" {
-        return type !== "polar" ? "line" : "polar";
     }
 }
 

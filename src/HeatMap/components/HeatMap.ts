@@ -2,11 +2,13 @@ import deepMerge from "deepmerge";
 import { Config, HeatMapData, Layout, ScatterHoverData } from "plotly.js";
 import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
+import { MapDispatchToProps, connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import { Alert } from "../../components/Alert";
 import { HoverTooltip } from "../../components/HoverTooltip";
 import PlotlyChart from "../../components/PlotlyChart";
 import "../../ui/Charts.scss";
-import { arrayMerge, configs } from "../../utils/configs";
+import { arrayMerge } from "../../utils/configs";
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
 import { Container, Data } from "../../utils/namespaces";
 import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
@@ -15,8 +17,7 @@ import HeatMapContainerProps = Container.HeatMapContainerProps;
 import { HeatMapDataHandlerProps } from "./HeatMapDataHandler";
 import { HeatMapState } from "../store/HeatMapReducer";
 import { store } from "../store";
-import { MapDispatchToProps, connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import { getDefaultConfigOptions, getDefaultDataOptions, getDefaultLayoutOptions } from "../utils/configs";
 
 interface ComponentProps extends HeatMapDataHandlerProps {
     alertMessage?: ReactChild;
@@ -79,10 +80,10 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
     private renderPlayground(): ReactElement<any> | null {
         if (this.props.playground) {
             const modelerLayoutConfigs = deepMerge.all(
-                [ HeatMap.getDefaultLayoutOptions(this.props), this.props.themeConfigs.layout ]
+                [ getDefaultLayoutOptions(this.props), this.props.themeConfigs.layout ]
             );
             const modelerDataConfigs = deepMerge.all(
-                [ HeatMap.getDefaultDataOptions(this.props), this.props.themeConfigs.data ], { arrayMerge }
+                [ getDefaultDataOptions(this.props), this.props.themeConfigs.data ], { arrayMerge }
             );
 
             return createElement(this.props.playground, {
@@ -91,7 +92,7 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
                 onChange: this.onOptionsUpdate,
                 layoutOptions: this.props.layoutOptions || "{\n\n}",
                 configurationOptions: this.props.configurationOptions || "{\n\n}",
-                configurationOptionsDefault: JSON.stringify(HeatMap.getDefaultConfigOptions(), null, 2),
+                configurationOptionsDefault: JSON.stringify(getDefaultConfigOptions(), null, 2),
                 modelerLayoutConfigs: JSON.stringify(modelerLayoutConfigs, null, 2)
             }, this.renderChart());
         }
@@ -107,7 +108,7 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
 
             const data: HeatMapData = deepMerge.all([
                 {
-                    ...HeatMap.getDefaultDataOptions(props),
+                    ...getDefaultDataOptions(props),
                     x: props.data.x,
                     y: props.data.y,
                     z: props.data.z,
@@ -131,7 +132,7 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
         const themeLayoutConfigs = props.devMode !== "basic" ? props.themeConfigs.layout : {};
 
         return deepMerge.all([
-            HeatMap.getDefaultLayoutOptions(props),
+            getDefaultLayoutOptions(props),
             {
                 annotations: props.showValues
                     ? this.getTextAnnotations(props.data, props.valuesColor)
@@ -219,28 +220,6 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
         );
     }
 
-    public static getDefaultLayoutOptions(props: HeatMapProps): Partial<Layout> {
-        const defaultConfigs: Partial<Layout> = {
-            showarrow: false,
-            xaxis: {
-                fixedrange: true,
-                title: props.xAxisLabel,
-                ticks: ""
-            },
-            yaxis: {
-                fixedrange: true,
-                title: props.yAxisLabel,
-                ticks: ""
-            }
-        };
-
-        return deepMerge.all([ configs.layout, defaultConfigs ]);
-    }
-
-    public static getDefaultConfigOptions(): Partial<Config> {
-        return { displayModeBar: false, doubleClick: false };
-    }
-
     public getConfigOptions(props: HeatMapProps): Partial<Config> {
         const parsedConfig = props.devMode !== "basic" && props.configurationOptions
             ? JSON.parse(props.configurationOptions)
@@ -250,24 +229,6 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
             [ { displayModeBar: false, doubleClick: false }, props.themeConfigs.configuration, parsedConfig ],
             { arrayMerge }
         );
-    }
-
-    public static getDefaultDataOptions(props: HeatMapProps): Partial<HeatMapData> {
-        return {
-            type: "heatmap",
-            hoverinfo: "none",
-            showscale: props.data && props.data.showscale,
-            colorscale: props.data && props.data.colorscale,
-            xgap: 1,
-            ygap: 1,
-            colorbar: {
-                y: 1,
-                yanchor: "top",
-                ypad: 0,
-                xpad: 5,
-                outlinecolor: "#9ba492"
-            }
-        };
     }
 }
 

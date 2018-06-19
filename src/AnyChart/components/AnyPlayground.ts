@@ -3,7 +3,7 @@ import { Playground } from "../../components/Playground";
 import { SidebarHeaderTools } from "../../components/SidebarHeaderTools";
 
 import { Alert } from "../../components/Alert";
-import { AnyChart, AnyChartProps } from "./AnyChart";
+import AnyChart, { AnyChartProps } from "./AnyChart";
 import { Panel, PanelProps } from "../../components/Panel";
 import { Select } from "../../components/Select";
 

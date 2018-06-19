@@ -3,6 +3,8 @@
 import deepMerge from "deepmerge";
 import { Config, Layout } from "plotly.js";
 import { Component, ReactChild, createElement } from "react";
+import { MapDispatchToProps, connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import { Alert } from "../../components/Alert";
 import { ChartLoading } from "../../components/ChartLoading";
 import PlotlyChart from "../../components/PlotlyChart";
@@ -11,8 +13,6 @@ import { getDimensions, parseStyle } from "../../utils/style";
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
 import { AnyChartDataHandlerProps } from "./AnyChartDataHandler";
 import { arrayMerge } from "../../utils/data";
-import { MapDispatchToProps, connect } from "react-redux";
-import { bindActionCreators } from "redux";
 
 // TODO improve typing by replace explicit any types
 
@@ -23,7 +23,7 @@ interface ComponentProps extends AnyChartDataHandlerProps {
 }
 export type AnyChartProps = ComponentProps & typeof PlotlyChartActions;
 
-export class AnyChart extends Component<AnyChartProps> {
+class AnyChart extends Component<AnyChartProps> {
     render() {
         if (this.props.alertMessage) {
             return createElement(Alert, { className: `widget-charts-any-alert` }, this.props.alertMessage);

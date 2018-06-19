@@ -1,16 +1,19 @@
 // import { Component, createElement } from "react";
+// import { Provider } from "react-redux";
 
-// import { LineChart } from "../LineChart/components/LineChart";
+// import LineChart from "../LineChart/components/LineChart";
 
 // import { getRandomNumbers, validateSeriesProps } from "../utils/data";
 // import deepMerge from "deepmerge";
 // import { ScatterData } from "plotly.js";
 // import { Container } from "../utils/namespaces";
+// import { defaultColours, fillColours } from "../utils/style";
+// import { LineChartDataHandlerProps } from "../LineChart/components/LineChartDataHandler";
+// import { store } from "../LineChart/store";
 // import LineChartContainerProps = Container.LineChartContainerProps;
 // import LineMode = Container.LineMode;
-// import { defaultColours, fillColours } from "../utils/style";
 
-// tslint:disable-next-line class-name
+// // tslint:disable-next-line class-name
 // export class preview extends Component<Container.PolarChartContainerProps, {}> {
 //     render() {
 //         const alertMessage = validateSeriesProps(
@@ -20,26 +23,27 @@
 //             this.props.configurationOptions
 //         );
 
-//         return createElement(LineChart, {
-//             ...this.props as LineChartContainerProps,
-//             alertMessage,
-//             devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-//             scatterData: preview.getData(this.props),
-//             type: "polar",
-//             themeConfigs: { layout: {}, configuration: {}, data: {} },
-//             polar: {
-//                 radialaxis: {
-//                     rangemode: this.props.rangeMode,
-//                     showgrid: this.props.showGrid,
-//                     gridcolor: "#d7d7d7",
-//                     tickcolor: "#d7d7d7"
-//                 },
-//                 angularaxis: {
-//                     linecolor: "#d7d7d7",
-//                     tickcolor: "#d7d7d7"
+//         return createElement(Provider, { store },
+//             createElement(LineChart, {
+//                 ...this.props as LineChartDataHandlerProps,
+//                 alertMessage,
+//                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
+//                 scatterData: preview.getData(this.props),
+//                 type: "polar",
+//                 themeConfigs: { layout: {}, configuration: {}, data: {} },
+//                 polar: {
+//                     radialaxis: {
+//                         rangemode: this.props.rangeMode,
+//                         showgrid: this.props.showGrid,
+//                         gridcolor: "#d7d7d7",
+//                         tickcolor: "#d7d7d7"
+//                     },
+//                     angularaxis: {
+//                         linecolor: "#d7d7d7",
+//                         tickcolor: "#d7d7d7"
+//                     }
 //                 }
-//             }
-//         });
+//         }));
 //     }
 
 //     static getData(props: LineChartContainerProps): ScatterData[] {

@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 
 import BarChartDataHandler from "./BarChartDataHandler";
 import { Container } from "../../utils/namespaces";
-import { store } from "../store/store";
+import { store } from "../store";
 import BarChartContainerProps = Container.BarChartContainerProps;
 
 __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";

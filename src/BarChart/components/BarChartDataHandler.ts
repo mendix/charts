@@ -14,7 +14,7 @@ import {
 } from "../../utils/data";
 import { Container, Data } from "../../utils/namespaces";
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
-import { ReduxStore, store } from "../store/store";
+import { ReduxStore, store } from "../store";
 
 import BarChartContainerProps = Container.BarChartContainerProps;
 

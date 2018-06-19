@@ -3,7 +3,7 @@ import { Config, Layout, ScatterData } from "plotly.js";
 import { configs } from "../../utils/configs";
 import { Container, Data } from "../../utils/namespaces";
 import { defaultColours } from "../../utils/style";
-import { LineChart, LineChartProps } from "../components/LineChart";
+import { LineChartProps } from "../components/LineChart";
 
 export const getDefaultLayoutOptions = (): Partial<Layout> => {
     const defaultConfigs: Partial<Layout> = {
@@ -77,7 +77,7 @@ export const getCustomSeriesOptions = (series: Data.LineSeriesProps, props: Line
         },
         mode,
         name: series.name,
-        type: LineChart.getChartType(props.type) === "line" ? "scatter" : "scatterpolar" as any,
+        type: getChartType(props.type) === "line" ? "scatter" : "scatterpolar" as any,
         fill: props.fill || series.fill
             ? props.type === "polar" ? "toself" : "tonexty"
             : "none",
@@ -108,5 +108,7 @@ export const getCustomSeriesOptions = (series: Data.LineSeriesProps, props: Line
 
     return seriesOptions;
 };
+
+export const getChartType = (type: string): "line" | "polar" => type !== "polar" ? "line" : "polar";
 
 export const getDefaultConfigOptions = (): Partial<Config> => ({ displayModeBar: false, doubleClick: false });

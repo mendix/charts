@@ -10,7 +10,7 @@ import { getDimensionsFromNode } from "../utils/style";
 import { ChartLoading } from "./ChartLoading";
 import * as PlotlyChartActions from "./actions/PlotlyChartActions";
 import { Plotly, PlotlyChartInstance, defaultPlotlyInstanceState } from "./reducers/PlotlyChartReducer";
-import { ReduxStore } from "../BarChart/store/store";
+import { ReduxStore } from "../BarChart/store";
 
 export interface ComponentProps {
     widgetID: string;

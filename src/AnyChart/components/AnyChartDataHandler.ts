@@ -2,7 +2,7 @@ import { Component, ReactChild, createElement } from "react";
 import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
-import { AnyChart, AnyChartProps } from "./AnyChart";
+import AnyChart, { AnyChartProps } from "./AnyChart";
 import { AnyChartPlayground } from "./AnyPlayground";
 import { isContextChanged, renderError, validateAdvancedOptions } from "../../utils/data";
 
@@ -11,7 +11,7 @@ import * as AnyChartActions from "../store/AnyChartActions";
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
 import AnyChartContainerProps = Container.AnyChartContainerProps;
 import { AnyChartInstanceState, defaultInstanceState } from "../store/AnyChartReducer";
-import { ReduxStore, store } from "../store/store";
+import { ReduxStore, store } from "../store";
 
 export type Actions = typeof AnyChartActions & typeof PlotlyChartActions;
 export type AnyChartDataHandlerProps = AnyChartContainerProps & AnyChartInstanceState & Actions;
