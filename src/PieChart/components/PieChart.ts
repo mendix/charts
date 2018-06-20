@@ -55,16 +55,11 @@ class PieChart extends Component<PieChartProps & PieChartState> {
         if (this.props.devMode === "developer" && this.props.loadPlayground) {
             store.dispatch(this.props.loadPlayground(this.props.friendlyId));
         }
+        this.updateData(this.props);
     }
 
     componentWillReceiveProps(nextProps: PieChartProps) {
-        if (!nextProps.alertMessage && !nextProps.fetchingData) {
-            nextProps.updateData(nextProps.friendlyId, {
-                layout: this.getLayoutOptions(nextProps),
-                data: this.getData(nextProps),
-                config: this.getConfigOptions(nextProps)
-            });
-        }
+        this.updateData(nextProps);
     }
 
     private getTooltipNodeRef = (node: HTMLDivElement) => {
@@ -105,6 +100,16 @@ class PieChart extends Component<PieChartProps & PieChartState> {
         }
 
         return null;
+    }
+
+    private updateData(props: PieChartProps) {
+        if (!props.alertMessage && !props.fetchingData) {
+            props.updateData(props.friendlyId, {
+                layout: this.getLayoutOptions(props),
+                data: this.getData(props),
+                config: this.getConfigOptions(props)
+            });
+        }
     }
 
     private getData(props: PieChartProps): PieData[] {

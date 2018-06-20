@@ -37,10 +37,6 @@ export class preview extends Component<HeatMapContainerProps, {}> {
         );
     }
 
-    componentDidMount() {
-        this.forceUpdate();
-    }
-
     static getData(props: HeatMapContainerProps): HeatMapData {
         return {
             x: [ "Monday", "Tuesday", "Wednesday", "Thursday", "Friday" ],

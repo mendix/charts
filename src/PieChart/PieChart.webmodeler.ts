@@ -34,10 +34,6 @@ export class preview extends Component<PieChartContainerProps, {}> {
         );
     }
 
-    componentDidMount() {
-        this.forceUpdate();
-    }
-
     static getData(props: PieChartContainerProps): PieData[] {
         return [
             deepMerge.all([

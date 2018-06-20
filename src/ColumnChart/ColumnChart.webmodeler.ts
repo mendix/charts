@@ -34,10 +34,6 @@ export class preview extends Component<BarChartContainerProps, {}> {
         );
     }
 
-    componentDidMount() {
-        this.forceUpdate();
-    }
-
     private getData(props: BarChartContainerProps): ScatterData[] {
         if (props.series.length) {
             return props.series.map((series, index) => {

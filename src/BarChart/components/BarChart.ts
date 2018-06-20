@@ -51,16 +51,11 @@ class BarChart extends Component<BarChartProps & BarChartState> {
         if (this.props.devMode === "developer" && this.props.loadPlayground) {
             store.dispatch(this.props.loadPlayground(this.props.friendlyId));
         }
+        this.updateData(this.props);
     }
 
     componentWillReceiveProps(nextProps: BarChartProps) {
-        if (!nextProps.fetchingData) {
-            nextProps.updateData(nextProps.friendlyId, {
-                layout: this.getLayoutOptions(nextProps),
-                data: nextProps.scatterData || [],
-                config: this.getConfigOptions(nextProps)
-            });
-        }
+        this.updateData(nextProps);
     }
 
     private getTooltipNodeRef = (node: HTMLDivElement) => {
@@ -96,6 +91,16 @@ class BarChart extends Component<BarChartProps & BarChartState> {
         }
 
         return null;
+    }
+
+    private updateData(props: BarChartProps) {
+        if (!props.alertMessage && !props.fetchingData) {
+            props.updateData(props.friendlyId, {
+                layout: this.getLayoutOptions(props),
+                data: props.scatterData || [],
+                config: this.getConfigOptions(props)
+            });
+        }
     }
 
     private getLayoutOptions(props: BarChartProps): Partial<Layout> {
@@ -178,7 +183,13 @@ class BarChart extends Component<BarChartProps & BarChartState> {
 
     private onOptionsUpdate = (layoutOptions: string, seriesOptions: string[], configurationOptions: string) => {
         if (this.props.scatterData) {
-            this.props.updateDataFromPlayground(this.props.friendlyId, this.props.scatterData, layoutOptions, seriesOptions, configurationOptions);
+            this.props.updateDataFromPlayground(
+                this.props.friendlyId,
+                this.props.scatterData,
+                layoutOptions,
+                seriesOptions,
+                configurationOptions
+            );
         }
     }
 

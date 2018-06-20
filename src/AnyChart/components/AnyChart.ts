@@ -35,14 +35,12 @@ class AnyChart extends Component<AnyChartProps> {
         return this.renderChart();
     }
 
+    componentDidMount() {
+        this.updateData(this.props);
+    }
+
     componentWillReceiveProps(nextProps: AnyChartProps) {
-        if (!nextProps.alertMessage && !nextProps.fetchingData) {
-            nextProps.updateData(nextProps.friendlyId, {
-                layout: this.getLayoutOptions(nextProps),
-                data: this.getData(nextProps),
-                config: this.getConfigOptions(nextProps)
-            });
-        }
+        this.updateData(nextProps);
     }
 
     private renderChart() {
@@ -53,6 +51,16 @@ class AnyChart extends Component<AnyChartProps> {
             style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
             onClick: this.onClick
         });
+    }
+
+    private updateData(props: AnyChartProps) {
+        if (!props.alertMessage && !props.fetchingData) {
+            props.updateData(props.friendlyId, {
+                layout: this.getLayoutOptions(props),
+                data: this.getData(props),
+                config: this.getConfigOptions(props)
+            });
+        }
     }
 
     private getData(props: AnyChartProps): any[] {
