@@ -7,17 +7,17 @@ import { bindActionCreators } from "redux";
 import { Alert } from "../../components/Alert";
 import { HoverTooltip } from "../../components/HoverTooltip";
 import PlotlyChart from "../../components/PlotlyChart";
-import "../../ui/Charts.scss";
 import { arrayMerge } from "../../utils/configs";
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
 import { Container, Data } from "../../utils/namespaces";
 import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 
-import HeatMapContainerProps = Container.HeatMapContainerProps;
 import { HeatMapDataHandlerProps } from "./HeatMapDataHandler";
 import { HeatMapState } from "../store/HeatMapReducer";
-import { store } from "../store";
 import { getDefaultConfigOptions, getDefaultDataOptions, getDefaultLayoutOptions } from "../utils/configs";
+import { store } from "../../store";
+import HeatMapContainerProps = Container.HeatMapContainerProps;
+import "../../ui/Charts.scss";
 
 interface ComponentProps extends HeatMapDataHandlerProps {
     alertMessage?: ReactChild;

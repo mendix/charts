@@ -1,6 +1,7 @@
 import { Action, Reducer } from "redux";
 import { AnyChartPlayground } from "../components/AnyPlayground";
 import { ReactChild } from "react";
+import { DefaultReduxStore, registerReducer } from "../../store";
 
 export type AnyChartAction = Action & AnyChartInstanceState & { widgetID: string };
 
@@ -14,6 +15,10 @@ export interface AnyChartInstanceState {
 
 export interface AnyChartReducerState {
     [ widgetID: string ]: AnyChartInstanceState;
+}
+
+export interface AnyReduxStore extends DefaultReduxStore {
+    any: AnyChartReducerState;
 }
 
 const prefix = "AnyChart";
@@ -89,3 +94,5 @@ export const anyChartReducer: Reducer<AnyChartReducerState> = (state = {} as Any
             return state;
     }
 };
+
+registerReducer({ any: anyChartReducer });

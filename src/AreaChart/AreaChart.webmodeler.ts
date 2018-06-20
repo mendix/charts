@@ -9,7 +9,7 @@ import { ScatterData } from "plotly.js";
 import { defaultColours, fillColours } from "../utils/style";
 import { LineChartDataHandlerProps } from "../LineChart/components/LineChartDataHandler";
 import { Provider } from "react-redux";
-import { store } from "../LineChart/store";
+import { store } from "../store";
 import LineChartContainerProps = Container.LineChartContainerProps;
 
 // tslint:disable-next-line class-name

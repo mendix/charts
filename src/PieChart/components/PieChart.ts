@@ -17,7 +17,7 @@ import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions
 import { parseAdvancedOptions } from "../../utils/data";
 import { getDefaultDataOptions, getDefaultLayoutOptions } from "../utils/configs";
 import PieChartContainerProps = Container.PieChartContainerProps;
-import { store } from "../store";
+import { store } from "../../store";
 import { PieChartState } from "../store/PieChartReducer";
 import { arrayMerge } from "../../utils/configs";
 

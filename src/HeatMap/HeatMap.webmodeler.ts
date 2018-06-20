@@ -1,17 +1,17 @@
 import { Component, createElement } from "react";
+import { Provider } from "react-redux";
 
 import HeatMap, { HeatMapProps } from "./components/HeatMap";
-import { HeatMapData } from "plotly.js";
+import { HeatMapDataHandlerProps } from "./components/HeatMapDataHandler";
 
 import deepMerge from "deepmerge";
-import { validateSeriesProps } from "../utils/data";
-import { Container } from "../utils/namespaces";
-import HeatMapContainerProps = Container.HeatMapContainerProps;
-import { HeatMapDataHandlerProps } from "./components/HeatMapDataHandler";
-import { Provider } from "react-redux";
-import { store } from "./store";
 import { getDefaultDataOptions } from "./utils/configs";
+import { validateSeriesProps } from "../utils/data";
 import { processColorScale } from "./utils/data";
+import { Container } from "../utils/namespaces";
+import { HeatMapData } from "plotly.js";
+import { store } from "../store";
+import HeatMapContainerProps = Container.HeatMapContainerProps;
 
 // tslint:disable-next-line class-name
 export class preview extends Component<HeatMapContainerProps, {}> {

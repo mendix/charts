@@ -13,19 +13,17 @@ import {
     getCustomLayoutOptions,
     getCustomSeriesOptions,
     getDefaultLayoutOptions,
-    getDefaultSeriesOptions
-} from "../utils/configs";
+    getDefaultSeriesOptions } from "../utils/configs";
 import { getDefaultConfigOptions } from "../../BarChart/utils/configs";
 import { LineChartState } from "../store/LineChartReducer";
 import { Data } from "../../utils/namespaces";
-import { store } from "../store";
+import { store } from "../../store";
 import {
     getDimensions,
     getDimensionsFromNode,
     getTooltipCoordinates,
     parseStyle,
-    setTooltipPosition
-} from "../../utils/style";
+    setTooltipPosition } from "../../utils/style";
 
 import { Alert } from "../../components/Alert";
 import { HoverTooltip } from "../../components/HoverTooltip";

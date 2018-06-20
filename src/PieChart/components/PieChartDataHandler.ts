@@ -1,15 +1,15 @@
 import { Component, createElement } from "react";
-
-import PieChartContainerProps = Container.PieChartContainerProps;
 import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
+import { bindActionCreators } from "redux";
+
 import { handleOnClick, isContextChanged, openTooltipForm, setRefreshAction, validateSeriesProps } from "../../utils/data";
 import { Container, Data } from "../../utils/namespaces";
 import PieChart from "./PieChart";
-import { ReduxStore, store } from "../store";
-import { PieChartState, defaultInstanceState } from "../store/PieChartReducer";
 import * as PieChartActions from "../store/PieChartActions";
+import { PieChartState, PieReduxStore as ReduxStore, defaultInstanceState } from "../store/PieChartReducer";
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
-import { bindActionCreators } from "redux";
+import { store } from "../../store";
+import PieChartContainerProps = Container.PieChartContainerProps;
 
 type Actions = typeof PieChartActions & typeof PlotlyChartActions;
 export type PieChartDataHandlerProps = PieChartContainerProps & PieChartState & Actions;
@@ -39,9 +39,7 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
         if (validationError) {
             this.props.showAlertMessage(friendlyId, validationError);
         }
-        if (this.props.devMode !== "basic") {
-            store.dispatch(this.props.fetchThemeConfigs(friendlyId));
-        }
+        store.dispatch(this.props.fetchThemeConfigs(friendlyId));
     }
 
     componentWillReceiveProps(nextProps: PieChartDataHandlerProps) {

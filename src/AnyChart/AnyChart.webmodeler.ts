@@ -4,7 +4,7 @@ import AnyChart from "./components/AnyChart";
 import { Container } from "../utils/namespaces";
 import { validateAdvancedOptions } from "../utils/data";
 import { Provider } from "react-redux";
-import { store } from "./store";
+import { store } from "../store";
 
 // tslint:disable-next-line class-name
 export class preview extends Component<Container.AnyChartContainerProps, {}> {

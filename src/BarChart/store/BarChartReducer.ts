@@ -2,6 +2,7 @@ import { ScatterData } from "plotly.js";
 import { Action, Reducer } from "redux";
 import { SeriesPlayground } from "../../components/SeriesPlayground";
 import { Container, Data } from "../../utils/namespaces";
+import { DefaultReduxStore, registerReducer } from "../../store";
 import BarChartContainerState = Container.BarChartContainerState;
 
 export type BarChartAction = Action & BarChartInstanceState & { widgetID: string };
@@ -19,6 +20,10 @@ export interface BarChartState {
 export type BarChartInstanceState = BarChartContainerState & BarChartState;
 export interface BarChartReducerState {
     [ widgetID: string ]: BarChartInstanceState;
+}
+
+export interface BarReduxStore extends DefaultReduxStore {
+    bar: BarChartReducerState;
 }
 
 const prefix = "BarChart";
@@ -135,3 +140,5 @@ export const barChartReducer: Reducer<BarChartReducerState> = (state = defaultSt
             return state;
     }
 };
+
+registerReducer({ bar: barChartReducer });

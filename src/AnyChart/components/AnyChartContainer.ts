@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 
 import AnyChartDataHandler from "./AnyChartDataHandler";
 import { Container } from "../../utils/namespaces";
-import { store } from "../store";
+import { store } from "../../store";
 import AnyChartContainerProps = Container.AnyChartContainerProps;
 
 __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";

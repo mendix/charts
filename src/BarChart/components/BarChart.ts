@@ -19,7 +19,7 @@ import { HoverTooltip } from "../../components/HoverTooltip";
 import { Data } from "../../utils/namespaces";
 import PlotlyChart from "../../components/PlotlyChart";
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
-import { store } from "../store";
+import { store } from "../../store";
 import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 import { BarChartDataHandlerProps } from "./BarChartDataHandler";
 

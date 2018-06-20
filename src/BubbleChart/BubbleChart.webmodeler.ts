@@ -10,7 +10,7 @@ import { defaultColours } from "../utils/style";
 import LineChartContainerProps = Container.LineChartContainerProps;
 import { LineChartDataHandlerProps } from "../LineChart/components/LineChartDataHandler";
 import { Provider } from "react-redux";
-import { store } from "../LineChart/store";
+import { store } from "../store";
 
 // tslint:disable-next-line class-name
 export class preview extends Component<LineChartContainerProps, {}> {

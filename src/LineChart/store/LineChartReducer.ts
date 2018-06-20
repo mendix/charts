@@ -1,7 +1,9 @@
 import { ScatterData } from "plotly.js";
 import { Action, Reducer } from "redux";
-import { SeriesPlayground } from "../../components/SeriesPlayground";
 import { Container, Data } from "../../utils/namespaces";
+import { DefaultReduxStore, registerReducer } from "../../store";
+
+import { SeriesPlayground } from "../../components/SeriesPlayground";
 import LineChartContainerState = Container.LineChartContainerState;
 import LineSeriesProps = Data.LineSeriesProps;
 
@@ -21,6 +23,9 @@ export interface LineChartState {
 export type LineChartInstanceState = LineChartContainerState & LineChartState;
 export interface LineChartReducerState {
     [ widgetID: string ]: LineChartInstanceState;
+}
+export interface ScatterReduxStore extends DefaultReduxStore {
+    scatter: LineChartReducerState;
 }
 
 const prefix = "ScatterChart";
@@ -138,3 +143,5 @@ export const scatterChartReducer: Reducer<LineChartReducerState> = (state = defa
             return state;
     }
 };
+
+registerReducer({ scatter: scatterChartReducer });

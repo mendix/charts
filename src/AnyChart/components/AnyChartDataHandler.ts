@@ -4,14 +4,14 @@ import { bindActionCreators } from "redux";
 
 import AnyChart, { AnyChartProps } from "./AnyChart";
 import { AnyChartPlayground } from "./AnyPlayground";
-import { isContextChanged, renderError, validateAdvancedOptions } from "../../utils/data";
 
-import { Container } from "../../utils/namespaces";
 import * as AnyChartActions from "../store/AnyChartActions";
+import { isContextChanged, renderError, validateAdvancedOptions } from "../../utils/data";
+import { Container } from "../../utils/namespaces";
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
+import { AnyChartInstanceState, AnyReduxStore as ReduxStore, defaultInstanceState } from "../store/AnyChartReducer";
+import { store } from "../../store";
 import AnyChartContainerProps = Container.AnyChartContainerProps;
-import { AnyChartInstanceState, defaultInstanceState } from "../store/AnyChartReducer";
-import { ReduxStore, store } from "../store";
 
 export type Actions = typeof AnyChartActions & typeof PlotlyChartActions;
 export type AnyChartDataHandlerProps = AnyChartContainerProps & AnyChartInstanceState & Actions;

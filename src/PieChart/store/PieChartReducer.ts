@@ -3,6 +3,7 @@ import { PiePlayground } from "../components/PiePlayground";
 import { ReactChild } from "react";
 import { ChartConfigs } from "../../utils/configs";
 import { PieData } from "plotly.js";
+import { DefaultReduxStore, registerReducer } from "../../store";
 
 export type PieChartAction = Action & PieChartState & { widgetID: string };
 
@@ -21,6 +22,10 @@ export interface PieChartState {
 
 export interface PieChartReducerState {
     [ widgetID: string ]: PieChartState;
+}
+
+export interface PieReduxStore extends DefaultReduxStore {
+    pie: PieChartReducerState;
 }
 
 const prefix = "PieChart";
@@ -115,3 +120,5 @@ export const pieChartReducer: Reducer<PieChartReducerState> = (state = {} as Pie
             return state;
     }
 };
+
+registerReducer({ pie: pieChartReducer });

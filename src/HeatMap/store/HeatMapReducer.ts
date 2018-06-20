@@ -3,6 +3,7 @@ import { PiePlayground } from "../../PieChart/components/PiePlayground";
 import { ReactChild } from "react";
 import { ChartConfigs } from "../../utils/configs";
 import { HeatMapData } from "plotly.js";
+import { DefaultReduxStore, registerReducer } from "../../store";
 
 export type HeatMapAction = Action & HeatMapState & { widgetID: string };
 
@@ -21,6 +22,10 @@ export interface HeatMapState {
 
 export interface HeatMapReducerState {
     [ widgetID: string ]: HeatMapState;
+}
+
+export interface HeatMapReduxStore extends DefaultReduxStore {
+    heatmap: HeatMapReducerState;
 }
 
 const prefix = "HeatMap";
@@ -114,3 +119,5 @@ export const heatmapReducer: Reducer<HeatMapReducerState> = (state = {} as HeatM
             return state;
     }
 };
+
+registerReducer({ heatmap: heatmapReducer });

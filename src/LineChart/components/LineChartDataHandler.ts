@@ -4,7 +4,7 @@ import { bindActionCreators } from "redux";
 
 import LineChart from "./LineChart";
 import * as LineChartActions from "../store/LineChartActions";
-import { LineChartInstanceState, defaultInstanceState } from "../store/LineChartReducer";
+import { LineChartInstanceState, ScatterReduxStore as ReduxStore, defaultInstanceState } from "../store/LineChartReducer";
 import {
     handleOnClick,
     isContextChanged,
@@ -14,12 +14,13 @@ import {
 } from "../../utils/data";
 import { Container, Data } from "../../utils/namespaces";
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
-import { ReduxStore, store } from "../store";
+import { store } from "../../store";
 
 import LineChartContainerProps = Container.LineChartContainerProps;
 import { ChartType } from "../../utils/configs";
 
-export type LineChartDataHandlerProps = LineChartContainerProps & LineChartInstanceState & typeof LineChartActions & typeof PlotlyChartActions;
+type Actions = typeof LineChartActions & typeof PlotlyChartActions;
+export type LineChartDataHandlerProps = LineChartContainerProps & LineChartInstanceState & Actions;
 
 export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
     private subscriptionHandles: number[] = [];

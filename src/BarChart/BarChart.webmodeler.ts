@@ -9,7 +9,7 @@ import { ScatterData } from "plotly.js";
 import { Container } from "../utils/namespaces";
 import { defaultColours } from "../utils/style";
 import { BarChartDataHandlerProps } from "./components/BarChartDataHandler";
-import { store } from "./store";
+import { store } from "../store";
 import BarChartContainerProps = Container.BarChartContainerProps;
 
 // tslint:disable-next-line class-name

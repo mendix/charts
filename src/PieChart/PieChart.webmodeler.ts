@@ -9,7 +9,7 @@ import { PieData } from "plotly.js";
 import { validateSeriesProps } from "../utils/data";
 import { defaultColours } from "../utils/style";
 import { PieChartDataHandlerProps } from "./components/PieChartDataHandler";
-import { store } from "./store";
+import { store } from "../store";
 import PieChartContainerProps = Container.PieChartContainerProps;
 
 // tslint:disable-next-line class-name

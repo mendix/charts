@@ -4,7 +4,7 @@ import { bindActionCreators } from "redux";
 
 import BarChart from "./BarChart";
 import * as BarChartActions from "../store/BarChartActions";
-import { BarChartInstanceState, defaultInstanceState } from "../store/BarChartReducer";
+import { BarChartInstanceState, BarReduxStore as ReduxStore, defaultInstanceState } from "../store/BarChartReducer";
 import {
     handleOnClick,
     isContextChanged,
@@ -14,7 +14,7 @@ import {
 } from "../../utils/data";
 import { Container, Data } from "../../utils/namespaces";
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
-import { ReduxStore, store } from "../store";
+import { store } from "../../store";
 
 import BarChartContainerProps = Container.BarChartContainerProps;
 

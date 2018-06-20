@@ -12,8 +12,8 @@ import { Container, Data } from "../../utils/namespaces";
 import HeatMapContainerProps = Container.HeatMapContainerProps;
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
 import * as HeatMapActions from "../store/HeatMapActions";
-import { HeatMapState, defaultInstanceState } from "../store/HeatMapReducer";
-import { ReduxStore, store } from "../store";
+import { HeatMapReduxStore as ReduxStore, HeatMapState, defaultInstanceState } from "../store/HeatMapReducer";
+import { store } from "../../store";
 import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { getAttributeName } from "../utils/data";
@@ -46,9 +46,7 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
         if (validationError) {
             this.props.showAlertMessage(friendlyId, validationError);
         }
-        if (this.props.devMode !== "basic") {
-            store.dispatch(this.props.fetchThemeConfigs(friendlyId));
-        }
+        store.dispatch(this.props.fetchThemeConfigs(friendlyId));
     }
 
     componentWillReceiveProps(nextProps: HeatMapDataHandlerProps) {

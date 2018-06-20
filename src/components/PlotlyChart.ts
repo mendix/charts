@@ -10,7 +10,7 @@ import { getDimensionsFromNode } from "../utils/style";
 import { ChartLoading } from "./ChartLoading";
 import * as PlotlyChartActions from "./actions/PlotlyChartActions";
 import { Plotly, PlotlyChartInstance, defaultPlotlyInstanceState } from "./reducers/PlotlyChartReducer";
-import { ReduxStore } from "../BarChart/store";
+import { DefaultReduxStore } from "../store";
 
 export interface ComponentProps {
     widgetID: string;
@@ -160,7 +160,7 @@ class PlotlyChart extends Component<PlotlyChartProps> {
     }
 }
 
-const mapStateToProps: MapStateToProps<PlotlyChartInstance, ComponentProps, ReduxStore> = (state, props) =>
+const mapStateToProps: MapStateToProps<PlotlyChartInstance, ComponentProps, DefaultReduxStore> = (state, props) =>
     state.plotly[props.widgetID] || defaultPlotlyInstanceState;
 const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>
     bindActionCreators(PlotlyChartActions, dispatch);

@@ -10,7 +10,7 @@ import { Container } from "../utils/namespaces";
 import BarChartContainerProps = Container.BarChartContainerProps;
 import { defaultColours } from "../utils/style";
 import { BarChartDataHandlerProps } from "../BarChart/components/BarChartDataHandler";
-import { store } from "../BarChart/store";
+import { store } from "../store";
 
 // tslint:disable-next-line class-name
 export class preview extends Component<BarChartContainerProps, {}> {

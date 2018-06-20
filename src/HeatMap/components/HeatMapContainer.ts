@@ -2,9 +2,9 @@ let __webpack_public_path__: string;
 import { SFC, createElement } from "react";
 import { Provider } from "react-redux";
 
-import { Container } from "../../utils/namespaces";
 import HeatMapDataHandler from "./HeatMapDataHandler";
-import { store } from "../store";
+import { Container } from "../../utils/namespaces";
+import { store } from "../../store";
 
 __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
