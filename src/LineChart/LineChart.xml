@@ -9,7 +9,7 @@
             <category>Chart properties</category>
             <description>Add series and configure their properties</description>
             <properties>
-                <property key="series" type="enumeration" defaultValue="static">
+                <property key="seriesType" type="enumeration" defaultValue="static">
                     <caption>Series</caption>
                     <category>Data source</category>
                     <description/>
@@ -126,7 +126,7 @@
                     <category>Static series</category>
                     <description>Color of the line e.g. green, #00FF00, rgb(0,255,0)</description>
                 </property>
-                <property key="seriesEntity" type="entity" allowNonPersistableEntities="true" isPath="yes" pathType="reference" entityProperty="dataEntity">
+                <property key="seriesEntity" type="entity" required="false" allowNonPersistableEntities="true" isPath="yes" pathType="reference" entityProperty="dataEntity">
                     <caption>Series entity</caption>
                     <category>Dynamic series</category>
                     <description>The entity from which the series values will be retrieved</description>

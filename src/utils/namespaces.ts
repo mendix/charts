@@ -207,6 +207,10 @@ export namespace Data {
         restParameters: Container.RestParameter[];
         entityConstraint: string;
         dataEntity: string;
+        seriesType: "static" | "dynamic";
+        seriesEntity: string;
+        seriesNameAttribute: string;
+        lineColorAttribute: string;
     }
 
     export interface SeriesDataSourceProps extends DataSourceProps {
