@@ -188,7 +188,7 @@ const validateJSONData = (data: any, attributes: string[]): string => {
     return "";
 };
 
-const getReferences = (attributePaths: string[]): ReferencesSpec => {
+export const getReferences = (attributePaths: string[]): ReferencesSpec => {
     let references: ReferencesSpec = { attributes: [] };
     attributePaths.forEach(attribute => {
         references = addPathReference(references, attribute);
