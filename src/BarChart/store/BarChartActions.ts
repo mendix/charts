@@ -2,35 +2,26 @@ import deepMerge from "deepmerge";
 import { ScatterData } from "plotly.js";
 import { ReactChild } from "react";
 import { Action, Dispatch } from "redux";
+import { seriesActionType } from "../../store/seriesReducer";
+import { fetchThemeConfigs as fetchBarThemeConfig } from "../../utils/configs";
 import { fetchData as fetchSeriesData, generateRESTURL, parseAdvancedOptions } from "../../utils/data";
 import { Data } from "../../utils/namespaces";
-import { getData } from "../utils/data";
-import { fetchThemeConfigs as fetchBarThemeConfig } from "../../utils/configs";
-import {
-    ALERT_MESSAGE,
-    BarChartAction,
-    FETCH_DATA_FAILED,
-    FETCH_THEME_CONFIGS,
-    FETCH_THEME_CONFIGS_COMPLETE,
-    LOAD_PLAYGROUND,
-    NO_CONTEXT,
-    TOGGLE_FETCHING_DATA,
-    UPDATE_DATA_FROM_FETCH,
-    UPDATE_DATA_FROM_PLAYGROUND
-} from "./BarChartReducer";
 import { BarChartDataHandlerProps } from "../components/BarChartDataHandler";
+import { getData } from "../utils/data";
+import { BarChartAction, barPrefix } from "./BarChartReducer";
 
+const actionType = seriesActionType(barPrefix);
 export const showAlertMessage = (widgetID: string, alertMessage: ReactChild): Partial<BarChartAction> =>
-    ({ type: ALERT_MESSAGE, widgetID, alertMessage });
+    ({ type: actionType.ALERT_MESSAGE, widgetID, alertMessage });
 export const isFetching = (widgetID: string, fetchingData: boolean): Partial<BarChartAction> =>
-    ({ type: TOGGLE_FETCHING_DATA, widgetID, fetchingData });
-export const noContext = (widgetID: string): Partial<BarChartAction> => ({ type: NO_CONTEXT, widgetID });
+    ({ type: actionType.TOGGLE_FETCHING_DATA, widgetID, fetchingData });
+export const noContext = (widgetID: string): Partial<BarChartAction> => ({ type: actionType.NO_CONTEXT, widgetID });
 
 export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatch<Partial<BarChartAction> & Action, any>) => {
     return () => {
         if (props.mxObject && props.series.length) {
             if (!props.fetchingData) {
-                dispatch({ type: TOGGLE_FETCHING_DATA, widgetID: props.friendlyId, fetchingData: true });
+                dispatch({ type: actionType.TOGGLE_FETCHING_DATA, widgetID: props.friendlyId, fetchingData: true });
             }
 
             Promise.all(props.series.map(series => {
@@ -66,24 +57,24 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                 seriesOptions: data.map(({ series }) => series.seriesOptions || "{\n\n}"),
                 configurationOptions: props.configurationOptions || "{\n\n}",
                 widgetID: props.friendlyId,
-                type: UPDATE_DATA_FROM_FETCH
+                type: actionType.UPDATE_DATA_FROM_FETCH
             }))
             .catch(reason => {
                 window.mx.ui.error(reason);
-                dispatch({ type: FETCH_DATA_FAILED, widgetID: props.friendlyId });
+                dispatch({ type: actionType.FETCH_DATA_FAILED, widgetID: props.friendlyId });
             });
         } else {
-            dispatch({ type: NO_CONTEXT, widgetID: props.friendlyId });
+            dispatch({ type: actionType.NO_CONTEXT, widgetID: props.friendlyId });
         }
     };
 };
 
 export const fetchThemeConfigs = (widgetID: string, orientation: "bar" | "column") => (dispatch: Dispatch<any, any>) => () => {
-    dispatch({ type: FETCH_THEME_CONFIGS, widgetID });
+    dispatch({ type: actionType.FETCH_THEME_CONFIGS, widgetID });
     fetchBarThemeConfig(orientation === "bar" ? "BarChart" : "ColumnChart")
-        .then(themeConfigs => dispatch({ type: FETCH_THEME_CONFIGS_COMPLETE, widgetID, themeConfigs }))
+        .then(themeConfigs => dispatch({ type: actionType.FETCH_THEME_CONFIGS_COMPLETE, widgetID, themeConfigs }))
         .catch(() => dispatch({
-            type: FETCH_THEME_CONFIGS_COMPLETE,
+            type: actionType.FETCH_THEME_CONFIGS_COMPLETE,
             widgetID,
             themeConfigs: { layout: {}, configuration: {}, data: {} }
         }));
@@ -91,7 +82,7 @@ export const fetchThemeConfigs = (widgetID: string, orientation: "bar" | "column
 
 export const loadPlayground = (widgetID: string) => (dispatch: Dispatch<any, any>) => async () => {
     const { SeriesPlayground } = await import("../../components/SeriesPlayground");
-    dispatch({ type: LOAD_PLAYGROUND, widgetID, playground: SeriesPlayground });
+    dispatch({ type: actionType.LOAD_PLAYGROUND, widgetID, playground: SeriesPlayground });
 };
 
 export const updateDataFromPlayground = (widgetID: string, scatterData: ScatterData[], layoutOptions: string, seriesOptions: string[], configurationOptions: string): Partial<BarChartAction> => {
@@ -106,7 +97,7 @@ export const updateDataFromPlayground = (widgetID: string, scatterData: ScatterD
     }
 
     return ({
-        type: UPDATE_DATA_FROM_PLAYGROUND,
+        type: actionType.UPDATE_DATA_FROM_PLAYGROUND,
         widgetID,
         scatterData: newScatterData,
         layoutOptions,

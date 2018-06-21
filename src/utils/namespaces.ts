@@ -68,7 +68,7 @@ export namespace Container {
         data?: Data.SeriesData<SeriesProps>[];
         scatterData?: ScatterData[];
         seriesOptions: string[];
-        fetchingData?: boolean;
+        fetchingData: boolean;
         fetchingConfigs: boolean;
         themeConfigs: ChartConfigs;
     }
@@ -90,7 +90,7 @@ export namespace Container {
         data?: Data.SeriesData<Data.LineSeriesProps>[];
         scatterData?: ScatterData[];
         seriesOptions: string[];
-        fetchingData?: boolean;
+        fetchingData: boolean;
         fetchingConfigs: boolean;
         themeConfigs: ChartConfigs;
     }
