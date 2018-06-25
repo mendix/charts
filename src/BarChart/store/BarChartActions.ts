@@ -2,7 +2,7 @@ import deepMerge from "deepmerge";
 import { ScatterData } from "plotly.js";
 import { ReactChild } from "react";
 import { Action, Dispatch } from "redux";
-import { seriesActionType } from "../../store/seriesReducer";
+import { seriesActionType } from "../../store/Series_Reducer";
 import { fetchThemeConfigs as fetchBarThemeConfig } from "../../utils/configs";
 import { fetchData as fetchSeriesData, generateRESTURL, parseAdvancedOptions } from "../../utils/data";
 import { Data } from "../../utils/namespaces";
@@ -36,7 +36,7 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                     guid: mxObject.getGuid(),
                     entity: series.dataEntity,
                     constraint: series.entityConstraint,
-                    sortAttribute: series.xValueSortAttribute,
+                    sortAttribute: series.xValueSortAttribute || series.xValueAttribute,
                     sortOrder: series.sortOrder,
                     type: series.dataSourceType,
                     attributes,
@@ -51,7 +51,7 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                 series: customData as Data.SeriesProps
             })))
             .then((data: Data.SeriesData<Data.SeriesProps>[]) => dispatch({
-                data,
+                seriesData: data,
                 layoutOptions: props.layoutOptions || "{\n\n}",
                 scatterData: getData(data, props),
                 seriesOptions: data.map(({ series }) => series.seriesOptions || "{\n\n}"),
@@ -105,3 +105,5 @@ export const updateDataFromPlayground = (widgetID: string, scatterData: ScatterD
         configurationOptions
     });
 };
+export const toggleUpdatingData = (widgetID: string, updatingData: boolean): Partial<BarChartAction> =>
+    ({ type: actionType.TOGGLE_UPDATING_DATA, widgetID, updatingData });

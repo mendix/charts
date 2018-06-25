@@ -18,10 +18,11 @@ import { store } from "../../store";
 
 import BarChartContainerProps = Container.BarChartContainerProps;
 
-export type BarChartDataHandlerProps = BarChartContainerProps & BarChartInstanceState & typeof BarChartActions & typeof PlotlyChartActions;
+type Actions = typeof BarChartActions & typeof PlotlyChartActions;
+export type BarChartDataHandlerProps = BarChartContainerProps & BarChartInstanceState & Actions;
 
 export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
-    private subscriptionHandle?: number;
+    private subscriptionHandles: number[] = [];
     private intervalID?: number;
 
     render() {
@@ -31,7 +32,7 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
                 onClick: this.onClick,
                 onHover: this.onHover,
                 scatterData: this.props.scatterData,
-                series: this.props.data ? this.props.data.map(({ series }) => series) : this.props.series
+                series: this.props.seriesData ? this.props.seriesData.map(({ series }) => series) : this.props.series
             })
         );
     }
@@ -42,21 +43,22 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
         if (validationError) {
             this.props.showAlertMessage(friendlyId, validationError);
         }
-        if (this.props.devMode !== "basic") {
-            store.dispatch(this.props.fetchThemeConfigs(friendlyId, this.props.orientation));
-        }
+        this.props.fetchThemeConfigs(friendlyId, this.props.orientation);
     }
 
-    componentWillReceiveProps(newProps: BarChartDataHandlerProps) {
-        this.resetSubscriptions(newProps.mxObject);
-        if (!newProps.alertMessage) {
-            if (!newProps.mxObject) {
-                newProps.noContext(newProps.friendlyId);
-            } else if (!newProps.fetchingConfigs && isContextChanged(this.props.mxObject, newProps.mxObject)) {
-                newProps.togglePlotlyDataLoading(newProps.friendlyId, true);
-                store.dispatch(newProps.fetchData(newProps));
+    componentWillReceiveProps(nextProps: BarChartDataHandlerProps) {
+        this.resetSubscriptions(nextProps);
+        if (!nextProps.alertMessage) {
+            if (!nextProps.mxObject) {
+                if (this.props.mxObject) {
+                    nextProps.noContext(nextProps.friendlyId);
+                }
+            } else if (!nextProps.fetchingConfigs && isContextChanged(this.props.mxObject, nextProps.mxObject)) {
+                if (!nextProps.fetchingData) {
+                    store.dispatch(nextProps.fetchData(nextProps));
+                }
                 this.clearRefreshInterval();
-                this.intervalID = setRefreshAction(newProps.refreshInterval, newProps.mxObject)(this.onRefresh);
+                this.intervalID = setRefreshAction(nextProps.refreshInterval, nextProps.mxObject)(this.onRefresh);
             }
         } else {
             this.clearRefreshInterval();
@@ -64,35 +66,43 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
     }
 
     shouldComponentUpdate(nextProps: BarChartDataHandlerProps) {
-        const doneLoading = !nextProps.fetchingData && this.props.fetchingData;
-        const advancedOptionsUpdated = nextProps.layoutOptions !== this.props.layoutOptions
-            || nextProps.seriesOptions.join(" ") !== this.props.seriesOptions.join(" ")
-            || nextProps.configurationOptions !== this.props.configurationOptions;
+        const toggleFetching = nextProps.fetchingData !== this.props.fetchingData;
+        const toggleUpdating = nextProps.updatingData !== this.props.updatingData;
         const playgroundLoaded = !!nextProps.playground && !this.props.playground;
 
-        return doneLoading || advancedOptionsUpdated || playgroundLoaded || !nextProps.mxObject;
+        return toggleFetching || toggleUpdating || playgroundLoaded || !nextProps.mxObject;
     }
 
     componentWillUnmount() {
         this.unsubscribe();
+        this.clearRefreshInterval();
     }
 
-    private resetSubscriptions(mxObject?: mendix.lib.MxObject) {
+    private resetSubscriptions(props: BarChartDataHandlerProps) {
         this.unsubscribe();
-        if (mxObject) {
-            this.subscriptionHandle = mx.data.subscribe({
+        if (props.mxObject) {
+            this.subscriptionHandles.push(mx.data.subscribe({
                 callback: () => store.dispatch(this.props.fetchData(this.props)),
-                guid: mxObject.getGuid()
+                guid: props.mxObject.getGuid()
+            }));
+        }
+        if (props.seriesData && props.seriesData.length) {
+            props.seriesData.forEach(({ data: mxObjects }) => {
+                if (mxObjects) {
+                    mxObjects.forEach(mxObject =>
+                        this.subscriptionHandles.push(mx.data.subscribe({
+                            callback: () => {/* callback is required but not in this case */},
+                            guid: mxObject.getGuid()
+                        }))
+                    );
+                }
             });
         }
     }
 
     private unsubscribe() {
-        if (this.subscriptionHandle) {
-            mx.data.unsubscribe(this.subscriptionHandle);
-            this.subscriptionHandle = undefined;
-        }
-        this.clearRefreshInterval();
+        this.subscriptionHandles.map(mx.data.unsubscribe);
+        this.subscriptionHandles = [];
     }
 
     private onRefresh = () => {

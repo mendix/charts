@@ -4,6 +4,7 @@ import { configs } from "../../utils/configs";
 import { Data } from "../../utils/namespaces";
 import { defaultColours } from "../../utils/style";
 import { BarChartProps } from "../components/BarChart";
+import { parseAdvancedOptions } from "../../utils/data";
 
 export const getDefaultLayoutOptions = (): Partial<Layout> => {
     const defaultConfigs: Partial<Layout> = {
@@ -65,3 +66,36 @@ export const getCustomSeriesOptions = (series: Data.SeriesProps, orientation: "b
 };
 
 export const getDefaultConfigOptions = (): Partial<Config> => ({ displayModeBar: false, doubleClick: false });
+
+export const getLayoutOptions = (props: BarChartProps): Partial<Layout> => {
+    const advancedOptions = parseAdvancedOptions(props.devMode, props.layoutOptions);
+
+    return deepMerge.all([ getModelerLayoutOptions(props), advancedOptions ]);
+};
+
+export const getModelerLayoutOptions = (props: BarChartProps): Partial<Layout> => {
+    const themeLayoutOptions = props.devMode !== "basic" ? props.themeConfigs.layout : {};
+
+    return deepMerge.all([
+        getDefaultLayoutOptions(),
+        getCustomLayoutOptions(props),
+        themeLayoutOptions
+    ]);
+};
+
+export const getConfigOptions = (props: BarChartProps): Partial<Config> => {
+    const advancedOptions = parseAdvancedOptions(props.devMode, props.configurationOptions);
+
+    return deepMerge.all([ getDefaultConfigOptions(), props.themeConfigs.configuration, advancedOptions ]);
+};
+
+export const getModelerSeriesOptions = (props: BarChartProps): string[] => {
+    const themeSeriesOptions = props.devMode !== "basic" ? props.themeConfigs.data : {};
+
+    return props.series ? props.series.map((series, index) => {
+        const customOptions = getCustomSeriesOptions(series, props.orientation, index);
+        const seriesOptions = deepMerge.all([ getDefaultSeriesOptions(), customOptions, themeSeriesOptions ]);
+
+        return JSON.stringify(seriesOptions, null, 2);
+    }) : [];
+};

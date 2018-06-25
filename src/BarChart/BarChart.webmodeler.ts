@@ -28,11 +28,17 @@ export class preview extends Component<BarChartContainerProps, {}> {
                 alertMessage,
                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
                 fetchingData: false,
+                updatingData: true,
+                toggleUpdatingData: this.toggleUpdatingData,
                 orientation: "bar",
                 scatterData: preview.getData(this.props),
                 themeConfigs: { layout: {}, configuration: {}, data: {} }
             })
         );
+    }
+
+    private toggleUpdatingData(widgetID: string, _updatingData: boolean): any {
+        console.log(widgetID, "updated"); // tslint:disable-line
     }
 
     static getData(props: BarChartContainerProps): ScatterData[] {

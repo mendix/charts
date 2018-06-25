@@ -65,7 +65,7 @@ export namespace Container {
 
     export interface BarChartContainerState {
         alertMessage?: ReactChild;
-        data?: Data.SeriesData<SeriesProps>[];
+        seriesData?: Data.SeriesData<SeriesProps>[];
         scatterData?: ScatterData[];
         seriesOptions: string[];
         fetchingData: boolean;
@@ -87,7 +87,7 @@ export namespace Container {
 
     export interface LineChartContainerState {
         alertMessage?: ReactChild;
-        data?: Data.SeriesData<Data.LineSeriesProps>[];
+        seriesData?: Data.SeriesData<Data.LineSeriesProps>[];
         scatterData?: ScatterData[];
         seriesOptions: string[];
         fetchingData: boolean;

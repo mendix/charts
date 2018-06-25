@@ -13,11 +13,10 @@ export const registerReducer = (reducer?: { [key: string ]: Reducer<any>}) => {
     store = createStore(
         combineReducers(reducers),
         window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__(),
-        applyMiddleware(thunkMiddleware/* , loggerMiddleware */)
+        applyMiddleware(thunkMiddleware/*, loggerMiddleware*/)
     );
 };
 registerReducer();
-
 export interface DefaultReduxStore {
     plotly: PlotlyChartState;
 }

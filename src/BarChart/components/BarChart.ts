@@ -1,27 +1,26 @@
-import deepMerge from "deepmerge";
-import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
+import { ScatterData, ScatterHoverData } from "plotly.js";
 import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
-import { MapDispatchToProps, connect } from "react-redux";
+import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
-import { Alert } from "../../components/Alert";
 import { BarChartState } from "../store/BarChartReducer";
-import {
-    getCustomLayoutOptions,
-    getCustomSeriesOptions,
-    getDefaultConfigOptions,
-    getDefaultLayoutOptions,
-    getDefaultSeriesOptions
-} from "../utils/configs";
-import { parseAdvancedOptions } from "../../utils/data";
-import { HoverTooltip } from "../../components/HoverTooltip";
 import { Data } from "../../utils/namespaces";
+import { BarChartDataHandlerProps } from "./BarChartDataHandler";
+import {
+    getConfigOptions,
+    getDefaultConfigOptions,
+    getLayoutOptions,
+    getModelerLayoutOptions,
+    getModelerSeriesOptions
+} from "../utils/configs";
+import { HoverTooltip } from "../../components/HoverTooltip";
+import { Alert } from "../../components/Alert";
 import PlotlyChart from "../../components/PlotlyChart";
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
-import { store } from "../../store";
+import { PlotlyChartInstance, defaultPlotlyInstanceState } from "../../components/reducers/PlotlyChartReducer";
+import { DefaultReduxStore, store } from "../../store";
 import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
-import { BarChartDataHandlerProps } from "./BarChartDataHandler";
 
 import "../../ui/Charts.scss";
 
@@ -31,7 +30,7 @@ interface ComponentProps extends BarChartDataHandlerProps {
     onHover?: (options: Data.OnHoverOptions<{ x: string, y: number }, Data.SeriesProps>) => void;
 }
 
-export type BarChartProps = ComponentProps & typeof PlotlyChartActions;
+export type BarChartProps = ComponentProps & typeof PlotlyChartActions & PlotlyChartInstance;
 
 class BarChart extends Component<BarChartProps & BarChartState> {
     private tooltipNode?: HTMLDivElement;
@@ -51,11 +50,20 @@ class BarChart extends Component<BarChartProps & BarChartState> {
         if (this.props.devMode === "developer" && this.props.loadPlayground) {
             store.dispatch(this.props.loadPlayground(this.props.friendlyId));
         }
-        this.updateData(this.props);
+        if (this.props.updatingData) {
+            this.updateData(this.props);
+        }
     }
 
     componentWillReceiveProps(nextProps: BarChartProps) {
-        this.updateData(nextProps);
+        const doneFetching = !nextProps.fetchingData && this.props.fetchingData;
+
+        if (!nextProps.alertMessage && (doneFetching || nextProps.updatingData)) {
+            this.updateData(nextProps);
+        }
+        if (nextProps.updatingData) {
+            nextProps.toggleUpdatingData(nextProps.friendlyId, false);
+        }
     }
 
     private getTooltipNodeRef = (node: HTMLDivElement) => {
@@ -63,10 +71,18 @@ class BarChart extends Component<BarChartProps & BarChartState> {
     }
 
     private renderChart() {
+        const playgroundLoaded = this.props.devMode !== "developer" || !!this.props.playground;
+
         return createElement(PlotlyChart,
             {
                 type: "bar",
                 widgetID: this.props.friendlyId,
+                loadingAPI: this.props.loadingAPI && playgroundLoaded,
+                loadingData: this.props.fetchingData,
+                layout: this.props.layout,
+                data: this.props.data,
+                config: this.props.config,
+                plotly: this.props.plotly,
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 onClick: this.onClick,
@@ -81,12 +97,12 @@ class BarChart extends Component<BarChartProps & BarChartState> {
             return createElement(this.props.playground, {
                 series: this.props.series,
                 seriesOptions: this.props.seriesOptions || [],
-                modelerSeriesConfigs: this.getModelerSeriesOptions(this.props),
+                modelerSeriesConfigs: getModelerSeriesOptions(this.props),
                 onChange: this.onOptionsUpdate,
                 layoutOptions: this.props.layoutOptions || "{\n\n}",
                 configurationOptions: this.props.configurationOptions || "{\n\n}",
                 configurationOptionsDefault: JSON.stringify(getDefaultConfigOptions(), null, 2),
-                modelerLayoutConfigs: JSON.stringify(this.getModelerLayoutOptions(this.props), null, 2)
+                modelerLayoutConfigs: JSON.stringify(getModelerLayoutOptions(this.props), null, 2)
             }, this.renderChart());
         }
 
@@ -94,46 +110,11 @@ class BarChart extends Component<BarChartProps & BarChartState> {
     }
 
     private updateData(props: BarChartProps) {
-        if (!props.alertMessage && !props.fetchingData) {
-            props.updateData(props.friendlyId, {
-                layout: this.getLayoutOptions(props),
-                data: props.scatterData || [],
-                config: this.getConfigOptions(props)
-            });
-        }
-    }
-
-    private getLayoutOptions(props: BarChartProps): Partial<Layout> {
-        const advancedOptions = parseAdvancedOptions(props.devMode, props.layoutOptions);
-
-        return deepMerge.all([ this.getModelerLayoutOptions(props), advancedOptions ]);
-    }
-
-    private getModelerLayoutOptions(props: BarChartProps): Partial<Layout> {
-        const themeLayoutOptions = props.devMode !== "basic" ? props.themeConfigs.layout : {};
-
-        return deepMerge.all([
-            getDefaultLayoutOptions(),
-            getCustomLayoutOptions(props),
-            themeLayoutOptions
-        ]);
-    }
-
-    public getConfigOptions(props: BarChartProps): Partial<Config> {
-        const advancedOptions = parseAdvancedOptions(props.devMode, props.configurationOptions);
-
-        return deepMerge.all([ getDefaultConfigOptions(), props.themeConfigs.configuration, advancedOptions ]);
-    }
-
-    private getModelerSeriesOptions(props: BarChartProps): string[] {
-        const themeSeriesOptions = props.devMode !== "basic" ? props.themeConfigs.data : {};
-
-        return props.series ? props.series.map((series, index) => {
-            const customOptions = getCustomSeriesOptions(series, props.orientation, index);
-            const seriesOptions = deepMerge.all([ getDefaultSeriesOptions(), customOptions, themeSeriesOptions ]);
-
-            return JSON.stringify(seriesOptions, null, 2);
-        }) : [];
+        props.updateData(props.friendlyId, {
+            layout: getLayoutOptions(props),
+            data: props.scatterData || [],
+            config: getConfigOptions(props)
+        });
     }
 
     private onClick = ({ points }: ScatterHoverData<mendix.lib.MxObject>) => {
@@ -203,6 +184,8 @@ class BarChart extends Component<BarChartProps & BarChartState> {
     }
 }
 
+const mapStateToProps: MapStateToProps<PlotlyChartInstance, ComponentProps, DefaultReduxStore> = (state, props) =>
+    state.plotly[props.friendlyId] || defaultPlotlyInstanceState;
 const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>
     bindActionCreators(PlotlyChartActions, dispatch);
-export default connect(null, mapDispatchToProps)(BarChart);
+export default connect(mapStateToProps, mapDispatchToProps)(BarChart);

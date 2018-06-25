@@ -232,7 +232,7 @@ export const fetchByXPath = (options: FetchByXPathOptions): Promise<MxO[]> => ne
     const { guid, entity, constraint, sortAttribute, sortOrder, attributes, references } = options;
     const entityPath = entity.split("/");
     const entityName = entityPath.length > 1 ? entityPath[entityPath.length - 1] : entity;
-    const xpath = "//" + entityName + constraint.split("[%CurrentObject%]").join(guid);
+    const xpath = `//${entityName}${constraint.split("[%CurrentObject%]").join(guid)}`;
 
     window.mx.data.get({
         callback: resolve,
