@@ -140,7 +140,7 @@
                         <attributeType name="Enum"/>
                     </attributeTypes>
                 </property>
-                <property key="lineColorAttribute" type="attribute" entityProperty="seriesEntity" required="false">
+                <property key="colorAttribute" type="attribute" entityProperty="seriesEntity" required="false">
                     <caption>Line color attribute</caption>
                     <category>Dynamic series</category>
                     <description>Color of the line e.g. green, #00FF00, rgb(0,255,0)</description>

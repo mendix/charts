@@ -210,7 +210,7 @@ export namespace Data {
         seriesType: "static" | "dynamic";
         seriesEntity: string;
         seriesNameAttribute: string;
-        lineColorAttribute: string;
+        colorAttribute: string;
     }
 
     export interface SeriesDataSourceProps extends DataSourceProps {

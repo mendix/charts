@@ -33,7 +33,7 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
 
             Promise.all(dynamicSeries.map(dynSeries => {
                 const entity = dynSeries.seriesEntity.split("/")[1];
-                const dynAttributes = [ dynSeries.seriesNameAttribute, dynSeries.lineColorAttribute ];
+                const dynAttributes = [ dynSeries.seriesNameAttribute, dynSeries.colorAttribute ];
 
                 return fetchByXPath({
                     entity,
@@ -43,7 +43,7 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
                 })
                 .then(mxObjects => {
                     return mixinSeries.concat(mxObjects.map(mxSeries => {
-                        const lineColor = mxSeries.get(dynSeries.lineColorAttribute) || "";
+                        const lineColor = mxSeries.get(dynSeries.colorAttribute) || "";
                         const name = mxSeries.get(dynSeries.seriesNameAttribute) || "";
                         const entityRef = dynSeries.seriesEntity.split("/")[0];
                         const entityConstraint = dynSeries.entityConstraint + `[${entityRef} = '${mxSeries.getGuid()}']`;
