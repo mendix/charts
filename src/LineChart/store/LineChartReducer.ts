@@ -4,7 +4,7 @@ import { Container, Data } from "../../utils/namespaces";
 import { DefaultReduxStore, registerReducer } from "../../store";
 
 import { SeriesPlayground } from "../../components/SeriesPlayground";
-import { seriesReducer } from "../../store/seriesReducer";
+import { seriesReducer } from "../../store/Series_Reducer";
 import LineChartContainerState = Container.LineChartContainerState;
 import LineSeriesProps = Data.LineSeriesProps;
 
@@ -19,6 +19,7 @@ export interface LineChartState {
     themeConfigs: { layout: {}, configuration: {}, data: {} };
     playground?: typeof SeriesPlayground;
     hiddenTraces: number[];
+    updatingData: boolean;
 }
 
 export type LineChartInstanceState = LineChartContainerState & LineChartState;
@@ -32,7 +33,7 @@ export interface ScatterReduxStore extends DefaultReduxStore {
 export const scatterPrefix = "ScatterChart";
 
 const defaultDataState: Partial<LineChartInstanceState> = {
-    data: [],
+    seriesData: [],
     fetchingData: false,
     scatterData: [],
     seriesOptions: []

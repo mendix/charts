@@ -29,6 +29,8 @@ export class preview extends Component<LineChartContainerProps, {}> {
                 alertMessage,
                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
                 fetchingData: false,
+                updatingData: true,
+                toggleUpdatingData: this.toggleUpdatingData,
                 scatterData: preview.getData(this.props),
                 themeConfigs: { layout: {}, configuration: {}, data: {} }
             })
@@ -71,6 +73,10 @@ export class preview extends Component<LineChartContainerProps, {}> {
             marker: {  color: defaultColours()[0] },
             ...preview.getSampleTraces()
         } as any ];
+    }
+
+    private toggleUpdatingData(widgetID: string, _updatingData: boolean): any {
+        console.log(widgetID, "updated"); // tslint:disable-line
     }
 
     private static getSampleTraces(): { x: (string | number)[], y: (string | number)[] } {

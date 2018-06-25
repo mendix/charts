@@ -39,7 +39,7 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
                 ...this.props as LineChartDataHandlerProps,
                 onClick: this.onClick,
                 onHover: this.onHover,
-                series: this.props.data ? this.props.data.map(({ series }) => series) : this.props.series
+                series: this.props.seriesData ? this.props.seriesData.map(({ series }) => series) : this.props.series
             })
         );
     }
@@ -50,17 +50,20 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
         if (validationError) {
             this.props.showAlertMessage(friendlyId, validationError);
         }
-        store.dispatch(this.props.fetchThemeConfigs(friendlyId, this.typeMapping[this.props.type]));
+        this.props.fetchThemeConfigs(friendlyId, this.typeMapping[this.props.type]);
     }
 
     componentWillReceiveProps(nextProps: LineChartDataHandlerProps) {
         this.resetSubscriptions(nextProps);
         if (!nextProps.alertMessage) {
             if (!nextProps.mxObject) {
-                nextProps.noContext(nextProps.friendlyId);
+                if (this.props.mxObject) {
+                    nextProps.noContext(nextProps.friendlyId);
+                }
             } else if (!nextProps.fetchingConfigs && isContextChanged(this.props.mxObject, nextProps.mxObject)) {
-                nextProps.togglePlotlyDataLoading(nextProps.friendlyId, true);
-                store.dispatch(nextProps.fetchData(nextProps));
+                if (!nextProps.fetchingData) {
+                    store.dispatch(nextProps.fetchData(nextProps));
+                }
                 this.clearRefreshInterval();
                 this.intervalID = setRefreshAction(nextProps.refreshInterval, nextProps.mxObject)(this.onRefresh);
             }
@@ -70,13 +73,11 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
     }
 
     shouldComponentUpdate(nextProps: LineChartDataHandlerProps) {
-        const doneLoading = !nextProps.fetchingData && this.props.fetchingData;
-        const advancedOptionsUpdated = nextProps.layoutOptions !== this.props.layoutOptions
-            || nextProps.seriesOptions.join(" ") !== this.props.seriesOptions.join(" ")
-            || nextProps.configurationOptions !== this.props.configurationOptions;
+        const toggleFetching = nextProps.fetchingData !== this.props.fetchingData;
+        const toggleUpdating = nextProps.updatingData !== this.props.updatingData;
         const playgroundLoaded = !!nextProps.playground && !this.props.playground;
 
-        return doneLoading || advancedOptionsUpdated || playgroundLoaded || !nextProps.mxObject;
+        return toggleFetching || toggleUpdating || playgroundLoaded || !nextProps.mxObject;
     }
 
     componentWillUnmount() {
@@ -88,12 +89,12 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
         this.unsubscribe();
         if (props.mxObject) {
             this.subscriptionHandles.push(mx.data.subscribe({
-                callback: () => store.dispatch(this.props.fetchData(props)),
+                callback: () => store.dispatch(props.fetchData(props)),
                 guid: props.mxObject.getGuid()
             }));
         }
-        if (props.data && props.data.length) {
-            props.data.forEach(({ data: mxObjects }) => {
+        if (props.seriesData && props.seriesData.length) {
+            props.seriesData.forEach(({ data: mxObjects }) => {
                 if (mxObjects) {
                     mxObjects.forEach(mxObject =>
                         this.subscriptionHandles.push(mx.data.subscribe({

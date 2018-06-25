@@ -1,26 +1,23 @@
-import deepMerge from "deepmerge";
-import { Config, Layout, ScatterHoverData } from "plotly.js";
+import { ScatterHoverData } from "plotly.js";
 import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { bindActionCreators } from "redux";
-import { MapDispatchToProps, connect } from "react-redux";
+import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 
 import "../../ui/Charts.scss";
-import { calculateBubbleSize, getStackedArea } from "../utils/data";
-import { parseAdvancedOptions } from "../../utils/data";
 import {
     getChartType,
-    getCustomLayoutOptions,
-    getCustomSeriesOptions,
-    getDefaultLayoutOptions,
-    getDefaultSeriesOptions } from "../utils/configs";
+    getModelerLayoutOptions,
+    getModelerSeriesOptions,
+    getScatterConfigOptions,
+    parseScatterData,
+    parseScatterLayoutOptions } from "../utils/configs";
 import { getDefaultConfigOptions } from "../../BarChart/utils/configs";
 import { LineChartState } from "../store/LineChartReducer";
 import { Data } from "../../utils/namespaces";
-import { store } from "../../store";
+import { DefaultReduxStore, store } from "../../store";
 import {
     getDimensions,
-    getDimensionsFromNode,
     getTooltipCoordinates,
     parseStyle,
     setTooltipPosition } from "../../utils/style";
@@ -30,6 +27,7 @@ import { HoverTooltip } from "../../components/HoverTooltip";
 import { LineChartDataHandlerProps } from "./LineChartDataHandler";
 import PlotlyChart from "../../components/PlotlyChart";
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
+import { PlotlyChartInstance, defaultPlotlyInstanceState } from "../../components/reducers/PlotlyChartReducer";
 
 interface ComponentProps extends LineChartDataHandlerProps {
     alertMessage?: ReactChild;
@@ -37,7 +35,7 @@ interface ComponentProps extends LineChartDataHandlerProps {
     onHover?: (options: Data.OnHoverOptions<{ x: string, y: number }, Data.SeriesProps>) => void;
 }
 
-export type LineChartProps = ComponentProps & typeof PlotlyChartActions;
+export type LineChartProps = ComponentProps & typeof PlotlyChartActions & PlotlyChartInstance;
 
 class LineChart extends Component<LineChartProps & LineChartState> {
     static defaultProps: Partial<LineChartProps> = {
@@ -61,11 +59,20 @@ class LineChart extends Component<LineChartProps & LineChartState> {
         if (this.props.devMode === "developer" && this.props.loadPlayground) {
             store.dispatch(this.props.loadPlayground(this.props.friendlyId));
         }
-        this.updateData(this.props);
+        if (this.props.updatingData) {
+            this.updateData(this.props);
+        }
     }
 
     componentWillReceiveProps(nextProps: LineChartProps) {
-        this.updateData(nextProps);
+        const doneFetching = !nextProps.fetchingData && this.props.fetchingData;
+
+        if (!nextProps.alertMessage && (doneFetching || nextProps.updatingData)) {
+            this.updateData(nextProps);
+        }
+        if (nextProps.updatingData) {
+            nextProps.toggleUpdatingData(nextProps.friendlyId, false);
+        }
     }
 
     private getTooltipNodeRef = (node: HTMLDivElement) => {
@@ -73,10 +80,18 @@ class LineChart extends Component<LineChartProps & LineChartState> {
     }
 
     private renderChart(): ReactElement<any> {
+        const playgroundLoaded = this.props.devMode !== "developer" || !!this.props.playground;
+
         return createElement(PlotlyChart,
             {
                 type: getChartType(this.props.type),
                 widgetID: this.props.friendlyId,
+                loadingAPI: this.props.loadingAPI && playgroundLoaded,
+                loadingData: this.props.fetchingData,
+                layout: this.props.layout,
+                data: this.props.data,
+                config: this.props.config,
+                plotly: this.props.plotly,
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 onClick: this.onClick,
@@ -93,12 +108,12 @@ class LineChart extends Component<LineChartProps & LineChartState> {
             return createElement(this.props.playground, {
                 series: this.props.series,
                 seriesOptions: this.props.seriesOptions || [],
-                modelerSeriesConfigs: this.getModelerSeriesOptions(this.props),
+                modelerSeriesConfigs: getModelerSeriesOptions(this.props),
                 onChange: this.onOptionsUpdate,
                 layoutOptions: this.props.layoutOptions || "{\n\n}",
                 configurationOptions: this.props.configurationOptions || "{\n\n}",
                 configurationOptionsDefault: JSON.stringify(getDefaultConfigOptions(), null, 2),
-                modelerLayoutConfigs: JSON.stringify(this.getModelerLayoutOptions(this.props), null, 2)
+                modelerLayoutConfigs: JSON.stringify(getModelerLayoutOptions(this.props), null, 2)
             }, this.renderChart());
         }
 
@@ -106,59 +121,11 @@ class LineChart extends Component<LineChartProps & LineChartState> {
     }
 
     private updateData(props: LineChartProps) {
-        if (!props.alertMessage && !props.fetchingData) {
-            props.updateData(props.friendlyId, {
-                layout: this.getLayoutOptions(props),
-                data: this.getData(props),
-                config: this.getConfigOptions(props)
-            });
-        }
-    }
-
-    private getData(props: LineChartProps) {
-        if (props.type === "area" && props.area === "stacked") {
-            return getStackedArea(props.scatterData || []);
-        }
-        if (props.type === "bubble" && this.chartNode && props.scatterData) {
-            return calculateBubbleSize(props.series, props.scatterData, getDimensionsFromNode(this.chartNode));
-        }
-
-        return props.scatterData || [];
-    }
-
-    private getLayoutOptions(props: LineChartProps): Partial<Layout> {
-        const advancedOptions = parseAdvancedOptions(props.devMode, props.layoutOptions);
-
-        return deepMerge.all([ this.getModelerLayoutOptions(props), advancedOptions ]);
-    }
-
-    private getModelerLayoutOptions(props: LineChartProps): Partial<Layout> {
-        const themeLayoutOptions = props.devMode !== "basic" ? props.themeConfigs.layout : {};
-
-        return deepMerge.all([
-            getDefaultLayoutOptions(),
-            getCustomLayoutOptions(props),
-            themeLayoutOptions
-        ]);
-    }
-
-    public getConfigOptions(props: LineChartProps): Partial<Config> {
-        const advancedOptions = parseAdvancedOptions(props.devMode, props.configurationOptions);
-
-        return deepMerge.all([ getDefaultConfigOptions(), props.themeConfigs.configuration, advancedOptions ]);
-    }
-
-    private getModelerSeriesOptions(props: LineChartProps): string[] {
-        const themeSeriesOptions = props.devMode !== "basic" ? props.themeConfigs.data : {};
-
-        return props.series
-            ? props.series.map((series, index) => {
-                const customOptions = getCustomSeriesOptions(series, props, index);
-                const seriesOptions = deepMerge.all([ getDefaultSeriesOptions(), customOptions, themeSeriesOptions ]);
-
-                return JSON.stringify(seriesOptions, null, 2);
-            })
-            : [];
+        props.updateData(props.friendlyId, {
+            layout: parseScatterLayoutOptions(props),
+            data: parseScatterData(props, this.chartNode),
+            config: getScatterConfigOptions(props)
+        });
     }
 
     private onClick = ({ points }: ScatterHoverData<mendix.lib.MxObject>) => {
@@ -212,9 +179,9 @@ class LineChart extends Component<LineChartProps & LineChartState> {
             (scatterData as any)[data[1][0]].visible = data[0].visible[0];
 
             this.props.updateData(this.props.friendlyId, {
-                layout: this.getLayoutOptions(this.props),
-                data: this.getData(this.props),
-                config: this.getConfigOptions(this.props)
+                layout: parseScatterLayoutOptions(this.props),
+                data: parseScatterData(this.props, this.chartNode),
+                config: getScatterConfigOptions(this.props)
             });
         }
     }
@@ -244,14 +211,16 @@ class LineChart extends Component<LineChartProps & LineChartState> {
         if (node && !this.chartNode) {
             this.chartNode = node;
             this.props.updateData(this.props.friendlyId, {
-                layout: this.getLayoutOptions(this.props),
-                data: this.getData(this.props),
-                config: this.getConfigOptions(this.props)
+                layout: parseScatterLayoutOptions(this.props),
+                data: parseScatterData(this.props, this.chartNode),
+                config: getScatterConfigOptions(this.props)
             });
         }
     }
 }
 
+const mapStateToProps: MapStateToProps<PlotlyChartInstance, ComponentProps, DefaultReduxStore> = (state, props) =>
+    state.plotly[props.friendlyId] || defaultPlotlyInstanceState;
 const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>
     bindActionCreators(PlotlyChartActions, dispatch);
-export default connect(null, mapDispatchToProps)(LineChart);
+export default connect(mapStateToProps, mapDispatchToProps)(LineChart);

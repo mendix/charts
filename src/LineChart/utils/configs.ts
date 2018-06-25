@@ -2,8 +2,10 @@ import deepMerge from "deepmerge";
 import { Config, Layout, ScatterData } from "plotly.js";
 import { configs } from "../../utils/configs";
 import { Container, Data } from "../../utils/namespaces";
-import { defaultColours } from "../../utils/style";
-import { LineChartProps } from "../components/LineChart";
+import { defaultColours, getDimensionsFromNode } from "../../utils/style";
+import { LineChartDataHandlerProps as LineChartProps } from "../components/LineChartDataHandler";
+import { calculateBubbleSize, getStackedArea } from "./data";
+import { parseAdvancedOptions } from "../../utils/data";
 
 export const getDefaultLayoutOptions = (): Partial<Layout> => {
     const defaultConfigs: Partial<Layout> = {
@@ -112,3 +114,49 @@ export const getCustomSeriesOptions = (series: Data.LineSeriesProps, props: Line
 export const getChartType = (type: string): "line" | "polar" => type !== "polar" ? "line" : "polar";
 
 export const getDefaultConfigOptions = (): Partial<Config> => ({ displayModeBar: false, doubleClick: false });
+
+export const getModelerLayoutOptions = (props: LineChartProps): Partial<Layout> => {
+    const themeLayoutOptions = props.devMode !== "basic" ? props.themeConfigs.layout : {};
+
+    return deepMerge.all([
+        getDefaultLayoutOptions(),
+        getCustomLayoutOptions(props),
+        themeLayoutOptions
+    ]);
+};
+
+export const getModelerSeriesOptions = (props: LineChartProps): string[] => {
+    const themeSeriesOptions = props.devMode !== "basic" ? props.themeConfigs.data : {};
+
+    return props.series
+        ? props.series.map((series, index) => {
+            const customOptions = getCustomSeriesOptions(series, props, index);
+            const seriesOptions = deepMerge.all([ getDefaultSeriesOptions(), customOptions, themeSeriesOptions ]);
+
+            return JSON.stringify(seriesOptions, null, 2);
+        })
+        : [];
+};
+
+export const parseScatterLayoutOptions = (props: LineChartProps): Partial<Layout> => {
+    const advancedOptions = parseAdvancedOptions(props.devMode, props.layoutOptions);
+
+    return deepMerge.all([ getModelerLayoutOptions(props), advancedOptions ]);
+};
+
+export const parseScatterData = (props: LineChartProps, chartNode?: HTMLDivElement) => {
+    if (props.type === "area" && props.area === "stacked") {
+        return getStackedArea(props.scatterData || []);
+    }
+    if (props.type === "bubble" && chartNode && props.scatterData) {
+        return calculateBubbleSize(props.series, props.scatterData, getDimensionsFromNode(chartNode));
+    }
+
+    return props.scatterData || [];
+};
+
+export const getScatterConfigOptions = (props: LineChartProps): Partial<Config> => {
+    const advancedOptions = parseAdvancedOptions(props.devMode, props.configurationOptions);
+
+    return deepMerge.all([ getDefaultConfigOptions(), props.themeConfigs.configuration, advancedOptions ]);
+};
