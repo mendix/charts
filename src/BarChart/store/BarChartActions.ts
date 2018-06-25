@@ -4,7 +4,7 @@ import { ReactChild } from "react";
 import { Action, Dispatch } from "redux";
 import { seriesActionType } from "../../store/SeriesReducer";
 import { fetchThemeConfigs as fetchBarThemeConfig } from "../../utils/configs";
-import { fetchData as fetchSeriesData, generateRESTURL, parseAdvancedOptions } from "../../utils/data";
+import { fetchByXPath, fetchData as fetchSeriesData, generateRESTURL, parseAdvancedOptions } from "../../utils/data";
 import { Data } from "../../utils/namespaces";
 import { BarChartDataHandlerProps } from "../components/BarChartDataHandler";
 import { getData } from "../utils/data";
@@ -23,45 +23,76 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
             if (!props.fetchingData) {
                 dispatch({ type: actionType.TOGGLE_FETCHING_DATA, instanceID: props.instanceID, fetchingData: true });
             }
+            const mixinSeries: Data.SeriesProps[] = props.series.filter(series => series.seriesType === "static");
+            const dynamicSeries = props.series.filter(series => series.seriesType === "dynamic");
 
-            Promise.all(props.series.map(series => {
-                const attributes = [ series.xValueAttribute, series.yValueAttribute ];
-                if (series.xValueSortAttribute) {
-                    attributes.push(series.xValueSortAttribute);
-                }
-                const mxObject = props.mxObject as mendix.lib.MxObject;
-                const url = series.restUrl && generateRESTURL(mxObject, series.restUrl, props.restParameters);
+            Promise.all(dynamicSeries.map(dynSeries => {
+                const entityPath = dynSeries.seriesEntity.split("/");
+                const entity = entityPath.pop() as string;
+                const constraint = "";
+                const dynAttributes = [ dynSeries.seriesNameAttribute, dynSeries.colorAttribute ];
 
-                return fetchSeriesData<Data.SeriesProps>({
-                    guid: mxObject.getGuid(),
-                    entity: series.dataEntity,
-                    constraint: series.entityConstraint,
-                    sortAttribute: series.xValueSortAttribute || series.xValueAttribute,
-                    sortOrder: series.sortOrder,
-                    type: series.dataSourceType,
-                    attributes,
-                    microflow: series.dataSourceMicroflow,
-                    url: url && `${url}&seriesName=${series.name}`,
-                    customData: series
+                return fetchByXPath({
+                    entity,
+                    guid: "",
+                    constraint,
+                    attributes: dynAttributes
+                })
+                .then(mxObjects => mixinSeries.concat(mxObjects.map(mxSeries => {
+                        const barColor = mxSeries.get(dynSeries.colorAttribute) || "";
+                        const name = mxSeries.get(dynSeries.seriesNameAttribute) || "";
+                        const entityRef = dynSeries.seriesEntity.split("/")[0];
+                        const entityConstraint = dynSeries.entityConstraint + `[${entityRef} = '${mxSeries.getGuid()}']`;
+
+                        return {
+                            ...dynSeries,
+                            entityConstraint,
+                            barColor,
+                            name
+                        } as Data.SeriesProps;
+                    }))
+                );
+            })).then(mixedInSeries => {
+                const workableSeries = mixedInSeries.length ? mixedInSeries[0] : props.series;
+                Promise.all(workableSeries.map(series => {
+                    const attributes = [ series.xValueAttribute, series.yValueAttribute ];
+                    if (series.xValueSortAttribute) {
+                        attributes.push(series.xValueSortAttribute);
+                    }
+                    const mxObject = props.mxObject as mendix.lib.MxObject;
+                    const url = series.restUrl && generateRESTURL(mxObject, series.restUrl, props.restParameters);
+
+                    return fetchSeriesData<Data.SeriesProps>({
+                        guid: mxObject.getGuid(),
+                        entity: series.dataEntity,
+                        constraint: series.entityConstraint,
+                        sortAttribute: series.xValueSortAttribute || series.xValueAttribute,
+                        sortOrder: series.sortOrder,
+                        type: series.dataSourceType,
+                        attributes,
+                        microflow: series.dataSourceMicroflow,
+                        url: url && `${url}&seriesName=${series.name}`,
+                        customData: series
+                    });
+                }))
+                .then(seriesData => seriesData.map(({ mxObjects, restData, customData }) => ({
+                    data: mxObjects,
+                    restData,
+                    series: customData as Data.SeriesProps
+                })))
+                .then((data: Data.SeriesData<Data.SeriesProps>[]) => dispatch({
+                    seriesData: data,
+                    layoutOptions: props.layoutOptions || "{\n\n}",
+                    scatterData: getData(data, props),
+                    seriesOptions: data.map(({ series }) => series.seriesOptions || "{\n\n}"),
+                    configurationOptions: props.configurationOptions || "{\n\n}",
+                    instanceID: props.instanceID,
+                    type: actionType.UPDATE_DATA_FROM_FETCH
+                }))
+                .catch(reason => {
+                    window.mx.ui.error(reason);
+                    dispatch({ type: actionType.FETCH_DATA_FAILED, instanceID: props.instanceID });
                 });
-            }))
-            .then(seriesData => seriesData.map(({ mxObjects, restData, customData }) => ({
-                data: mxObjects,
-                restData,
-                series: customData as Data.SeriesProps
-            })))
-            .then((data: Data.SeriesData<Data.SeriesProps>[]) => dispatch({
-                seriesData: data,
-                layoutOptions: props.layoutOptions || "{\n\n}",
-                scatterData: getData(data, props),
-                seriesOptions: data.map(({ series }) => series.seriesOptions || "{\n\n}"),
-                configurationOptions: props.configurationOptions || "{\n\n}",
-                instanceID: props.instanceID,
-                type: actionType.UPDATE_DATA_FROM_FETCH
-            }))
-            .catch(reason => {
-                window.mx.ui.error(reason);
-                dispatch({ type: actionType.FETCH_DATA_FAILED, instanceID: props.instanceID });
             });
         } else {
             dispatch({ type: actionType.NO_CONTEXT, instanceID: props.instanceID });

@@ -18,9 +18,18 @@
             <category>Chart properties</category>
             <description>Add series and configure their properties</description>
             <properties>
+                <property key="seriesType" type="enumeration" defaultValue="static">
+                    <caption>Series</caption>
+                    <category>Data source</category>
+                    <description/>
+                    <enumerationValues>
+                        <enumerationValue key="static">Static</enumerationValue>
+                        <enumerationValue key="dynamic">Dynamic</enumerationValue>
+                    </enumerationValues>
+                </property>
                 <property key="name" type="translatableString">
                     <caption>Series name</caption>
-                    <category>Data source</category>
+                    <category>Static series</category>
                     <description/>
                     <translations>
                         <translation lang="en_US">Series</translation>
@@ -105,8 +114,31 @@
                 </property>
                 <property key="barColor" type="string" required="false">
                     <caption>Bar color</caption>
-                    <category>Appearance</category>
+                    <category>Static series</category>
                     <description>Color of the bar e.g. green, #00FF00, rgb(0,255,0)</description>
+                </property>
+                <property key="seriesEntity" type="entity" required="false" allowNonPersistableEntities="true" isPath="yes" pathType="reference" entityProperty="dataEntity">
+                    <caption>Series entity</caption>
+                    <category>Dynamic series</category>
+                    <description>The entity from which the series values will be retrieved</description>
+                </property>
+                <property key="seriesNameAttribute" type="attribute" entityProperty="seriesEntity" required="false">
+                    <caption>Series name attribute</caption>
+                    <category>Dynamic series</category>
+                    <description/>
+                    <attributeTypes>
+                        <attributeType name="String"/>
+                        <attributeType name="Enum"/>
+                    </attributeTypes>
+                </property>
+                <property key="colorAttribute" type="attribute" entityProperty="seriesEntity" required="false">
+                    <caption>Bar color attribute</caption>
+                    <category>Dynamic series</category>
+                    <description>Color of the bar e.g. green, #00FF00, rgb(0,255,0)</description>
+                    <attributeTypes>
+                        <attributeType name="String"/>
+                        <attributeType name="Enum"/>
+                    </attributeTypes>
                 </property>
                 <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
                     <caption>On click</caption>
@@ -210,7 +242,7 @@
             <enumerationValues>
                 <enumerationValue key="percentageOfWidth">Percentage of width</enumerationValue>
                 <enumerationValue key="pixels">Pixels</enumerationValue>
-                <enumerationValue key="percentageOfParent">Percentage of Parent</enumerationValue>
+                <enumerationValue key="percentageOfParent">Percentage of parent</enumerationValue>
             </enumerationValues>
         </property>
         <property key="height" type="integer" defaultValue="75">
