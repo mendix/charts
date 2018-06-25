@@ -32,15 +32,13 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
             const dynamicSeries = props.series.filter(series => series.seriesType === "dynamic");
 
             Promise.all(dynamicSeries.map(dynSeries => {
-                const entityPath = dynSeries.seriesEntity.split("/");
-                const entity = entityPath.pop() as string;
-                const constraint = "";
-                const dynAttributes = [ dynSeries.seriesNameAttribute, dynSeries.lineColorAttribute];
+                const entity = dynSeries.seriesEntity.split("/")[1];
+                const dynAttributes = [ dynSeries.seriesNameAttribute, dynSeries.lineColorAttribute ];
 
                 return fetchByXPath({
                     entity,
                     guid: "",
-                    constraint,
+                    constraint: "",
                     attributes: dynAttributes
                 })
                 .then(mxObjects => {
