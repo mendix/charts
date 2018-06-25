@@ -9,6 +9,7 @@ import {
     NO_CONTEXT,
     PieChartAction,
     TOGGLE_FETCHING_DATA,
+    TOGGLE_UPDATING_DATA,
     UPDATE_DATA_FROM_FETCH,
     UPDATE_DATA_FROM_PLAYGROUND
 } from "./PieChartReducer";
@@ -88,3 +89,5 @@ export const updateDataFromPlayground = (widgetID: string, dataOptions: string, 
         layoutOptions,
         configurationOptions
     });
+export const toggleUpdatingData = (widgetID: string, updatingData: boolean): Partial<PieChartAction> =>
+    ({ type: TOGGLE_UPDATING_DATA, widgetID, updatingData });

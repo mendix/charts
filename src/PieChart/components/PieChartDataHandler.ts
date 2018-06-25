@@ -39,17 +39,20 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
         if (validationError) {
             this.props.showAlertMessage(friendlyId, validationError);
         }
-        store.dispatch(this.props.fetchThemeConfigs(friendlyId));
+        this.props.fetchThemeConfigs(friendlyId);
     }
 
     componentWillReceiveProps(nextProps: PieChartDataHandlerProps) {
         this.resetSubscriptions(nextProps);
         if (!nextProps.alertMessage) {
             if (!nextProps.mxObject) {
-                nextProps.noContext(nextProps.friendlyId);
+                if (this.props.mxObject) {
+                    nextProps.noContext(nextProps.friendlyId);
+                }
             } else if (!nextProps.fetchingConfigs && isContextChanged(this.props.mxObject, nextProps.mxObject)) {
-                nextProps.togglePlotlyDataLoading(nextProps.friendlyId, true);
-                store.dispatch(nextProps.fetchPieData(nextProps));
+                if (!nextProps.fetchingData) {
+                    store.dispatch(nextProps.fetchPieData(nextProps));
+                }
                 this.clearRefreshInterval();
                 this.intervalID = setRefreshAction(nextProps.refreshInterval, nextProps.mxObject)(this.onRefresh);
             }
@@ -59,13 +62,11 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
     }
 
     shouldComponentUpdate(nextProps: PieChartDataHandlerProps) {
-        const doneLoading = !nextProps.fetchingData && this.props.fetchingData;
-        const advancedOptionsUpdated = nextProps.layoutOptions !== this.props.layoutOptions
-            || nextProps.dataOptions !== this.props.dataOptions
-            || nextProps.configurationOptions !== this.props.configurationOptions;
+        const toggleFetching = nextProps.fetchingData !== this.props.fetchingData;
+        const toggleUpdating = nextProps.updatingData !== this.props.updatingData;
         const playgroundLoaded = !!nextProps.playground && !this.props.playground;
 
-        return doneLoading || advancedOptionsUpdated || playgroundLoaded || !nextProps.mxObject;
+        return toggleFetching || toggleUpdating || playgroundLoaded || !nextProps.mxObject;
     }
 
     componentWillUnmount() {

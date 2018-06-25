@@ -2,7 +2,7 @@ import deepMerge from "deepmerge";
 import { Data } from "../../utils/namespaces";
 import { PieData } from "plotly.js";
 import { PieChartDataHandlerProps } from "../components/PieChartDataHandler";
-import { PieTraces } from "../components/PieChart";
+import { PieChartProps, PieTraces } from "../components/PieChart";
 import { getDefaultDataOptions } from "./configs";
 import { defaultColours } from "../../utils/style";
 
@@ -18,7 +18,7 @@ export const getData = (data: Data.FetchedData<string>, props: PieChartDataHandl
             {
                 ...deepMerge.all(
                     [
-                        getDefaultDataOptions(props),
+                        getDefaultDataOptions(props as PieChartProps),
                         {
                             labels: traces.labels,
                             values: traces.values,

@@ -15,9 +15,10 @@ export interface PieChartState {
     data?: mendix.lib.MxObject[];
     pieData?: PieData[];
     alertMessage?: ReactChild;
-    fetchingData?: boolean;
+    fetchingData: boolean;
     fetchingConfigs: boolean;
     themeConfigs: ChartConfigs;
+    updatingData: boolean;
 }
 
 export interface PieChartReducerState {
@@ -32,6 +33,7 @@ const prefix = "PieChart";
 export const RESET = `${prefix}.RESET`;
 export const ALERT_MESSAGE = `${prefix}.ALERT_MESSAGE`;
 export const TOGGLE_FETCHING_DATA = `${prefix}.TOGGLE_FETCHING_DATA`;
+export const TOGGLE_UPDATING_DATA = `${prefix}.TOGGLE_UPDATING_DATA`;
 export const UPDATE_DATA_FROM_FETCH = `${prefix}.UPDATE_DATA_FROM_FETCH`;
 export const FETCH_DATA_FAILED = `${prefix}.FETCH_DATA_FAILED`;
 export const NO_CONTEXT = `${prefix}.NO_CONTEXT`;
@@ -93,9 +95,17 @@ export const pieChartReducer: Reducer<PieChartReducerState> = (state = {} as Pie
             return {
                 ...state,
                 [action.widgetID]: {
+                    ...state[action.widgetID],
+                    ...defaultInstanceState,
+                    updatingData: true
+                } };
+        case TOGGLE_UPDATING_DATA:
+            return {
+                ...state,
+                [action.widgetID]: {
                     ...defaultInstanceState,
                     ...state[action.widgetID],
-                    ...defaultInstanceState
+                    updatingData: action.updatingData
                 } };
         case LOAD_PLAYGROUND:
             return {
@@ -113,7 +123,8 @@ export const pieChartReducer: Reducer<PieChartReducerState> = (state = {} as Pie
                     ...state[action.widgetID],
                     layoutOptions: action.layoutOptions,
                     dataOptions: action.dataOptions,
-                    configurationOptions: action.configurationOptions
+                    configurationOptions: action.configurationOptions,
+                    updatingData: true
                 }
             };
         default:

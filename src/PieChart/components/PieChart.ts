@@ -1,8 +1,8 @@
 import deepMerge from "deepmerge";
-import { Config, Layout, PieData, PieHoverData } from "plotly.js";
+import { PieHoverData } from "plotly.js";
 import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
-import { MapDispatchToProps, connect } from "react-redux";
+import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
 import { Alert } from "../../components/Alert";
@@ -14,12 +14,17 @@ import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } 
 import { PieChartDataHandlerProps } from "./PieChartDataHandler";
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
 
-import { parseAdvancedOptions } from "../../utils/data";
-import { getDefaultDataOptions, getDefaultLayoutOptions } from "../utils/configs";
+import {
+    getConfigOptions,
+    getData,
+    getDefaultConfigOptions,
+    getDefaultDataOptions,
+    getDefaultLayoutOptions,
+    getLayoutOptions } from "../utils/configs";
 import PieChartContainerProps = Container.PieChartContainerProps;
-import { store } from "../../store";
+import { DefaultReduxStore, store } from "../../store";
 import { PieChartState } from "../store/PieChartReducer";
-import { arrayMerge } from "../../utils/configs";
+import { PlotlyChartInstance, defaultPlotlyInstanceState } from "../../components/reducers/PlotlyChartReducer";
 
 interface ComponentProps extends PieChartDataHandlerProps {
     alertMessage?: ReactChild;
@@ -27,7 +32,7 @@ interface ComponentProps extends PieChartDataHandlerProps {
     onHover?: (options: Data.OnHoverOptions<{ label: string, value: number }, PieChartContainerProps>) => void;
 }
 
-export type PieChartProps = ComponentProps & typeof PlotlyChartActions;
+export type PieChartProps = ComponentProps & typeof PlotlyChartActions & PlotlyChartInstance;
 
 export interface PieTraces {
     labels: string[];
@@ -55,11 +60,18 @@ class PieChart extends Component<PieChartProps & PieChartState> {
         if (this.props.devMode === "developer" && this.props.loadPlayground) {
             store.dispatch(this.props.loadPlayground(this.props.friendlyId));
         }
-        this.updateData(this.props);
+        // this.updateData(this.props);
     }
 
     componentWillReceiveProps(nextProps: PieChartProps) {
-        this.updateData(nextProps);
+        const doneFetching = !nextProps.fetchingData && this.props.fetchingData;
+
+        if (!nextProps.alertMessage && (doneFetching || nextProps.updatingData)) {
+            this.updateData(nextProps);
+        }
+        if (nextProps.updatingData) {
+            nextProps.toggleUpdatingData(nextProps.friendlyId, false);
+        }
     }
 
     private getTooltipNodeRef = (node: HTMLDivElement) => {
@@ -67,10 +79,18 @@ class PieChart extends Component<PieChartProps & PieChartState> {
     }
 
     private renderChart() {
+        const playgroundLoaded = this.props.devMode !== "developer" || !!this.props.playground;
+
         return createElement(PlotlyChart,
             {
                 widgetID: this.props.friendlyId,
                 type: "pie",
+                loadingAPI: this.props.loadingAPI && playgroundLoaded,
+                loadingData: this.props.fetchingData,
+                layout: this.props.layout,
+                data: this.props.data,
+                config: this.props.config,
+                plotly: this.props.plotly,
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 onClick: this.onClick,
@@ -95,7 +115,7 @@ class PieChart extends Component<PieChartProps & PieChartState> {
                 layoutOptions: this.props.layoutOptions || "{\n\n}",
                 modelerLayoutConfigs: JSON.stringify(modelerLayoutConfigs, null, 2),
                 configurationOptions: this.props.configurationOptions || "{\n\n}",
-                configurationOptionsDefault: JSON.stringify(PieChart.getDefaultConfigOptions(), null, 2)
+                configurationOptionsDefault: JSON.stringify(getDefaultConfigOptions(), null, 2)
             }, this.renderChart());
         }
 
@@ -103,45 +123,11 @@ class PieChart extends Component<PieChartProps & PieChartState> {
     }
 
     private updateData(props: PieChartProps) {
-        if (!props.alertMessage && !props.fetchingData) {
-            props.updateData(props.friendlyId, {
-                layout: this.getLayoutOptions(props),
-                data: this.getData(props),
-                config: this.getConfigOptions(props)
-            });
-        }
-    }
-
-    private getData(props: PieChartProps): PieData[] {
-        if (props.pieData && props.pieData.length) {
-            const { dataOptions } = props;
-            const advancedOptions = props.devMode !== "basic" && dataOptions ? JSON.parse(dataOptions) : {};
-            const dataThemeConfigs = props.devMode !== "basic" ? props.themeConfigs.data : {};
-
-            return [
-                {
-                    ...deepMerge.all(
-                        [
-                            props.pieData[0],
-                            dataThemeConfigs,
-                            advancedOptions
-                        ],
-                        { arrayMerge }
-                    ),
-                    customdata: props.pieData[0].customdata
-                }
-            ];
-        }
-
-        return [];
-    }
-
-    private getLayoutOptions(props: PieChartProps): Partial<Layout> {
-        const { layoutOptions } = props;
-        const advancedOptions = props.devMode !== "basic" && layoutOptions ? JSON.parse(layoutOptions) : {};
-        const themeLayoutConfigs = props.devMode !== "basic" ? props.themeConfigs.layout : {};
-
-        return deepMerge.all([ getDefaultLayoutOptions(props), themeLayoutConfigs, advancedOptions ]);
+        props.updateData(props.friendlyId, {
+            layout: getLayoutOptions(props),
+            data: getData(props),
+            config: getConfigOptions(props)
+        });
     }
 
     private onClick = ({ points }: PieHoverData<mendix.lib.MxObject[]>) => {
@@ -194,18 +180,10 @@ class PieChart extends Component<PieChartProps & PieChartState> {
             configurationOptions
         );
     }
-
-    private static getDefaultConfigOptions(): Partial<Config> {
-        return { displayModeBar: false, doubleClick: false };
-    }
-
-    public getConfigOptions(props: PieChartProps): Partial<Config> {
-        const advancedOptions = parseAdvancedOptions(props.devMode, props.configurationOptions);
-
-        return deepMerge.all([ PieChart.getDefaultConfigOptions(), props.themeConfigs.configuration, advancedOptions ]);
-    }
 }
 
+const mapStateToProps: MapStateToProps<PlotlyChartInstance, ComponentProps, DefaultReduxStore> = (state, props) =>
+    state.plotly[props.friendlyId] || defaultPlotlyInstanceState;
 const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>
     bindActionCreators(PlotlyChartActions, dispatch);
-export default connect(null, mapDispatchToProps)(PieChart);
+export default connect(mapStateToProps, mapDispatchToProps)(PieChart);
