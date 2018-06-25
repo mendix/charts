@@ -4,7 +4,7 @@ import { Container, Data } from "../../utils/namespaces";
 import { DefaultReduxStore, registerReducer } from "../../store";
 
 import { SeriesPlayground } from "../../components/SeriesPlayground";
-import { seriesReducer } from "../../store/Series_Reducer";
+import { seriesReducer } from "../../store/SeriesReducer";
 import LineChartContainerState = Container.LineChartContainerState;
 import LineSeriesProps = Data.LineSeriesProps;
 

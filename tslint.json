@@ -146,7 +146,12 @@
     "no-submodule-imports": false,
     "no-implicit-dependencies": false,
     "no-namespace": false,
-    "newline-before-return": true
+    "newline-before-return": true,
+    "prefer-template": [
+      true,
+      "allow-single-concat"
+    ],
+    "no-invalid-template-strings": true
   },
   "jsRules": {
     "trailing-comma": [

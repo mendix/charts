@@ -2,7 +2,7 @@ import deepMerge from "deepmerge";
 import { ScatterData } from "plotly.js";
 import { ReactChild } from "react";
 import { Action, Dispatch } from "redux";
-import { seriesActionType } from "../../store/Series_Reducer";
+import { seriesActionType } from "../../store/SeriesReducer";
 import { ChartType, fetchThemeConfigs as fetchLineThemeConfig } from "../../utils/configs";
 import { fetchData as fetchSeriesData, generateRESTURL, parseAdvancedOptions } from "../../utils/data";
 import { Data } from "../../utils/namespaces";

@@ -2,7 +2,7 @@ import { ScatterData } from "plotly.js";
 import { Action, Reducer } from "redux";
 import { SeriesPlayground } from "../../components/SeriesPlayground";
 import { DefaultReduxStore, registerReducer } from "../../store";
-import { seriesReducer } from "../../store/Series_Reducer";
+import { seriesReducer } from "../../store/SeriesReducer";
 import { Container, Data } from "../../utils/namespaces";
 import BarChartContainerState = Container.BarChartContainerState;
 
