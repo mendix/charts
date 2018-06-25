@@ -31,7 +31,10 @@ export const TOGGLE_PLOTLY_DATA_LOADING = `${prefix}.TOGGLE_PLOTLY_DATA_LOADING`
 export const UPDATE_DATA = `${prefix}.UPDATE_DATA`;
 
 export const defaultPlotlyInstanceState: Partial<PlotlyChartInstance> = {
-    loadingAPI: true
+    loadingAPI: true,
+    data: [],
+    layout: {},
+    config: {}
 };
 const defaultState: Partial<PlotlyChartState> = {};
 

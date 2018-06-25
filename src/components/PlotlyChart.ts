@@ -1,16 +1,15 @@
 import { CSSProperties, Component, createElement } from "react";
-import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
-
+import { MapDispatchToProps, connect } from "react-redux";
+import { bindActionCreators } from "redux";
 import * as classNames from "classnames";
 import deepMerge from "deepmerge";
-import { Data, PieHoverData, ScatterHoverData } from "plotly.js";
-import ReactResizeDetector from "react-resize-detector";
-import { bindActionCreators } from "redux";
-import { getDimensionsFromNode } from "../utils/style";
+
 import { ChartLoading } from "./ChartLoading";
+import { Data, PieHoverData, ScatterHoverData } from "plotly.js";
 import * as PlotlyChartActions from "./actions/PlotlyChartActions";
-import { Plotly, PlotlyChartInstance, defaultPlotlyInstanceState } from "./reducers/PlotlyChartReducer";
-import { DefaultReduxStore } from "../store";
+import { Plotly, PlotlyChartInstance } from "./reducers/PlotlyChartReducer";
+import ReactResizeDetector from "react-resize-detector";
+import { getDimensionsFromNode } from "../utils/style";
 
 export interface ComponentProps {
     widgetID: string;
@@ -160,8 +159,6 @@ class PlotlyChart extends Component<PlotlyChartProps> {
     }
 }
 
-const mapStateToProps: MapStateToProps<PlotlyChartInstance, ComponentProps, DefaultReduxStore> = (state, props) =>
-    state.plotly[props.widgetID] || defaultPlotlyInstanceState;
 const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>
     bindActionCreators(PlotlyChartActions, dispatch);
-export default connect(mapStateToProps, mapDispatchToProps)(PlotlyChart);
+export default connect(null, mapDispatchToProps)(PlotlyChart);
