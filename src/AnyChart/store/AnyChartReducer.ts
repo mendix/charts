@@ -5,10 +5,15 @@ import { DefaultReduxStore, registerReducer } from "../../store";
 
 export type AnyChartAction = Action & AnyChartInstanceState & { widgetID: string };
 
-export interface AnyChartInstanceState {
-    playground?: typeof AnyChartPlayground;
+export interface AnyChartData {
     attributeData: string;
     attributeLayout: string;
+    dataStatic: string;
+    layoutStatic: string;
+    configurationOptions: string;
+}
+export interface AnyChartInstanceState extends AnyChartData {
+    playground?: typeof AnyChartPlayground;
     alertMessage?: ReactChild;
     fetchingData: boolean;
 }
@@ -23,9 +28,8 @@ export interface AnyReduxStore extends DefaultReduxStore {
 
 const prefix = "AnyChart";
 export const ALERT_MESSAGE = `${prefix}.ALERT_MESSAGE`;
+export const FETCHED_DATA = `${prefix}.FETCH_DATA`;
 export const TOGGLE_FETCHING_DATA = `${prefix}.TOGGLE_FETCHING_DATA`;
-export const UPDATE_DATA_FROM_FETCH = `${prefix}.UPDATE_DATA_FROM_FETCH`;
-export const FETCH_DATA_FAILED = `${prefix}.FETCH_DATA_FAILED`;
 export const NO_CONTEXT = `${prefix}.NO_CONTEXT`;
 export const LOAD_PLAYGROUND = `${prefix}.LOAD_PLAYGROUND`;
 export const UPDATE_DATA_FROM_PLAYGROUND = `${prefix}.UPDATE_DATA_FROM_PLAYGROUND`;
@@ -37,7 +41,7 @@ export const defaultInstanceState: Partial<AnyChartInstanceState> = {
 
 export const anyChartReducer: Reducer<AnyChartReducerState> = (state = {} as AnyChartReducerState, action: AnyChartAction): AnyChartReducerState => {
     switch (action.type) {
-        case UPDATE_DATA_FROM_FETCH:
+        case FETCHED_DATA:
             return {
                 ...state,
                 [action.widgetID]: {
@@ -45,11 +49,12 @@ export const anyChartReducer: Reducer<AnyChartReducerState> = (state = {} as Any
                     ...state[action.widgetID],
                     attributeData: action.attributeData,
                     attributeLayout: action.attributeLayout,
+                    dataStatic: action.dataStatic,
+                    layoutStatic: action.layoutStatic,
+                    configurationOptions: action.configurationOptions,
                     fetchingData: false
                 }
             };
-        case FETCH_DATA_FAILED:
-            return { ...state, [action.widgetID]: { ...state[action.widgetID], ...defaultInstanceState } };
         case NO_CONTEXT:
             return {
                 ...state,
@@ -79,7 +84,12 @@ export const anyChartReducer: Reducer<AnyChartReducerState> = (state = {} as Any
                 ...state,
                 [action.widgetID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID]
+                    ...state[action.widgetID],
+                    attributeData: action.attributeData,
+                    attributeLayout: action.attributeLayout,
+                    dataStatic: action.dataStatic,
+                    layoutStatic: action.layoutStatic,
+                    configurationOptions: action.configurationOptions
                 }
             };
         case ALERT_MESSAGE:

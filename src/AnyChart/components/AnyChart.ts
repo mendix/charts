@@ -1,66 +1,54 @@
 
 // tslint:disable no-console
-import deepMerge from "deepmerge";
-import { Config, Layout } from "plotly.js";
 import { Component, ReactChild, createElement } from "react";
-import { MapDispatchToProps, connect } from "react-redux";
+import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import deepMerge from "deepmerge";
+
 import { Alert } from "../../components/Alert";
-import { ChartLoading } from "../../components/ChartLoading";
-import PlotlyChart from "../../components/PlotlyChart";
-import "../../ui/Charts.scss";
-import { getDimensions, parseStyle } from "../../utils/style";
-import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
 import { AnyChartDataHandlerProps } from "./AnyChartDataHandler";
 import { arrayMerge } from "../../utils/data";
+import PlotlyChart from "../../components/PlotlyChart";
+import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
+import { PlotlyChartInstance, defaultPlotlyInstanceState } from "../../components/reducers/PlotlyChartReducer";
+import { getDimensions, parseStyle } from "../../utils/style";
+import "../../ui/Charts.scss";
+
+import { Config, Layout } from "plotly.js";
+import { DefaultReduxStore } from "../../store";
 
 // TODO improve typing by replace explicit any types
 
-interface ComponentProps extends AnyChartDataHandlerProps {
+export interface AnyChartComponentProps extends AnyChartDataHandlerProps {
     alertMessage?: ReactChild;
     onClick?: (data: any) => void;
     onHover?: (data: any, node: HTMLDivElement) => void;
 }
-export type AnyChartProps = ComponentProps & typeof PlotlyChartActions;
+export type AnyChartProps = AnyChartComponentProps & typeof PlotlyChartActions & PlotlyChartInstance;
 
 class AnyChart extends Component<AnyChartProps> {
     render() {
         if (this.props.alertMessage) {
             return createElement(Alert, { className: `widget-charts-any-alert` }, this.props.alertMessage);
         }
-        if (this.props.fetchingData) {
-            return createElement(ChartLoading);
-        }
 
         return this.renderChart();
     }
 
-    componentDidMount() {
-        this.updateData(this.props);
-    }
-
-    componentWillReceiveProps(nextProps: AnyChartProps) {
-        this.updateData(nextProps);
-    }
-
     private renderChart() {
         return createElement(PlotlyChart, {
+            data: this.getData(this.props),
+            loadingAPI: this.props.loadingAPI,
+            loadingData: this.props.fetchingData,
+            layout: this.getLayoutOptions(this.props),
+            config: this.getConfigOptions(this.props),
+            plotly: this.props.plotly,
             widgetID: this.props.friendlyId,
             type: "full",
             className: this.props.class,
             style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
             onClick: this.onClick
         });
-    }
-
-    private updateData(props: AnyChartProps) {
-        if (!props.alertMessage && !props.fetchingData) {
-            props.updateData(props.friendlyId, {
-                layout: this.getLayoutOptions(props),
-                data: this.getData(props),
-                config: this.getConfigOptions(props)
-            });
-        }
     }
 
     private getData(props: AnyChartProps): any[] {
@@ -107,6 +95,8 @@ class AnyChart extends Component<AnyChartProps> {
     }
 }
 
-const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>
-    bindActionCreators(PlotlyChartActions, dispatch);
-export default connect(null, mapDispatchToProps)(AnyChart);
+const mapStateToProps: MapStateToProps<PlotlyChartInstance, AnyChartComponentProps, DefaultReduxStore> = (state, props) =>
+    state.plotly[props.friendlyId] || defaultPlotlyInstanceState;
+const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, AnyChartComponentProps> =
+    dispatch => bindActionCreators(PlotlyChartActions, dispatch);
+export default connect(mapStateToProps, mapDispatchToProps)(AnyChart);

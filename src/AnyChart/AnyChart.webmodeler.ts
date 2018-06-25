@@ -1,6 +1,6 @@
 import { Component, ReactChild, createElement } from "react";
 
-import AnyChart from "./components/AnyChart";
+import AnyChart, { AnyChartComponentProps } from "./components/AnyChart";
 import { Container } from "../utils/namespaces";
 import { validateAdvancedOptions } from "../utils/data";
 import { Provider } from "react-redux";
@@ -11,7 +11,7 @@ export class preview extends Component<Container.AnyChartContainerProps, {}> {
     render() {
         return createElement(Provider, { store },
             createElement(AnyChart, {
-                ...this.props as any,
+                ...this.props as AnyChartComponentProps,
                 devMode: "advanced",
                 fetchingData: false,
                 attributeData: this.props.sampleData,

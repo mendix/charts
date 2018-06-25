@@ -4,16 +4,16 @@ import * as classNames from "classnames";
 import { Operation, compare } from "fast-json-patch";
 import * as jsonMap from "json-source-map";
 
+import AnyChart from "../AnyChart/components/AnyChart";
 import { InfoTooltip } from "./InfoTooltip";
 import { MendixButton } from "./MendixButton";
 import { Panel } from "./Panel";
+import { PlaygroundInfo } from "./PlaygroundInfo";
 import PlotlyChart from "./PlotlyChart";
 import { Sidebar } from "./Sidebar";
 import { SidebarHeader } from "./SidebarHeader";
 import { SidebarContent } from "./SidebarContent";
 import { SidebarHeaderTools } from "./SidebarHeaderTools";
-
-import { PlaygroundInfo } from "./PlaygroundInfo";
 
 import "brace";
 import "brace/mode/json";
@@ -33,7 +33,7 @@ export interface RenderAceEditorOptions {
     overwriteValue?: string;
 }
 
-type SidebarChildren = typeof Panel | typeof PlotlyChart | typeof SidebarHeaderTools;
+type SidebarChildren = typeof Panel | typeof PlotlyChart | typeof AnyChart | typeof SidebarHeaderTools;
 
 export class Playground extends Component<{}, PlaygroundState> {
     state = {
@@ -65,7 +65,8 @@ export class Playground extends Component<{}, PlaygroundState> {
             createElement("div", { className: "widget-charts-playground-toggle" },
                 createElement(MendixButton, { onClick: this.toggleShowEditor }, "Toggle Editor")
             ),
-            this.renderContent(PlotlyChart)
+            this.renderContent(PlotlyChart),
+            this.renderContent(AnyChart)
         );
     }
 

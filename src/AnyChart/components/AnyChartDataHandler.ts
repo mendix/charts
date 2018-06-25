@@ -2,7 +2,7 @@ import { Component, ReactChild, createElement } from "react";
 import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
-import AnyChart, { AnyChartProps } from "./AnyChart";
+import AnyChart, { AnyChartComponentProps } from "./AnyChart";
 import { AnyChartPlayground } from "./AnyPlayground";
 
 import * as AnyChartActions from "../store/AnyChartActions";
@@ -20,14 +20,14 @@ export class AnyChartDataHandler extends Component<AnyChartDataHandlerProps> {
     private subscriptionHandles: number[] = [];
 
     render() {
-        const anyProps: AnyChartProps = {
+        const anyChartProps: AnyChartComponentProps = {
             ...this.props as AnyChartDataHandlerProps,
             onClick: this.onClick,
             onHover: this.props.tooltipForm ? this.onHover : undefined
         };
 
         return createElement("div", { className: "widget-charts-wrapper" },
-            createElement(this.props.devMode === "developer" ? AnyChartPlayground : AnyChart, anyProps)
+            createElement(this.props.devMode === "developer" ? AnyChartPlayground : AnyChart, anyChartProps)
         );
     }
 
@@ -36,28 +36,35 @@ export class AnyChartDataHandler extends Component<AnyChartDataHandlerProps> {
         if (validationError) {
             this.props.showAlertMessage(this.props.friendlyId, validationError);
         }
+        this.props.toggleFetchingData(this.props.friendlyId, true);
     }
 
     componentWillReceiveProps(nextProps: AnyChartDataHandlerProps) {
         this.resetSubscriptions(nextProps.mxObject);
         if (!nextProps.alertMessage) {
             if (!nextProps.mxObject) {
-                nextProps.noContext(nextProps.friendlyId);
+                if (this.props.mxObject) {
+                    nextProps.noContext(nextProps.friendlyId);
+                }
             } else if (isContextChanged(this.props.mxObject, nextProps.mxObject)) {
-                nextProps.togglePlotlyDataLoading(nextProps.friendlyId, true);
-                nextProps.fetchAnyChartData(nextProps);
+                if (!nextProps.fetchingData) {
+                    nextProps.toggleFetchingData(nextProps.friendlyId, true);
+                }
+                nextProps.fetchData(nextProps);
             }
         }
     }
 
     shouldComponentUpdate(nextProps: AnyChartDataHandlerProps) {
-        const contextChanged = isContextChanged(this.props.mxObject, nextProps.mxObject);
-        const advancedOptionsUpdated = nextProps.attributeData !== this.props.attributeData
+        const optionsUpdated = nextProps.attributeData !== this.props.attributeData
             || nextProps.attributeLayout !== this.props.attributeLayout
-            || nextProps.configurationOptions !== this.props.configurationOptions;
+            || nextProps.configurationOptions !== this.props.configurationOptions
+            || nextProps.dataStatic !== this.props.dataStatic
+            || nextProps.layoutStatic !== this.props.layoutStatic;
         const playgroundLoaded = !!nextProps.playground && !this.props.playground;
+        const toggleFetchingData = nextProps.fetchingData !== this.props.fetchingData;
 
-        return contextChanged || advancedOptionsUpdated || playgroundLoaded;
+        return toggleFetchingData || optionsUpdated || playgroundLoaded || !nextProps.mxObject;
     }
 
     private resetSubscriptions(mxObject?: mendix.lib.MxObject) {
@@ -65,19 +72,19 @@ export class AnyChartDataHandler extends Component<AnyChartDataHandlerProps> {
         this.subscriptionHandles = [];
         if (mxObject) {
             this.subscriptionHandles.push(window.mx.data.subscribe({
-                callback: () => store.dispatch(this.props.fetchAnyChartData(this.props)),
+                callback: () => store.dispatch(this.props.fetchData(this.props)),
                 guid: mxObject.getGuid()
             }));
             if (this.props.dataAttribute) {
                 this.subscriptionHandles.push(window.mx.data.subscribe({
-                    callback: () => store.dispatch(this.props.fetchAnyChartData(this.props)),
+                    callback: () => store.dispatch(this.props.fetchData(this.props)),
                     guid: mxObject.getGuid(),
                     attr: this.props.dataAttribute
                 }));
             }
             if (this.props.layoutAttribute) {
                 this.subscriptionHandles.push(window.mx.data.subscribe({
-                    callback: () => store.dispatch(this.props.fetchAnyChartData(this.props)),
+                    callback: () => store.dispatch(this.props.fetchData(this.props)),
                     guid: mxObject.getGuid(),
                     attr: this.props.layoutAttribute
                 }));

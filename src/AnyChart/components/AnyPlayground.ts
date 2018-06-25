@@ -3,26 +3,17 @@ import { Playground } from "../../components/Playground";
 import { SidebarHeaderTools } from "../../components/SidebarHeaderTools";
 
 import { Alert } from "../../components/Alert";
-import AnyChart, { AnyChartProps } from "./AnyChart";
+import AnyChart from "./AnyChart";
+import { AnyChartDataHandlerProps } from "./AnyChartDataHandler";
 import { Panel, PanelProps } from "../../components/Panel";
 import { Select } from "../../components/Select";
 
 interface AnyChartPlaygroundState {
-    staticData: string;
-    staticLayout: string;
-    attributeData: string;
-    attributeLayout: string;
     activeOption: string;
-    configurationOptions: string;
 }
 
-export class AnyChartPlayground extends Component<AnyChartProps, AnyChartPlaygroundState> {
+export class AnyChartPlayground extends Component<AnyChartDataHandlerProps, AnyChartPlaygroundState> {
     state: AnyChartPlaygroundState = {
-        staticData: this.props.dataStatic,
-        staticLayout: this.props.layoutStatic,
-        attributeLayout: this.props.attributeLayout,
-        attributeData: this.props.attributeData,
-        configurationOptions: this.props.configurationOptions,
         activeOption: "layout"
     };
     private timeoutId?: number;
@@ -33,30 +24,21 @@ export class AnyChartPlayground extends Component<AnyChartProps, AnyChartPlaygro
             return createElement(Alert, { className: `widget-charts-any-alert` }, this.props.alertMessage);
         }
 
-        return createElement("div", {},
-            createElement(Playground, {}, ...this.renderPanels(), this.renderHeaderTools()),
-            this.createChart()
+        return createElement(Playground, {},
+            ...this.renderPanels(),
+            this.renderHeaderTools(),
+            this.renderChart()
         );
     }
 
-    private createChart() {
+    private renderChart() {
         return createElement(AnyChart, {
-            ...this.props as AnyChartProps,
-            layoutStatic: this.state.staticLayout,
-            dataStatic: this.state.staticData,
-            attributeLayout: this.state.attributeLayout,
-            attributeData: this.state.attributeData,
-            configurationOptions: this.state.configurationOptions
-        });
-    }
-
-    componentWillReceiveProps(newProps: AnyChartProps) {
-        this.setState({
-            attributeData: newProps.attributeData,
-            attributeLayout: newProps.attributeLayout,
-            staticData: newProps.dataStatic,
-            staticLayout: newProps.layoutStatic,
-            configurationOptions: newProps.configurationOptions
+            ...this.props as AnyChartDataHandlerProps,
+            layoutStatic: this.props.layoutStatic,
+            dataStatic: this.props.dataStatic,
+            attributeLayout: this.props.attributeLayout,
+            attributeData: this.props.attributeData,
+            configurationOptions: this.props.configurationOptions
         });
     }
 
@@ -78,7 +60,7 @@ export class AnyChartPlayground extends Component<AnyChartProps, AnyChartPlaygro
                     heading: "Dynamic"
                 },
                 Playground.renderAceEditor({
-                    value: this.formatJSONString(`${this.state.attributeLayout || "{\n\n}"}`),
+                    value: this.formatJSONString(`${this.props.attributeLayout || "{\n\n}"}`),
                     onChange: value => this.onUpdate("layoutDynamic", value),
                     onValidate: this.onValidate
                 })
@@ -90,7 +72,7 @@ export class AnyChartPlayground extends Component<AnyChartProps, AnyChartPlaygro
                     headingClass: "read-only"
                 },
                 Playground.renderAceEditor({
-                    value: this.formatJSONString(this.state.staticLayout || "{\n\n}"),
+                    value: this.formatJSONString(this.props.layoutStatic || "{\n\n}"),
                     onChange: value => this.onUpdate("layoutStatic", value),
                     overwriteValue: this.props.attributeLayout,
                     onValidate: this.onValidate
@@ -100,7 +82,7 @@ export class AnyChartPlayground extends Component<AnyChartProps, AnyChartPlaygro
     }
 
     private renderDataPanes() {
-        if (this.state.attributeData) {
+        if (this.props.attributeData) {
 
             return [
                 createElement(Panel,
@@ -110,7 +92,7 @@ export class AnyChartPlayground extends Component<AnyChartProps, AnyChartPlaygro
                         headingClass: "item-header"
                     },
                     Playground.renderAceEditor({
-                        value: this.formatJSONString(`${this.state.attributeData || "{\n\n}"}`),
+                        value: this.formatJSONString(`${this.props.attributeData || "{\n\n}"}`),
                         onChange: value => this.onUpdate("dataDynamic", value),
                         onValidate: this.onValidate
                     })
@@ -122,9 +104,9 @@ export class AnyChartPlayground extends Component<AnyChartProps, AnyChartPlaygro
                         headingClass: "read-only"
                     },
                     Playground.renderAceEditor({
-                        value: this.formatJSONString(this.state.staticData || "{\n\n}"),
+                        value: this.formatJSONString(this.props.dataStatic || "{\n\n}"),
                         onChange: value => this.onUpdate("dataStatic", value),
-                        overwriteValue: this.state.attributeData,
+                        overwriteValue: this.props.attributeData,
                         onValidate: this.onValidate
                     })
                 )
@@ -135,7 +117,7 @@ export class AnyChartPlayground extends Component<AnyChartProps, AnyChartPlaygro
     }
 
     private renderConfigPanels() {
-        if (this.state.attributeData) {
+        if (this.props.attributeData) {
 
             return [
                 createElement(Panel,
@@ -144,7 +126,7 @@ export class AnyChartPlayground extends Component<AnyChartProps, AnyChartPlaygro
                         heading: "Configuration settings"
                     },
                     Playground.renderAceEditor({
-                        value: this.formatJSONString(`${this.state.configurationOptions || "{\n\n}"}`),
+                        value: this.formatJSONString(`${this.props.configurationOptions || "{\n\n}"}`),
                         onChange: value => this.onUpdate("config", value),
                         onValidate: this.onValidate
                     })
@@ -156,9 +138,9 @@ export class AnyChartPlayground extends Component<AnyChartProps, AnyChartPlaygro
                         headingClass: "read-only"
                     },
                     Playground.renderAceEditor({
-                        value: `{ "displayModeBar": false, "doubleClick": false }`,
+                        value: this.formatJSONString(`{ "displayModeBar": false, "doubleClick": false }`),
                         readOnly: true,
-                        overwriteValue: this.state.configurationOptions,
+                        overwriteValue: this.props.configurationOptions,
                         onValidate: this.onValidate
                     })
                 )
@@ -192,7 +174,7 @@ export class AnyChartPlayground extends Component<AnyChartProps, AnyChartPlaygro
         this.timeoutId = window.setTimeout(() => {
             try {
                 if (this.isValid) {
-                    this.updateChart(source, JSON.stringify(JSON.parse(value), null, 2));
+                    this.updateChart(source, this.formatJSONString(value));
                 } else {
                     this.updateChart(source, Playground.convertJSToJSON(value));
                 }
@@ -205,12 +187,12 @@ export class AnyChartPlayground extends Component<AnyChartProps, AnyChartPlaygro
 
     private updateChart = (source: string, value: string) => {
         const cleanValue = Playground.removeTrailingNewLine(value);
-        this.setState({
-            attributeLayout: source === "layoutDynamic" ? cleanValue : this.state.attributeLayout,
-            attributeData: source === "dataDynamic" ? cleanValue : this.state.attributeData,
-            staticLayout: source === "layoutStatic" ? cleanValue : this.state.staticLayout,
-            staticData: source === "dataStatic" ? cleanValue : this.state.staticData,
-            configurationOptions: source === "config" ? cleanValue : this.state.configurationOptions
+        this.props.updateDataFromPlayground(this.props.friendlyId, {
+            attributeLayout: source === "layoutDynamic" ? cleanValue : this.props.attributeLayout,
+            attributeData: source === "dataDynamic" ? cleanValue : this.props.attributeData,
+            layoutStatic: source === "layoutStatic" ? cleanValue : this.props.layoutStatic,
+            dataStatic: source === "dataStatic" ? cleanValue : this.props.dataStatic,
+            configurationOptions: source === "config" ? cleanValue : this.props.configurationOptions
         });
     }
 
