@@ -30,7 +30,7 @@ export class preview extends Component<HeatMapContainerProps, {}> {
                 fetchingData: false,
                 themeConfigs: { layout: {}, configuration: {}, data: {} },
                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-                data: deepMerge.all(
+                heatmapData: deepMerge.all(
                     [ getDefaultDataOptions(this.props as HeatMapProps), preview.getData(this.props) ]
                 ) as HeatMapData
             })

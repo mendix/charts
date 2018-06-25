@@ -13,11 +13,12 @@ export interface HeatMapState {
     configurationOptions: string;
     playground?: typeof PiePlayground;
     mxObjects?: mendix.lib.MxObject[];
-    data?: HeatMapData;
+    heatmapData?: HeatMapData;
     alertMessage?: ReactChild;
-    fetchingData?: boolean;
+    fetchingData: boolean;
     fetchingConfigs: boolean;
     themeConfigs: ChartConfigs;
+    updatingData: boolean;
 }
 
 export interface HeatMapReducerState {
@@ -32,6 +33,7 @@ const prefix = "HeatMap";
 export const RESET = `${prefix}.RESET`;
 export const ALERT_MESSAGE = `${prefix}.ALERT_MESSAGE`;
 export const TOGGLE_FETCHING_DATA = `${prefix}.TOGGLE_FETCHING_DATA`;
+export const TOGGLE_UPDATING_DATA = `${prefix}.TOGGLE_UPDATING_DATA`;
 export const UPDATE_DATA_FROM_FETCH = `${prefix}.UPDATE_DATA_FROM_FETCH`;
 export const FETCH_DATA_FAILED = `${prefix}.FETCH_DATA_FAILED`;
 export const NO_CONTEXT = `${prefix}.NO_CONTEXT`;
@@ -75,26 +77,34 @@ export const heatmapReducer: Reducer<HeatMapReducerState> = (state = {} as HeatM
                     fetchingData: action.fetchingData
                 } };
         case FETCH_DATA_FAILED:
-            return { ...state, [action.widgetID]: { ...state[action.widgetID], data: undefined } };
+            return { ...state, [action.widgetID]: { ...state[action.widgetID], heatmapData: undefined } };
         case UPDATE_DATA_FROM_FETCH:
             return {
                 ...state,
                 [action.widgetID]: {
                     ...defaultInstanceState,
                     ...state[action.widgetID],
-                    data: action.data && action.data,
+                    heatmapData: action.heatmapData && action.heatmapData,
                     fetchingData: false,
                     layoutOptions: action.layoutOptions
                 }
             };
-        case NO_CONTEXT:
+        case TOGGLE_UPDATING_DATA:
             return {
                 ...state,
                 [action.widgetID]: {
                     ...defaultInstanceState,
                     ...state[action.widgetID],
+                    updatingData: action.updatingData
+                } };
+        case NO_CONTEXT:
+            return {
+                ...state,
+                [action.widgetID]: {
+                    ...state[action.widgetID],
                     ...defaultInstanceState,
-                    data: undefined
+                    heatmapData: undefined,
+                    updatingData: true
                 } };
         case LOAD_PLAYGROUND:
             return {
@@ -112,7 +122,8 @@ export const heatmapReducer: Reducer<HeatMapReducerState> = (state = {} as HeatM
                     ...state[action.widgetID],
                     layoutOptions: action.layoutOptions,
                     dataOptions: action.dataOptions,
-                    configurationOptions: action.configurationOptions
+                    configurationOptions: action.configurationOptions,
+                    updatingData: true
                 }
             };
         default:

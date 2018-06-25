@@ -9,6 +9,7 @@ import {
     LOAD_PLAYGROUND,
     NO_CONTEXT,
     TOGGLE_FETCHING_DATA,
+    TOGGLE_UPDATING_DATA,
     UPDATE_DATA_FROM_FETCH,
     UPDATE_DATA_FROM_PLAYGROUND
 } from "./HeatMapReducer";
@@ -46,7 +47,7 @@ export const fetchHeatMapData = (props: HeatMapDataHandlerProps) => (dispatch: D
             if (dataSourceType === "XPath") {
                 fetchSortedData(props)
                     .then(data => dispatch({
-                        data: data.data,
+                        heatmapData: data.data,
                         mxObjects: data.mxObjects,
                         layoutOptions: props.layoutOptions || "{\n\n}",
                         configurationOptions: props.configurationOptions || "{\n\n}",
@@ -63,7 +64,7 @@ export const fetchHeatMapData = (props: HeatMapDataHandlerProps) => (dispatch: D
                         const horizontalValues = getValues(props.horizontalNameAttribute, data);
                         const verticalValues = getValues(props.verticalNameAttribute, data);
                         dispatch({
-                            data: {
+                            heatmapData: {
                                 x: horizontalValues,
                                 y: verticalValues,
                                 z: processZData(props, verticalValues, horizontalValues, data),
@@ -106,7 +107,7 @@ export const fetchHeatMapData = (props: HeatMapDataHandlerProps) => (dispatch: D
                     const x = getValues(props.horizontalNameAttribute, [], data.restData);
                     const y = getValues(props.verticalNameAttribute, [], data.restData);
                     dispatch({
-                        data: {
+                        heatmapData: {
                             x,
                             y,
                             z: processZData(props, y, x, [], data.restData),
@@ -145,3 +146,5 @@ export const updateDataFromPlayground = (widgetID: string, dataOptions: string, 
         layoutOptions,
         configurationOptions
     });
+export const toggleUpdatingData = (widgetID: string, updatingData: boolean): Partial<HeatMapAction> =>
+    ({ type: TOGGLE_UPDATING_DATA, widgetID, updatingData });

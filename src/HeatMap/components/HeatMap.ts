@@ -1,10 +1,10 @@
+import { Alert } from "../../components/Alert";
 import deepMerge from "deepmerge";
-import { Config, HeatMapData, Layout, ScatterHoverData } from "plotly.js";
 import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
-import { MapDispatchToProps, connect } from "react-redux";
+import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { Alert } from "../../components/Alert";
+import { ScatterHoverData } from "plotly.js";
 import { HoverTooltip } from "../../components/HoverTooltip";
 import PlotlyChart from "../../components/PlotlyChart";
 import { arrayMerge } from "../../utils/configs";
@@ -14,10 +14,17 @@ import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } 
 
 import { HeatMapDataHandlerProps } from "./HeatMapDataHandler";
 import { HeatMapState } from "../store/HeatMapReducer";
-import { getDefaultConfigOptions, getDefaultDataOptions, getDefaultLayoutOptions } from "../utils/configs";
-import { store } from "../../store";
+import {
+    getConfigOptions,
+    getData,
+    getDefaultConfigOptions,
+    getDefaultDataOptions,
+    getDefaultLayoutOptions,
+    getLayoutOptions } from "../utils/configs";
+import { DefaultReduxStore, store } from "../../store";
 import HeatMapContainerProps = Container.HeatMapContainerProps;
 import "../../ui/Charts.scss";
+import { PlotlyChartInstance, defaultPlotlyInstanceState } from "../../components/reducers/PlotlyChartReducer";
 
 interface ComponentProps extends HeatMapDataHandlerProps {
     alertMessage?: ReactChild;
@@ -25,7 +32,7 @@ interface ComponentProps extends HeatMapDataHandlerProps {
     onHover?: (options: Data.OnHoverOptions<{ x: string, y: string, z: number }, HeatMapContainerProps>) => void;
 }
 
-export type HeatMapProps = ComponentProps & typeof PlotlyChartActions;
+export type HeatMapProps = ComponentProps & typeof PlotlyChartActions & PlotlyChartInstance;
 
 class HeatMap extends Component<HeatMapProps & HeatMapState> {
     private tooltipNode?: HTMLDivElement;
@@ -47,11 +54,18 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
         if (this.props.devMode === "developer" && this.props.loadPlayground) {
             store.dispatch(this.props.loadPlayground(this.props.friendlyId));
         }
-        this.updateData(this.props);
+        // this.updateData(this.props);
     }
 
     componentWillReceiveProps(nextProps: HeatMapProps) {
-        this.updateData(nextProps);
+        const doneFetching = !nextProps.fetchingData && this.props.fetchingData;
+
+        if (!nextProps.alertMessage && (doneFetching || nextProps.updatingData)) {
+            this.updateData(nextProps);
+        }
+        if (nextProps.updatingData) {
+            nextProps.toggleUpdatingData(nextProps.friendlyId, false);
+        }
     }
 
     private getTooltipNodeRef = (node: HTMLDivElement) => {
@@ -59,10 +73,18 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
     }
 
     private renderChart() {
+        const playgroundLoaded = this.props.devMode !== "developer" || !!this.props.playground;
+
         return createElement(PlotlyChart,
             {
                 widgetID: this.props.friendlyId,
                 type: "heatmap",
+                loadingAPI: this.props.loadingAPI && playgroundLoaded,
+                loadingData: this.props.fetchingData,
+                layout: this.props.layout,
+                data: this.props.data,
+                config: this.props.config,
+                plotly: this.props.plotly,
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
                 onClick: this.onClick,
@@ -96,82 +118,11 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
     }
 
     private updateData(props: HeatMapProps) {
-        if (!props.alertMessage && !props.fetchingData) {
-            props.updateData(props.friendlyId, {
-                layout: this.getLayoutOptions(props),
-                data: this.getData(props),
-                config: this.getConfigOptions(props)
-            });
-        }
-    }
-
-    private getData(props: HeatMapProps): HeatMapData[] {
-        if (props.data) {
-            const { dataOptions } = props;
-            const advancedOptions = props.devMode !== "basic" && dataOptions ? JSON.parse(dataOptions) : {};
-            const dataThemeConfigs = props.devMode !== "basic" ? props.themeConfigs.data : {};
-
-            const data: HeatMapData = deepMerge.all([
-                {
-                    ...getDefaultDataOptions(props),
-                    x: props.data.x,
-                    y: props.data.y,
-                    z: props.data.z,
-                    text: props.data.z.map(row => row.map(item => `${item}`)),
-                    zsmooth: props.smoothColor ? "best" : false
-                },
-                dataThemeConfigs,
-                advancedOptions
-            ], { arrayMerge });
-            data.colorscale = advancedOptions.colorscale || data.colorscale;
-
-            return [ data ];
-        }
-
-        return [];
-    }
-
-    private getLayoutOptions(props: HeatMapProps): Partial<Layout> {
-        const { layoutOptions } = props;
-        const advancedOptions = props.devMode !== "basic" && layoutOptions ? JSON.parse(layoutOptions) : {};
-        const themeLayoutConfigs = props.devMode !== "basic" ? props.themeConfigs.layout : {};
-
-        return deepMerge.all([
-            getDefaultLayoutOptions(props),
-            {
-                annotations: props.showValues
-                    ? this.getTextAnnotations(props.data, props.valuesColor)
-                    : undefined
-            },
-            themeLayoutConfigs,
-            advancedOptions
-        ]);
-    }
-
-    private getTextAnnotations(data?: HeatMapData, valuesColor = "") {
-        const annotations: {}[] = [];
-        if (data) {
-            for (let i = 0; i < data.y.length; i++) {
-                for (let j = 0; j < data.x.length; j++) {
-                    const result = {
-                        xref: "x1",
-                        yref: "y1",
-                        x: data.x[ j ],
-                        y: data.y[ i ],
-                        text: data.z[ i ][ j ],
-                        font: {
-                            family: "Open Sans",
-                            size: 14,
-                            color: valuesColor || "#555"
-                        },
-                        showarrow: false
-                    };
-                    annotations.push(result);
-                }
-            }
-        }
-
-        return annotations;
+        props.updateData(props.friendlyId, {
+            layout: getLayoutOptions(props),
+            data: getData(props),
+            config: getConfigOptions(props)
+        });
     }
 
     private onClick = ({ points }: ScatterHoverData<any>) => {
@@ -224,19 +175,10 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
             configurationOptions
         );
     }
-
-    public getConfigOptions(props: HeatMapProps): Partial<Config> {
-        const parsedConfig = props.devMode !== "basic" && props.configurationOptions
-            ? JSON.parse(props.configurationOptions)
-            : {};
-
-        return deepMerge.all(
-            [ { displayModeBar: false, doubleClick: false }, props.themeConfigs.configuration, parsedConfig ],
-            { arrayMerge }
-        );
-    }
 }
 
+const mapStateToProps: MapStateToProps<PlotlyChartInstance, ComponentProps, DefaultReduxStore> = (state, props) =>
+    state.plotly[props.friendlyId] || defaultPlotlyInstanceState;
 const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>
     bindActionCreators(PlotlyChartActions, dispatch);
-export default connect(null, mapDispatchToProps)(HeatMap);
+export default connect(mapStateToProps, mapDispatchToProps)(HeatMap);
