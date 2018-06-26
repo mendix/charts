@@ -20,11 +20,11 @@ export interface SeriesInstanceState {
 }
 
 export interface SeriesChartReducerState<T> {
-    [ widgetID: string ]: T;
+    [ instanceID: string ]: T;
 }
 
 export interface InstanceAction extends Action, SeriesInstanceState {
-    widgetID: string;
+    instanceID: string;
 }
 
 export const seriesActionType = (prefix: string) => ({
@@ -47,18 +47,18 @@ export const seriesReducer = <T extends SeriesInstanceState, A extends InstanceA
                 case seriesActionType(actionPrefix).FETCH_THEME_CONFIGS:
                     return {
                         ...state,
-                        [action.widgetID]: {
+                        [action.instanceID]: {
                             ...defaultInstanceState as SeriesInstanceState,
-                            ...state[action.widgetID] as SeriesInstanceState,
+                            ...state[action.instanceID] as SeriesInstanceState,
                             fetchingConfigs: true
                         } as T
                     };
                 case seriesActionType(actionPrefix).FETCH_THEME_CONFIGS_COMPLETE:
                     return {
                         ...state,
-                        [action.widgetID]: {
+                        [action.instanceID]: {
                             ...defaultInstanceState as SeriesInstanceState,
-                            ...state[action.widgetID] as SeriesInstanceState,
+                            ...state[action.instanceID] as SeriesInstanceState,
                             themeConfigs: action.themeConfigs,
                             fetchingConfigs: false
                         } as T
@@ -66,9 +66,9 @@ export const seriesReducer = <T extends SeriesInstanceState, A extends InstanceA
                 case seriesActionType(actionPrefix).UPDATE_DATA_FROM_FETCH:
                     return {
                         ...state,
-                        [action.widgetID]: {
+                        [action.instanceID]: {
                             ...defaultInstanceState as SeriesInstanceState,
-                            ...state[action.widgetID] as SeriesInstanceState,
+                            ...state[action.instanceID] as SeriesInstanceState,
                             seriesData: action.seriesData && action.seriesData.slice(),
                             layoutOptions: action.layoutOptions,
                             fetchingData: false,
@@ -79,46 +79,46 @@ export const seriesReducer = <T extends SeriesInstanceState, A extends InstanceA
                 case seriesActionType(actionPrefix).FETCH_DATA_FAILED:
                     return {
                         ...state,
-                        [action.widgetID]: {
-                            ...state[action.widgetID] as SeriesInstanceState,
+                        [action.instanceID]: {
+                            ...state[action.instanceID] as SeriesInstanceState,
                             ...defaultDataState as SeriesInstanceState
                         } as T
                     };
                 case seriesActionType(actionPrefix).NO_CONTEXT:
                     return {
                         ...state,
-                        [action.widgetID]: {
+                        [action.instanceID]: {
                             ...defaultInstanceState as SeriesInstanceState,
-                            ...state[action.widgetID] as SeriesInstanceState,
+                            ...state[action.instanceID] as SeriesInstanceState,
                             ...defaultDataState as SeriesInstanceState,
                             updatingData: true,
-                            themeConfigs: state[action.widgetID].themeConfigs
+                            themeConfigs: state[action.instanceID].themeConfigs
                         } as T
                     };
                 case seriesActionType(actionPrefix).TOGGLE_FETCHING_DATA:
                     return {
                         ...state,
-                        [action.widgetID]: {
+                        [action.instanceID]: {
                             ...defaultInstanceState as SeriesInstanceState,
-                            ...state[action.widgetID] as SeriesInstanceState,
+                            ...state[action.instanceID] as SeriesInstanceState,
                             fetchingData: action.fetchingData
                         } as T
                     };
                 case seriesActionType(actionPrefix).LOAD_PLAYGROUND:
                     return {
                         ...state,
-                        [action.widgetID]: {
+                        [action.instanceID]: {
                             ...defaultInstanceState as SeriesInstanceState,
-                            ...state[action.widgetID] as SeriesInstanceState,
+                            ...state[action.instanceID] as SeriesInstanceState,
                             playground: action.playground
                         } as T
                     };
                 case seriesActionType(actionPrefix).UPDATE_DATA_FROM_PLAYGROUND:
                     return {
                         ...state,
-                        [action.widgetID]: {
+                        [action.instanceID]: {
                             ...defaultInstanceState as SeriesInstanceState,
-                            ...state[action.widgetID] as SeriesInstanceState,
+                            ...state[action.instanceID] as SeriesInstanceState,
                             layoutOptions: action.layoutOptions,
                             scatterData: action.scatterData && action.scatterData.slice(),
                             seriesOptions: action.seriesOptions && action.seriesOptions.slice(),
@@ -129,18 +129,18 @@ export const seriesReducer = <T extends SeriesInstanceState, A extends InstanceA
                 case seriesActionType(actionPrefix).TOGGLE_UPDATING_DATA:
                     return {
                         ...state,
-                        [action.widgetID]: {
+                        [action.instanceID]: {
                             ...defaultInstanceState as SeriesInstanceState,
-                            ...state[action.widgetID] as SeriesInstanceState,
+                            ...state[action.instanceID] as SeriesInstanceState,
                             updatingData: action.updatingData
                         } as T
                     };
                 case seriesActionType(actionPrefix).ALERT_MESSAGE:
                     return {
                         ...state,
-                        [action.widgetID]: {
+                        [action.instanceID]: {
                             ...defaultInstanceState as SeriesInstanceState,
-                            ...state[action.widgetID] as SeriesInstanceState,
+                            ...state[action.instanceID] as SeriesInstanceState,
                             alertMessage: action.alertMessage
                         } as T
                     };

@@ -5,7 +5,7 @@ import { ChartConfigs } from "../../utils/configs";
 import { HeatMapData } from "plotly.js";
 import { DefaultReduxStore, registerReducer } from "../../store";
 
-export type HeatMapAction = Action & HeatMapState & { widgetID: string };
+export type HeatMapAction = Action & HeatMapState & { instanceID: string };
 
 export interface HeatMapState {
     layoutOptions: string;
@@ -53,18 +53,18 @@ export const heatmapReducer: Reducer<HeatMapReducerState> = (state = {} as HeatM
         case FETCH_THEME_CONFIGS:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     fetchingConfigs: true
                 }
             };
         case FETCH_THEME_CONFIGS_COMPLETE:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     themeConfigs: action.themeConfigs,
                     fetchingConfigs: false
                 }
@@ -72,27 +72,27 @@ export const heatmapReducer: Reducer<HeatMapReducerState> = (state = {} as HeatM
         case ALERT_MESSAGE:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     alertMessage: action.alertMessage
                 } };
         case TOGGLE_FETCHING_DATA:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     fetchingData: action.fetchingData
                 } };
         case FETCH_DATA_FAILED:
-            return { ...state, [action.widgetID]: { ...state[action.widgetID], heatmapData: undefined } };
+            return { ...state, [action.instanceID]: { ...state[action.instanceID], heatmapData: undefined } };
         case UPDATE_DATA_FROM_FETCH:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     heatmapData: action.heatmapData && action.heatmapData,
                     fetchingData: false,
                     layoutOptions: action.layoutOptions
@@ -101,35 +101,35 @@ export const heatmapReducer: Reducer<HeatMapReducerState> = (state = {} as HeatM
         case TOGGLE_UPDATING_DATA:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     updatingData: action.updatingData
                 } };
         case NO_CONTEXT:
             return {
                 ...state,
-                [action.widgetID]: {
-                    ...state[action.widgetID],
+                [action.instanceID]: {
+                    ...state[action.instanceID],
                     ...defaultInstanceState,
                     heatmapData: undefined,
                     updatingData: true,
-                    themeConfigs: state[action.widgetID].themeConfigs
+                    themeConfigs: state[action.instanceID].themeConfigs
                 } };
         case LOAD_PLAYGROUND:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     playground: action.playground
                 } };
         case UPDATE_DATA_FROM_PLAYGROUND:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     layoutOptions: action.layoutOptions,
                     dataOptions: action.dataOptions,
                     configurationOptions: action.configurationOptions,

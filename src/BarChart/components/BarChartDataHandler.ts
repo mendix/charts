@@ -19,7 +19,8 @@ import { store } from "../../store";
 import BarChartContainerProps = Container.BarChartContainerProps;
 
 type Actions = typeof BarChartActions & typeof PlotlyChartActions;
-export type BarChartDataHandlerProps = BarChartContainerProps & BarChartInstanceState & Actions;
+type ComponentProps = BarChartContainerProps & { instanceID: string };
+export type BarChartDataHandlerProps = ComponentProps & BarChartInstanceState & Actions;
 
 export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
     private subscriptionHandles: number[] = [];
@@ -38,12 +39,12 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
     }
 
     componentDidMount() {
-        const { series, friendlyId, layoutOptions, configurationOptions } = this.props;
+        const { series, instanceID, friendlyId, layoutOptions, configurationOptions } = this.props;
         const validationError = validateSeriesProps(series, friendlyId, layoutOptions, configurationOptions);
         if (validationError) {
-            this.props.showAlertMessage(friendlyId, validationError);
+            this.props.showAlertMessage(instanceID, validationError);
         }
-        store.dispatch(this.props.fetchThemeConfigs(friendlyId, this.props.orientation));
+        store.dispatch(this.props.fetchThemeConfigs(instanceID, this.props.orientation));
     }
 
     componentWillReceiveProps(nextProps: BarChartDataHandlerProps) {
@@ -51,9 +52,9 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
         if (!nextProps.alertMessage) {
             if (!nextProps.mxObject) {
                 if (this.props.mxObject) {
-                    nextProps.noContext(nextProps.friendlyId);
+                    nextProps.noContext(nextProps.instanceID);
                 }
-            } else if (!nextProps.fetchingConfigs && isContextChanged(this.props.mxObject, nextProps.mxObject)) {
+            } else if (isContextChanged(this.props.mxObject, nextProps.mxObject)) {
                 if (!nextProps.fetchingData) {
                     store.dispatch(nextProps.fetchData(nextProps));
                 }
@@ -151,9 +152,9 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
     }
 }
 
-const mapStateToProps: MapStateToProps<BarChartInstanceState, BarChartContainerProps, ReduxStore> = (state, props) =>
-    state.bar[props.friendlyId] || defaultInstanceState as BarChartInstanceState;
-const mapDispatchToProps: MapDispatchToProps<typeof BarChartActions & typeof PlotlyChartActions, BarChartContainerProps> =
+const mapStateToProps: MapStateToProps<BarChartInstanceState, ComponentProps, ReduxStore> = (state, props) =>
+    state.bar[props.instanceID] || defaultInstanceState as BarChartInstanceState;
+const mapDispatchToProps: MapDispatchToProps<typeof BarChartActions & typeof PlotlyChartActions, ComponentProps> =
     dispatch => ({
         ...bindActionCreators(BarChartActions, dispatch),
         ...bindActionCreators(PlotlyChartActions, dispatch)

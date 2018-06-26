@@ -57,7 +57,7 @@ class LineChart extends Component<LineChartProps & LineChartState> {
 
     componentDidMount() {
         if (this.props.devMode === "developer" && this.props.loadPlayground) {
-            store.dispatch(this.props.loadPlayground(this.props.friendlyId));
+            store.dispatch(this.props.loadPlayground(this.props.instanceID));
         }
         if (this.props.updatingData) {
             this.updateData(this.props);
@@ -71,7 +71,7 @@ class LineChart extends Component<LineChartProps & LineChartState> {
             this.updateData(nextProps);
         }
         if (nextProps.updatingData) {
-            nextProps.toggleUpdatingData(nextProps.friendlyId, false);
+            nextProps.toggleUpdatingData(nextProps.instanceID, false);
         }
     }
 
@@ -85,7 +85,7 @@ class LineChart extends Component<LineChartProps & LineChartState> {
         return createElement(PlotlyChart,
             {
                 type: getChartType(this.props.type),
-                widgetID: this.props.friendlyId,
+                widgetID: this.props.instanceID,
                 loadingAPI: this.props.loadingAPI && playgroundLoaded,
                 loadingData: this.props.fetchingData,
                 layout: this.props.layout,
@@ -121,7 +121,7 @@ class LineChart extends Component<LineChartProps & LineChartState> {
     }
 
     private updateData(props: LineChartProps) {
-        props.updateData(props.friendlyId, {
+        props.updateData(props.instanceID, {
             layout: parseScatterLayoutOptions(props),
             data: parseScatterData(props, this.chartNode),
             config: getScatterConfigOptions(props)
@@ -178,7 +178,7 @@ class LineChart extends Component<LineChartProps & LineChartState> {
             const scatterData = this.props.scatterData.slice();
             (scatterData as any)[data[1][0]].visible = data[0].visible[0];
 
-            this.props.updateData(this.props.friendlyId, {
+            this.props.updateData(this.props.instanceID, {
                 layout: parseScatterLayoutOptions(this.props),
                 data: parseScatterData(this.props, this.chartNode),
                 config: getScatterConfigOptions(this.props)
@@ -199,7 +199,7 @@ class LineChart extends Component<LineChartProps & LineChartState> {
             return (this.props.scatterData as any)[index];
         });
         this.props.updateDataFromPlayground(
-            this.props.friendlyId,
+            this.props.instanceID,
             updatedScatterData,
             layoutOptions,
             seriesOptions,
@@ -210,7 +210,7 @@ class LineChart extends Component<LineChartProps & LineChartState> {
     private onLoadAndResize = (node: HTMLDivElement) => {
         if (node && !this.chartNode) {
             this.chartNode = node;
-            this.props.updateData(this.props.friendlyId, {
+            this.props.updateData(this.props.instanceID, {
                 layout: parseScatterLayoutOptions(this.props),
                 data: parseScatterData(this.props, this.chartNode),
                 config: getScatterConfigOptions(this.props)
@@ -220,7 +220,7 @@ class LineChart extends Component<LineChartProps & LineChartState> {
 }
 
 const mapStateToProps: MapStateToProps<PlotlyChartInstance, ComponentProps, DefaultReduxStore> = (state, props) =>
-    state.plotly[props.friendlyId] || defaultPlotlyInstanceState;
+    state.plotly[props.instanceID] || defaultPlotlyInstanceState;
 const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>
     bindActionCreators(PlotlyChartActions, dispatch);
 export default connect(mapStateToProps, mapDispatchToProps)(LineChart);

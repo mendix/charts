@@ -19,7 +19,8 @@ import { bindActionCreators } from "redux";
 import { getAttributeName } from "../utils/data";
 
 type Actions = typeof HeatMapActions & typeof PlotlyChartActions;
-export type HeatMapDataHandlerProps = HeatMapContainerProps & HeatMapState & Actions;
+type ComponentProps = HeatMapContainerProps & { instanceID: string };
+export type HeatMapDataHandlerProps = ComponentProps & HeatMapState & Actions;
 
 class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
     private subscriptionHandles: number[] = [];
@@ -36,7 +37,7 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
     }
 
     componentDidMount() {
-        const { friendlyId, layoutOptions, configurationOptions } = this.props;
+        const { friendlyId, instanceID, layoutOptions, configurationOptions } = this.props;
         const validationError = validateSeriesProps(
             [ { ...this.props, seriesOptions: this.props.dataOptions } ],
             friendlyId,
@@ -44,9 +45,9 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
             configurationOptions
         );
         if (validationError) {
-            this.props.showAlertMessage(friendlyId, validationError);
+            this.props.showAlertMessage(instanceID, validationError);
         }
-        store.dispatch(this.props.fetchThemeConfigs(friendlyId));
+        store.dispatch(this.props.fetchThemeConfigs(instanceID));
     }
 
     componentWillReceiveProps(nextProps: HeatMapDataHandlerProps) {
@@ -54,9 +55,9 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
         if (!nextProps.alertMessage) {
             if (!nextProps.mxObject) {
                 if (this.props.mxObject) {
-                    nextProps.noContext(nextProps.friendlyId);
+                    nextProps.noContext(nextProps.instanceID);
                 }
-            } else if (!nextProps.fetchingConfigs && isContextChanged(this.props.mxObject, nextProps.mxObject)) {
+            } else if (isContextChanged(this.props.mxObject, nextProps.mxObject)) {
                 if (!nextProps.fetchingData) {
                     store.dispatch(nextProps.fetchHeatMapData(nextProps));
                 }
@@ -169,9 +170,9 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
     }
 }
 
-const mapStateToProps: MapStateToProps<HeatMapState, HeatMapContainerProps, ReduxStore> = (state, props) =>
-    state.heatmap[props.friendlyId] || defaultInstanceState as HeatMapState;
-const mapDispatchToProps: MapDispatchToProps<typeof HeatMapActions & typeof PlotlyChartActions, HeatMapContainerProps> =
+const mapStateToProps: MapStateToProps<HeatMapState, ComponentProps, ReduxStore> = (state, props) =>
+    state.heatmap[props.instanceID] || defaultInstanceState as HeatMapState;
+const mapDispatchToProps: MapDispatchToProps<typeof HeatMapActions & typeof PlotlyChartActions, ComponentProps> =
     dispatch => ({
         ...bindActionCreators(HeatMapActions, dispatch),
         ...bindActionCreators(PlotlyChartActions, dispatch)

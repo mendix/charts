@@ -11,12 +11,12 @@ import { getData } from "../utils/data";
 import { LineChartAction, scatterPrefix } from "./LineChartReducer";
 
 const actionType = seriesActionType(scatterPrefix);
-export const showAlertMessage = (widgetID: string, alertMessage: ReactChild): Partial<LineChartAction> =>
-    ({ type: actionType.ALERT_MESSAGE, widgetID, alertMessage });
-export const isFetching = (widgetID: string, fetchingData: boolean): Partial<LineChartAction> =>
-    ({ type: actionType.TOGGLE_FETCHING_DATA, widgetID, fetchingData });
-export const noContext = (widgetID: string): Partial<LineChartAction> =>
-    ({ type: actionType.NO_CONTEXT, widgetID });
+export const showAlertMessage = (instanceID: string, alertMessage: ReactChild): Partial<LineChartAction> =>
+    ({ type: actionType.ALERT_MESSAGE, instanceID, alertMessage });
+export const isFetching = (instanceID: string, fetchingData: boolean): Partial<LineChartAction> =>
+    ({ type: actionType.TOGGLE_FETCHING_DATA, instanceID, fetchingData });
+export const noContext = (instanceID: string): Partial<LineChartAction> =>
+    ({ type: actionType.NO_CONTEXT, instanceID });
 
 export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispatch<Partial<LineChartAction> & Action, any>) => {
     return () => {
@@ -24,7 +24,7 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
             if (!props.fetchingData) {
                 dispatch({
                     type: actionType.TOGGLE_FETCHING_DATA,
-                    widgetID: props.friendlyId,
+                    instanceID: props.instanceID,
                     fetchingData: true
                 });
             }
@@ -63,31 +63,31 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
                 scatterData: getData(data, props),
                 seriesOptions: data.map(({ series }) => series.seriesOptions || "{\n\n}"),
                 configurationOptions: props.configurationOptions || "{\n\n}",
-                widgetID: props.friendlyId,
+                instanceID: props.instanceID,
                 type: actionType.UPDATE_DATA_FROM_FETCH
             }))
             .catch(reason => {
                 window.mx.ui.error(reason);
-                dispatch({ type: actionType.FETCH_DATA_FAILED, widgetID: props.friendlyId });
+                dispatch({ type: actionType.FETCH_DATA_FAILED, instanceID: props.instanceID });
             });
         } else {
-            dispatch({ type: actionType.NO_CONTEXT, widgetID: props.friendlyId });
+            dispatch({ type: actionType.NO_CONTEXT, instanceID: props.instanceID });
         }
     };
 };
 
-export const fetchThemeConfigs = (widgetID: string, type: ChartType) => (dispatch: Dispatch<any, any>) => () => {
-    dispatch({ type: actionType.FETCH_THEME_CONFIGS, widgetID });
+export const fetchThemeConfigs = (instanceID: string, type: ChartType) => (dispatch: Dispatch<any, any>) => () => {
+    dispatch({ type: actionType.FETCH_THEME_CONFIGS, instanceID });
     fetchLineThemeConfig(type)
-        .then(themeConfigs => dispatch({ type: actionType.FETCH_THEME_CONFIGS_COMPLETE, widgetID, themeConfigs }));
+        .then(themeConfigs => dispatch({ type: actionType.FETCH_THEME_CONFIGS_COMPLETE, instanceID, themeConfigs }));
 };
 
-export const loadPlayground = (widgetID: string) => (dispatch: Dispatch<any, any>) => async () => {
+export const loadPlayground = (instanceID: string) => (dispatch: Dispatch<any, any>) => async () => {
     const { SeriesPlayground } = await import("../../components/SeriesPlayground");
-    dispatch({ type: actionType.LOAD_PLAYGROUND, widgetID, playground: SeriesPlayground });
+    dispatch({ type: actionType.LOAD_PLAYGROUND, instanceID, playground: SeriesPlayground });
 };
 
-export const updateDataFromPlayground = (widgetID: string, scatterData: ScatterData[], layoutOptions: string, seriesOptions: string[], configurationOptions: string): Partial<LineChartAction> => {
+export const updateDataFromPlayground = (instanceID: string, scatterData: ScatterData[], layoutOptions: string, seriesOptions: string[], configurationOptions: string): Partial<LineChartAction> => {
     let newScatterData = scatterData;
     if (seriesOptions && seriesOptions.length) {
         newScatterData = scatterData.map((data, index) => {
@@ -100,12 +100,12 @@ export const updateDataFromPlayground = (widgetID: string, scatterData: ScatterD
 
     return ({
         type: actionType.UPDATE_DATA_FROM_PLAYGROUND,
-        widgetID,
+        instanceID,
         scatterData: newScatterData,
         layoutOptions,
         seriesOptions,
         configurationOptions
     });
 };
-export const toggleUpdatingData = (widgetID: string, updatingData: boolean): Partial<LineChartAction> =>
-    ({ type: actionType.TOGGLE_UPDATING_DATA, widgetID, updatingData });
+export const toggleUpdatingData = (instanceID: string, updatingData: boolean): Partial<LineChartAction> =>
+    ({ type: actionType.TOGGLE_UPDATING_DATA, instanceID, updatingData });

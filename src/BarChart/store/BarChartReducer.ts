@@ -6,7 +6,7 @@ import { seriesReducer } from "../../store/SeriesReducer";
 import { Container, Data } from "../../utils/namespaces";
 import BarChartContainerState = Container.BarChartContainerState;
 
-export type BarChartAction = Action & BarChartInstanceState & { widgetID: string };
+export type BarChartAction = Action & BarChartInstanceState & { instanceID: string };
 
 export interface BarChartState {
     layoutOptions: string;

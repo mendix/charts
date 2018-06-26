@@ -20,7 +20,8 @@ import LineChartContainerProps = Container.LineChartContainerProps;
 import { ChartType } from "../../utils/configs";
 
 type Actions = typeof LineChartActions & typeof PlotlyChartActions;
-export type LineChartDataHandlerProps = LineChartContainerProps & LineChartInstanceState & Actions;
+type ComponentProps = LineChartContainerProps & { instanceID: string };
+export type LineChartDataHandlerProps = ComponentProps & LineChartInstanceState & Actions;
 
 export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
     private subscriptionHandles: number[] = [];
@@ -45,12 +46,12 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
     }
 
     componentDidMount() {
-        const { series, friendlyId, layoutOptions, configurationOptions } = this.props;
+        const { series, friendlyId, instanceID, layoutOptions, configurationOptions } = this.props;
         const validationError = validateSeriesProps(series, friendlyId, layoutOptions, configurationOptions);
         if (validationError) {
-            this.props.showAlertMessage(friendlyId, validationError);
+            this.props.showAlertMessage(instanceID, validationError);
         }
-        store.dispatch(this.props.fetchThemeConfigs(friendlyId, this.typeMapping[this.props.type]));
+        store.dispatch(this.props.fetchThemeConfigs(instanceID, this.typeMapping[this.props.type]));
     }
 
     componentWillReceiveProps(nextProps: LineChartDataHandlerProps) {
@@ -58,9 +59,9 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
         if (!nextProps.alertMessage) {
             if (!nextProps.mxObject) {
                 if (this.props.mxObject) {
-                    nextProps.noContext(nextProps.friendlyId);
+                    nextProps.noContext(nextProps.instanceID);
                 }
-            } else if (!nextProps.fetchingConfigs && isContextChanged(this.props.mxObject, nextProps.mxObject)) {
+            } else if (isContextChanged(this.props.mxObject, nextProps.mxObject)) {
                 if (!nextProps.fetchingData) {
                     store.dispatch(nextProps.fetchData(nextProps));
                 }
@@ -158,9 +159,9 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
     }
 }
 
-const mapStateToProps: MapStateToProps<LineChartInstanceState, LineChartContainerProps, ReduxStore> = (state, props) =>
-    state.scatter[props.friendlyId] || defaultInstanceState as LineChartInstanceState;
-const mapDispatchToProps: MapDispatchToProps<typeof LineChartActions & typeof PlotlyChartActions, LineChartContainerProps> =
+const mapStateToProps: MapStateToProps<LineChartInstanceState, ComponentProps, ReduxStore> = (state, props) =>
+    state.scatter[props.instanceID] || defaultInstanceState as LineChartInstanceState;
+const mapDispatchToProps: MapDispatchToProps<typeof LineChartActions & typeof PlotlyChartActions, ComponentProps> =
     dispatch => ({
         ...bindActionCreators(LineChartActions, dispatch),
         ...bindActionCreators(PlotlyChartActions, dispatch)

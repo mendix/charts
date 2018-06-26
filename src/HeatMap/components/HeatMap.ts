@@ -52,7 +52,7 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
 
     componentDidMount() {
         if (this.props.devMode === "developer" && this.props.loadPlayground) {
-            store.dispatch(this.props.loadPlayground(this.props.friendlyId));
+            store.dispatch(this.props.loadPlayground(this.props.instanceID));
         }
         // this.updateData(this.props);
     }
@@ -64,7 +64,7 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
             this.updateData(nextProps);
         }
         if (nextProps.updatingData) {
-            nextProps.toggleUpdatingData(nextProps.friendlyId, false);
+            nextProps.toggleUpdatingData(nextProps.instanceID, false);
         }
     }
 
@@ -77,7 +77,7 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
 
         return createElement(PlotlyChart,
             {
-                widgetID: this.props.friendlyId,
+                widgetID: this.props.instanceID,
                 type: "heatmap",
                 loadingAPI: this.props.loadingAPI && playgroundLoaded,
                 loadingData: this.props.fetchingData,
@@ -118,7 +118,7 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
     }
 
     private updateData(props: HeatMapProps) {
-        props.updateData(props.friendlyId, {
+        props.updateData(props.instanceID, {
             layout: getLayoutOptions(props),
             data: getData(props),
             config: getConfigOptions(props)
@@ -169,7 +169,7 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
 
     private onOptionsUpdate = (layoutOptions: string, dataOptions: string, configurationOptions: string) => {
         this.props.updateDataFromPlayground(
-            this.props.friendlyId,
+            this.props.instanceID,
             dataOptions,
             layoutOptions,
             configurationOptions
@@ -178,7 +178,7 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
 }
 
 const mapStateToProps: MapStateToProps<PlotlyChartInstance, ComponentProps, DefaultReduxStore> = (state, props) =>
-    state.plotly[props.friendlyId] || defaultPlotlyInstanceState;
+    state.plotly[props.instanceID] || defaultPlotlyInstanceState;
 const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>
     bindActionCreators(PlotlyChartActions, dispatch);
 export default connect(mapStateToProps, mapDispatchToProps)(HeatMap);

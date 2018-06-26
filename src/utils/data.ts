@@ -488,3 +488,5 @@ export const renderError = (id: string, errorMessages: string[]) => {
 
     return "";
 };
+
+export const generateInstanceID = (friendlyId: string) => `${friendlyId}-${Math.round(Math.random() * 20)}`;

@@ -8,7 +8,7 @@ import { seriesReducer } from "../../store/SeriesReducer";
 import LineChartContainerState = Container.LineChartContainerState;
 import LineSeriesProps = Data.LineSeriesProps;
 
-export type LineChartAction = Action & LineChartInstanceState & { widgetID: string };
+export type LineChartAction = Action & LineChartInstanceState & { instanceID: string };
 
 export interface LineChartState {
     layoutOptions: string;

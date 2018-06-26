@@ -19,23 +19,23 @@ import { Action } from "redux";
 import { fetchData, generateRESTURL } from "../../utils/data";
 import { getData } from "../utils/data";
 
-export const showAlertMessage = (widgetID: string, alertMessage: ReactChild): Partial<PieChartAction> =>
-    ({ type: ALERT_MESSAGE, widgetID, alertMessage });
-export const isFetching = (widgetID: string, fetchingData: boolean): Partial<PieChartAction> =>
-    ({ type: TOGGLE_FETCHING_DATA, widgetID, fetchingData });
-export const noContext = (widgetID: string): Partial<PieChartAction> => ({ type: NO_CONTEXT, widgetID });
+export const showAlertMessage = (instanceID: string, alertMessage: ReactChild): Partial<PieChartAction> =>
+    ({ type: ALERT_MESSAGE, instanceID, alertMessage });
+export const isFetching = (instanceID: string, fetchingData: boolean): Partial<PieChartAction> =>
+    ({ type: TOGGLE_FETCHING_DATA, instanceID, fetchingData });
+export const noContext = (instanceID: string): Partial<PieChartAction> => ({ type: NO_CONTEXT, instanceID });
 
-export const fetchThemeConfigs = (widgetID: string) => (dispatch: Dispatch<any>) => () => {
-    dispatch({ type: FETCH_THEME_CONFIGS, widgetID });
+export const fetchThemeConfigs = (instanceID: string) => (dispatch: Dispatch<any>) => () => {
+    dispatch({ type: FETCH_THEME_CONFIGS, instanceID });
     fetchPieThemeConfig("PieChart")
-        .then(themeConfigs => dispatch({ type: FETCH_THEME_CONFIGS_COMPLETE, widgetID, themeConfigs }));
+        .then(themeConfigs => dispatch({ type: FETCH_THEME_CONFIGS_COMPLETE, instanceID, themeConfigs }));
 };
 
 export const fetchPieData = (props: PieChartDataHandlerProps) => (dispatch: Dispatch<Partial<PieChartAction> & Action>) => {
     return () => {
         if (props.mxObject && props.dataEntity) {
             if (!props.fetchingData) {
-                dispatch({ type: TOGGLE_FETCHING_DATA, widgetID: props.friendlyId, fetchingData: true });
+                dispatch({ type: TOGGLE_FETCHING_DATA, instanceID: props.instanceID, fetchingData: true });
             }
 
             const attributes = [ props.nameAttribute, props.valueAttribute ];
@@ -59,30 +59,30 @@ export const fetchPieData = (props: PieChartDataHandlerProps) => (dispatch: Disp
                 pieData: getData(data, props),
                 layoutOptions: props.layoutOptions || "{\n\n}",
                 configurationOptions: props.configurationOptions || "{\n\n}",
-                widgetID: props.friendlyId,
+                instanceID: props.instanceID,
                 type: UPDATE_DATA_FROM_FETCH
             })).catch(error => {
                 window.mx.ui.error(`An error occurred while retrieving data in ${props.friendlyId}:\n ${error.message}`);
-                dispatch({ type: FETCH_DATA_FAILED, widgetID: props.friendlyId });
+                dispatch({ type: FETCH_DATA_FAILED, instanceID: props.instanceID });
             });
         } else {
-            dispatch({ type: NO_CONTEXT, widgetID: props.friendlyId });
+            dispatch({ type: NO_CONTEXT, instanceID: props.instanceID });
         }
     };
 };
 
-export const loadPlayground = (widgetID: string) => (dispatch: Dispatch<any>) => async () => {
+export const loadPlayground = (instanceID: string) => (dispatch: Dispatch<any>) => async () => {
     const { PiePlayground } = await import("../components/PiePlayground");
-    dispatch({ type: LOAD_PLAYGROUND, widgetID, playground: PiePlayground });
+    dispatch({ type: LOAD_PLAYGROUND, instanceID, playground: PiePlayground });
 };
 
-export const updateDataFromPlayground = (widgetID: string, dataOptions: string, layoutOptions: string, configurationOptions: string): Partial<PieChartAction> =>
+export const updateDataFromPlayground = (instanceID: string, dataOptions: string, layoutOptions: string, configurationOptions: string): Partial<PieChartAction> =>
     ({
         type: UPDATE_DATA_FROM_PLAYGROUND,
-        widgetID,
+        instanceID,
         dataOptions,
         layoutOptions,
         configurationOptions
     });
-export const toggleUpdatingData = (widgetID: string, updatingData: boolean): Partial<PieChartAction> =>
-    ({ type: TOGGLE_UPDATING_DATA, widgetID, updatingData });
+export const toggleUpdatingData = (instanceID: string, updatingData: boolean): Partial<PieChartAction> =>
+    ({ type: TOGGLE_UPDATING_DATA, instanceID, updatingData });

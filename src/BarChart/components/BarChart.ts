@@ -48,7 +48,7 @@ class BarChart extends Component<BarChartProps & BarChartState> {
 
     componentDidMount() {
         if (this.props.devMode === "developer" && this.props.loadPlayground) {
-            store.dispatch(this.props.loadPlayground(this.props.friendlyId));
+            store.dispatch(this.props.loadPlayground(this.props.instanceID));
         }
         if (this.props.updatingData) {
             this.updateData(this.props);
@@ -62,7 +62,7 @@ class BarChart extends Component<BarChartProps & BarChartState> {
             this.updateData(nextProps);
         }
         if (nextProps.updatingData) {
-            nextProps.toggleUpdatingData(nextProps.friendlyId, false);
+            nextProps.toggleUpdatingData(nextProps.instanceID, false);
         }
     }
 
@@ -76,7 +76,7 @@ class BarChart extends Component<BarChartProps & BarChartState> {
         return createElement(PlotlyChart,
             {
                 type: "bar",
-                widgetID: this.props.friendlyId,
+                widgetID: this.props.instanceID,
                 loadingAPI: this.props.loadingAPI && playgroundLoaded,
                 loadingData: this.props.fetchingData,
                 layout: this.props.layout,
@@ -110,7 +110,7 @@ class BarChart extends Component<BarChartProps & BarChartState> {
     }
 
     private updateData(props: BarChartProps) {
-        props.updateData(props.friendlyId, {
+        props.updateData(props.instanceID, {
             layout: getLayoutOptions(props),
             data: props.scatterData || [],
             config: getConfigOptions(props)
@@ -165,7 +165,7 @@ class BarChart extends Component<BarChartProps & BarChartState> {
     private onOptionsUpdate = (layoutOptions: string, seriesOptions: string[], configurationOptions: string) => {
         if (this.props.scatterData) {
             this.props.updateDataFromPlayground(
-                this.props.friendlyId,
+                this.props.instanceID,
                 this.props.scatterData,
                 layoutOptions,
                 seriesOptions,
@@ -185,7 +185,7 @@ class BarChart extends Component<BarChartProps & BarChartState> {
 }
 
 const mapStateToProps: MapStateToProps<PlotlyChartInstance, ComponentProps, DefaultReduxStore> = (state, props) =>
-    state.plotly[props.friendlyId] || defaultPlotlyInstanceState;
+    state.plotly[props.instanceID] || defaultPlotlyInstanceState;
 const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>
     bindActionCreators(PlotlyChartActions, dispatch);
 export default connect(mapStateToProps, mapDispatchToProps)(BarChart);

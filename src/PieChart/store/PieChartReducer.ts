@@ -5,7 +5,7 @@ import { ChartConfigs } from "../../utils/configs";
 import { PieData } from "plotly.js";
 import { DefaultReduxStore, registerReducer } from "../../store";
 
-export type PieChartAction = Action & PieChartState & { widgetID: string };
+export type PieChartAction = Action & PieChartState & { instanceID: string };
 
 export interface PieChartState {
     layoutOptions: string;
@@ -54,19 +54,18 @@ export const pieChartReducer: Reducer<PieChartReducerState> = (state = {} as Pie
         case FETCH_THEME_CONFIGS:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
-                    fetchingConfigs: false,
-                    fetchingData: true
+                    ...state[action.instanceID],
+                    fetchingConfigs: true
                 }
             };
         case FETCH_THEME_CONFIGS_COMPLETE:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     themeConfigs: action.themeConfigs,
                     fetchingConfigs: false
                 }
@@ -74,27 +73,27 @@ export const pieChartReducer: Reducer<PieChartReducerState> = (state = {} as Pie
         case ALERT_MESSAGE:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     alertMessage: action.alertMessage
                 } };
         case TOGGLE_FETCHING_DATA:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     fetchingData: action.fetchingData
                 } };
         case FETCH_DATA_FAILED:
-            return { ...state, [action.widgetID]: { ...state[action.widgetID], pieData: [] } };
+            return { ...state, [action.instanceID]: { ...state[action.instanceID], pieData: [] } };
         case UPDATE_DATA_FROM_FETCH:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     data: action.data,
                     fetchingData: false,
                     layoutOptions: action.layoutOptions,
@@ -104,34 +103,34 @@ export const pieChartReducer: Reducer<PieChartReducerState> = (state = {} as Pie
         case NO_CONTEXT:
             return {
                 ...state,
-                [action.widgetID]: {
-                    ...state[action.widgetID],
+                [action.instanceID]: {
+                    ...state[action.instanceID],
                     ...defaultInstanceState,
                     updatingData: true,
-                    themeConfigs: state[action.widgetID].themeConfigs
+                    themeConfigs: state[action.instanceID].themeConfigs
                 } };
         case TOGGLE_UPDATING_DATA:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     updatingData: action.updatingData
                 } };
         case LOAD_PLAYGROUND:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     playground: action.playground
                 } };
         case UPDATE_DATA_FROM_PLAYGROUND:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     layoutOptions: action.layoutOptions,
                     dataOptions: action.dataOptions,
                     configurationOptions: action.configurationOptions,

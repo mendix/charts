@@ -12,7 +12,8 @@ import { store } from "../../store";
 import PieChartContainerProps = Container.PieChartContainerProps;
 
 type Actions = typeof PieChartActions & typeof PlotlyChartActions;
-export type PieChartDataHandlerProps = PieChartContainerProps & PieChartState & Actions;
+type ComponentProps = PieChartContainerProps & { instanceID: string };
+export type PieChartDataHandlerProps = ComponentProps & PieChartState & Actions;
 
 export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
     private subscriptionHandles: number[] = [];
@@ -29,7 +30,7 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
     }
 
     componentDidMount() {
-        const { friendlyId, layoutOptions, configurationOptions } = this.props;
+        const { friendlyId, instanceID, layoutOptions, configurationOptions } = this.props;
         const validationError = validateSeriesProps(
             [ { ...this.props, seriesOptions: this.props.dataOptions } ],
             friendlyId,
@@ -37,9 +38,9 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
             configurationOptions
         );
         if (validationError) {
-            this.props.showAlertMessage(friendlyId, validationError);
+            this.props.showAlertMessage(instanceID, validationError);
         }
-        store.dispatch(this.props.fetchThemeConfigs(friendlyId));
+        store.dispatch(this.props.fetchThemeConfigs(instanceID));
     }
 
     componentWillReceiveProps(nextProps: PieChartDataHandlerProps) {
@@ -47,9 +48,9 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
         if (!nextProps.alertMessage) {
             if (!nextProps.mxObject) {
                 if (this.props.mxObject) {
-                    nextProps.noContext(nextProps.friendlyId);
+                    nextProps.noContext(nextProps.instanceID);
                 }
-            } else if (!nextProps.fetchingConfigs && isContextChanged(this.props.mxObject, nextProps.mxObject)) {
+            } else if (isContextChanged(this.props.mxObject, nextProps.mxObject)) {
                 if (!nextProps.fetchingData) {
                     store.dispatch(nextProps.fetchPieData(nextProps));
                 }
@@ -147,9 +148,9 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
     }
 }
 
-const mapStateToProps: MapStateToProps<PieChartState, PieChartContainerProps, ReduxStore> = (state, props) =>
-    state.pie[props.friendlyId] || defaultInstanceState as PieChartState;
-const mapDispatchToProps: MapDispatchToProps<typeof PieChartActions & typeof PlotlyChartActions, PieChartContainerProps> =
+const mapStateToProps: MapStateToProps<PieChartState, ComponentProps, ReduxStore> = (state, props) =>
+    state.pie[props.instanceID] || defaultInstanceState as PieChartState;
+const mapDispatchToProps: MapDispatchToProps<typeof PieChartActions & typeof PlotlyChartActions, ComponentProps> =
     dispatch => ({
         ...bindActionCreators(PieChartActions, dispatch),
         ...bindActionCreators(PlotlyChartActions, dispatch)
