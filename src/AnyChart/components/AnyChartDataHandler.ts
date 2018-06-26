@@ -14,7 +14,8 @@ import { store } from "../../store";
 import AnyChartContainerProps = Container.AnyChartContainerProps;
 
 export type Actions = typeof AnyChartActions & typeof PlotlyChartActions;
-export type AnyChartDataHandlerProps = AnyChartContainerProps & AnyChartInstanceState & Actions;
+type ComponentProps = AnyChartContainerProps & { instanceID: string };
+export type AnyChartDataHandlerProps = ComponentProps & AnyChartInstanceState & Actions;
 
 export class AnyChartDataHandler extends Component<AnyChartDataHandlerProps> {
     private subscriptionHandles: number[] = [];
@@ -34,9 +35,9 @@ export class AnyChartDataHandler extends Component<AnyChartDataHandlerProps> {
     componentDidMount() {
         const validationError = AnyChartDataHandler.validateSeriesProps(this.props);
         if (validationError) {
-            this.props.showAlertMessage(this.props.friendlyId, validationError);
+            this.props.showAlertMessage(this.props.instanceID, validationError);
         }
-        this.props.toggleFetchingData(this.props.friendlyId, true);
+        this.props.toggleFetchingData(this.props.instanceID, true);
     }
 
     componentWillReceiveProps(nextProps: AnyChartDataHandlerProps) {
@@ -44,11 +45,11 @@ export class AnyChartDataHandler extends Component<AnyChartDataHandlerProps> {
         if (!nextProps.alertMessage) {
             if (!nextProps.mxObject) {
                 if (this.props.mxObject) {
-                    nextProps.noContext(nextProps.friendlyId);
+                    nextProps.noContext(nextProps.instanceID);
                 }
             } else if (isContextChanged(this.props.mxObject, nextProps.mxObject)) {
                 if (!nextProps.fetchingData) {
-                    nextProps.toggleFetchingData(nextProps.friendlyId, true);
+                    nextProps.toggleFetchingData(nextProps.instanceID, true);
                 }
                 nextProps.fetchData(nextProps);
             }
@@ -183,9 +184,9 @@ export class AnyChartDataHandler extends Component<AnyChartDataHandlerProps> {
     }
 }
 
-const mapStateToProps: MapStateToProps<AnyChartInstanceState, AnyChartContainerProps, ReduxStore> = (state, props) =>
-    state.any[props.friendlyId] || defaultInstanceState as AnyChartInstanceState;
-const mapDispatchToProps: MapDispatchToProps<typeof AnyChartActions & typeof PlotlyChartActions, AnyChartContainerProps> =
+const mapStateToProps: MapStateToProps<AnyChartInstanceState, ComponentProps, ReduxStore> = (state, props) =>
+    state.any[props.instanceID] || defaultInstanceState as AnyChartInstanceState;
+const mapDispatchToProps: MapDispatchToProps<typeof AnyChartActions & typeof PlotlyChartActions, ComponentProps> =
     dispatch => ({
         ...bindActionCreators(AnyChartActions, dispatch),
         ...bindActionCreators(PlotlyChartActions, dispatch)

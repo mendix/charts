@@ -5,6 +5,7 @@ import { SidebarHeaderTools } from "../../components/SidebarHeaderTools";
 import { Alert } from "../../components/Alert";
 import AnyChart from "./AnyChart";
 import { AnyChartDataHandlerProps } from "./AnyChartDataHandler";
+import { defaultConfigOptions } from "../utils/configs";
 import { Panel, PanelProps } from "../../components/Panel";
 import { Select } from "../../components/Select";
 
@@ -27,19 +28,8 @@ export class AnyChartPlayground extends Component<AnyChartDataHandlerProps, AnyC
         return createElement(Playground, {},
             ...this.renderPanels(),
             this.renderHeaderTools(),
-            this.renderChart()
+            createElement(AnyChart, this.props)
         );
-    }
-
-    private renderChart() {
-        return createElement(AnyChart, {
-            ...this.props as AnyChartDataHandlerProps,
-            layoutStatic: this.props.layoutStatic,
-            dataStatic: this.props.dataStatic,
-            attributeLayout: this.props.attributeLayout,
-            attributeData: this.props.attributeData,
-            configurationOptions: this.props.configurationOptions
-        });
     }
 
     private renderPanels(): (ReactElement<PanelProps> | null)[] {
@@ -138,7 +128,7 @@ export class AnyChartPlayground extends Component<AnyChartDataHandlerProps, AnyC
                         headingClass: "read-only"
                     },
                     Playground.renderAceEditor({
-                        value: this.formatJSONString(`{ "displayModeBar": false, "doubleClick": false }`),
+                        value: this.formatJSONString(JSON.stringify(defaultConfigOptions)),
                         readOnly: true,
                         overwriteValue: this.props.configurationOptions,
                         onValidate: this.onValidate
@@ -187,7 +177,7 @@ export class AnyChartPlayground extends Component<AnyChartDataHandlerProps, AnyC
 
     private updateChart = (source: string, value: string) => {
         const cleanValue = Playground.removeTrailingNewLine(value);
-        this.props.updateDataFromPlayground(this.props.friendlyId, {
+        this.props.updateDataFromPlayground(this.props.instanceID, {
             attributeLayout: source === "layoutDynamic" ? cleanValue : this.props.attributeLayout,
             attributeData: source === "dataDynamic" ? cleanValue : this.props.attributeData,
             layoutStatic: source === "layoutStatic" ? cleanValue : this.props.layoutStatic,
@@ -201,6 +191,8 @@ export class AnyChartPlayground extends Component<AnyChartDataHandlerProps, AnyC
     }
 
     private formatJSONString(value: string) {
-        return JSON.stringify(JSON.parse(value), null, 2);
+        const stringValue = JSON.stringify(JSON.parse(value), null, 2);
+
+        return stringValue === "{}" ? "{\n\n}" : stringValue;
     }
 }

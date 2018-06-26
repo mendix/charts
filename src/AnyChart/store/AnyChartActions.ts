@@ -10,13 +10,13 @@ import { ReactChild } from "react";
 import { AnyChartDataHandlerProps } from "../components/AnyChartDataHandler";
 import { renderError, validateAdvancedOptions } from "../../utils/data";
 
-export const showAlertMessage = (widgetID: string, alertMessage: ReactChild): Partial<AnyChartAction> =>
-    ({ type: ALERT_MESSAGE, widgetID, alertMessage });
-export const toggleFetchingData = (widgetID: string, fetchingData: boolean): Partial<AnyChartAction> =>
-    ({ type: TOGGLE_FETCHING_DATA, widgetID, fetchingData });
-export const noContext = (widgetID: string): Partial<AnyChartAction> => ({ type: NO_CONTEXT, widgetID });
+export const showAlertMessage = (instanceID: string, alertMessage: ReactChild): Partial<AnyChartAction> =>
+    ({ type: ALERT_MESSAGE, instanceID, alertMessage });
+export const toggleFetchingData = (instanceID: string, fetchingData: boolean): Partial<AnyChartAction> =>
+    ({ type: TOGGLE_FETCHING_DATA, instanceID, fetchingData });
+export const noContext = (instanceID: string): Partial<AnyChartAction> => ({ type: NO_CONTEXT, instanceID });
 export const fetchData = (props: AnyChartDataHandlerProps) => {
-    const { dataAttribute, layoutAttribute, friendlyId, sampleData, sampleLayout } = props;
+    const { dataAttribute, layoutAttribute, friendlyId, instanceID, sampleData, sampleLayout } = props;
     const attributeData = props.mxObject && dataAttribute
         ? props.mxObject.get(dataAttribute) as string
         : sampleData || "[]";
@@ -32,7 +32,7 @@ export const fetchData = (props: AnyChartDataHandlerProps) => {
         }
     });
     if (errorMessages.length) {
-        return showAlertMessage(friendlyId, renderError(friendlyId, errorMessages));
+        return showAlertMessage(instanceID, renderError(friendlyId, errorMessages));
     }
 
     return {
@@ -43,8 +43,8 @@ export const fetchData = (props: AnyChartDataHandlerProps) => {
         layoutStatic: props.layoutStatic,
         configurationOptions: props.configurationOptions,
         type: FETCHED_DATA,
-        widgetID: friendlyId
+        instanceID
     };
 };
-export const updateDataFromPlayground = (widgetID: string, data: AnyChartData) =>
-    ({ type: UPDATE_DATA_FROM_PLAYGROUND, widgetID, ...data });
+export const updateDataFromPlayground = (instanceID: string, data: AnyChartData) =>
+    ({ type: UPDATE_DATA_FROM_PLAYGROUND, instanceID, ...data });

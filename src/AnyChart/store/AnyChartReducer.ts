@@ -3,7 +3,7 @@ import { AnyChartPlayground } from "../components/AnyPlayground";
 import { ReactChild } from "react";
 import { DefaultReduxStore, registerReducer } from "../../store";
 
-export type AnyChartAction = Action & AnyChartInstanceState & { widgetID: string };
+export type AnyChartAction = Action & AnyChartInstanceState & { instanceID: string };
 
 export interface AnyChartData {
     attributeData: string;
@@ -44,9 +44,9 @@ export const anyChartReducer: Reducer<AnyChartReducerState> = (state = {} as Any
         case FETCHED_DATA:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     attributeData: action.attributeData,
                     attributeLayout: action.attributeLayout,
                     dataStatic: action.dataStatic,
@@ -58,33 +58,33 @@ export const anyChartReducer: Reducer<AnyChartReducerState> = (state = {} as Any
         case NO_CONTEXT:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     ...defaultInstanceState
                 } };
         case TOGGLE_FETCHING_DATA:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     fetchingData: action.fetchingData
                 } };
         case LOAD_PLAYGROUND:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     playground: action.playground
                 } };
         case UPDATE_DATA_FROM_PLAYGROUND:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     attributeData: action.attributeData,
                     attributeLayout: action.attributeLayout,
                     dataStatic: action.dataStatic,
@@ -95,9 +95,9 @@ export const anyChartReducer: Reducer<AnyChartReducerState> = (state = {} as Any
         case ALERT_MESSAGE:
             return {
                 ...state,
-                [action.widgetID]: {
+                [action.instanceID]: {
                     ...defaultInstanceState,
-                    ...state[action.widgetID],
+                    ...state[action.instanceID],
                     alertMessage: action.alertMessage
                 } };
         default:
