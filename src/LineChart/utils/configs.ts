@@ -116,26 +116,28 @@ export const getChartType = (type: string): "line" | "polar" => type !== "polar"
 export const getDefaultConfigOptions = (): Partial<Config> => ({ displayModeBar: false, doubleClick: false });
 
 export const getModelerLayoutOptions = (props: LineChartProps): Partial<Layout> => {
-    const themeLayoutOptions = props.devMode !== "basic" ? props.themeConfigs.layout : {};
-
     return deepMerge.all([
         getDefaultLayoutOptions(),
         getCustomLayoutOptions(props),
-        themeLayoutOptions
+        props.themeConfigs.layout
     ]);
 };
 
 export const getModelerSeriesOptions = (props: LineChartProps): string[] => {
-    const themeSeriesOptions = props.devMode !== "basic" ? props.themeConfigs.data : {};
-
-    return props.series
-        ? props.series.map((series, index) => {
+    if (props.series) {
+        return props.series.map((series, index) => {
             const customOptions = getCustomSeriesOptions(series, props, index);
-            const seriesOptions = deepMerge.all([ getDefaultSeriesOptions(), customOptions, themeSeriesOptions ]);
+            const seriesOptions = deepMerge.all([
+                getDefaultSeriesOptions(),
+                customOptions,
+                props.themeConfigs.data
+            ]);
 
             return JSON.stringify(seriesOptions, null, 2);
-        })
-        : [];
+        });
+    }
+
+    return [];
 };
 
 export const parseScatterLayoutOptions = (props: LineChartProps): Partial<Layout> => {

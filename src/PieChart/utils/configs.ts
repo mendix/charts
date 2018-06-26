@@ -39,14 +39,13 @@ export const getData = (props: PieChartProps): PieData[] => {
     if (props.pieData && props.pieData.length) {
         const { dataOptions } = props;
         const advancedOptions = props.devMode !== "basic" && dataOptions ? JSON.parse(dataOptions) : {};
-        const dataThemeConfigs = props.devMode !== "basic" ? props.themeConfigs.data : {};
 
         return [
             {
                 ...deepMerge.all(
                     [
                         props.pieData[0],
-                        dataThemeConfigs,
+                        props.themeConfigs.data,
                         advancedOptions
                     ],
                     { arrayMerge }
@@ -62,9 +61,8 @@ export const getData = (props: PieChartProps): PieData[] => {
 export const getLayoutOptions = (props: PieChartProps): Partial<Layout> => {
     const { layoutOptions } = props;
     const advancedOptions = props.devMode !== "basic" && layoutOptions ? JSON.parse(layoutOptions) : {};
-    const themeLayoutConfigs = props.devMode !== "basic" ? props.themeConfigs.layout : {};
 
-    return deepMerge.all([ getDefaultLayoutOptions(props), themeLayoutConfigs, advancedOptions ]);
+    return deepMerge.all([ getDefaultLayoutOptions(props), props.themeConfigs.layout, advancedOptions ]);
 };
 
 export const getDefaultConfigOptions = (): Partial<Config> =>

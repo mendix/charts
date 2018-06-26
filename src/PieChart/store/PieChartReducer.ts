@@ -61,6 +61,16 @@ export const pieChartReducer: Reducer<PieChartReducerState> = (state = {} as Pie
                     fetchingData: true
                 }
             };
+        case FETCH_THEME_CONFIGS_COMPLETE:
+            return {
+                ...state,
+                [action.widgetID]: {
+                    ...defaultInstanceState,
+                    ...state[action.widgetID],
+                    themeConfigs: action.themeConfigs,
+                    fetchingConfigs: false
+                }
+            };
         case ALERT_MESSAGE:
             return {
                 ...state,
@@ -97,7 +107,8 @@ export const pieChartReducer: Reducer<PieChartReducerState> = (state = {} as Pie
                 [action.widgetID]: {
                     ...state[action.widgetID],
                     ...defaultInstanceState,
-                    updatingData: true
+                    updatingData: true,
+                    themeConfigs: state[action.widgetID].themeConfigs
                 } };
         case TOGGLE_UPDATING_DATA:
             return {

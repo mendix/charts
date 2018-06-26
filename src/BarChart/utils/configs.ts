@@ -47,9 +47,9 @@ export const getDefaultSeriesOptions = (): Partial<ScatterData> => ({
     type: "bar"
 });
 
-export const getCustomSeriesOptions = (series: Data.SeriesProps, orientation: "bar" | "column", colourIndex: number, traces?: Data.ScatterTrace) => {
+export const getCustomSeriesOptions = (series: Data.SeriesProps, orientation: "bar" | "column", colourIndex: number, traces?: Data.ScatterTrace): Partial<ScatterData> => {
     const color: string | undefined = series.barColor || defaultColours()[colourIndex];
-    const seriesOptions = {
+    const seriesOptions: Partial<ScatterData> = {
         marker: color ? { color } : {},
         name: series.name,
         orientation: orientation === "bar" ? "h" : "v"
@@ -73,15 +73,11 @@ export const getLayoutOptions = (props: BarChartProps): Partial<Layout> => {
     return deepMerge.all([ getModelerLayoutOptions(props), advancedOptions ]);
 };
 
-export const getModelerLayoutOptions = (props: BarChartProps): Partial<Layout> => {
-    const themeLayoutOptions = props.devMode !== "basic" ? props.themeConfigs.layout : {};
-
-    return deepMerge.all([
-        getDefaultLayoutOptions(),
-        getCustomLayoutOptions(props),
-        themeLayoutOptions
-    ]);
-};
+export const getModelerLayoutOptions = (props: BarChartProps): Partial<Layout> => deepMerge.all([
+    getDefaultLayoutOptions(),
+    getCustomLayoutOptions(props),
+    props.themeConfigs.layout
+]);
 
 export const getConfigOptions = (props: BarChartProps): Partial<Config> => {
     const advancedOptions = parseAdvancedOptions(props.devMode, props.configurationOptions);
@@ -90,12 +86,18 @@ export const getConfigOptions = (props: BarChartProps): Partial<Config> => {
 };
 
 export const getModelerSeriesOptions = (props: BarChartProps): string[] => {
-    const themeSeriesOptions = props.devMode !== "basic" ? props.themeConfigs.data : {};
+    if (props.series) {
+        return props.series.map((series, index) => {
+            const customOptions = getCustomSeriesOptions(series, props.orientation, index);
+            const seriesOptions = deepMerge.all([
+                getDefaultSeriesOptions(),
+                customOptions,
+                props.themeConfigs.data
+            ]);
 
-    return props.series ? props.series.map((series, index) => {
-        const customOptions = getCustomSeriesOptions(series, props.orientation, index);
-        const seriesOptions = deepMerge.all([ getDefaultSeriesOptions(), customOptions, themeSeriesOptions ]);
+            return JSON.stringify(seriesOptions, null, 2);
+        });
+    }
 
-        return JSON.stringify(seriesOptions, null, 2);
-    }) : [];
+    return [];
 };

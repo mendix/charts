@@ -79,12 +79,7 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
 export const fetchThemeConfigs = (widgetID: string, type: ChartType) => (dispatch: Dispatch<any, any>) => () => {
     dispatch({ type: actionType.FETCH_THEME_CONFIGS, widgetID });
     fetchLineThemeConfig(type)
-        .then(themeConfigs => dispatch({ type: actionType.FETCH_THEME_CONFIGS_COMPLETE, widgetID, themeConfigs }))
-        .catch(() => dispatch({
-            type: actionType.FETCH_THEME_CONFIGS_COMPLETE,
-            widgetID,
-            themeConfigs: { layout: {}, configuration: {}, data: {} }
-        }));
+        .then(themeConfigs => dispatch({ type: actionType.FETCH_THEME_CONFIGS_COMPLETE, widgetID, themeConfigs }));
 };
 
 export const loadPlayground = (widgetID: string) => (dispatch: Dispatch<any, any>) => async () => {

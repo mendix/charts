@@ -28,12 +28,7 @@ export const noContext = (widgetID: string): Partial<PieChartAction> => ({ type:
 export const fetchThemeConfigs = (widgetID: string) => (dispatch: Dispatch<any>) => () => {
     dispatch({ type: FETCH_THEME_CONFIGS, widgetID });
     fetchPieThemeConfig("PieChart")
-        .then(themeConfigs => dispatch({ type: FETCH_THEME_CONFIGS_COMPLETE, widgetID, themeConfigs }))
-        .catch(() => dispatch({
-            type: FETCH_THEME_CONFIGS_COMPLETE,
-            widgetID,
-            themeConfigs: { layout: {}, configuration: {}, data: {} }
-        }));
+        .then(themeConfigs => dispatch({ type: FETCH_THEME_CONFIGS_COMPLETE, widgetID, themeConfigs }));
 };
 
 export const fetchPieData = (props: PieChartDataHandlerProps) => (dispatch: Dispatch<Partial<PieChartAction> & Action>) => {

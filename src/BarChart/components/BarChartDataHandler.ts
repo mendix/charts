@@ -43,7 +43,7 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
         if (validationError) {
             this.props.showAlertMessage(friendlyId, validationError);
         }
-        this.props.fetchThemeConfigs(friendlyId, this.props.orientation);
+        store.dispatch(this.props.fetchThemeConfigs(friendlyId, this.props.orientation));
     }
 
     componentWillReceiveProps(nextProps: BarChartDataHandlerProps) {

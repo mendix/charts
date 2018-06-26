@@ -50,7 +50,7 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
         if (validationError) {
             this.props.showAlertMessage(friendlyId, validationError);
         }
-        this.props.fetchThemeConfigs(friendlyId, this.typeMapping[this.props.type]);
+        store.dispatch(this.props.fetchThemeConfigs(friendlyId, this.typeMapping[this.props.type]));
     }
 
     componentWillReceiveProps(nextProps: LineChartDataHandlerProps) {

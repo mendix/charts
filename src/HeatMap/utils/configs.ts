@@ -44,7 +44,6 @@ export const getData = (props: HeatMapProps): HeatMapData[] => {
     if (props.heatmapData) {
         const { dataOptions } = props;
         const advancedOptions = props.devMode !== "basic" && dataOptions ? JSON.parse(dataOptions) : {};
-        const dataThemeConfigs = props.devMode !== "basic" ? props.themeConfigs.data : {};
 
         const data: HeatMapData = deepMerge.all([
             {
@@ -55,7 +54,7 @@ export const getData = (props: HeatMapProps): HeatMapData[] => {
                 text: props.heatmapData.z.map(row => row.map(item => `${item}`)),
                 zsmooth: props.smoothColor ? "best" : false
             },
-            dataThemeConfigs,
+            props.themeConfigs.data,
             advancedOptions
         ], { arrayMerge });
         data.colorscale = advancedOptions.colorscale || data.colorscale;
@@ -69,7 +68,6 @@ export const getData = (props: HeatMapProps): HeatMapData[] => {
 export const getLayoutOptions = (props: HeatMapProps): Partial<Layout> => {
     const { layoutOptions } = props;
     const advancedOptions = props.devMode !== "basic" && layoutOptions ? JSON.parse(layoutOptions) : {};
-    const themeLayoutConfigs = props.devMode !== "basic" ? props.themeConfigs.layout : {};
 
     return deepMerge.all([
         getDefaultLayoutOptions(props),
@@ -78,7 +76,7 @@ export const getLayoutOptions = (props: HeatMapProps): Partial<Layout> => {
                 ? getTextAnnotations(props.heatmapData, props.valuesColor)
                 : undefined
         },
-        themeLayoutConfigs,
+        props.themeConfigs.layout,
         advancedOptions
     ]);
 };

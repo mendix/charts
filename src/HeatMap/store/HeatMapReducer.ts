@@ -56,8 +56,17 @@ export const heatmapReducer: Reducer<HeatMapReducerState> = (state = {} as HeatM
                 [action.widgetID]: {
                     ...defaultInstanceState,
                     ...state[action.widgetID],
-                    fetchingConfigs: false,
-                    fetchingData: true
+                    fetchingConfigs: true
+                }
+            };
+        case FETCH_THEME_CONFIGS_COMPLETE:
+            return {
+                ...state,
+                [action.widgetID]: {
+                    ...defaultInstanceState,
+                    ...state[action.widgetID],
+                    themeConfigs: action.themeConfigs,
+                    fetchingConfigs: false
                 }
             };
         case ALERT_MESSAGE:
@@ -104,7 +113,8 @@ export const heatmapReducer: Reducer<HeatMapReducerState> = (state = {} as HeatM
                     ...state[action.widgetID],
                     ...defaultInstanceState,
                     heatmapData: undefined,
-                    updatingData: true
+                    updatingData: true,
+                    themeConfigs: state[action.widgetID].themeConfigs
                 } };
         case LOAD_PLAYGROUND:
             return {

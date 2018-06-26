@@ -50,8 +50,7 @@ export const seriesReducer = <T extends SeriesInstanceState, A extends InstanceA
                         [action.widgetID]: {
                             ...defaultInstanceState as SeriesInstanceState,
                             ...state[action.widgetID] as SeriesInstanceState,
-                            fetchingConfigs: false,
-                            fetchingData: true
+                            fetchingConfigs: true
                         } as T
                     };
                 case seriesActionType(actionPrefix).FETCH_THEME_CONFIGS_COMPLETE:
@@ -78,10 +77,13 @@ export const seriesReducer = <T extends SeriesInstanceState, A extends InstanceA
                         } as T
                     };
                 case seriesActionType(actionPrefix).FETCH_DATA_FAILED:
-                    return { ...state, [action.widgetID]: {
-                        ...state[action.widgetID] as SeriesInstanceState,
-                        ...defaultDataState as SeriesInstanceState
-                    } as T };
+                    return {
+                        ...state,
+                        [action.widgetID]: {
+                            ...state[action.widgetID] as SeriesInstanceState,
+                            ...defaultDataState as SeriesInstanceState
+                        } as T
+                    };
                 case seriesActionType(actionPrefix).NO_CONTEXT:
                     return {
                         ...state,
@@ -89,8 +91,10 @@ export const seriesReducer = <T extends SeriesInstanceState, A extends InstanceA
                             ...defaultInstanceState as SeriesInstanceState,
                             ...state[action.widgetID] as SeriesInstanceState,
                             ...defaultDataState as SeriesInstanceState,
-                            updatingData: true
-                        } as T };
+                            updatingData: true,
+                            themeConfigs: state[action.widgetID].themeConfigs
+                        } as T
+                    };
                 case seriesActionType(actionPrefix).TOGGLE_FETCHING_DATA:
                     return {
                         ...state,
@@ -98,7 +102,8 @@ export const seriesReducer = <T extends SeriesInstanceState, A extends InstanceA
                             ...defaultInstanceState as SeriesInstanceState,
                             ...state[action.widgetID] as SeriesInstanceState,
                             fetchingData: action.fetchingData
-                        } as T };
+                        } as T
+                    };
                 case seriesActionType(actionPrefix).LOAD_PLAYGROUND:
                     return {
                         ...state,
@@ -106,7 +111,8 @@ export const seriesReducer = <T extends SeriesInstanceState, A extends InstanceA
                             ...defaultInstanceState as SeriesInstanceState,
                             ...state[action.widgetID] as SeriesInstanceState,
                             playground: action.playground
-                        } as T };
+                        } as T
+                    };
                 case seriesActionType(actionPrefix).UPDATE_DATA_FROM_PLAYGROUND:
                     return {
                         ...state,
@@ -136,7 +142,8 @@ export const seriesReducer = <T extends SeriesInstanceState, A extends InstanceA
                             ...defaultInstanceState as SeriesInstanceState,
                             ...state[action.widgetID] as SeriesInstanceState,
                             alertMessage: action.alertMessage
-                        } as T };
+                        } as T
+                    };
                 default:
                     return state;
             }

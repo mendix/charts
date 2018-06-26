@@ -39,7 +39,7 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
         if (validationError) {
             this.props.showAlertMessage(friendlyId, validationError);
         }
-        this.props.fetchThemeConfigs(friendlyId);
+        store.dispatch(this.props.fetchThemeConfigs(friendlyId));
     }
 
     componentWillReceiveProps(nextProps: PieChartDataHandlerProps) {

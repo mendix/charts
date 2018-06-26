@@ -72,12 +72,7 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
 export const fetchThemeConfigs = (widgetID: string, orientation: "bar" | "column") => (dispatch: Dispatch<any, any>) => () => {
     dispatch({ type: actionType.FETCH_THEME_CONFIGS, widgetID });
     fetchBarThemeConfig(orientation === "bar" ? "BarChart" : "ColumnChart")
-        .then(themeConfigs => dispatch({ type: actionType.FETCH_THEME_CONFIGS_COMPLETE, widgetID, themeConfigs }))
-        .catch(() => dispatch({
-            type: actionType.FETCH_THEME_CONFIGS_COMPLETE,
-            widgetID,
-            themeConfigs: { layout: {}, configuration: {}, data: {} }
-        }));
+        .then(themeConfigs => dispatch({ type: actionType.FETCH_THEME_CONFIGS_COMPLETE, widgetID, themeConfigs }));
 };
 
 export const loadPlayground = (widgetID: string) => (dispatch: Dispatch<any, any>) => async () => {
