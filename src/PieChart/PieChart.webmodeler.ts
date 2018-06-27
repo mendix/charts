@@ -1,19 +1,23 @@
 import { Component, createElement } from "react";
 import { Provider } from "react-redux";
+import deepMerge from "deepmerge";
+import { store } from "../store";
+import "./store/PieChartReducer"; // ==important==: without this, the reducer shall not be registered.
 
 import PieChart from "./components/PieChart";
 
-import deepMerge from "deepmerge";
+import { getInstanceID, validateSeriesProps } from "../utils/data";
 import { Container } from "../utils/namespaces";
-import { PieData } from "plotly.js";
-import { validateSeriesProps } from "../utils/data";
-import { defaultColours } from "../utils/style";
 import { PieChartDataHandlerProps } from "./components/PieChartDataHandler";
-import { store } from "../store";
+import { PieData } from "plotly.js";
+import { defaultColours } from "../utils/style";
 import PieChartContainerProps = Container.PieChartContainerProps;
 
 // tslint:disable-next-line class-name
-export class preview extends Component<PieChartContainerProps, {}> {
+export class preview extends Component<PieChartContainerProps, { updatingData: boolean }> {
+    state = { updatingData: true };
+    private instanceID = getInstanceID(this.props.friendlyId, store, "pie");
+
     render() {
         const alertMessage = validateSeriesProps(
             [ { ...this.props, seriesOptions: this.props.dataOptions } ],
@@ -27,11 +31,22 @@ export class preview extends Component<PieChartContainerProps, {}> {
                 ...this.props as PieChartDataHandlerProps,
                 alertMessage,
                 fetchingData: false,
+                updatingData: this.state.updatingData,
+                toggleUpdatingData: this.toggleUpdatingData,
+                instanceID: this.instanceID,
                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
                 pieData: preview.getData(this.props),
                 themeConfigs: { layout: {}, configuration: {}, data: {} }
             })
         );
+    }
+
+    componentWillReceiveProps() {
+        this.setState({ updatingData: true });
+    }
+
+    private toggleUpdatingData = (_widgetID: string, updatingData: boolean): any => {
+        this.setState({ updatingData });
     }
 
     static getData(props: PieChartContainerProps): PieData[] {

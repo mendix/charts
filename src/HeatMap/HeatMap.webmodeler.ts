@@ -1,20 +1,24 @@
 import { Component, createElement } from "react";
 import { Provider } from "react-redux";
+import deepMerge from "deepmerge";
+import { store } from "../store";
+import "./store/HeatMapReducer"; // ==important==: without this, the reducer shall not be registered.
 
 import HeatMap, { HeatMapProps } from "./components/HeatMap";
 import { HeatMapDataHandlerProps } from "./components/HeatMapDataHandler";
 
-import deepMerge from "deepmerge";
-import { getDefaultDataOptions } from "./utils/configs";
-import { validateSeriesProps } from "../utils/data";
+import { getInstanceID, validateSeriesProps } from "../utils/data";
 import { processColorScale } from "./utils/data";
+import { getDefaultDataOptions } from "./utils/configs";
 import { Container } from "../utils/namespaces";
 import { HeatMapData } from "plotly.js";
-import { store } from "../store";
 import HeatMapContainerProps = Container.HeatMapContainerProps;
 
 // tslint:disable-next-line class-name
-export class preview extends Component<HeatMapContainerProps, {}> {
+export class preview extends Component<HeatMapContainerProps, { updatingData: boolean }> {
+    state = { updatingData: true };
+    private instanceID = getInstanceID(this.props.friendlyId, store, "heatmap");
+
     render() {
         const alertMessage = validateSeriesProps(
             [ { ...this.props, seriesOptions: this.props.dataOptions } ],
@@ -28,6 +32,9 @@ export class preview extends Component<HeatMapContainerProps, {}> {
                 ...this.props as HeatMapDataHandlerProps,
                 alertMessage,
                 fetchingData: false,
+                updatingData: this.state.updatingData,
+                toggleUpdatingData: this.toggleUpdatingData,
+                instanceID: this.instanceID,
                 themeConfigs: { layout: {}, configuration: {}, data: {} },
                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
                 heatmapData: deepMerge.all(
@@ -35,6 +42,14 @@ export class preview extends Component<HeatMapContainerProps, {}> {
                 ) as HeatMapData
             })
         );
+    }
+
+    componentWillReceiveProps() {
+        this.setState({ updatingData: true });
+    }
+
+    private toggleUpdatingData = (_widgetID: string, updatingData: boolean): any => {
+        this.setState({ updatingData });
     }
 
     static getData(props: HeatMapContainerProps): HeatMapData {

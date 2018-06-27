@@ -1,19 +1,23 @@
 import { Component, createElement } from "react";
 import { Provider } from "react-redux";
+import deepMerge from "deepmerge";
+import { store } from "../store";
+import "./store/BarChartReducer"; // ==important==: without this, the reducer shall not be registered.
 
 import BarChart from "./components/BarChart";
 
-import { getRandomNumbers, validateSeriesProps } from "../utils/data";
-import deepMerge from "deepmerge";
-import { ScatterData } from "plotly.js";
-import { Container } from "../utils/namespaces";
-import { defaultColours } from "../utils/style";
 import { BarChartDataHandlerProps } from "./components/BarChartDataHandler";
-import { store } from "../store";
+import { getInstanceID, getRandomNumbers, validateSeriesProps } from "../utils/data";
+import { Container } from "../utils/namespaces";
+import { ScatterData } from "plotly.js";
+import { defaultColours } from "../utils/style";
 import BarChartContainerProps = Container.BarChartContainerProps;
 
 // tslint:disable-next-line class-name
-export class preview extends Component<BarChartContainerProps, {}> {
+export class preview extends Component<BarChartContainerProps, { updatingData: boolean }> {
+    state = { updatingData: true };
+    private instanceID = getInstanceID(this.props.friendlyId, store, "bar");
+
     render() {
         const alertMessage = validateSeriesProps(
             this.props.series,
@@ -28,8 +32,9 @@ export class preview extends Component<BarChartContainerProps, {}> {
                 alertMessage,
                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
                 fetchingData: false,
-                updatingData: true,
+                updatingData: this.state.updatingData,
                 toggleUpdatingData: this.toggleUpdatingData,
+                instanceID: this.instanceID,
                 orientation: "bar",
                 scatterData: preview.getData(this.props),
                 themeConfigs: { layout: {}, configuration: {}, data: {} }
@@ -37,8 +42,12 @@ export class preview extends Component<BarChartContainerProps, {}> {
         );
     }
 
-    private toggleUpdatingData(widgetID: string, _updatingData: boolean): any {
-        console.log(widgetID, "updated"); // tslint:disable-line
+    componentWillReceiveProps() {
+        this.setState({ updatingData: true });
+    }
+
+    private toggleUpdatingData = (_widgetID: string, updatingData: boolean): any => {
+        this.setState({ updatingData });
     }
 
     static getData(props: BarChartContainerProps): ScatterData[] {

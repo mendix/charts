@@ -1,19 +1,23 @@
 import { Component, createElement } from "react";
+import { Provider } from "react-redux";
+import deepMerge from "deepmerge";
+import { store } from "../store";
+import "../LineChart/store/LineChartReducer"; // ==important==: without this, the reducer shall not be registered.
 
 import LineChart from "../LineChart/components/LineChart";
 
-import { getRandomNumbers, validateSeriesProps } from "../utils/data";
-import deepMerge from "deepmerge";
-import { ScatterData } from "plotly.js";
+import { getInstanceID, getRandomNumbers, validateSeriesProps } from "../utils/data";
 import { Container, Data } from "../utils/namespaces";
+import { LineChartDataHandlerProps } from "../LineChart/components/LineChartDataHandler";
+import { ScatterData } from "plotly.js";
 import { defaultColours } from "../utils/style";
 import LineChartContainerProps = Container.LineChartContainerProps;
-import { LineChartDataHandlerProps } from "../LineChart/components/LineChartDataHandler";
-import { Provider } from "react-redux";
-import { store } from "../store";
 
 // tslint:disable-next-line class-name
-export class preview extends Component<LineChartContainerProps, {}> {
+export class preview extends Component<LineChartContainerProps, { updatingData: boolean }> {
+    state = { updatingData: true };
+    private instanceID = getInstanceID(this.props.friendlyId, store, "scatter");
+
     render() {
         const alertMessage = validateSeriesProps(
             this.props.series,
@@ -29,10 +33,21 @@ export class preview extends Component<LineChartContainerProps, {}> {
                 type: "bubble",
                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
                 fetchingData: false,
+                updatingData: this.state.updatingData,
+                toggleUpdatingData: this.toggleUpdatingData,
+                instanceID: this.instanceID,
                 scatterData: preview.getData(this.props),
                 themeConfigs: { layout: {}, configuration: {}, data: {} }
             })
         );
+    }
+
+    componentWillReceiveProps() {
+        this.setState({ updatingData: true });
+    }
+
+    private toggleUpdatingData = (_widgetID: string, updatingData: boolean): any => {
+        this.setState({ updatingData });
     }
 
     static getData(props: LineChartContainerProps): ScatterData[] {
