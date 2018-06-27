@@ -93,7 +93,7 @@ export class AnyChartDataHandler extends Component<AnyChartDataHandlerProps> {
         }
     }
 
-    private onClick(data: any) {
+    private onClick = (data: any) => {
         const { eventEntity, eventDataAttribute, onClickMicroflow, onClickNanoflow, mxform } = this.props;
 
         if (eventEntity && eventDataAttribute && onClickMicroflow) {
