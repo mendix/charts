@@ -58,7 +58,7 @@ class PieChart extends Component<PieChartProps & PieChartState> {
 
     componentDidMount() {
         if (this.props.devMode === "developer" && this.props.loadPlayground) {
-            store.dispatch(this.props.loadPlayground(this.props.friendlyId));
+            store.dispatch(this.props.loadPlayground(this.props.instanceID));
         }
         // this.updateData(this.props);
     }
@@ -70,7 +70,7 @@ class PieChart extends Component<PieChartProps & PieChartState> {
             this.updateData(nextProps);
         }
         if (nextProps.updatingData) {
-            nextProps.toggleUpdatingData(nextProps.friendlyId, false);
+            nextProps.toggleUpdatingData(nextProps.instanceID, false);
         }
     }
 
@@ -83,7 +83,7 @@ class PieChart extends Component<PieChartProps & PieChartState> {
 
         return createElement(PlotlyChart,
             {
-                widgetID: this.props.friendlyId,
+                widgetID: this.props.instanceID,
                 type: "pie",
                 loadingAPI: this.props.loadingAPI && playgroundLoaded,
                 loadingData: this.props.fetchingData,
@@ -123,7 +123,7 @@ class PieChart extends Component<PieChartProps & PieChartState> {
     }
 
     private updateData(props: PieChartProps) {
-        props.updateData(props.friendlyId, {
+        props.updateData(props.instanceID, {
             layout: getLayoutOptions(props),
             data: getData(props),
             config: getConfigOptions(props)
@@ -174,7 +174,7 @@ class PieChart extends Component<PieChartProps & PieChartState> {
 
     private onOptionsUpdate = (layoutOptions: string, dataOptions: string, configurationOptions: string) => {
         this.props.updateDataFromPlayground(
-            this.props.friendlyId,
+            this.props.instanceID,
             dataOptions,
             layoutOptions,
             configurationOptions
@@ -183,7 +183,7 @@ class PieChart extends Component<PieChartProps & PieChartState> {
 }
 
 const mapStateToProps: MapStateToProps<PlotlyChartInstance, ComponentProps, DefaultReduxStore> = (state, props) =>
-    state.plotly[props.friendlyId] || defaultPlotlyInstanceState;
+    state.plotly[props.instanceID] || defaultPlotlyInstanceState;
 const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>
     bindActionCreators(PlotlyChartActions, dispatch);
 export default connect(mapStateToProps, mapDispatchToProps)(PieChart);
