@@ -70,7 +70,7 @@ export const processChartConfigs = (type: ChartType, themeConfigs: ThemeConfigs)
     return { layout: sharedLayout, configuration: sharedConfiguration, data: {} };
 };
 
-export const arrayMerge = (_destinationArray: any[], sourceArray: any[]) => sourceArray;
+export const arrayOverwrite = (_destinationArray: any[], sourceArray: any[]) => sourceArray;
 
 export type ChartType = "LineChart" | "BubbleChart" | "PieChart" | "HeatMap" | "AnyChart" |
     "PolarChart" | "BarChart" | "AreaChart" | "TimeSeries" | "ColumnChart";

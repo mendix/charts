@@ -67,7 +67,7 @@ export const plotlyChartReducer: Reducer<PlotlyChartState> = (state = defaultSta
                     ...state[action.widgetID],
                     plotly: state[action.widgetID] && state[action.widgetID].plotly,
                     loadingData: false,
-                    data: action.data,
+                    data: action.data && action.data.slice(),
                     layout: action.layout,
                     config: action.config
                 }

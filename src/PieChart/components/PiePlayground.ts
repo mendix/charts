@@ -36,6 +36,14 @@ export class PiePlayground extends Component<PiePlaygroundProps, PiePlaygroundSt
         );
     }
 
+    componentWillReceiveProps(nextProps: PiePlaygroundProps) {
+        this.newPieOptions = {
+            layout: nextProps.layoutOptions || "{}",
+            config: nextProps.configurationOptions || "{}",
+            data: nextProps.dataOptions || "{\n\n}"
+        };
+    }
+
     private renderPanels(): (ReactElement<PanelProps> | null)[] {
         if (this.state.activeOption === "layout") {
             return this.renderLayoutPanels();

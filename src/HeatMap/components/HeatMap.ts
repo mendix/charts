@@ -7,7 +7,7 @@ import { bindActionCreators } from "redux";
 import { ScatterHoverData } from "plotly.js";
 import { HoverTooltip } from "../../components/HoverTooltip";
 import PlotlyChart from "../../components/PlotlyChart";
-import { arrayMerge } from "../../utils/configs";
+import { arrayOverwrite } from "../../utils/configs";
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
 import { Container, Data } from "../../utils/namespaces";
 import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
@@ -100,7 +100,8 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
                 [ getDefaultLayoutOptions(this.props), this.props.themeConfigs.layout ]
             );
             const modelerDataConfigs = deepMerge.all(
-                [ getDefaultDataOptions(this.props), this.props.themeConfigs.data ], { arrayMerge }
+                [ getDefaultDataOptions(this.props), this.props.themeConfigs.data ],
+                { arrayMerge: arrayOverwrite }
             );
 
             return createElement(this.props.playground, {

@@ -12,17 +12,14 @@ export const getConfigOptions = (props: AnyChartProps): Partial<Config> => {
 
 export const getLayoutOptions = (props: AnyChartProps): Partial<Layout> => {
     const staticLayout: Partial<Layout> = JSON.parse(props.layoutStatic || "{}");
-    const attributeLayout: Partial<Layout> = JSON.parse(props.attributeLayout || "{}");
+    const attributeLayout: Partial<Layout> = props.attributeLayout ? JSON.parse(props.attributeLayout || "{}") : {};
 
-    return props.attributeLayout
-        ? deepMerge.all([ staticLayout, attributeLayout ], { arrayMerge })
-        : staticLayout;
+    return deepMerge.all([ staticLayout, attributeLayout ], { arrayMerge });
 };
 
 export const getData = (props: AnyChartProps): any[] => {
     const staticData: any[] = JSON.parse(props.dataStatic || "[]");
+    const attributeData: any[] = props.attributeData ? JSON.parse(props.attributeData || "{}") : {};
 
-    return props.attributeData
-        ? deepMerge.all([ staticData, JSON.parse(props.attributeData) ], { arrayMerge })
-        : staticData;
+    return deepMerge.all([ staticData, attributeData ], { arrayMerge });
 };
