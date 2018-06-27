@@ -1,18 +1,18 @@
 let __webpack_public_path__;
 import { Component, createElement } from "react";
 import { Provider } from "react-redux";
+import { store } from "../../store";
 
+import { getInstanceID } from "../../utils/data";
 import BarChartDataHandler from "./BarChartDataHandler";
 import { Container } from "../../utils/namespaces";
-import { store } from "../../store";
 import BarChartContainerProps = Container.BarChartContainerProps;
-import { generateInstanceID } from "../../utils/data";
 
 __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
 class BarChartContainer extends Component<BarChartContainerProps> {
     static defaultProps: Partial<BarChartContainerProps> = { orientation: "bar" };
-    private instanceID = this.getInstanceID(this.props.friendlyId);
+    private instanceID = getInstanceID(this.props.friendlyId, store, "bar");
 
     render() {
         return createElement(Provider, { store },
@@ -21,17 +21,6 @@ class BarChartContainer extends Component<BarChartContainerProps> {
                 instanceID: this.instanceID
             })
         );
-    }
-
-    private getInstanceID(friendlyId: string): string {
-        let instanceID = generateInstanceID(friendlyId);
-        const state = store.getState();
-        const instances: string[] = Object.keys(state.bar);
-        while (instances.indexOf(instanceID) > -1) {
-            instanceID = generateInstanceID(friendlyId);
-        }
-
-        return instanceID;
     }
 }
 

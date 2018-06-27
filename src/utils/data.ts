@@ -10,6 +10,7 @@ import ReferencesSpec = Data.ReferencesSpec;
 import FetchedData = Data.FetchedData;
 import FetchDataOptions = Data.FetchDataOptions;
 import FetchByXPathOptions = Data.FetchByXPathOptions;
+import { Store } from "redux";
 
 type MxO = mendix.lib.MxObject;
 
@@ -489,4 +490,15 @@ export const renderError = (id: string, errorMessages: string[]) => {
     return "";
 };
 
+type ReduxStoreKey = "scatter" | "bar" | "pie" | "heatmap" | "any";
+
 export const generateInstanceID = (friendlyId: string) => `${friendlyId}-${Math.round(Math.random() * 20)}`;
+export const getInstanceID = (friendlyId: string, store: Store, reduxStoreKey: ReduxStoreKey): string => {
+    let instanceID = generateInstanceID(friendlyId);
+    const instances: string[] = Object.keys(store.getState()[reduxStoreKey]);
+    while (instances.indexOf(instanceID) > -1) {
+        instanceID = generateInstanceID(friendlyId);
+    }
+
+    return instanceID;
+};
