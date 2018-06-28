@@ -211,6 +211,7 @@ export namespace Data {
         seriesEntity: string;
         seriesNameAttribute: string;
         colorAttribute: string;
+        fillColorAttribute: string;
     }
 
     export interface SeriesDataSourceProps extends DataSourceProps {

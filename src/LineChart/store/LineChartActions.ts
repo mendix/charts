@@ -33,7 +33,16 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
 
             Promise.all(dynamicSeries.map(dynSeries => {
                 const entity = dynSeries.seriesEntity.split("/")[1];
-                const dynAttributes = [ dynSeries.seriesNameAttribute, dynSeries.colorAttribute ];
+                const dynAttributes = [];
+                if (dynSeries.seriesNameAttribute) {
+                    dynAttributes.push(dynSeries.seriesNameAttribute);
+                }
+                if (dynSeries.colorAttribute) {
+                    dynAttributes.push(dynSeries.colorAttribute);
+                }
+                if (dynSeries.fillColorAttribute) {
+                    dynAttributes.push(dynSeries.fillColorAttribute);
+                }
 
                 return fetchByXPath({
                     entity,
@@ -43,14 +52,16 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
                 })
                 .then(mxObjects => {
                     return mixinSeries.concat(mxObjects.map(mxSeries => {
-                        const lineColor = mxSeries.get(dynSeries.colorAttribute) || "";
-                        const name = mxSeries.get(dynSeries.seriesNameAttribute) || "";
+                        const lineColor = dynSeries.colorAttribute ? mxSeries.get(dynSeries.colorAttribute) : "";
+                        const fillColor = dynSeries.fillColorAttribute ? mxSeries.get(dynSeries.fillColorAttribute) : "";
+                        const name = dynSeries.seriesNameAttribute ? mxSeries.get(dynSeries.seriesNameAttribute) : "";
                         const entityRef = dynSeries.seriesEntity.split("/")[0];
                         const entityConstraint = dynSeries.entityConstraint + `[${entityRef} = '${mxSeries.getGuid()}']`;
 
                         return {
                             ...dynSeries,
                             entityConstraint,
+                            fillColor,
                             lineColor,
                             name
                         } as Data.LineSeriesProps;
