@@ -69,14 +69,8 @@ export const validateSeriesProps = <T extends Partial<SeriesProps>>
                 errorMessage.push(`Invalid configuration JSON: ${error}`);
             }
         }
-        if (errorMessage.length) {
-            return createElement("div", {},
-                `Configuration error in widget ${widgetId}:`,
-                errorMessage.map((message, key) => createElement("p", { key }, message))
-            );
-        }
 
-        return "";
+        return errorMessage.length ? renderError(widgetId, errorMessage) : "";
 };
 
 export const validateAdvancedOptions = (rawData: string): string => {
@@ -483,7 +477,7 @@ export const renderError = (id: string, errorMessages: string[]) => {
     if (errorMessages.length) {
         return createElement("div", {},
             `Configuration error in widget ${id}:`,
-            errorMessages.map((message, key) => createElement("p", { key }, message))
+            ...errorMessages.map((message, key) => createElement("p", { key }, message))
         );
     }
 
