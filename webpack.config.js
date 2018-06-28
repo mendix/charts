@@ -3,7 +3,7 @@ const webpack = require("webpack");
 const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
-const DynamicPublicPathPlugin = require("dynamic-public-path-webpack-plugin");
+// const DynamicPublicPathPlugin = require("dynamic-public-path-webpack-plugin");
 // const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 // new BundleAnalyzerPlugin()
 
