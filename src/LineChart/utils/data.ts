@@ -16,7 +16,6 @@ export const getData = (seriesData: Data.SeriesData<LineSeriesProps>[], props: L
         const advancedOptions: ScatterData = parseAdvancedOptions(props.devMode, series.seriesOptions);
         const traces: Data.ScatterTrace = getSeriesTraces({ data, restData, series });
         const modellerOptions: Partial<ScatterData> = getCustomSeriesOptions(series, props, index, traces);
-        const themeConfigs = props.devMode !== "basic" ? props.themeConfigs.data : {};
         const customOptions = {
             customdata: data as mendix.lib.MxObject[], // each array element shall be returned as the custom data of a corresponding point
             series, // shall be accessible via the data property of a hover/click point
@@ -27,7 +26,7 @@ export const getData = (seriesData: Data.SeriesData<LineSeriesProps>[], props: L
             ...deepMerge.all<ScatterData>([
                 getDefaultSeriesOptions(),
                 modellerOptions,
-                themeConfigs,
+                props.themeConfigs.data,
                 advancedOptions
             ]),
             ...customOptions

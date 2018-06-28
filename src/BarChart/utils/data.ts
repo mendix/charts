@@ -10,7 +10,6 @@ export const getData = (seriesData: Data.SeriesData[], props: BarChartDataHandle
         const advancedOptions = parseAdvancedOptions(props.devMode, series.seriesOptions);
         const traces = getSeriesTraces({ data, series });
         const modellerOptions = getCustomSeriesOptions(series, props.orientation, index, traces);
-        const themeConfigs = props.devMode !== "basic" ? props.themeConfigs.data : {};
         const customOptions = {
             customdata: data as mendix.lib.MxObject[], // each array element shall be returned as the custom data of a corresponding point
             series // shall be accessible via the data property of a hover/click point
@@ -20,7 +19,7 @@ export const getData = (seriesData: Data.SeriesData[], props: BarChartDataHandle
             ...deepMerge.all<ScatterData>([
                 getDefaultSeriesOptions(),
                 modellerOptions,
-                themeConfigs,
+                props.themeConfigs.data,
                 advancedOptions
             ]),
             ...customOptions
