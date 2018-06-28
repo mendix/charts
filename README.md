@@ -27,19 +27,25 @@ Plot and compare your data across different charts.
 
 ### Line chart
 A line (scatter) chart should have one or more series, each displaying commonly grouped data points.
+
 ![LineChartProperties](/assets/LineChart_ChartProperties.png)
 
-Data can be retrieved from the database, from a microflow, or from REST endpoint.
+A serie's data can be retrieved from the database, by a microflow, or from REST endpoint.
 Below are the properties for configuring series data:
 
-* `name`[required] - Caption for series, shown on hover & on the legend.
-* `Entity`[required] - Entity containing the series data points.
-* `X-axis data attribute`[required] - The attribute that contains the data point X value.
-* `Y-axis data attribute`[required] - The attribute that contains the data point Y value.
-* `X-axis sort attribute` - The attribute to use for sorting the x-axis data.
-* `REST URL` - The URL used to retrieve data. Only used when the datasource is REST endpoint.
+![LineChartProperties](/assets/SerieDataSource.png)
 
-For more details: [REST endpoint](/RESTEndpoint.md)
+* Place the widget in data form within the context of the entity
+* Select the series either static or dynamic
+* Select an entity for the chart values
+* Select the data source 
+* Optional change the XPath constraint if the data source selected is Database
+* Select a micro that returns serie values if the data source selected is Microflow.
+* Enter the REST URL if the data source selected REST endpoint. For more details: [REST endpoint](/RESTEndpoint.md)
+
+Dynamic series retrieves all the chart series in one configuration. Select the series as dynamic and add configurations for them under `Dynamic Series` tab.
+
+![LineChartProperties](/assets/DynamicSeries.png)
 
 NB: The line chart's x-axis provides support for dates and thus the line chart can be configured as a time series.
 
