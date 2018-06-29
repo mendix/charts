@@ -9,14 +9,14 @@
             <category>Chart properties</category>
             <description>Add series and configure their properties</description>
             <properties>
-                <property key="name" type="translatableString">
-                    <caption>Series name</caption>
+            <property key="seriesType" type="enumeration" defaultValue="static">
+                    <caption>Series</caption>
                     <category>Data source</category>
                     <description/>
-                    <translations>
-                        <translation lang="en_US">Series</translation>
-                        <translation lang="nl_NL">Serie</translation>
-                    </translations>
+                    <enumerationValues>
+                        <enumerationValue key="static">Static</enumerationValue>
+                        <enumerationValue key="dynamic">Dynamic</enumerationValue>
+                    </enumerationValues>
                 </property>
                 <property key="dataEntity" type="entity" allowNonPersistableEntities="true">
                     <caption>Entity</caption>
@@ -114,10 +114,42 @@
                         <enumerationValue key="desc">Descending</enumerationValue>
                     </enumerationValues>
                 </property>
+                <property key="name" type="translatableString">
+                    <caption>Series name</caption>
+                    <category>Static series</category>
+                    <description/>
+                    <translations>
+                        <translation lang="en_US">Series</translation>
+                        <translation lang="nl_NL">Serie</translation>
+                    </translations>
+                </property>
                 <property key="color" type="string" required="false">
                     <caption>Serie color</caption>
-                    <category>Appearance</category>
+                    <category>Static series</category>
                     <description>Color of the bubbles e.g. green, #00FF00, rgb(0,255,0)</description>
+                </property>
+                <property key="seriesEntity" type="entity" required="false" allowNonPersistableEntities="true" isPath="yes" pathType="reference" entityProperty="dataEntity">
+                    <caption>Series entity</caption>
+                    <category>Dynamic series</category>
+                    <description>The entity from which the series values will be retrieved</description>
+                </property>
+                <property key="seriesNameAttribute" type="attribute" entityProperty="seriesEntity" required="false">
+                    <caption>Series name attribute</caption>
+                    <category>Dynamic series</category>
+                    <description/>
+                    <attributeTypes>
+                        <attributeType name="String"/>
+                        <attributeType name="Enum"/>
+                    </attributeTypes>
+                </property>
+                <property key="colorAttribute" type="attribute" entityProperty="seriesEntity" required="false">
+                    <caption>Color attribute</caption>
+                    <category>Dynamic series</category>
+                    <description>Color of the line e.g. green, #00FF00, rgb(0,255,0)</description>
+                    <attributeTypes>
+                        <attributeType name="String"/>
+                        <attributeType name="Enum"/>
+                    </attributeTypes>
                 </property>
                 <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
                     <caption>On click</caption>
