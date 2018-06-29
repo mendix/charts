@@ -18,7 +18,7 @@
                         <enumerationValue key="dynamic">Dynamic</enumerationValue>
                     </enumerationValues>
                 </property>
-                <property key="dataEntity" type="entity" allowNonPersistableEntities="true" isPath="optional" pathType="reference" entityProperty="seriesEntity">
+                <property key="dataEntity" type="entity" allowNonPersistableEntities="true">
                     <caption>Data entity</caption>
                     <category>Data source</category>
                     <description>The entity from which the data values will be retrieved</description>
