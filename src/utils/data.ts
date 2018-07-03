@@ -20,6 +20,14 @@ export const validateSeriesProps = <T extends Partial<SeriesProps>>
         if (dataSeries && dataSeries.length) {
             dataSeries.forEach(series => {
                 const identifier = series.name ? `series "${series.name}"` : "the widget";
+                if (series.seriesType === "dynamic") {
+                    if (!series.seriesEntity) {
+                        errorMessage.push(`'Dynamic series - Series entity' in ${identifier} is missing`);
+                    }
+                    if (!series.seriesNameAttribute) {
+                        errorMessage.push(`'Dynamic series - Series name attribute' in ${identifier} is missing`);
+                    }
+                }
                 if (series.dataSourceType === "microflow") {
                     if (!series.dataSourceMicroflow) {
                         errorMessage.push(`'Data source type' in ${identifier} is set to 'Microflow' but no microflow is specified.`);
