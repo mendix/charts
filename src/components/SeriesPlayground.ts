@@ -41,6 +41,14 @@ export class SeriesPlayground extends Component<SeriesPlaygroundProps, SeriesPla
         );
     }
 
+    componentWillReceiveProps(nextProps: SeriesPlaygroundProps) {
+        this.newSeriesOptions = {
+            layout: nextProps.layoutOptions || "{}",
+            config: nextProps.configurationOptions || "{}",
+            seriesOptions: nextProps.seriesOptions || []
+        };
+    }
+
     private renderPanels(): (ReactElement<PanelProps> | null)[] {
         if (this.state.activeOption === "layout") {
             return this.renderLayoutPanels();

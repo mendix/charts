@@ -1,6 +1,6 @@
 import chart from "./pages/default.page";
 
-describe("Polar chart", () => {
+xdescribe("Polar chart", () => {
     beforeAll(() => {
         chart.open();
     });

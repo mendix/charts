@@ -5,6 +5,12 @@
 }
 
 .widget-charts {
+    &.loading {
+        .js-plotly-plot {
+            display: none;
+        }
+    }
+
     .widget-charts-tooltip {
         background-color: #FFFFFF;
         border-color: #f1f1f1;
@@ -19,7 +25,7 @@
         z-index: 1000;
     }
 
-    &.js-plotly-plot {
+    .js-plotly-plot {
         .plotly {
             .modebar {
                 z-index: 0 !important; // Strange: styles from the library that can't be over written without this

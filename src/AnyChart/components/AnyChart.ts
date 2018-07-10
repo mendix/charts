@@ -1,75 +1,52 @@
 
 // tslint:disable no-console
 import { Component, ReactChild, createElement } from "react";
+import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
+import { bindActionCreators } from "redux";
 
 import { Alert } from "../../components/Alert";
-import { ChartLoading } from "../../components/ChartLoading";
-import { PlotlyChart } from "../../components/PlotlyChart";
-
-import { arrayMerge } from "../../utils/data";
-import deepMerge from "deepmerge";
-import { Style } from "../../utils/namespaces";
-import { Config, Layout } from "plotly.js";
+import { AnyChartDataHandlerProps } from "./AnyChartDataHandler";
+import PlotlyChart from "../../components/PlotlyChart";
+import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
+import { PlotlyChartInstance, defaultPlotlyInstanceState } from "../../components/reducers/PlotlyChartReducer";
 import { getDimensions, parseStyle } from "../../utils/style";
-import { WrapperProps } from "../../utils/types";
-
 import "../../ui/Charts.scss";
+
+import { getConfigOptions, getData, getLayoutOptions } from "../utils/configs";
+import { DefaultReduxStore } from "../../store";
+
 // TODO improve typing by replace explicit any types
 
-export interface AnyChartProps extends WrapperProps, Style.Dimensions {
+export interface AnyChartComponentProps extends AnyChartDataHandlerProps {
     alertMessage?: ReactChild;
-    loading?: boolean;
-    dataStatic: string;
-    layoutStatic: string;
-    attributeData: string;
-    attributeLayout: string;
-    configurationOptions: string;
     onClick?: (data: any) => void;
     onHover?: (data: any, node: HTMLDivElement) => void;
 }
+export type AnyChartProps = AnyChartComponentProps & typeof PlotlyChartActions & PlotlyChartInstance;
 
-export class AnyChart extends Component<AnyChartProps, { alertMessage?: ReactChild }> {
+class AnyChart extends Component<AnyChartProps> {
     render() {
         if (this.props.alertMessage) {
             return createElement(Alert, { className: `widget-charts-any-alert` }, this.props.alertMessage);
-        }
-        if (this.props.loading) {
-            return createElement(ChartLoading);
         }
 
         return this.renderChart();
     }
 
-    componentWillReceiveProps(newProps: AnyChartProps) {
-        this.setState({ alertMessage: newProps.alertMessage });
-    }
-
     private renderChart() {
         return createElement(PlotlyChart, {
+            data: getData(this.props),
+            loadingAPI: this.props.loadingAPI,
+            loadingData: this.props.fetchingData,
+            layout: getLayoutOptions(this.props),
+            config: getConfigOptions(this.props),
+            plotly: this.props.plotly,
+            widgetID: this.props.instanceID,
             type: "full",
             className: this.props.class,
             style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
-            layout: this.getLayoutOptions(this.props),
-            data: this.getData(this.props),
-            config: this.getConfigOptions(this.props),
             onClick: this.onClick
         });
-    }
-
-    private getData(props: AnyChartProps): any[] {
-        const staticData: any[] = JSON.parse(props.dataStatic || "[]");
-
-        return props.attributeData
-            ? deepMerge.all([ staticData, JSON.parse(props.attributeData) ], { arrayMerge })
-            : staticData;
-    }
-
-    private getLayoutOptions(props: AnyChartProps): Partial<Layout> {
-        const staticLayout = JSON.parse(props.layoutStatic || "{}");
-
-        return props.attributeLayout
-            ? deepMerge.all([ staticLayout, JSON.parse(props.attributeLayout) ], { arrayMerge }) as Partial<Layout>
-            : staticLayout;
     }
 
     private onClick = ({ points }: any) => {
@@ -92,10 +69,10 @@ export class AnyChart extends Component<AnyChartProps, { alertMessage?: ReactChi
             return result;
         });
     }
-
-    public getConfigOptions(props: AnyChartProps): Partial<Config> {
-        const parsedConfig = JSON.parse(props.configurationOptions || "{}");
-
-        return deepMerge.all([ { displayModeBar: false, doubleClick: false }, parsedConfig ]);
-    }
 }
+
+const mapStateToProps: MapStateToProps<PlotlyChartInstance, AnyChartComponentProps, DefaultReduxStore> = (state, props) =>
+    state.plotly[props.instanceID] || defaultPlotlyInstanceState;
+const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, AnyChartComponentProps> =
+    dispatch => bindActionCreators(PlotlyChartActions, dispatch);
+export default connect(mapStateToProps, mapDispatchToProps)(AnyChart);

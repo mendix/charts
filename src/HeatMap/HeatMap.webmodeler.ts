@@ -1,16 +1,24 @@
 import { Component, createElement } from "react";
-
-import { HeatMap, HeatMapProps } from "./components/HeatMap";
-import HeatMapContainer from "./components/HeatMapContainer";
-import { HeatMapData } from "plotly.js";
-
+import { Provider } from "react-redux";
 import deepMerge from "deepmerge";
-import { validateSeriesProps } from "../utils/data";
+import { store } from "../store";
+import "./store/HeatMapReducer"; // ==important==: without this, the reducer shall not be registered.
+
+import HeatMap, { HeatMapProps } from "./components/HeatMap";
+import { HeatMapDataHandlerProps } from "./components/HeatMapDataHandler";
+
+import { getInstanceID, validateSeriesProps } from "../utils/data";
+import { processColorScale } from "./utils/data";
+import { getDefaultDataOptions } from "./utils/configs";
 import { Container } from "../utils/namespaces";
+import { HeatMapData } from "plotly.js";
 import HeatMapContainerProps = Container.HeatMapContainerProps;
 
 // tslint:disable-next-line class-name
-export class preview extends Component<HeatMapContainerProps, {}> {
+export class preview extends Component<HeatMapContainerProps, { updatingData: boolean }> {
+    state = { updatingData: true };
+    private instanceID = getInstanceID(this.props.friendlyId, store, "heatmap");
+
     render() {
         const alertMessage = validateSeriesProps(
             [ { ...this.props, seriesOptions: this.props.dataOptions } ],
@@ -19,15 +27,29 @@ export class preview extends Component<HeatMapContainerProps, {}> {
             this.props.configurationOptions
         );
 
-        return createElement(HeatMap, {
-            ...this.props as HeatMapContainerProps,
-            alertMessage,
-            themeConfigs: { layout: {}, configuration: {}, data: {} },
-            devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-            defaultData: deepMerge.all(
-                [ HeatMap.getDefaultDataOptions(this.props as HeatMapProps), preview.getData(this.props) ]
-            )
-        });
+        return createElement(Provider, { store },
+            createElement(HeatMap, {
+                ...this.props as HeatMapDataHandlerProps,
+                alertMessage,
+                fetchingData: false,
+                updatingData: this.state.updatingData,
+                toggleUpdatingData: this.toggleUpdatingData,
+                instanceID: this.instanceID,
+                themeConfigs: { layout: {}, configuration: {}, data: {} },
+                devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
+                heatmapData: deepMerge.all(
+                    [ getDefaultDataOptions(this.props as HeatMapProps), preview.getData(this.props) ]
+                ) as HeatMapData
+            })
+        );
+    }
+
+    componentWillReceiveProps() {
+        this.setState({ updatingData: true });
+    }
+
+    private toggleUpdatingData = (_widgetID: string, updatingData: boolean): any => {
+        this.setState({ updatingData });
     }
 
     static getData(props: HeatMapContainerProps): HeatMapData {
@@ -36,7 +58,7 @@ export class preview extends Component<HeatMapContainerProps, {}> {
             y: [ "Morning", "Afternoon", "Evening" ],
             z: [ [ 1, 20, 30, 50, 1 ], [ 20, 1, 60, 80, 30 ], [ 30, 60, 1, -10, 20 ] ],
             zsmooth: props.smoothColor ? "best" : false,
-            colorscale: HeatMapContainer.processColorScale(props.scaleColors),
+            colorscale: processColorScale(props.scaleColors),
             showscale: props.showScale,
             type: "heatmap",
             hoverinfo: "none"

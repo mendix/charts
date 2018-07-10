@@ -10,72 +10,75 @@ import ReferencesSpec = Data.ReferencesSpec;
 import FetchedData = Data.FetchedData;
 import FetchDataOptions = Data.FetchDataOptions;
 import FetchByXPathOptions = Data.FetchByXPathOptions;
+import { Store } from "redux";
 
 type MxO = mendix.lib.MxObject;
 
-export const validateSeriesProps = <T extends Partial<SeriesProps>>(
-    dataSeries: T[], widgetId: string, layoutOptions: string, configurationOptions: string): ReactChild => {
-
-    const errorMessage: string[] = [];
-    if (dataSeries && dataSeries.length) {
-        dataSeries.forEach(series => {
-            const identifier = series.name ? `series "${series.name}"` : "the widget";
-            if (series.dataSourceType === "microflow") {
-                if (!series.dataSourceMicroflow) {
-                    errorMessage.push(`'Data source type' in ${identifier} is set to 'Microflow' but no microflow is specified.`); // tslint:disable-line max-line-length
+export const validateSeriesProps = <T extends Partial<SeriesProps>>
+    (dataSeries: T[], widgetId: string, layoutOptions: string, configurationOptions: string): ReactChild => {
+        const errorMessage: string[] = [];
+        if (dataSeries && dataSeries.length) {
+            dataSeries.forEach(series => {
+                const identifier = series.name ? `series "${series.name}"` : "the widget";
+                if (series.seriesType === "dynamic") {
+                    if (!series.seriesEntity) {
+                        errorMessage.push(`'Dynamic series - Series entity' in ${identifier} is missing`);
+                    }
+                    if (!series.seriesNameAttribute) {
+                        errorMessage.push(`'Dynamic series - Series name attribute' in ${identifier} is missing`);
+                    }
                 }
-                if (series.xValueAttribute && series.xValueAttribute.split("/").length > 1) {
-                    errorMessage.push(`'X-axis data attribute' in ${identifier} does not support references for data source 'Microflow'`);
+                if (series.dataSourceType === "microflow") {
+                    if (!series.dataSourceMicroflow) {
+                        errorMessage.push(`'Data source type' in ${identifier} is set to 'Microflow' but no microflow is specified.`);
+                    }
+                    if (series.xValueAttribute && series.xValueAttribute.split("/").length > 1) {
+                        errorMessage.push(`'X-axis data attribute' in ${identifier} does not support references for data source 'Microflow'`);
+                    }
+                    if (series.xValueSortAttribute && series.xValueSortAttribute.split("/").length > 1) {
+                        errorMessage.push(`'X-axis sort attribute' in ${identifier} does not support references for data source 'Microflow'`);
+                    }
+                } else if (series.dataSourceType === "XPath") {
+                    if (series.xValueAttribute && series.xValueAttribute.split("/").length > 3) {
+                        errorMessage.push(`'X-axis data attribute' in ${identifier} supports maximal one level deep reference`);
+                    }
+                    if (series.xValueSortAttribute && series.xValueSortAttribute.split("/").length > 3) {
+                        errorMessage.push(`'X-axis sort attribute' in ${identifier} supports maximal one level deep reference`);
+                    }
+                } else if (series.dataSourceType === "REST") {
+                    if (!series.restUrl) {
+                        errorMessage.push(`\n'Data source type' in ${identifier} is set to 'REST' but no REST URL is specified.`);
+                    }
                 }
-                if (series.xValueSortAttribute && series.xValueSortAttribute.split("/").length > 1) {
-                    errorMessage.push(`'X-axis sort attribute' in ${identifier} does not support references for data source 'Microflow'`);
+                if (series.seriesOptions && series.seriesOptions.trim()) {
+                    const error = validateAdvancedOptions(series.seriesOptions.trim());
+                    if (error) {
+                        errorMessage.push(`Invalid options JSON for ${identifier}: ${error}`);
+                    }
                 }
-            } else if (series.dataSourceType === "XPath") {
-                if (series.xValueAttribute && series.xValueAttribute.split("/").length > 3) {
-                    errorMessage.push(`'X-axis data attribute' in ${identifier} supports maximal one level deep reference`);
+                if (series.dataEntity && window.mx) {
+                    const dataEntityMeta = window.mx.meta.getEntity(series.dataEntity);
+                    if (series.dataSourceType === "XPath" && !dataEntityMeta.isPersistable()) {
+                        errorMessage.push(`Entity ${series.dataEntity} should be persistable when using Data source 'Database'`);
+                    }
                 }
-                if (series.xValueSortAttribute && series.xValueSortAttribute.split("/").length > 3) {
-                    errorMessage.push(`'X-axis sort attribute' in ${identifier} supports maximal one level deep reference`);
-                }
-            } else if (series.dataSourceType === "REST") {
-                if (!series.restUrl) {
-                    errorMessage.push(`\n'Data source type' in ${identifier} is set to 'REST' but no REST URL is specified.`);
-                }
-            }
-            if (series.seriesOptions && series.seriesOptions.trim()) {
-                const error = validateAdvancedOptions(series.seriesOptions.trim());
-                if (error) {
-                    errorMessage.push(`Invalid options JSON for ${identifier}: ${error}`);
-                }
-            }
-            if (series.dataEntity && window.mx) {
-                const dataEntityMeta = window.mx.meta.getEntity(series.dataEntity);
-                if (series.dataSourceType === "XPath" && !dataEntityMeta.isPersistable()) {
-                    errorMessage.push(`Entity ${series.dataEntity} should be persistable when using Data source 'Database'`);
-                }
-            }
-        });
-    }
-    if (layoutOptions && layoutOptions.trim()) {
-        const error = validateAdvancedOptions(layoutOptions.trim());
-        if (error) {
-            errorMessage.push(`Invalid layout JSON: ${error}`);
+            });
         }
-    }
-    if (configurationOptions && configurationOptions.trim()) {
-        const error = validateAdvancedOptions(configurationOptions.trim());
-        if (error) {
-            errorMessage.push(`Invalid configuration JSON: ${error}`);
-        }
-    }
-    if (errorMessage.length) {
-        return createElement("div", {},
-            `Configuration error in widget ${widgetId}:`,
-            ...errorMessage.map((message, key) => createElement("p", { key }, message))
-        );
-    }
 
-    return "";
+        if (layoutOptions && layoutOptions.trim()) {
+            const error = validateAdvancedOptions(layoutOptions.trim());
+            if (error) {
+                errorMessage.push(`Invalid layout JSON: ${error}`);
+            }
+        }
+        if (configurationOptions && configurationOptions.trim()) {
+            const error = validateAdvancedOptions(configurationOptions.trim());
+            if (error) {
+                errorMessage.push(`Invalid configuration JSON: ${error}`);
+            }
+        }
+
+        return errorMessage.length ? renderError(widgetId, errorMessage) : "";
 };
 
 export const validateAdvancedOptions = (rawData: string): string => {
@@ -193,7 +196,7 @@ const validateJSONData = (data: any, attributes: string[]): string => {
     return "";
 };
 
-const getReferences = (attributePaths: string[]): ReferencesSpec => {
+export const getReferences = (attributePaths: string[]): ReferencesSpec => {
     let references: ReferencesSpec = { attributes: [] };
     attributePaths.forEach(attribute => {
         references = addPathReference(references, attribute);
@@ -232,7 +235,7 @@ export const fetchByXPath = (options: FetchByXPathOptions): Promise<MxO[]> => ne
     const { guid, entity, constraint, sortAttribute, sortOrder, attributes, references } = options;
     const entityPath = entity.split("/");
     const entityName = entityPath.length > 1 ? entityPath[entityPath.length - 1] : entity;
-    const xpath = "//" + entityName + constraint.split("[%CurrentObject%]").join(guid);
+    const xpath = `//${entityName}${constraint.split("[%CurrentObject%]").join(guid)}`;
 
     window.mx.data.get({
         callback: resolve,
@@ -310,6 +313,18 @@ export const openTooltipForm = (domNode: HTMLDivElement, tooltipForm: string, da
     window.mx.ui.openForm(tooltipForm, { domNode, context, location: "node" });
 };
 
+export const isContextChanged = (currentContext?: mendix.lib.MxObject, newContext?: mendix.lib.MxObject): boolean => {
+    return (!currentContext && !!newContext) ||
+        (!!currentContext && !newContext) ||
+        ((!!currentContext && currentContext.getGuid()) !== (!!newContext && newContext.getGuid()));
+};
+
+export const setRefreshAction = (refreshInterval: number, mxObject?: mendix.lib.MxObject) => (callback: () => void) => {
+    if (refreshInterval > 0 && mxObject) {
+        return window.setInterval(callback, refreshInterval);
+    }
+};
+
 export const getSeriesTraces = ({ data, restData, series }: SeriesData): ScatterTrace => {
     let xData: Datum[] = [];
     let yData: number[] = [];
@@ -319,7 +334,7 @@ export const getSeriesTraces = ({ data, restData, series }: SeriesData): Scatter
         xData = data.map(mxObject => getAttributeValue(mxObject, series.xValueAttribute));
         yData = data.map(mxObject => parseFloat(mxObject.get(series.yValueAttribute) as string));
         markerSizeData = (series as any).markerSizeAttribute
-            ? data.map(mxObject => parseFloat(mxObject.get((series as any).markerSizeAttribute as string) as string))
+            ? data.map(mxObject => parseFloat(mxObject.get((series as any).markerSizeAttribute) as string))
             : undefined;
         sortData = series.xValueSortAttribute
             ? data.map(mxObject => getAttributeValue(mxObject, series.xValueSortAttribute))
@@ -367,6 +382,7 @@ export const getSeriesTraces = ({ data, restData, series }: SeriesData): Scatter
         if (a.sort < b.sort) {
             return 1;
         }
+
         return 0;
     });
     const sortedXData = sorted.map(value => value.x);
@@ -460,4 +476,31 @@ export const arrayMerge = (target: any[], source: any[], options: any) => {
     });
 
     return destination;
+};
+
+export const parseAdvancedOptions = (devMode: Container.DevMode, options: string) =>
+    devMode !== "basic" && options ? JSON.parse(options) : {};
+
+export const renderError = (id: string, errorMessages: string[]) => {
+    if (errorMessages.length) {
+        return createElement("div", {},
+            `Configuration error in widget ${id}:`,
+            ...errorMessages.map((message, key) => createElement("p", { key }, message))
+        );
+    }
+
+    return "";
+};
+
+type ReduxStoreKey = "scatter" | "bar" | "pie" | "heatmap" | "any";
+
+export const generateInstanceID = (friendlyId: string) => `${friendlyId}-${Math.round(Math.random() * 20)}`;
+export const getInstanceID = (friendlyId: string, store: Store, reduxStoreKey: ReduxStoreKey): string => {
+    let instanceID = generateInstanceID(friendlyId);
+    const instances: string[] = Object.keys(store.getState()[reduxStoreKey]);
+    while (instances.indexOf(instanceID) > -1) {
+        instanceID = generateInstanceID(friendlyId);
+    }
+
+    return instanceID;
 };

@@ -1,16 +1,23 @@
 import { Component, createElement } from "react";
-
-import { BarChart } from "../BarChart/components/BarChart";
-
-import { getRandomNumbers, validateSeriesProps } from "../utils/data";
+import { Provider } from "react-redux";
 import deepMerge from "deepmerge";
-import { ScatterData } from "plotly.js";
+import { store } from "../store";
+import "../BarChart/store/BarChartReducer"; // ==important==: without this, the reducer shall not be registered.
+
+import BarChart from "../BarChart/components/BarChart";
+
+import { BarChartDataHandlerProps } from "../BarChart/components/BarChartDataHandler";
+import { getInstanceID, getRandomNumbers, validateSeriesProps } from "../utils/data";
 import { Container } from "../utils/namespaces";
-import BarChartContainerProps = Container.BarChartContainerProps;
+import { ScatterData } from "plotly.js";
 import { defaultColours } from "../utils/style";
+import BarChartContainerProps = Container.BarChartContainerProps;
 
 // tslint:disable-next-line class-name
-export class preview extends Component<BarChartContainerProps, {}> {
+export class preview extends Component<BarChartContainerProps, { updatingData: boolean }> {
+    state = { updatingData: true };
+    private instanceID = getInstanceID(this.props.friendlyId, store, "bar");
+
     render() {
         const alertMessage = validateSeriesProps(
             this.props.series,
@@ -19,13 +26,27 @@ export class preview extends Component<BarChartContainerProps, {}> {
             this.props.configurationOptions
         );
 
-        return createElement(BarChart, {
-            ...this.props as BarChartContainerProps,
-            alertMessage,
-            devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-            scatterData: this.getData(this.props),
-            themeConfigs: { layout: {}, configuration: {}, data: {} }
-        });
+        return createElement(Provider, { store },
+            createElement(BarChart, {
+                ...this.props as BarChartDataHandlerProps,
+                alertMessage,
+                devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
+                fetchingData: false,
+                updatingData: this.state.updatingData,
+                toggleUpdatingData: this.toggleUpdatingData,
+                instanceID: this.instanceID,
+                scatterData: this.getData(this.props),
+                themeConfigs: { layout: {}, configuration: {}, data: {} }
+            })
+        );
+    }
+
+    componentWillReceiveProps() {
+        this.setState({ updatingData: true });
+    }
+
+    private toggleUpdatingData = (_widgetID: string, updatingData: boolean): any => {
+        this.setState({ updatingData });
     }
 
     private getData(props: BarChartContainerProps): ScatterData[] {

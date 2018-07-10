@@ -4,16 +4,16 @@ import * as classNames from "classnames";
 import { Operation, compare } from "fast-json-patch";
 import * as jsonMap from "json-source-map";
 
+import AnyChart from "../AnyChart/components/AnyChart";
 import { InfoTooltip } from "./InfoTooltip";
 import { MendixButton } from "./MendixButton";
 import { Panel } from "./Panel";
-import { PlotlyChart } from "./PlotlyChart";
+import { PlaygroundInfo } from "./PlaygroundInfo";
+import PlotlyChart from "./PlotlyChart";
 import { Sidebar } from "./Sidebar";
 import { SidebarHeader } from "./SidebarHeader";
 import { SidebarContent } from "./SidebarContent";
 import { SidebarHeaderTools } from "./SidebarHeaderTools";
-
-import { PlaygroundInfo } from "./PlaygroundInfo";
 
 import "brace";
 import "brace/mode/json";
@@ -32,6 +32,8 @@ export interface RenderAceEditorOptions {
     readOnly?: boolean;
     overwriteValue?: string;
 }
+
+type SidebarChildren = typeof Panel | typeof PlotlyChart | typeof AnyChart | typeof SidebarHeaderTools;
 
 export class Playground extends Component<{}, PlaygroundState> {
     state = {
@@ -63,11 +65,12 @@ export class Playground extends Component<{}, PlaygroundState> {
             createElement("div", { className: "widget-charts-playground-toggle" },
                 createElement(MendixButton, { onClick: this.toggleShowEditor }, "Toggle Editor")
             ),
-            this.renderContent(PlotlyChart)
+            this.renderContent(PlotlyChart),
+            this.renderContent(AnyChart)
         );
     }
 
-    private renderContent(component: typeof Panel | typeof PlotlyChart | typeof SidebarHeaderTools): ReactChild | (ReactChild | any | boolean)[] | null {
+    private renderContent(component: SidebarChildren): ReactChild | (ReactChild | any | boolean)[] | null {
         if (this.props.children && Array.isArray(this.props.children)) {
             return this.props.children.filter(child => isValidElement(child) && child.type === component);
         } else if (isValidElement(this.props.children) && this.props.children.type === component) {

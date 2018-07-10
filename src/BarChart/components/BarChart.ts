@@ -1,83 +1,69 @@
-import deepMerge from "deepmerge";
-import { Config, Layout, ScatterData, ScatterHoverData } from "plotly.js";
+import { ScatterData, ScatterHoverData } from "plotly.js";
 import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
-import { Alert } from "../../components/Alert";
-import { ChartLoading } from "../../components/ChartLoading";
+import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
+import { bindActionCreators } from "redux";
+
+import { BarChartState } from "../store/BarChartReducer";
+import { Data } from "../../utils/namespaces";
+import { BarChartDataHandlerProps } from "./BarChartDataHandler";
+import {
+    getConfigOptions,
+    getDefaultConfigOptions,
+    getLayoutOptions,
+    getModelerLayoutOptions,
+    getModelerSeriesOptions
+} from "../utils/configs";
 import { HoverTooltip } from "../../components/HoverTooltip";
-import { PlotlyChart } from "../../components/PlotlyChart";
-import { SeriesPlayground } from "../../components/SeriesPlayground";
-import "../../ui/Charts.scss";
-import { configs } from "../../utils/configs";
-import { Container, Data } from "../../utils/namespaces";
+import { Alert } from "../../components/Alert";
+import PlotlyChart from "../../components/PlotlyChart";
+import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
+import { PlotlyChartInstance, defaultPlotlyInstanceState } from "../../components/reducers/PlotlyChartReducer";
+import { DefaultReduxStore, store } from "../../store";
 import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 
-export interface BarChartProps extends Container.BarChartContainerProps {
+import "../../ui/Charts.scss";
+
+interface ComponentProps extends BarChartDataHandlerProps {
     alertMessage?: ReactChild;
-    loading?: boolean;
-    scatterData?: ScatterData[];
-    seriesOptions?: string[];
-    themeConfigs: { layout: {}, configuration: {}, data: {} };
     onClick?: (options: Data.OnClickOptions<{ x: string, y: number }, Data.SeriesProps>) => void;
     onHover?: (options: Data.OnHoverOptions<{ x: string, y: number }, Data.SeriesProps>) => void;
 }
 
-interface BarChartState {
-    layoutOptions: string;
-    series?: Data.SeriesProps[];
-    seriesOptions?: string[];
-    scatterData?: ScatterData[];
-    playgroundLoaded: boolean;
-    configurationOptions: string;
-}
+export type BarChartProps = ComponentProps & typeof PlotlyChartActions & PlotlyChartInstance;
 
-export class BarChart extends Component<BarChartProps, BarChartState> {
-    state: BarChartState = {
-        layoutOptions: this.props.layoutOptions,
-        series: this.props.series,
-        configurationOptions: this.props.configurationOptions,
-        seriesOptions: this.props.seriesOptions,
-        scatterData: this.props.scatterData,
-        playgroundLoaded: false
-    };
+class BarChart extends Component<BarChartProps & BarChartState> {
     private tooltipNode?: HTMLDivElement;
-    private Playground?: typeof SeriesPlayground;
-
-    constructor(props: BarChartProps) {
-        super(props);
-
-        if (props.devMode === "developer") {
-            this.loadPlaygroundComponent();
-        }
-    }
 
     render() {
         if (this.props.alertMessage) {
             return createElement(Alert, { className: "widget-charts-bar-alert" }, this.props.alertMessage);
         }
-        if (this.props.loading || (this.props.devMode === "developer" && !this.state.playgroundLoaded)) {
-            return createElement(ChartLoading);
-        }
-        if (this.props.devMode === "developer" && this.state.playgroundLoaded) {
+        if (this.props.devMode === "developer" && this.props.playground) {
             return this.renderPlayground();
         }
 
         return this.renderChart();
     }
 
-    componentWillReceiveProps(newProps: BarChartProps) {
-        this.setState({
-            layoutOptions: newProps.layoutOptions,
-            series: newProps.series,
-            seriesOptions: newProps.seriesOptions,
-            scatterData: newProps.scatterData
-        });
+    componentDidMount() {
+        if (this.props.devMode === "developer" && this.props.loadPlayground) {
+            store.dispatch(this.props.loadPlayground(this.props.instanceID));
+        }
+        if (this.props.updatingData) {
+            this.updateData(this.props);
+        }
     }
 
-    private async loadPlaygroundComponent() {
-        const { SeriesPlayground: PlaygroundImport } = await import("../../components/SeriesPlayground");
-        this.Playground = PlaygroundImport;
-        this.setState({ playgroundLoaded: true });
+    componentWillReceiveProps(nextProps: BarChartProps) {
+        const doneFetching = !nextProps.fetchingData && this.props.fetchingData;
+
+        if (!nextProps.alertMessage && (doneFetching || nextProps.updatingData)) {
+            this.updateData(nextProps);
+        }
+        if (nextProps.updatingData) {
+            nextProps.toggleUpdatingData(nextProps.instanceID, false);
+        }
     }
 
     private getTooltipNodeRef = (node: HTMLDivElement) => {
@@ -85,14 +71,20 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     }
 
     private renderChart() {
+        const playgroundLoaded = this.props.devMode !== "developer" || !!this.props.playground;
+
         return createElement(PlotlyChart,
             {
                 type: "bar",
+                widgetID: this.props.instanceID,
+                loadingAPI: this.props.loadingAPI && playgroundLoaded,
+                loadingData: this.props.fetchingData,
+                layout: this.props.layout,
+                data: this.props.data,
+                config: this.props.config,
+                plotly: this.props.plotly,
                 className: this.props.class,
                 style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
-                layout: this.getLayoutOptions(this.props),
-                data: this.getData(this.props),
-                config: this.getConfigOptions(this.props),
                 onClick: this.onClick,
                 onHover: this.onHover,
                 getTooltipNode: this.getTooltipNodeRef
@@ -101,57 +93,28 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
     }
 
     private renderPlayground(): ReactElement<any> | null {
-        if (this.Playground) {
-            const { series } = this.state;
-            const modelerLayoutConfigs = deepMerge.all(
-                [ BarChart.defaultLayoutConfigs(this.props), this.props.themeConfigs.layout ]
-            );
-            const modelerSeriesConfigs = series ? series.map(_series => deepMerge.all([
-                BarChart.getDefaultSeriesOptions(_series, this.props),
-                this.props.themeConfigs.data
-            ])) : [];
-
-            return createElement(this.Playground, {
-                series,
-                seriesOptions: this.state.seriesOptions || [],
-                modelerSeriesConfigs: modelerSeriesConfigs.map(config => JSON.stringify(config, null, 2)),
-                onChange: this.onRuntimeUpdate,
-                layoutOptions: this.state.layoutOptions || "{\n\n}",
-                configurationOptions: this.state.configurationOptions || "{\n\n}",
-                configurationOptionsDefault: JSON.stringify(BarChart.getDefaultConfigOptions(), null, 2),
-                modelerLayoutConfigs: JSON.stringify(modelerLayoutConfigs, null, 2)
+        if (this.props.playground) {
+            return createElement(this.props.playground, {
+                series: this.props.series,
+                seriesOptions: this.props.seriesOptions || [],
+                modelerSeriesConfigs: getModelerSeriesOptions(this.props),
+                onChange: this.onOptionsUpdate,
+                layoutOptions: this.props.layoutOptions || "{\n\n}",
+                configurationOptions: this.props.configurationOptions || "{\n\n}",
+                configurationOptionsDefault: JSON.stringify(getDefaultConfigOptions(), null, 2),
+                modelerLayoutConfigs: JSON.stringify(getModelerLayoutOptions(this.props), null, 2)
             }, this.renderChart());
         }
 
         return null;
     }
 
-    private getLayoutOptions(props: BarChartProps): Partial<Layout> {
-        const { layoutOptions } = this.state;
-        const advancedOptions = props.devMode !== "basic" && layoutOptions ? JSON.parse(layoutOptions) : {};
-        const themeLayoutConfigs = props.devMode !== "basic" ? this.props.themeConfigs.layout : {};
-
-        return deepMerge.all([ BarChart.defaultLayoutConfigs(props), themeLayoutConfigs, advancedOptions ]);
-    }
-
-    private getData(props: BarChartProps): ScatterData[] {
-        if (props.scatterData && this.state.seriesOptions) {
-            const { seriesOptions: options } = this.state;
-            const dataThemeConfigs = props.devMode !== "basic" ? this.props.themeConfigs.data : {};
-            return props.scatterData.map((data, index) => {
-                const parsedOptions = props.devMode !== "basic" && options && options.length
-                    ? JSON.parse(options[index])
-                    : {};
-
-                // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
-                return {
-                    ...deepMerge.all<ScatterData>([ data, dataThemeConfigs, parsedOptions ]),
-                    customdata: data.customdata
-                };
-            });
-        }
-
-        return props.scatterData || [];
+    private updateData(props: BarChartProps) {
+        props.updateData(props.instanceID, {
+            layout: getLayoutOptions(props),
+            data: props.scatterData || [],
+            config: getConfigOptions(props)
+        });
     }
 
     private onClick = ({ points }: ScatterHoverData<mendix.lib.MxObject>) => {
@@ -199,20 +162,16 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
         }
     }
 
-    private onRuntimeUpdate = (layoutOptions: string, seriesOptions: string[], configurationOptions: string) => {
-        this.setState({ layoutOptions, seriesOptions, configurationOptions });
-    }
-
-    private static getDefaultConfigOptions(): Partial<Config> {
-        return { displayModeBar: false, doubleClick: false };
-    }
-
-    public getConfigOptions(props: BarChartProps): Partial<Config> {
-        const parsedConfig = props.devMode !== "basic" && this.state.configurationOptions
-            ? JSON.parse(this.state.configurationOptions)
-            : {};
-
-        return deepMerge.all([ BarChart.getDefaultConfigOptions(), props.themeConfigs.configuration, parsedConfig ]);
+    private onOptionsUpdate = (layoutOptions: string, seriesOptions: string[], configurationOptions: string) => {
+        if (this.props.scatterData) {
+            this.props.updateDataFromPlayground(
+                this.props.instanceID,
+                this.props.scatterData,
+                layoutOptions,
+                seriesOptions,
+                configurationOptions
+            );
+        }
     }
 
     public static getDefaultSeriesOptions(series: Data.SeriesProps, props: BarChartProps): Partial<ScatterData> {
@@ -223,30 +182,10 @@ export class BarChart extends Component<BarChartProps, BarChartState> {
             orientation: props.orientation === "bar" ? "h" : "v"
         };
     }
-
-    public static defaultLayoutConfigs(props: BarChartProps): Partial<Layout> {
-        const defaultConfigs: Partial<Layout> = {
-            barmode: props.barMode,
-            showlegend: props.showLegend,
-            xaxis: {
-                gridcolor: "#d7d7d7",
-                zerolinecolor: "#d7d7d7",
-                zeroline: props.orientation === "bar" ? true : false,
-                title: props.xAxisLabel,
-                showgrid: props.grid === "vertical" || props.grid === "both",
-                fixedrange: true
-            },
-            yaxis: {
-                rangemode: "tozero",
-                zeroline: true,
-                zerolinecolor: "#d7d7d7",
-                gridcolor: "#d7d7d7",
-                title: props.yAxisLabel,
-                showgrid: props.grid === "horizontal" || props.grid === "both",
-                fixedrange: true
-            }
-        };
-
-        return deepMerge.all([ configs.layout, defaultConfigs ]);
-    }
 }
+
+const mapStateToProps: MapStateToProps<PlotlyChartInstance, ComponentProps, DefaultReduxStore> = (state, props) =>
+    state.plotly[props.instanceID] || defaultPlotlyInstanceState;
+const mapDispatchToProps: MapDispatchToProps<typeof PlotlyChartActions, ComponentProps> = dispatch =>
+    bindActionCreators(PlotlyChartActions, dispatch);
+export default connect(mapStateToProps, mapDispatchToProps)(BarChart);

@@ -1,16 +1,19 @@
 import { Component, ReactChild, createElement } from "react";
 
-import { AnyChart } from "./components/AnyChart";
+import AnyChart, { AnyChartComponentProps } from "./components/AnyChart";
 import { Container } from "../utils/namespaces";
 import { validateAdvancedOptions } from "../utils/data";
+import { Provider } from "react-redux";
+import { store } from "../store";
 
 // tslint:disable-next-line class-name
 export class preview extends Component<Container.AnyChartContainerProps, {}> {
     render() {
-        return createElement("div", {},
+        return createElement(Provider, { store },
             createElement(AnyChart, {
-                ...this.props as any,
+                ...this.props as AnyChartComponentProps,
                 devMode: "advanced",
+                fetchingData: false,
                 attributeData: this.props.sampleData,
                 attributeLayout:  this.props.sampleLayout,
                 alertMessage: this.validateSeriesProps(this.props)

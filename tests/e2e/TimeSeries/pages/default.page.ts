@@ -3,7 +3,7 @@ import { DefaultPage } from "../../DefaultPage/home.page";
 class TimeSeries extends DefaultPage {
 
     public get timeSeries() {
-        return browser.element(".mx-name-timeSeries1.js-plotly-plot svg");
+        return browser.element(".mx-name-timeSeries1 .js-plotly-plot svg");
     }
 
     public get miniSlider() {

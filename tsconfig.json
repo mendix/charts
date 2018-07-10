@@ -10,7 +10,9 @@
     "types": [
       "mendix-client",
       "jasmine",
-      "core-js"
+      "core-js",
+      "redux",
+      "redux-thunk"
     ],
     "moduleResolution": "node",
     "declaration": false,
@@ -21,7 +23,7 @@
     "noFallthroughCasesInSwitch": true,
     "strict": true,
     "strictFunctionTypes": false,
-    "skipLibCheck": false,
+    "skipLibCheck": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
