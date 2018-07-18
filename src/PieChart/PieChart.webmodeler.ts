@@ -15,8 +15,9 @@ import PieChartContainerProps = Container.PieChartContainerProps;
 
 // tslint:disable-next-line class-name
 export class preview extends Component<PieChartContainerProps, { updatingData: boolean }> {
-    state = { updatingData: true };
+    readonly state = { updatingData: true };
     private instanceID = getInstanceID(this.props.friendlyId, store, "pie");
+    private scatterData = preview.getData(this.props);
 
     render() {
         const alertMessage = validateSeriesProps(
@@ -35,7 +36,7 @@ export class preview extends Component<PieChartContainerProps, { updatingData: b
                 toggleUpdatingData: this.toggleUpdatingData,
                 instanceID: this.instanceID,
                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-                pieData: preview.getData(this.props),
+                pieData: this.scatterData,
                 themeConfigs: { layout: {}, configuration: {}, data: {} }
             })
         );

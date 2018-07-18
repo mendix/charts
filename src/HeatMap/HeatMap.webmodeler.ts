@@ -16,8 +16,12 @@ import HeatMapContainerProps = Container.HeatMapContainerProps;
 
 // tslint:disable-next-line class-name
 export class preview extends Component<HeatMapContainerProps, { updatingData: boolean }> {
-    state = { updatingData: true };
+    readonly state = { updatingData: true };
     private instanceID = getInstanceID(this.props.friendlyId, store, "heatmap");
+    private scatterData = deepMerge.all([
+        getDefaultDataOptions(this.props as HeatMapProps),
+        preview.getData(this.props)
+    ]) as HeatMapData;
 
     render() {
         const alertMessage = validateSeriesProps(
@@ -37,9 +41,7 @@ export class preview extends Component<HeatMapContainerProps, { updatingData: bo
                 instanceID: this.instanceID,
                 themeConfigs: { layout: {}, configuration: {}, data: {} },
                 devMode: this.props.devMode === "developer" ? "advanced" : this.props.devMode,
-                heatmapData: deepMerge.all(
-                    [ getDefaultDataOptions(this.props as HeatMapProps), preview.getData(this.props) ]
-                ) as HeatMapData
+                heatmapData: this.scatterData
             })
         );
     }

@@ -15,8 +15,9 @@ import LineChartContainerProps = Container.LineChartContainerProps;
 
 // tslint:disable-next-line class-name
 export class preview extends Component<LineChartContainerProps, { updatingData: boolean }> {
-    state = { updatingData: true };
+    readonly state = { updatingData: true };
     private instanceID = getInstanceID(this.props.friendlyId, store, "scatter");
+    private scatterData = preview.getData(this.props);
 
     render() {
         const alertMessage = validateSeriesProps(
@@ -36,7 +37,7 @@ export class preview extends Component<LineChartContainerProps, { updatingData: 
                 updatingData: this.state.updatingData,
                 toggleUpdatingData: this.toggleUpdatingData,
                 instanceID: this.instanceID,
-                scatterData: preview.getData(this.props),
+                scatterData: this.scatterData,
                 themeConfigs: { layout: {}, configuration: {}, data: {} }
             })
         );
