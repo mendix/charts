@@ -13,6 +13,7 @@ import FetchByXPathOptions = Data.FetchByXPathOptions;
 import { Store } from "redux";
 
 type MxO = mendix.lib.MxObject;
+type Callback = mendix.lib.MxObject | mendix.lib.MxObject[] | boolean | number | string | mxui.lib.form._FormBase;
 
 export const validateSeriesProps = <T extends Partial<SeriesProps>>
     (dataSeries: T[], widgetId: string, layoutOptions: string, configurationOptions: string): ReactChild => {
@@ -271,6 +272,47 @@ export const fetchByREST = (url: string): Promise<any> => new Promise((resolve, 
             reject(`${errorMessage} ${data.statusText}`);
         }
     }).catch(error => reject(`${errorMessage} ${error.message}`));
+});
+
+export const handleClick = <T extends EventProps>(options: T, mxObject?: MxO, mxform?: mxui.lib.form._FormBase): Promise<Callback> => new Promise((resolve, reject) => {
+    const context = new mendix.lib.MxContext();
+
+    if (!mxObject || options.onClickEvent === "doNothing") {
+        resolve();
+    } else {
+        context.setContext(mxObject.getEntity(), mxObject.getGuid());
+    }
+
+    if (options.onClickEvent === "callMicroflow" && options.onClickMicroflow) {
+        window.mx.ui.action(options.onClickMicroflow, {
+            callback: resolve,
+            error: error => reject(`Error while executing microflow ${options.onClickMicroflow}: ${error.message}`), // tslint:disable-line max-line-length
+            params: {
+                applyto: "selection",
+                guids: mxObject ? [ mxObject.getGuid() ] : undefined
+            },
+            origin: mxform
+        });
+    } else if (options.onClickEvent === "showPage" && options.onClickPage) {
+        window.mx.ui.openForm(options.onClickPage, {
+            callback: resolve,
+            context,
+            error: error => reject(`Error while opening page ${options.onClickPage}: ${error.message}`),
+            location: options.openPageLocation
+        });
+
+        if (options.openPageLocation === "content") { // Callback is not called in this case
+            resolve();
+        }
+    } else if (options.onClickEvent === "callNanoflow" && options.onClickNanoflow.nanoflow && mxform && context) {
+        window.mx.data.callNanoflow({
+            callback: resolve,
+            context,
+            error: error => reject(`Error executing the on click nanoflow ${error.message}`),
+            nanoflow: options.onClickNanoflow,
+            origin: mxform
+        });
+    }
 });
 
 export const handleOnClick = <T extends EventProps>(options: T, mxObject?: MxO, mxform?: mxui.lib.form._FormBase) => {

@@ -6,7 +6,8 @@ import LineChart from "./LineChart";
 import * as LineChartActions from "../store/LineChartActions";
 import { LineChartInstanceState, ScatterReduxStore as ReduxStore, defaultInstanceState } from "../store/LineChartReducer";
 import {
-    handleOnClick,
+    handleClick,
+    // handleOnClick,
     isContextChanged,
     openTooltipForm,
     setRefreshAction,
@@ -26,6 +27,8 @@ export type LineChartDataHandlerProps = ComponentProps & LineChartInstanceState 
 export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
     private subscriptionHandles: number[] = [];
     private intervalID?: number;
+    private isRunningAction = false;
+    private showProgress?: number;
     private typeMapping: { [ key in Container.ScatterTypes ]: ChartType } = {
         line: "LineChart",
         area: "AreaChart",
@@ -33,6 +36,8 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
         timeseries: "TimeSeries",
         polar: "PolarChart"
     };
+
+    readonly onStopActionbound = this.onStopAction.bind(this);
 
     render() {
         return createElement("div", { className: "widget-charts-wrapper" },
@@ -120,12 +125,29 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
     }
 
     private onClick = (options: Data.OnClickOptions<{ x: string, y: number }, Data.SeriesProps>) => {
-        if (options.mxObject) {
-            handleOnClick(options.options, options.mxObject, options.mxForm);
-        } else if (options.trace) {
-            this.createDataPoint(options.options, options.trace)
-                .then(mxObject => handleOnClick(options.options, mxObject, options.mxForm))
-                .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
+        if (!this.isRunningAction) {
+            this.onStartAction();
+            if (options.mxObject) {
+                // handleOnClick(options.options, options.mxObject, options.mxForm);
+                handleClick(options.options, options.mxObject, options.mxForm)
+                    .then(this.onStopActionbound)
+                    .catch((error) => {
+                        mx.ui.error(error);
+                        this.onStopActionbound();
+                    });
+            } else if (options.trace) {
+                this.createDataPoint(options.options, options.trace)
+                    .then(mxObject => {
+                        handleClick(options.options, mxObject, options.mxForm)
+                            .then(this.onStopActionbound)
+                            .catch((error) => {
+                                mx.ui.error(error);
+                                this.onStopActionbound();
+                            });
+                        })
+                        // handleOnClick(options.options, mxObject, options.mxForm))
+                    .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
+            }
         }
     }
 
@@ -156,6 +178,22 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
     private clearRefreshInterval() {
         window.clearInterval(this.intervalID);
         this.intervalID = undefined;
+    }
+
+    private onStartAction() {
+        this.isRunningAction = true;
+        setTimeout(() => {
+            if (this.isRunningAction) {
+                this.showProgress = mx.ui.showProgress();
+            }
+        } , 120);
+    }
+    private onStopAction() {
+        this.isRunningAction = false;
+        if (this.showProgress) {
+            mx.ui.hideProgress(this.showProgress);
+        }
+
     }
 }
 

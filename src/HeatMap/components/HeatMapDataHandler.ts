@@ -1,7 +1,7 @@
 import { Component, createElement } from "react";
 
 import {
-    handleOnClick,
+    handleClick,
     isContextChanged,
     openTooltipForm,
     setRefreshAction,
@@ -25,6 +25,9 @@ export type HeatMapDataHandlerProps = ComponentProps & HeatMapState & Actions;
 class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
     private subscriptionHandles: number[] = [];
     private intervalID?: number;
+    private isRunningAction = false;
+    private showProgress?: number;
+    readonly onStopActionbound = this.onStopAction.bind(this);
 
     render() {
         return createElement("div", { className: "widget-charts-wrapper" },
@@ -121,16 +124,31 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
     }
 
     private handleOnClick = (options: Data.OnClickOptions<{ x: string, y: string, z: number }, HeatMapContainerProps>) => {
-        if (options.trace) {
+        if (!this.isRunningAction && options.trace) {
+            this.onStartAction();
             const mxObject = this.findSourceObject(options.trace.x, options.trace.y, options.trace.z);
+
             if (mxObject) {
-                handleOnClick(options.options, mxObject, options.mxForm);
+                handleClick(options.options, options.mxObject, options.mxForm)
+                    .then(this.onStopActionbound)
+                    .catch((error) => {
+                        mx.ui.error(error);
+                        this.onStopActionbound();
+                    });
             } else {
                 this.createDataPoint(options.options, options.trace)
-                    .then(newMxObject => handleOnClick(options.options, newMxObject, options.mxForm))
+                    .then(newMxObject => {
+                        handleClick(options.options, newMxObject, options.mxForm)
+                            .then(this.onStopActionbound)
+                            .catch((error) => {
+                                mx.ui.error(error);
+                                this.onStopActionbound();
+                            });
+                    })
                     .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
             }
         }
+
     }
 
     private handleOnHover = (options: Data.OnHoverOptions<{ x: string, y: string, z: number }, HeatMapContainerProps>) => {
@@ -167,6 +185,22 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
             data.get(getAttributeName(this.props.verticalNameAttribute)) === y &&
             Number(data.get(this.props.valueAttribute)) === z
         );
+    }
+
+    private onStartAction() {
+        this.isRunningAction = true;
+        setTimeout(() => {
+            if (this.isRunningAction) {
+                this.showProgress = mx.ui.showProgress();
+            }
+        } , 120);
+    }
+    private onStopAction() {
+        this.isRunningAction = false;
+        if (this.showProgress) {
+            mx.ui.hideProgress(this.showProgress);
+        }
+
     }
 }
 
