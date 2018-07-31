@@ -6,7 +6,7 @@ import LineChart from "./LineChart";
 import * as LineChartActions from "../store/LineChartActions";
 import { LineChartInstanceState, ScatterReduxStore as ReduxStore, defaultInstanceState } from "../store/LineChartReducer";
 import {
-    handleClick,
+    handleOnClick,
     // handleOnClick,
     isContextChanged,
     openTooltipForm,
@@ -129,7 +129,7 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
             this.onStartAction();
             if (options.mxObject) {
                 // handleOnClick(options.options, options.mxObject, options.mxForm);
-                handleClick(options.options, options.mxObject, options.mxForm)
+                handleOnClick(options.options, options.mxObject, options.mxForm)
                     .then(this.onStopActionbound)
                     .catch((error) => {
                         mx.ui.error(error);
@@ -138,7 +138,7 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
             } else if (options.trace) {
                 this.createDataPoint(options.options, options.trace)
                     .then(mxObject => {
-                        handleClick(options.options, mxObject, options.mxForm)
+                        handleOnClick(options.options, mxObject, options.mxForm)
                             .then(this.onStopActionbound)
                             .catch((error) => {
                                 mx.ui.error(error);

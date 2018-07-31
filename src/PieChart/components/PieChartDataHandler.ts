@@ -2,7 +2,7 @@ import { Component, createElement } from "react";
 import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
-import { handleClick, isContextChanged, openTooltipForm, setRefreshAction, validateSeriesProps } from "../../utils/data";
+import { handleOnClick, isContextChanged, openTooltipForm, setRefreshAction, validateSeriesProps } from "../../utils/data";
 import { Container, Data } from "../../utils/namespaces";
 import PieChart from "./PieChart";
 import * as PieChartActions from "../store/PieChartActions";
@@ -120,7 +120,7 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
         if (!this.isRunningAction) {
             this.onStartAction();
             if (options.mxObject) {
-                handleClick(options.options, options.mxObject, options.mxForm)
+                handleOnClick(options.options, options.mxObject, options.mxForm)
                     .then(this.onStopActionbound)
                     .catch((error) => {
                         mx.ui.error(error);
@@ -129,7 +129,7 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
             } else if (options.trace) {
                 this.createDataPoint(options.options, options.trace)
                     .then(mxObject => {
-                        handleClick(options.options, mxObject, options.mxForm)
+                        handleOnClick(options.options, mxObject, options.mxForm)
                             .then(this.onStopActionbound)
                             .catch((error) => {
                                 mx.ui.error(error);

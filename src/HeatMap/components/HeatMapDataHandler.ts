@@ -1,7 +1,7 @@
 import { Component, createElement } from "react";
 
 import {
-    handleClick,
+    handleOnClick,
     isContextChanged,
     openTooltipForm,
     setRefreshAction,
@@ -129,7 +129,7 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
             const mxObject = this.findSourceObject(options.trace.x, options.trace.y, options.trace.z);
 
             if (mxObject) {
-                handleClick(options.options, options.mxObject, options.mxForm)
+                handleOnClick(options.options, options.mxObject, options.mxForm)
                     .then(this.onStopActionbound)
                     .catch((error) => {
                         mx.ui.error(error);
@@ -138,7 +138,7 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
             } else {
                 this.createDataPoint(options.options, options.trace)
                     .then(newMxObject => {
-                        handleClick(options.options, newMxObject, options.mxForm)
+                        handleOnClick(options.options, newMxObject, options.mxForm)
                             .then(this.onStopActionbound)
                             .catch((error) => {
                                 mx.ui.error(error);
