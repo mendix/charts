@@ -6,7 +6,7 @@ import BarChart from "./BarChart";
 import * as BarChartActions from "../store/BarChartActions";
 import { BarChartInstanceState, BarReduxStore as ReduxStore, defaultInstanceState } from "../store/BarChartReducer";
 import {
-    handleClick,
+    handleOnClick,
     isContextChanged,
     openTooltipForm,
     setRefreshAction,
@@ -121,7 +121,7 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
             this.onStartAction();
             if (options.mxObject) {
                 // handleOnClick(options.options, options.mxObject, options.mxForm);
-                handleClick(options.options, options.mxObject, options.mxForm)
+                handleOnClick(options.options, options.mxObject, options.mxForm)
                     .then(this.onStopActionbound)
                     .catch((error) => {
                         mx.ui.error(error);
@@ -130,7 +130,7 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
             } else if (options.trace) {
                 this.createDataPoint(options.options, options.trace)
                     .then(mxObject => {
-                        handleClick(options.options, mxObject, options.mxForm)
+                        handleOnClick(options.options, mxObject, options.mxForm)
                             .then(this.onStopActionbound)
                             .catch((error) => {
                                 mx.ui.error(error);
