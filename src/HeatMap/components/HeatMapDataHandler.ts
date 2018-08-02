@@ -140,7 +140,7 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
                     .then(newMxObject => {
                         handleOnClick(options.options, newMxObject, options.mxForm)
                             .then(this.onStopActionbound)
-                            .catch((error) => {
+                            .catch(error => {
                                 mx.ui.error(error);
                                 this.onStopActionbound();
                             });
@@ -148,7 +148,6 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
                     .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
             }
         }
-
     }
 
     private handleOnHover = (options: Data.OnHoverOptions<{ x: string, y: string, z: number }, HeatMapContainerProps>) => {
@@ -195,6 +194,7 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
             }
         } , 120);
     }
+
     private onStopAction() {
         this.isRunningAction = false;
         if (this.showProgress) {

@@ -120,7 +120,6 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
         if (!this.isRunningAction) {
             this.onStartAction();
             if (options.mxObject) {
-                // handleOnClick(options.options, options.mxObject, options.mxForm);
                 handleOnClick(options.options, options.mxObject, options.mxForm)
                     .then(this.onStopActionbound)
                     .catch((error) => {
@@ -179,12 +178,12 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
             }
         } , 120);
     }
+
     private onStopAction() {
         this.isRunningAction = false;
         if (this.showProgress) {
             mx.ui.hideProgress(this.showProgress);
         }
-
     }
 }
 
