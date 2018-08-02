@@ -173,12 +173,12 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
             }
         } , 120);
     }
+
     private onStopAction() {
         this.isRunningAction = false;
         if (this.showProgress) {
             mx.ui.hideProgress(this.showProgress);
         }
-
     }
 }
 

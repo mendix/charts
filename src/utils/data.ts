@@ -279,6 +279,8 @@ export const handleOnClick = <T extends EventProps>(options: T, mxObject?: MxO, 
 
     if (!mxObject || options.onClickEvent === "doNothing") {
         resolve();
+
+        return;
     } else {
         context.setContext(mxObject.getEntity(), mxObject.getGuid());
     }

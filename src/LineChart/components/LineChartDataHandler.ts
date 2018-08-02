@@ -7,7 +7,6 @@ import * as LineChartActions from "../store/LineChartActions";
 import { LineChartInstanceState, ScatterReduxStore as ReduxStore, defaultInstanceState } from "../store/LineChartReducer";
 import {
     handleOnClick,
-    // handleOnClick,
     isContextChanged,
     openTooltipForm,
     setRefreshAction,
@@ -128,7 +127,6 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
         if (!this.isRunningAction) {
             this.onStartAction();
             if (options.mxObject) {
-                // handleOnClick(options.options, options.mxObject, options.mxForm);
                 handleOnClick(options.options, options.mxObject, options.mxForm)
                     .then(this.onStopActionbound)
                     .catch((error) => {
@@ -145,7 +143,6 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
                                 this.onStopActionbound();
                             });
                         })
-                        // handleOnClick(options.options, mxObject, options.mxForm))
                     .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
             }
         }
@@ -188,12 +185,12 @@ export class LineChartDataHandler extends Component<LineChartDataHandlerProps> {
             }
         } , 120);
     }
+
     private onStopAction() {
         this.isRunningAction = false;
         if (this.showProgress) {
             mx.ui.hideProgress(this.showProgress);
         }
-
     }
 }
 
