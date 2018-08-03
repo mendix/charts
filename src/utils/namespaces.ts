@@ -231,6 +231,7 @@ export namespace Data {
     }
 
     export type SortOrder = "asc" | "desc";
+    export type AggregationType = "none" | "count" | "sum" | "average" | "min" | "max" | "median" | "mode" | "first" | "last" | "stdDev";
 
     export interface EventProps {
         onClickEvent: "doNothing" | "showPage" | "callMicroflow" | "callNanoflow";
@@ -261,6 +262,7 @@ export namespace Data {
         seriesOptions: string;
         barColor: string;
         color?: string; // All serie barColor, lineColor, bubbleColor etc should be replaced with 'color'
+        aggregationType: AggregationType;
     }
 
     export interface LineSeriesProps extends SeriesProps {
