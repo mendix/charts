@@ -139,6 +139,15 @@ export namespace Container {
         valuePercentage: number;
         colour: number;
     }
+
+    export interface SampleTrace {
+        seriesName: string;
+        trace: {
+            x: (string | number)[];
+            y: (string | number)[];
+        };
+    }
+
     export interface AnyChartContainerPropsBase extends WrapperProps, Style.Dimensions {
         dataStatic: string;
         dataAttribute: string;
