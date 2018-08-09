@@ -59,7 +59,7 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
                         const entityConstraint = dynSeries.entityConstraint + `[${entityRef} = '${mxSeries.getGuid()}']`;
 
                         return {
-                            ...dynSeries,
+                            ...dynSeries, // Mixin all fixed dynamic series props
                             entityConstraint,
                             fillColor,
                             lineColor,

@@ -6,6 +6,7 @@ import { defaultColours, getDimensionsFromNode } from "../../utils/style";
 import { LineChartDataHandlerProps as LineChartProps } from "../components/LineChartDataHandler";
 import { calculateBubbleSize, getStackedArea } from "./data";
 import { parseAdvancedOptions } from "../../utils/data";
+import { Transform } from "plotly.js/lib/core";
 
 export const getDefaultLayoutOptions = (): Partial<Layout> => {
     const defaultConfigs: Partial<Layout> = {
@@ -67,6 +68,23 @@ export const getDefaultSeriesOptions = (): Partial<ScatterData> => ({
     hoveron: "points"
 });
 
+export const getTransforms = (series: Data.LineSeriesProps, traces: Data.ScatterTrace): Transform[] | undefined => {
+    const { aggregationType } = series;
+    if (aggregationType !== "none" && traces) {
+        return [ {
+            type: "aggregate",
+            groups: traces.x,
+            aggregations: [ {
+                target: "y",
+                func: aggregationType,
+                enabled: true
+            } ]
+        } as Transform ];
+    }
+
+    return undefined;
+};
+
 export const getCustomSeriesOptions = (series: Data.LineSeriesProps, props: LineChartProps, colourIndex: number, traces?: Data.ScatterTrace): Partial<ScatterData> => {
     const color: string | undefined = series.lineColor || defaultColours()[colourIndex];
     const mode = props.type === "bubble"
@@ -83,8 +101,10 @@ export const getCustomSeriesOptions = (series: Data.LineSeriesProps, props: Line
         fill: props.fill || series.fill
             ? props.type === "polar" ? "toself" : "tonexty"
             : "none",
-        marker: props.type === "bubble" ? { line: { width: 0 } } : {}
+        marker: props.type === "bubble" ? { line: { width: 0 } } : {},
+        transforms: traces ? getTransforms(series, traces) : undefined
     };
+
     if (traces) {
         if (props.type === "polar") {
             return deepMerge.all([

@@ -102,14 +102,14 @@
                         <enumerationValue key="none">None</enumerationValue>
                         <enumerationValue key="count">Count</enumerationValue>
                         <enumerationValue key="sum">Sum</enumerationValue>
-                        <enumerationValue key="average">Average</enumerationValue>
+                        <enumerationValue key="avg">Average</enumerationValue>
                         <enumerationValue key="min">Minimum</enumerationValue>
                         <enumerationValue key="max">Maximum</enumerationValue>
                         <enumerationValue key="median">Median</enumerationValue>
                         <enumerationValue key="mode">Mode</enumerationValue>
                         <enumerationValue key="first">First</enumerationValue>
                         <enumerationValue key="last">Last</enumerationValue>
-                        <enumerationValue key="stdDev">Standard deviation</enumerationValue>
+                        <enumerationValue key="stddev">Standard deviation</enumerationValue>
                     </enumerationValues>
                 </property>
                 <property key="mode" type="enumeration" defaultValue="linesXmarkers">

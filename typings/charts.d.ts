@@ -35,4 +35,10 @@ declare module "plotly.js/dist/plotly" {
     export = Plotly;
 }
 
+declare module "plotly.js/lib/aggregate" {
+    const Aggregate: any;
+
+    export = Aggregate;
+}
+
 declare module "*.json";
