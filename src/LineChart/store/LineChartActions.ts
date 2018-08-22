@@ -29,7 +29,9 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
                 });
             }
             const mixinSeries: Data.LineSeriesProps[] = props.series.filter(series => series.seriesType === "static");
-            const dynamicSeries = props.series.filter(series => series.seriesType === "dynamic");
+            const dynamicSeries = props.series.filter(series => series.seriesType === "dynamic" && series.dataSourceType === "XPath");
+
+            // const dynamicMicroflow = props.series.filter(series => series.seriesType === "dynamic" && series.dataSourceType === "microflow");
 
             Promise.all(dynamicSeries.map(dynSeries => {
                 const entity = dynSeries.seriesEntity.split("/")[1];
@@ -88,15 +90,57 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
                         type: series.dataSourceType,
                         attributes,
                         microflow: series.dataSourceMicroflow,
-                        url: url && `${url}&seriesName=${series.name}`,
+                        url: (url && series.seriesType === "static") ? `${url}&seriesName=${series.name}` : url ,
                         customData: series
                     });
                 }))
-                .then(seriesData => seriesData.map(({ mxObjects, restData, customData }) => ({
-                    data: mxObjects,
-                    restData,
-                    series: customData as Data.LineSeriesProps
-                })))
+                .then(seriesData => {
+                    const returnData: Data.SeriesData<Data.LineSeriesProps>[] = [];
+
+                    seriesData.forEach(({ mxObjects, restData, customData }) => {
+                        if (restData && customData && customData.seriesType === "dynamic" && customData.dataSourceType === "REST") {
+                            const { seriesEntity, seriesNameAttribute, colorAttribute, fillColorAttribute } = customData;
+                            const association = (seriesEntity.indexOf("/") > -1)
+                                ? seriesEntity.split("/")[0].split(".")[1]
+                                : seriesEntity.split(".")[1];
+                            restData.forEach(restDataSeries => {
+                                const fillColor = fillColorAttribute ? restDataSeries[fillColorAttribute] : undefined;
+                                const lineColor = colorAttribute ? restDataSeries[colorAttribute] : undefined;
+                                const name = seriesNameAttribute ? restDataSeries[seriesNameAttribute] : undefined;
+                                returnData.push({
+                                    data: mxObjects,
+                                    restData: restDataSeries[association],
+                                    series: {
+                                        ...customData,
+                                        lineColor,
+                                        name,
+                                        fillColor
+                                    }
+                                } as Data.SeriesData<Data.LineSeriesProps>);
+                            });
+                        } else {
+                        // } else if(mxObjects && customData && customData.seriesType === "dynamic" && customData.dataSourceType === "microflow") {
+                        //     // sort mxObjects by lineColor.
+                        //     // get distinct for lineColors from the passed objects.
+                        //     returnData.push({
+                        //         data: mxObjects,
+                        //         restData,
+                        //         series: { ...customData, lineColor, name}
+                        //     });
+                        // } else (mxObjects && customData && customData.seriesType === "dynamic" && customData.dataSourceType === "XPath") {
+                        //     // remember you are meant to return to referenced child mx object or attribute via https://apidocs.mendix.com/7/client/mendix_lib_MxObject.html#getChildren
+                        //     // https://apidocs.mendix.com/7/client/mx.data.html (static) get
+                        // }
+                            returnData.push({
+                                data: mxObjects,
+                                restData,
+                                series: customData as Data.LineSeriesProps
+                            });
+                        }
+                    });
+
+                    return returnData;
+                })
                 .then((data: Data.SeriesData<Data.LineSeriesProps>[]) => dispatch({
                     seriesData: data,
                     layoutOptions: props.layoutOptions || "{\n\n}",

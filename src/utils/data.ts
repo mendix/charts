@@ -118,7 +118,13 @@ export const fetchData = <S>(options: FetchDataOptions<S>): Promise<FetchedData<
             } else if (options.type === "REST" && options.url && attributes) {
                 fetchByREST(options.url)
                     .then(restData => {
-                        const validationString = validateJSONData(restData, attributes);
+                        const valuesAttribute = (customData && (customData as any).seriesEntity.indexOf("/") > -1 && (customData as any).seriesType === "dynamic")
+                            ? customData && (customData as any).seriesEntity.split("/")[0].split(".")[1]
+                            : undefined ;
+                        const jsonData = (customData && (customData as any).seriesType === "dynamic")
+                            ? restData[0][valuesAttribute]
+                            : restData;
+                        const validationString = validateJSONData(jsonData, attributes);
                         if (validationString) {
                             reject({ message: validationString, customData: options.customData });
                         } else {
