@@ -1,6 +1,6 @@
 import deepMerge from "deepmerge";
 import { Config, Layout, ScatterData } from "plotly.js";
-import { configs } from "../../utils/configs";
+import { configs, getTransforms } from "../../utils/configs";
 import { Data } from "../../utils/namespaces";
 import { defaultColours } from "../../utils/style";
 import { BarChartProps } from "../components/BarChart";
@@ -52,7 +52,8 @@ export const getCustomSeriesOptions = (series: Data.SeriesProps, orientation: "b
     const seriesOptions: Partial<ScatterData> = {
         marker: color ? { color } : {},
         name: series.name,
-        orientation: orientation === "bar" ? "h" : "v"
+        orientation: orientation === "bar" ? "h" : "v",
+        transforms: traces ? getTransforms(series, traces) : undefined
     };
     if (traces) {
         return {

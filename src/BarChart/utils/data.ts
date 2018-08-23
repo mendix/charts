@@ -6,9 +6,9 @@ import { getCustomSeriesOptions, getDefaultSeriesOptions } from "./configs";
 import { BarChartDataHandlerProps } from "../components/BarChartDataHandler";
 
 export const getData = (seriesData: Data.SeriesData[], props: BarChartDataHandlerProps): ScatterData[] =>
-    seriesData.map(({ data, series }, index) => {
+    seriesData.map(({ data, restData, series }, index) => {
         const advancedOptions = parseAdvancedOptions(props.devMode, series.seriesOptions);
-        const traces = getSeriesTraces({ data, series });
+        const traces = getSeriesTraces({ data, restData, series });
         const modellerOptions = getCustomSeriesOptions(series, props.orientation, index, traces);
         const customOptions = {
             customdata: data as mendix.lib.MxObject[], // each array element shall be returned as the custom data of a corresponding point
