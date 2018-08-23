@@ -1,12 +1,11 @@
 import deepMerge from "deepmerge";
 import { Config, Layout, ScatterData } from "plotly.js";
-import { configs } from "../../utils/configs";
+import { configs, getTransforms } from "../../utils/configs";
 import { Container, Data } from "../../utils/namespaces";
 import { defaultColours, getDimensionsFromNode } from "../../utils/style";
 import { LineChartDataHandlerProps as LineChartProps } from "../components/LineChartDataHandler";
 import { calculateBubbleSize, getStackedArea } from "./data";
 import { parseAdvancedOptions } from "../../utils/data";
-import { Transform } from "plotly.js/lib/core";
 
 export const getDefaultLayoutOptions = (): Partial<Layout> => {
     const defaultConfigs: Partial<Layout> = {
@@ -67,23 +66,6 @@ export const getDefaultSeriesOptions = (): Partial<ScatterData> => ({
     hoverinfo: "none" as any, // typings don't have a hoverinfo value of "y"
     hoveron: "points"
 });
-
-export const getTransforms = (series: Data.LineSeriesProps, traces: Data.ScatterTrace): Transform[] | undefined => {
-    const { aggregationType } = series;
-    if (aggregationType !== "none" && traces) {
-        return [ {
-            type: "aggregate",
-            groups: traces.x,
-            aggregations: [ {
-                target: "y",
-                func: aggregationType,
-                enabled: true
-            } ]
-        } as Transform ];
-    }
-
-    return undefined;
-};
 
 export const getCustomSeriesOptions = (series: Data.LineSeriesProps, props: LineChartProps, colourIndex: number, traces?: Data.ScatterTrace): Partial<ScatterData> => {
     const color: string | undefined = series.lineColor || defaultColours()[colourIndex];

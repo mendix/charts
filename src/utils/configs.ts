@@ -1,5 +1,6 @@
-import { Config, Layout } from "plotly.js";
+import { Config, Layout, Transform } from "plotly.js";
 import deepMerge from "deepmerge";
+import { Data } from "./namespaces";
 
 export const configs: SharedConfigs = {
     layout: {
@@ -94,3 +95,20 @@ export interface ThemeConfigs extends SharedConfigs {
         BubbleChart?: ChartConfigs;
     };
 }
+
+export const getTransforms = (series: Data.SeriesProps, traces: Data.ScatterTrace): Transform[] | undefined => {
+    const { aggregationType } = series;
+    if (aggregationType !== "none" && traces) {
+        return [ {
+            type: "aggregate",
+            groups: traces.x,
+            aggregations: [ {
+                target: "y",
+                func: aggregationType,
+                enabled: true
+            } ]
+        } as Transform ];
+    }
+
+    return undefined;
+};
