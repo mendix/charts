@@ -256,6 +256,14 @@ export const fetchByXPath = (options: FetchByXPathOptions): Promise<MxO[]> => ne
     });
 });
 
+export const fetchByXPathGuids = (guids: string[]): Promise<MxO[]> => new Promise<MxO[]>((resolve, reject) => {
+    window.mx.data.get({
+        guids,
+        callback: resolve,
+        error: error => reject(`An error occurred while retrieving data via GUIDS: ${guids}: ${error.message}`)
+    });
+});
+
 export const fetchByMicroflow = (actionname: string, guid: string): Promise<MxO[]> =>
     new Promise((resolve, reject) => {
         const errorMessage = `An error occurred while retrieving data by microflow (${actionname}): `;
