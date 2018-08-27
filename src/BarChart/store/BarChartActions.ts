@@ -4,7 +4,7 @@ import { ReactChild } from "react";
 import { Action, Dispatch } from "redux";
 import { seriesActionType } from "../../store/SeriesReducer";
 import { fetchThemeConfigs as fetchBarThemeConfig } from "../../utils/configs";
-import { fetchByXPath, fetchData as fetchSeriesData, generateRESTURL, parseAdvancedOptions } from "../../utils/data";
+import { fetchByXPath, fetchByXPathGuids, fetchData as fetchSeriesData, generateRESTURL, parseAdvancedOptions } from "../../utils/data";
 import { Data } from "../../utils/namespaces";
 import { BarChartDataHandlerProps } from "../components/BarChartDataHandler";
 import { getData } from "../utils/data";
@@ -76,8 +76,8 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                     });
                 }))
                 .then(seriesData => {
-                    const returnData: Data.SeriesData<Data.SeriesProps>[] = [];
-                    seriesData.forEach(({ mxObjects, restData, customData }) => {
+                    return seriesData.reduce(async (cummulator: Promise<Data.SeriesData<Data.SeriesProps>[]>, { mxObjects, restData, customData }) => {
+                        const returnData = await cummulator;
                         if (restData && customData && customData.seriesType === "dynamic" && customData.dataSourceType === "REST") {
                             const { seriesEntity, seriesNameAttribute, colorAttribute, fillColorAttribute } = customData;
                             const association = (seriesEntity.indexOf("/") > -1)
@@ -98,6 +98,38 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                                     }
                                 } as Data.SeriesData<Data.SeriesProps>);
                             });
+                        } else if (mxObjects && customData && customData.seriesType === "dynamic" && customData.dataSourceType === "microflow") {
+                            const { seriesEntity, colorAttribute, seriesNameAttribute, fillColorAttribute } = customData;
+                            const association = (seriesEntity.indexOf("/") > -1 && mxObjects[0].isPersistable())
+                                ? seriesEntity.split("/")[0]
+                                : seriesNameAttribute;
+
+                            const seriesItems: { [key: string]: (mendix.lib.MxObject | number)[] } = {};
+                            for (const item of mxObjects) {
+                                const referenceGuid = item.get(association) as string;
+                                if (!seriesItems[referenceGuid]) {
+                                    seriesItems[referenceGuid] = [];
+                                }
+                                seriesItems[referenceGuid].push(item);
+                            }
+                            // if (mxObjects[0].isPersistable() && mxObjects[0].isReference(association)) {
+
+                            // }
+                            const associatedMxObjects = await fetchByXPathGuids(Object.keys(seriesItems));
+                            associatedMxObjects.forEach(associated => {
+                                const name = seriesNameAttribute ? associated.get(seriesNameAttribute) : undefined;
+                                const fillColor = fillColorAttribute ? associated.get(fillColorAttribute) : undefined;
+                                const lineColor = colorAttribute ? associated.get(colorAttribute) : undefined;
+                                returnData.push({
+                                    data: seriesItems[associated.getGuid()],
+                                    series: {
+                                        ...customData,
+                                        lineColor,
+                                        name,
+                                        fillColor
+                                    }
+                                } as Data.SeriesData<Data.LineSeriesProps>);
+                            });
                         } else {
                         // } else if(mxObjects && customData && customData.seriesType === "dynamic" && customData.dataSourceType === "microflow") {
                         //     // sort mxObjects by lineColor.
@@ -117,9 +149,9 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                                 series: customData as Data.SeriesProps
                             });
                         }
-                    });
 
-                    return returnData;
+                        return returnData;
+                    }, Promise.resolve([])) as Promise<Data.SeriesData<Data.SeriesProps>[]>;
                 })
                 .then((data: Data.SeriesData<Data.SeriesProps>[]) => dispatch({
                     seriesData: data,
