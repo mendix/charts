@@ -252,6 +252,9 @@ export namespace Data {
         seriesOptions: string;
         barColor: string;
         color?: string; // All serie barColor, lineColor, bubbleColor etc should be replaced with 'color'
+        seriesSortAttribute: string;
+        seriesSortOrder: SortOrder;
+        seriesEntityConstraint: string;
     }
 
     export interface LineSeriesProps extends SeriesProps {

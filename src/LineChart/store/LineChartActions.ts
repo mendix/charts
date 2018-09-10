@@ -34,6 +34,7 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
             Promise.all(dynamicSeries.map(dynSeries => {
                 const entity = dynSeries.seriesEntity.split("/")[1];
                 const dynAttributes = [];
+                const constraint = dynSeries.seriesEntityConstraint;
                 if (dynSeries.seriesNameAttribute) {
                     dynAttributes.push(dynSeries.seriesNameAttribute);
                 }
@@ -44,10 +45,16 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
                     dynAttributes.push(dynSeries.fillColorAttribute);
                 }
 
+                const sortAttribute = dynSeries.seriesSortAttribute || dynSeries.seriesNameAttribute;
+                const sortOrder = dynSeries.seriesSortOrder;
+                const guid = props.mxObject ? props.mxObject.getGuid() : "";
+
                 return fetchByXPath({
+                    guid,
                     entity,
-                    guid: "",
-                    constraint: "",
+                    constraint,
+                    sortAttribute,
+                    sortOrder,
                     attributes: dynAttributes
                 })
                 .then(mxObjects => {

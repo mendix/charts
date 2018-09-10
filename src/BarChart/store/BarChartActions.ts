@@ -29,13 +29,18 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
             Promise.all(dynamicSeries.map(dynSeries => {
                 const entityPath = dynSeries.seriesEntity.split("/");
                 const entity = entityPath.pop() as string;
-                const constraint = "";
+                const constraint = dynSeries.seriesEntityConstraint;
                 const dynAttributes = [ dynSeries.seriesNameAttribute, dynSeries.colorAttribute ];
+                const sortAttribute = dynSeries.seriesSortAttribute || dynSeries.seriesNameAttribute;
+                const sortOrder = dynSeries.seriesSortOrder;
+                const guid = props.mxObject ? props.mxObject.getGuid() : "";
 
                 return fetchByXPath({
+                    guid,
                     entity,
-                    guid: "",
                     constraint,
+                    sortAttribute,
+                    sortOrder,
                     attributes: dynAttributes
                 })
                 .then(mxObjects => mixinSeries.concat(mxObjects.map(mxSeries => {

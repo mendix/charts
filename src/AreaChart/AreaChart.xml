@@ -132,10 +132,37 @@
                     <category>Static series</category>
                     <description>By default, the border color with transparency is used</description>
                 </property>
-                                <property key="seriesEntity" type="entity" required="false" allowNonPersistableEntities="true" isPath="yes" pathType="reference" entityProperty="dataEntity">
+                <property key="seriesEntity" type="entity" required="false" allowNonPersistableEntities="true" isPath="yes" pathType="reference" entityProperty="dataEntity">
                     <caption>Series entity</caption>
                     <category>Dynamic series</category>
                     <description>The entity from which the series values will be retrieved</description>
+                </property>
+                 <property key="seriesEntityConstraint" type="entityConstraint" entityProperty="seriesEntity" required="false">
+                    <caption>Series XPath constraint</caption>
+                    <category>Dynamic series</category>
+                    <description>The constraint on the data from the series entity</description>
+                </property>
+                <property key="seriesSortAttribute" type="attribute" entityProperty="seriesEntity" required="false" isPath="optional" pathType="reference">
+                    <caption>Series Sort Attribute</caption>
+                    <category>Dynamic series</category>
+                    <description/>
+                    <attributeTypes>
+                        <attributeType name="Decimal"/>
+                        <attributeType name="Long"/>
+                        <attributeType name="Integer"/>
+                        <attributeType name="String"/>
+                        <attributeType name="AutoNumber"/>
+                        <attributeType name="DateTime"/>
+                    </attributeTypes>
+                </property>
+                <property key="seriesSortOrder" type="enumeration" defaultValue="asc">
+                    <caption>Series Sort order</caption>
+                    <category>Dynamic series</category>
+                    <description/>
+                    <enumerationValues>
+                        <enumerationValue key="asc">Ascending</enumerationValue>
+                        <enumerationValue key="desc">Descending</enumerationValue>
+                    </enumerationValues>
                 </property>
                 <property key="seriesNameAttribute" type="attribute" entityProperty="seriesEntity" required="false">
                     <caption>Series name attribute</caption>
