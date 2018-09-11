@@ -144,7 +144,7 @@
                     <category>Static series</category>
                     <description>Color of the line e.g. green, #00FF00, rgb(0,255,0)</description>
                 </property>
-                <property key="seriesEntity" type="entity" required="false" allowNonPersistableEntities="true" isPath="yes" pathType="reference" entityProperty="dataEntity">
+                <property key="seriesEntity" type="entity" required="false" allowNonPersistableEntities="true" isPath="optional" pathType="reference" entityProperty="dataEntity">
                     <caption>Series entity</caption>
                     <category>Dynamic series</category>
                     <description>The entity from which the series values will be retrieved</description>
