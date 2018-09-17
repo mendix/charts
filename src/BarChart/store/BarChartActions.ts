@@ -4,7 +4,7 @@ import { ReactChild } from "react";
 import { Action, Dispatch } from "redux";
 import { seriesActionType } from "../../store/SeriesReducer";
 import { fetchThemeConfigs as fetchBarThemeConfig } from "../../utils/configs";
-import { fetchByXPath, fetchByXPathGuids, fetchData as fetchSeriesData, generateRESTURL, parseAdvancedOptions } from "../../utils/data";
+import { fetchByXPathGuids, fetchData as fetchSeriesData, generateRESTURL, parseAdvancedOptions } from "../../utils/data";
 import { Data } from "../../utils/namespaces";
 import { BarChartDataHandlerProps } from "../components/BarChartDataHandler";
 import { getData } from "../utils/data";
@@ -23,62 +23,37 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
             if (!props.fetchingData) {
                 dispatch({ type: actionType.TOGGLE_FETCHING_DATA, instanceID: props.instanceID, fetchingData: true });
             }
-            const mixinSeries: Data.SeriesProps[] = props.series.filter(series => series.seriesType === "static");
-            const dynamicSeries = props.series.filter(series => series.seriesType === "dynamic" && series.dataSourceType === "XPath");
 
-            Promise.all(dynamicSeries.map(dynSeries => {
-                const entityPath = dynSeries.seriesEntity.split("/");
-                const entity = entityPath.pop() as string;
-                const constraint = "";
-                const dynAttributes = [ dynSeries.seriesNameAttribute, dynSeries.colorAttribute ];
+            Promise.all(props.series.map(series => {
+                const attributes = [ series.xValueAttribute, series.yValueAttribute, series.xValueSortAttribute ]
+                    .reduce((cummulator: string[], attribute) => {
+                        if (attribute && series.seriesType === "static") {
+                            cummulator.push(attribute);
+                        }
 
-                return fetchByXPath({
-                    entity,
-                    guid: "",
-                    constraint,
-                    attributes: dynAttributes
-                })
-                .then(mxObjects => mixinSeries.concat(mxObjects.map(mxSeries => {
-                        const barColor = mxSeries.get(dynSeries.colorAttribute) || "";
-                        const name = mxSeries.get(dynSeries.seriesNameAttribute) || "";
-                        const entityRef = dynSeries.seriesEntity.split("/")[0];
-                        const entityConstraint = dynSeries.entityConstraint + `[${entityRef} = '${mxSeries.getGuid()}']`;
+                        return cummulator;
+                    }, []);
 
-                        return {
-                            ...dynSeries,
-                            entityConstraint,
-                            barColor,
-                            name
-                        } as Data.SeriesProps;
-                    }))
-                );
-            })).then(mixedInSeries => {
-                const workableSeries = mixedInSeries.length ? mixedInSeries[0] : props.series;
-                Promise.all(workableSeries.map(series => {
-                    const attributes = [ series.xValueAttribute, series.yValueAttribute ];
-                    if (series.xValueSortAttribute) {
-                        attributes.push(series.xValueSortAttribute);
-                    }
-                    const mxObject = props.mxObject as mendix.lib.MxObject;
-                    const url = series.restUrl && generateRESTURL(mxObject, series.restUrl, props.restParameters);
+                const { mxObject } = props;
+                const url = series.restUrl && generateRESTURL(mxObject, series.restUrl, props.restParameters);
 
-                    return fetchSeriesData<Data.SeriesProps>({
-                        guid: mxObject.getGuid(),
-                        entity: series.dataEntity,
-                        constraint: series.entityConstraint,
-                        sortAttribute: series.xValueSortAttribute || series.xValueAttribute,
-                        sortOrder: series.sortOrder,
-                        type: series.dataSourceType,
-                        attributes,
-                        microflow: series.dataSourceMicroflow,
-                        url: (url && series.seriesType === "static") ? `${url}&seriesName=${series.name}` : url ,
-                        customData: series
-                    });
-                }))
+                return fetchSeriesData<Data.SeriesProps>({
+                    guid: mxObject.getGuid(),
+                    entity: series.dataEntity,
+                    constraint: series.entityConstraint,
+                    sortAttribute: series.xValueSortAttribute || series.xValueAttribute,
+                    sortOrder: series.sortOrder,
+                    type: series.dataSourceType,
+                    attributes,
+                    microflow: series.dataSourceMicroflow,
+                    url: (url && series.seriesType === "static") ? `${url}&seriesName=${series.name}` : url,
+                    customData: series
+                });
+            }))
                 .then(seriesData => {
                     return seriesData.reduce(async (cummulator: Promise<Data.SeriesData<Data.SeriesProps>[]>, { mxObjects, restData, customData }) => {
-                        const returnData = await cummulator;
                         if (restData && customData && customData.seriesType === "dynamic" && customData.dataSourceType === "REST") {
+                            const returnData = await cummulator;
                             const { seriesEntity, seriesNameAttribute, colorAttribute, fillColorAttribute } = customData;
                             const association = (seriesEntity.indexOf("/") > -1)
                                 ? seriesEntity.split("/")[0].split(".")[1]
@@ -98,9 +73,13 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                                     }
                                 } as Data.SeriesData<Data.SeriesProps>);
                             });
-                        } else if (mxObjects && customData && customData.seriesType === "dynamic" && customData.dataSourceType === "microflow") {
+
+                            return returnData;
+                        } else if (mxObjects && customData && customData.seriesType === "dynamic" && (customData.dataSourceType === "microflow" || customData.dataSourceType === "XPath")) {
+                            const isPersistable = mxObjects[0].isPersistable();
+                            const returnData = await cummulator;
                             const { seriesEntity, colorAttribute, seriesNameAttribute, fillColorAttribute } = customData;
-                            const association = (seriesEntity.indexOf("/") > -1 && mxObjects[0].isPersistable())
+                            const association = (seriesEntity.indexOf("/") > -1 && isPersistable)
                                 ? seriesEntity.split("/")[0]
                                 : seriesNameAttribute;
 
@@ -112,45 +91,49 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                                 }
                                 seriesItems[referenceGuid].push(item);
                             }
-                            // if (mxObjects[0].isPersistable() && mxObjects[0].isReference(association)) {
+                            if (isPersistable) {
+                                const associatedMxObjects = await fetchByXPathGuids(Object.keys(seriesItems));
+                                associatedMxObjects.forEach(associated => {
+                                    const name = seriesNameAttribute ? associated.get(seriesNameAttribute) : "";
+                                    const fillColor = fillColorAttribute ? associated.get(fillColorAttribute) : "";
+                                    const lineColor = colorAttribute ? associated.get(colorAttribute) : "";
+                                    returnData.push({
+                                        data: seriesItems[associated.getGuid()],
+                                        series: {
+                                            ...customData,
+                                            lineColor,
+                                            name,
+                                            fillColor
+                                        }
+                                    } as Data.SeriesData<Data.LineSeriesProps>);
+                                });
+                            } else {
+                                Object.keys(seriesItems).forEach(name => {
+                                    const fillColor = fillColorAttribute ? (seriesItems[name][0] as mendix.lib.MxObject).get(fillColorAttribute) : undefined;
+                                    const lineColor = colorAttribute ? (seriesItems[name][0] as mendix.lib.MxObject).get(colorAttribute) : undefined;
+                                    returnData.push({
+                                        data: seriesItems[name],
+                                        series: {
+                                            ...customData,
+                                            lineColor,
+                                            name,
+                                            fillColor
+                                        }
+                                    } as Data.SeriesData<Data.LineSeriesProps>);
+                                });
+                            }
 
-                            // }
-                            const associatedMxObjects = await fetchByXPathGuids(Object.keys(seriesItems));
-                            associatedMxObjects.forEach(associated => {
-                                const name = seriesNameAttribute ? associated.get(seriesNameAttribute) : undefined;
-                                const fillColor = fillColorAttribute ? associated.get(fillColorAttribute) : undefined;
-                                const lineColor = colorAttribute ? associated.get(colorAttribute) : undefined;
-                                returnData.push({
-                                    data: seriesItems[associated.getGuid()],
-                                    series: {
-                                        ...customData,
-                                        lineColor,
-                                        name,
-                                        fillColor
-                                    }
-                                } as Data.SeriesData<Data.LineSeriesProps>);
-                            });
+                            return returnData;
                         } else {
-                        // } else if(mxObjects && customData && customData.seriesType === "dynamic" && customData.dataSourceType === "microflow") {
-                        //     // sort mxObjects by lineColor.
-                        //     // get distinct for lineColors from the passed objects.
-                        //     returnData.push({
-                        //         data: mxObjects,
-                        //         restData,
-                        //         series: { ...customData, lineColor, name}
-                        //     });
-                        // } else (mxObjects && customData && customData.seriesType === "dynamic" && customData.dataSourceType === "XPath") {
-                        //     // remember you are meant to return to referenced child mx object or attribute via https://apidocs.mendix.com/7/client/mendix_lib_MxObject.html#getChildren
-                        //     // https://apidocs.mendix.com/7/client/mx.data.html (static) get
-                        // }
+                            const returnData = await cummulator;
                             returnData.push({
                                 data: mxObjects,
                                 restData,
                                 series: customData as Data.SeriesProps
                             });
-                        }
 
-                        return returnData;
+                            return returnData;
+                        }
                     }, Promise.resolve([])) as Promise<Data.SeriesData<Data.SeriesProps>[]>;
                 })
                 .then((data: Data.SeriesData<Data.SeriesProps>[]) => dispatch({
@@ -166,7 +149,6 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                     window.mx.ui.error(reason);
                     dispatch({ type: actionType.FETCH_DATA_FAILED, instanceID: props.instanceID });
                 });
-            });
         } else {
             dispatch({ type: actionType.NO_CONTEXT, instanceID: props.instanceID });
         }
