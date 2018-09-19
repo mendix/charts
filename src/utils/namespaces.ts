@@ -5,6 +5,11 @@ import { ChartConfigs } from "./configs";
 export namespace Container {
     import SeriesProps = Data.SeriesProps;
 
+    export interface MxClick {
+        entity: string;
+        guid: string;
+    }
+
     export interface WrapperProps {
         "class"?: string;
         mxform: mxui.lib.form._FormBase;
@@ -243,14 +248,14 @@ export namespace Data {
     }
 
     export interface OnClickOptions<T = any, O extends EventProps = EventProps> {
-        mxObject?: mendix.lib.MxObject;
+        mxObjectCustom?: Container.MxClick;
         trace?: T;
         mxForm: mxui.lib.form._FormBase;
         options: O;
     }
 
     export interface OnHoverOptions<T = any, O extends DataSourceProps = DataSourceProps> {
-        mxObject?: mendix.lib.MxObject;
+        mxObjectCustom?: Container.MxClick;
         options: O;
         tooltipForm: string;
         tooltipNode: HTMLDivElement;

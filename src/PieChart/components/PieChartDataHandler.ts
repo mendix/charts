@@ -119,8 +119,8 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
     private handleOnClick = (options: Data.OnClickOptions<{ label: string, value: number }, PieChartContainerProps>) => {
         if (!this.isRunningAction) {
             this.onStartAction();
-            if (options.mxObject) {
-                handleOnClick(options.options, options.mxObject, options.mxForm)
+            if (options.mxObjectCustom) {
+                handleOnClick(options.options, options.mxObjectCustom, options.mxForm)
                     .then(this.onStopActionbound)
                     .catch((error) => {
                         mx.ui.error(error);
@@ -129,7 +129,8 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
             } else if (options.trace) {
                 this.createDataPoint(options.options, options.trace)
                     .then(mxObject => {
-                        handleOnClick(options.options, mxObject, options.mxForm)
+                        const mxObjectCustom = { entity: mxObject.getEntity(), guid: mxObject.getGuid() };
+                        handleOnClick(options.options, mxObjectCustom, options.mxForm)
                             .then(this.onStopActionbound)
                             .catch((error) => {
                                 mx.ui.error(error);
@@ -142,11 +143,14 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
     }
 
     private handleOnHover = (options: Data.OnHoverOptions<{ label: string, value: number }, PieChartContainerProps>) => {
-        if (options.mxObject) {
-            openTooltipForm(options.tooltipNode, options.tooltipForm, options.mxObject);
+        if (options.mxObjectCustom) {
+            openTooltipForm(options.tooltipNode, options.tooltipForm, options.mxObjectCustom);
         } else if (options.trace && options.options.dataEntity) {
             this.createDataPoint(options.options, options.trace)
-                .then(mxObject => openTooltipForm(options.tooltipNode, options.tooltipForm, mxObject))
+                .then(mxObject => {
+                    const mxObjectCustom = { entity: mxObject.getEntity(), guid: mxObject.getGuid() };
+                    openTooltipForm(options.tooltipNode, options.tooltipForm, mxObjectCustom);
+                })
                 .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
         }
     }

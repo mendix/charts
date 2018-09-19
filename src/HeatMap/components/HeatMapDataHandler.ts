@@ -129,7 +129,7 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
             const mxObject = this.findSourceObject(options.trace.x, options.trace.y, options.trace.z);
 
             if (mxObject) {
-                handleOnClick(options.options, options.mxObject, options.mxForm)
+                handleOnClick(options.options, options.mxObjectCustom, options.mxForm)
                     .then(this.onStopActionbound)
                     .catch((error) => {
                         mx.ui.error(error);
@@ -138,7 +138,8 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
             } else {
                 this.createDataPoint(options.options, options.trace)
                     .then(newMxObject => {
-                        handleOnClick(options.options, newMxObject, options.mxForm)
+                        const mxObjectCustom = { entity: newMxObject.getEntity(), guid: newMxObject.getGuid() };
+                        handleOnClick(options.options, mxObjectCustom, options.mxForm)
                             .then(this.onStopActionbound)
                             .catch(error => {
                                 mx.ui.error(error);
@@ -154,10 +155,14 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
         if (options.trace) {
             const mxObject = this.findSourceObject(options.trace.x, options.trace.y, options.trace.z);
             if (mxObject) {
-                openTooltipForm(options.tooltipNode, options.tooltipForm, mxObject);
+                const mxObjectCustom = { entity: mxObject.getEntity(), guid: mxObject.getGuid() };
+                openTooltipForm(options.tooltipNode, options.tooltipForm, mxObjectCustom);
             } else {
                 this.createDataPoint(options.options, options.trace)
-                    .then(newMxObject => openTooltipForm(options.tooltipNode, options.tooltipForm, newMxObject))
+                    .then(newMxObject => {
+                        const mxObjectCustom = { entity: newMxObject.getEntity(), guid: newMxObject.getGuid() };
+                        openTooltipForm(options.tooltipNode, options.tooltipForm, mxObjectCustom);
+                    })
                     .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
             }
         }

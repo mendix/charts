@@ -288,15 +288,15 @@ export const fetchByREST = (url: string): Promise<any> => new Promise((resolve, 
     }).catch(error => reject(`${errorMessage} ${error.message}`));
 });
 
-export const handleOnClick = <T extends EventProps>(options: T, mxObject?: MxO, mxform?: mxui.lib.form._FormBase): Promise<Callback> => new Promise((resolve, reject) => {
+export const handleOnClick = <T extends EventProps>(options: T, mxObjectCustom?: Container.MxClick, mxform?: mxui.lib.form._FormBase): Promise<Callback> => new Promise((resolve, reject) => {
     const context = new mendix.lib.MxContext();
 
-    if (!mxObject || options.onClickEvent === "doNothing") {
+    if (!mxObjectCustom || options.onClickEvent === "doNothing") {
         resolve();
 
         return;
     } else {
-        context.setContext(mxObject.getEntity(), mxObject.getGuid());
+        context.setContext(mxObjectCustom.entity, mxObjectCustom.guid);
     }
 
     if (options.onClickEvent === "callMicroflow" && options.onClickMicroflow) {
@@ -305,7 +305,7 @@ export const handleOnClick = <T extends EventProps>(options: T, mxObject?: MxO, 
             error: error => reject(`Error while executing microflow ${options.onClickMicroflow}: ${error.message}`), // tslint:disable-line max-line-length
             params: {
                 applyto: "selection",
-                guids: mxObject ? [ mxObject.getGuid() ] : undefined
+                guids: mxObjectCustom ? [ mxObjectCustom.guid ] : undefined
             },
             origin: mxform
         });
@@ -331,9 +331,9 @@ export const handleOnClick = <T extends EventProps>(options: T, mxObject?: MxO, 
     }
 });
 
-export const openTooltipForm = (domNode: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) => {
+export const openTooltipForm = (domNode: HTMLDivElement, tooltipForm: string, dataObject: Container.MxClick) => {
     const context = new mendix.lib.MxContext();
-    context.setContext(dataObject.getEntity(), dataObject.getGuid());
+    context.setContext(dataObject.entity, dataObject.guid);
     window.mx.ui.openForm(tooltipForm, { domNode, context, location: "node" });
 };
 
