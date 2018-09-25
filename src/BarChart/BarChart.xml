@@ -112,6 +112,24 @@
                         <enumerationValue key="desc">Descending</enumerationValue>
                     </enumerationValues>
                 </property>
+                <property key="aggregationType" type="enumeration" defaultValue="none">
+                    <caption>Aggregation type</caption>
+                    <category>Data points</category>
+                    <description>Defines how data is aggregated when multiple Y values are available for a single X value</description>
+                    <enumerationValues>
+                        <enumerationValue key="none">None</enumerationValue>
+                        <enumerationValue key="count">Count</enumerationValue>
+                        <enumerationValue key="sum">Sum</enumerationValue>
+                        <enumerationValue key="avg">Average</enumerationValue>
+                        <enumerationValue key="min">Minimum</enumerationValue>
+                        <enumerationValue key="max">Maximum</enumerationValue>
+                        <enumerationValue key="median">Median</enumerationValue>
+                        <enumerationValue key="mode">Mode</enumerationValue>
+                        <enumerationValue key="first">First</enumerationValue>
+                        <enumerationValue key="last">Last</enumerationValue>
+                        <enumerationValue key="stddev">Standard deviation</enumerationValue>
+                    </enumerationValues>
+                </property>
                 <property key="barColor" type="string" required="false">
                     <caption>Bar color</caption>
                     <category>Static series</category>
