@@ -5,11 +5,13 @@ import * as classNames from "classnames";
 import deepMerge from "deepmerge";
 
 import { ChartLoading } from "./ChartLoading";
-import { Data, PieHoverData, ScatterData, ScatterHoverData } from "plotly.js";
+import { Data, PieHoverData, ScatterHoverData } from "plotly.js";
 import * as PlotlyChartActions from "./actions/PlotlyChartActions";
 import { Plotly, PlotlyChartInstance } from "./reducers/PlotlyChartReducer";
 import ReactResizeDetector from "react-resize-detector";
 import { getDimensionsFromNode } from "../utils/style";
+
+const aggregateLib = require("plotly.js/lib/aggregate"); // tslint:disable-line
 
 export interface ComponentProps {
     widgetID: string;
@@ -138,14 +140,7 @@ class PlotlyChart extends Component<PlotlyChartProps> {
                 register([ await import("plotly.js/lib/pie") ]);
             }
             if (this.props.type === "bar" || this.props.type === "line") {
-                const modules = [ await import("plotly.js/lib/bar"), await import("plotly.js/lib/scatter") ];
-                const scatterData = this.props.data && this.props.data as ScatterData[];
-
-                if (scatterData && scatterData.filter(data => data.transforms).length) {
-                    modules.push(await import("plotly.js/lib/aggregate"));
-                }
-
-                register(modules);
+                register([ aggregateLib, await import("plotly.js/lib/bar"), await import("plotly.js/lib/scatter") ]);
             }
             if (this.props.type === "heatmap") {
                 register([ await import("plotly.js/lib/heatmap") ]);
