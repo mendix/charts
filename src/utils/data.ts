@@ -19,11 +19,18 @@ export const validateSeriesProps = <T extends Partial<SeriesProps>>
     (dataSeries: T[], widgetId: string, layoutOptions: string, configurationOptions: string): ReactChild => {
         const errorMessage: string[] = [];
         if (dataSeries && dataSeries.length) {
-            dataSeries.forEach(series => {
+            dataSeries.forEach((series, index) => {
                 const identifier = series.name ? `series "${series.name}"` : "the widget";
                 if (series.seriesType === "dynamic") {
                     if (!series.seriesEntity) {
                         errorMessage.push(`'Dynamic series - Series entity' in ${identifier} is missing`);
+                    } else {
+                        const seriesPath = series.seriesEntity.split("/")[0];
+                        const { dataEntity } = series;
+                        const dataEntityMeta = (dataEntity && window.mx) && window.mx.meta.getEntity(dataEntity);
+                        if (!(dataEntity === seriesPath || (dataEntityMeta && dataEntityMeta.isReference(seriesPath)))) {
+                            errorMessage.push(`'Dynamic series - Series entity ${series.seriesEntity}' in 'series ${index + 1}' should be the same as ${dataEntity} or a reference of ${dataEntity}`);
+                        }
                     }
                     if (!series.seriesNameAttribute) {
                         errorMessage.push(`'Dynamic series - Series name attribute' in ${identifier} is missing`);
