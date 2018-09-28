@@ -182,6 +182,28 @@
                         <attributeType name="Enum"/>
                     </attributeTypes>
                 </property>
+                <property key="seriesSortAttribute" type="attribute" entityProperty="seriesEntity" required="false">
+                    <caption>Series sort attribute</caption>
+                    <category>Dynamic series</category>
+                    <description>Not supported for REST datasource</description>
+                    <attributeTypes>
+                        <attributeType name="Decimal"/>
+                        <attributeType name="Long"/>
+                        <attributeType name="Integer"/>
+                        <attributeType name="String"/>
+                        <attributeType name="AutoNumber"/>
+                        <attributeType name="DateTime"/>
+                    </attributeTypes>
+                </property>
+                <property key="seriesSortOrder" type="enumeration" defaultValue="asc">
+                    <caption>Series sort order</caption>
+                    <category>Dynamic series</category>
+                    <description/>
+                    <enumerationValues>
+                        <enumerationValue key="asc">Ascending</enumerationValue>
+                        <enumerationValue key="desc">Descending</enumerationValue>
+                    </enumerationValues>
+                </property>
                 <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
                     <caption>On click</caption>
                     <category>Events</category>

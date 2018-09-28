@@ -226,6 +226,8 @@ export namespace Data {
         seriesNameAttribute: string;
         colorAttribute: string;
         fillColorAttribute: string;
+        seriesSortAttribute: string;
+        seriesSortOrder: SortOrder;
     }
 
     export interface SeriesDataSourceProps extends DataSourceProps {

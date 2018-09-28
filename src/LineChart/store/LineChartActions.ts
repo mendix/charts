@@ -4,7 +4,7 @@ import { ReactChild } from "react";
 import { Action, Dispatch } from "redux";
 import { seriesActionType } from "../../store/SeriesReducer";
 import { ChartType, fetchThemeConfigs as fetchLineThemeConfig } from "../../utils/configs";
-import { fetchByXPathGuids, fetchData as fetchSeriesData, generateRESTURL, parseAdvancedOptions } from "../../utils/data";
+import { fetchByXPath, fetchData as fetchSeriesData, generateRESTURL, parseAdvancedOptions } from "../../utils/data";
 import { Data } from "../../utils/namespaces";
 import { LineChartDataHandlerProps } from "../components/LineChartDataHandler";
 import { getData } from "../utils/data";
@@ -60,7 +60,7 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
                         if (restData && customData && customData.seriesType === "dynamic" && customData.dataSourceType === "REST") {
                             const returnData = await cummulator;
                             const { seriesEntity, seriesNameAttribute, colorAttribute, fillColorAttribute } = customData;
-                            const association = (seriesEntity.indexOf("/") > -1)
+                            const association = seriesEntity.indexOf("/") > -1
                                 ? seriesEntity.split("/")[0].split(".")[1]
                                 : seriesEntity.split(".")[1];
                             restData.forEach(restDataSeries => {
@@ -81,23 +81,30 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
 
                             return returnData;
                         } else if (mxObjects && customData && customData.seriesType === "dynamic" && (customData.dataSourceType === "microflow" || customData.dataSourceType === "XPath")) {
-                            const isPersistable = mxObjects[0].isPersistable();
                             const returnData = await cummulator;
-                            const { seriesEntity, colorAttribute, seriesNameAttribute, fillColorAttribute } = customData;
-                            const association = (seriesEntity.indexOf("/") > -1 && isPersistable)
+                            const { seriesEntity, colorAttribute, seriesNameAttribute, fillColorAttribute, seriesSortAttribute, seriesSortOrder } = customData;
+                            const association = seriesEntity.indexOf("/") > -1
                                 ? seriesEntity.split("/")[0]
                                 : seriesNameAttribute;
 
-                            const seriesItems: { [key: string]: (mendix.lib.MxObject | number)[] } = {};
+                            const seriesItems: { [key: string]: mendix.lib.MxObject[] } = {};
                             for (const item of mxObjects) {
-                                const referenceGuid = item.get(association) as string;
-                                if (!seriesItems[referenceGuid]) {
-                                    seriesItems[referenceGuid] = [];
+                                const identifier = item.get(association) as string;
+                                if (!seriesItems[identifier]) {
+                                    seriesItems[identifier] = [];
                                 }
-                                seriesItems[referenceGuid].push(item);
+                                seriesItems[identifier].push(item);
                             }
-                            if (isPersistable) {
-                                const associatedMxObjects = await fetchByXPathGuids(Object.keys(seriesItems));
+                            if (seriesEntity.indexOf("/") > -1) {
+                                const seriesGuids = Object.keys(seriesItems);
+                                const constraint = `[id=${seriesGuids.join(" or id=")}]`;
+                                const associatedMxObjects = await fetchByXPath({
+                                    entity: seriesEntity.split("/")[1],
+                                    guid: "",
+                                    constraint,
+                                    sortAttribute: seriesSortAttribute,
+                                    sortOrder: seriesSortOrder
+                                });
                                 associatedMxObjects.forEach(associated => {
                                     const name = seriesNameAttribute ? associated.get(seriesNameAttribute) : "";
                                     const fillColor = fillColorAttribute ? associated.get(fillColorAttribute) : "";
@@ -113,9 +120,19 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
                                     } as Data.SeriesData<Data.LineSeriesProps>);
                                 });
                             } else {
-                                Object.keys(seriesItems).forEach(name => {
-                                    const fillColor = fillColorAttribute ? (seriesItems[name][0] as mendix.lib.MxObject).get(fillColorAttribute) : "";
-                                    const lineColor = colorAttribute ? (seriesItems[name][0] as mendix.lib.MxObject).get(colorAttribute) : "";
+                                const seriesNames = Object.keys(seriesItems);
+                                if (seriesSortAttribute) {
+                                    seriesNames.sort((seriesNameA, seriesNameB) => {
+                                        const seriesSortA = seriesItems[seriesNameA][0].get(seriesSortAttribute) as string;
+                                        const seriesSortB = seriesItems[seriesNameB][0].get(seriesSortAttribute) as string;
+
+                                        return seriesSortOrder === "asc" ? seriesSortA.localeCompare(seriesSortB) : seriesSortB.localeCompare(seriesSortA);
+                                    });
+                                }
+                                seriesNames.forEach(name => {
+                                    const firstMxObject = seriesItems[name][0];
+                                    const fillColor = fillColorAttribute ? firstMxObject.get(fillColorAttribute) : "";
+                                    const lineColor = colorAttribute ? firstMxObject.get(colorAttribute) : "";
                                     returnData.push({
                                         data: seriesItems[name],
                                         series: {
