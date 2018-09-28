@@ -30,7 +30,7 @@ export const getCustomLayoutOptions = (props: LineChartProps): Partial<Layout> =
     const sharedConfigs: Partial<Layout> = {
         showlegend: props.showLegend,
         margin: {
-            t: props.type === "polar" ? 60 : 10
+            t: props.type === "polar" ? 60 : 35
         }
     };
 
