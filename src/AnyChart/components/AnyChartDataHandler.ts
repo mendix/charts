@@ -172,7 +172,7 @@ export class AnyChartDataHandler extends Component<AnyChartDataHandlerProps> {
         if (props.tooltipForm && !hasEvent) {
             errorMessages.push("A tooltip requires event entity and event data attribute");
         }
-        if (props.tooltipForm && props.tooltipMicroflow) {
+        if (props.tooltipForm && !props.tooltipMicroflow) {
             errorMessages.push("A tooltip requires a tooltip microflow");
         }
         if (props.onClickMicroflow && !hasEvent) {

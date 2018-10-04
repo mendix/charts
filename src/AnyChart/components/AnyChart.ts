@@ -1,15 +1,17 @@
 
 // tslint:disable no-console
 import { Component, ReactChild, createElement } from "react";
+import { render, unmountComponentAtNode } from "react-dom";
 import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
+import { HoverTooltip } from "../../components/HoverTooltip";
 import { Alert } from "../../components/Alert";
 import { AnyChartDataHandlerProps } from "./AnyChartDataHandler";
 import PlotlyChart from "../../components/PlotlyChart";
 import * as PlotlyChartActions from "../../components/actions/PlotlyChartActions";
 import { PlotlyChartInstance, defaultPlotlyInstanceState } from "../../components/reducers/PlotlyChartReducer";
-import { getDimensions, parseStyle } from "../../utils/style";
+import { getDimensions, getTooltipCoordinates, parseStyle, setTooltipPosition } from "../../utils/style";
 import "../../ui/Charts.scss";
 
 import { getConfigOptions, getData, getLayoutOptions } from "../utils/configs";
@@ -25,6 +27,8 @@ export interface AnyChartComponentProps extends AnyChartDataHandlerProps {
 export type AnyChartProps = AnyChartComponentProps & typeof PlotlyChartActions & PlotlyChartInstance;
 
 class AnyChart extends Component<AnyChartProps> {
+    private tooltipNode?: HTMLDivElement;
+
     render() {
         if (this.props.alertMessage) {
             return createElement(Alert, { className: `widget-charts-any-alert` }, this.props.alertMessage);
@@ -45,7 +49,9 @@ class AnyChart extends Component<AnyChartProps> {
             type: "full",
             className: this.props.class,
             style: { ...getDimensions(this.props), ...parseStyle(this.props.style) },
-            onClick: this.onClick
+            onClick: this.onClick,
+            onHover: this.onHover,
+            getTooltipNode: this.getTooltipNodeRef
         });
     }
 
@@ -53,6 +59,28 @@ class AnyChart extends Component<AnyChartProps> {
         if (this.props.onClick) {
             this.props.onClick(this.extractRelevantPointData(points));
         }
+    }
+
+    private onHover = ({ points, event }: any) => {
+        if (event && this.tooltipNode) {
+            const { y, z, text } = points[0];
+            unmountComponentAtNode(this.tooltipNode);
+            const coordinates = getTooltipCoordinates(event, this.tooltipNode);
+            if (coordinates) {
+                setTooltipPosition(this.tooltipNode, coordinates);
+                if (this.props.onHover) {
+                    this.props.onHover(this.extractRelevantPointData(points), this.tooltipNode);
+                } else if (points[0].data.hoverinfo === "none") {
+                    render(createElement(HoverTooltip, { text: z || text || y }), this.tooltipNode);
+                } else {
+                    this.tooltipNode.style.opacity = "0";
+                }
+            }
+        }
+    }
+
+    private getTooltipNodeRef = (node: HTMLDivElement) => {
+        this.tooltipNode = node;
     }
 
     private extractRelevantPointData(points: any[]): any[] {

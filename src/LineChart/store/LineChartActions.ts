@@ -107,8 +107,8 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
                                 });
                                 associatedMxObjects.forEach(associated => {
                                     const name = seriesNameAttribute ? associated.get(seriesNameAttribute) : "";
-                                    const fillColor = fillColorAttribute ? associated.get(fillColorAttribute) : "";
-                                    const lineColor = colorAttribute ? associated.get(colorAttribute) : "";
+                                    const fillColor = fillColorAttribute ? associated.get(fillColorAttribute) : undefined;
+                                    const lineColor = colorAttribute ? associated.get(colorAttribute) : undefined;
                                     returnData.push({
                                         data: seriesItems[associated.getGuid()],
                                         series: {
@@ -131,8 +131,8 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
                                 }
                                 seriesNames.forEach(name => {
                                     const firstMxObject = seriesItems[name][0];
-                                    const fillColor = fillColorAttribute ? firstMxObject.get(fillColorAttribute) : "";
-                                    const lineColor = colorAttribute ? firstMxObject.get(colorAttribute) : "";
+                                    const fillColor = fillColorAttribute ? firstMxObject.get(fillColorAttribute) : undefined;
+                                    const lineColor = colorAttribute ? firstMxObject.get(colorAttribute) : undefined;
                                     returnData.push({
                                         data: seriesItems[name],
                                         series: {
