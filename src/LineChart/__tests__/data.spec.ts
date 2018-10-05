@@ -12,7 +12,8 @@ describe("LineChart/utils/data", () => {
                 xValueAttribute: "xValue",
                 xValueSortAttribute: "createdDate",
                 yValueAttribute: "yValue",
-                lineColor: ""
+                lineColor: "",
+                aggregationType: "none"
             };
             const props: Partial<LineChartDataHandlerProps> = {
                 devMode: "basic",
@@ -51,8 +52,9 @@ describe("LineChart/utils/data", () => {
                 y: [ 4, 5, 6 ],
                 text: "",
                 customdata: [ { get: jasmine.any(Function) } ],
-                series: { name: "Series 1", xValueAttribute: "xValue", xValueSortAttribute: "createdDate", yValueAttribute: "yValue", lineColor: "" },
-                visible: true
+                series: { name: "Series 1", xValueAttribute: "xValue", xValueSortAttribute: "createdDate", yValueAttribute: "yValue", lineColor: "", aggregationType: "none" },
+                visible: true,
+                transforms: undefined
             } ] as any);
         });
     });
