@@ -54,10 +54,19 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                     return seriesData.reduce(async (cummulator: Promise<Data.SeriesData<Data.SeriesProps>[]>, { mxObjects, restData, customData }) => {
                         if (restData && customData && customData.seriesType === "dynamic" && customData.dataSourceType === "REST") {
                             const returnData = await cummulator;
-                            const { seriesEntity, seriesNameAttribute, colorAttribute, fillColorAttribute } = customData;
+                            const { seriesEntity, seriesNameAttribute, colorAttribute, fillColorAttribute, seriesSortAttribute, seriesSortOrder } = customData;
                             const association = seriesEntity.indexOf("/") > -1
                                 ? seriesEntity.split("/")[0].split(".")[1]
                                 : seriesEntity.split(".")[1];
+
+                            if (seriesSortAttribute) { // sorting
+                                restData.sort((seriesA, seriesB) => {
+                                    const seriesSortA = seriesA[seriesSortAttribute] as string;
+                                    const seriesSortB = seriesB[seriesSortAttribute] as string;
+
+                                    return seriesSortOrder === "asc" ? seriesSortA.localeCompare(seriesSortB) : seriesSortB.localeCompare(seriesSortA);
+                                });
+                            }
                             restData.forEach(restDataSeries => {
                                 const fillColor = fillColorAttribute ? restDataSeries[fillColorAttribute] : undefined;
                                 const lineColor = colorAttribute ? restDataSeries[colorAttribute] : undefined;

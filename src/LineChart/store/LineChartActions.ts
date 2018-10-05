@@ -59,10 +59,20 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
                     return seriesData.reduce(async (cummulator: Promise<Data.SeriesData<Data.LineSeriesProps>[]>, { mxObjects, restData, customData }) => {
                         if (restData && customData && customData.seriesType === "dynamic" && customData.dataSourceType === "REST") {
                             const returnData = await cummulator;
-                            const { seriesEntity, seriesNameAttribute, colorAttribute, fillColorAttribute } = customData;
+                            const { seriesEntity, seriesNameAttribute, colorAttribute, fillColorAttribute, seriesSortAttribute, seriesSortOrder } = customData;
                             const association = seriesEntity.indexOf("/") > -1
                                 ? seriesEntity.split("/")[0].split(".")[1]
                                 : seriesEntity.split(".")[1];
+
+                            if (seriesSortAttribute) { // sorting
+                                restData.sort((seriesA, seriesB) => {
+                                    const seriesSortA = seriesA[seriesSortAttribute] as string;
+                                    const seriesSortB = seriesB[seriesSortAttribute] as string;
+
+                                    return seriesSortOrder === "asc" ? seriesSortA.localeCompare(seriesSortB) : seriesSortB.localeCompare(seriesSortA);
+                                });
+                            }
+
                             restData.forEach(restDataSeries => {
                                 const fillColor = fillColorAttribute ? restDataSeries[fillColorAttribute] : undefined;
                                 const lineColor = colorAttribute ? restDataSeries[colorAttribute] : undefined;
@@ -121,7 +131,7 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
                                 });
                             } else {
                                 const seriesNames = Object.keys(seriesItems);
-                                if (seriesSortAttribute) {
+                                if (seriesSortAttribute) { // sorting
                                     seriesNames.sort((seriesNameA, seriesNameB) => {
                                         const seriesSortA = seriesItems[seriesNameA][0].get(seriesSortAttribute) as string;
                                         const seriesSortB = seriesItems[seriesNameB][0].get(seriesSortAttribute) as string;
@@ -129,6 +139,7 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
                                         return seriesSortOrder === "asc" ? seriesSortA.localeCompare(seriesSortB) : seriesSortB.localeCompare(seriesSortA);
                                     });
                                 }
+
                                 seriesNames.forEach(name => {
                                     const firstMxObject = seriesItems[name][0];
                                     const fillColor = fillColorAttribute ? firstMxObject.get(fillColorAttribute) : undefined;

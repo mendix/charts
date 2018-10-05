@@ -99,7 +99,7 @@ class PlotlyChart extends Component<PlotlyChartProps> {
     private renderChart({ config, data, layout, onClick, onHover, onRestyle }: PlotlyChartProps, plotly: Plotly) {
         const rootNode = this.chartNode && this.chartNode.parentElement as HTMLDivElement;
         if (this.chartNode && rootNode && !this.props.loadingAPI && layout && data && config) {
-            const data2 = (data as Data[]).map(data_ => {
+            const chartData = (data as Data[]).map(data_ => {
                 if (data_.customdata) {
                     const customdata = data_.customdata.map(dataObject => ({
                         entity: dataObject.getEntity() as string,
@@ -113,7 +113,7 @@ class PlotlyChart extends Component<PlotlyChartProps> {
             });
             const layoutOptions = deepMerge.all([ layout, getDimensionsFromNode(rootNode) ]);
             const plotlyConfig = window.dojo && window.dojo.locale ? { ...config, locale: window.dojo.locale } : config;
-            plotly.newPlot(this.chartNode, data2 as Data[], layoutOptions, plotlyConfig)
+            plotly.newPlot(this.chartNode, chartData as Data[], layoutOptions, plotlyConfig)
                 .then(myPlot => {
                     if (onClick) {
                         myPlot.on("plotly_click", onClick as any);
