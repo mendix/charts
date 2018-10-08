@@ -130,11 +130,11 @@ class PieChart extends Component<PieChartProps & PieChartState> {
         });
     }
 
-    private onClick = ({ points }: PieHoverData<mendix.lib.MxObject[]>) => {
+    private onClick = ({ points }: PieHoverData<Container.MxClick[]>) => {
         if (this.props.onClick && this.props.pieData) {
             const point = points[0];
             this.props.onClick({
-                mxObject: point.customdata[0],
+                mxObjectCustom: point.customdata[0],
                 options: this.props,
                 mxForm: this.props.mxform,
                 trace: {
@@ -145,7 +145,7 @@ class PieChart extends Component<PieChartProps & PieChartState> {
         }
     }
 
-    private onHover = ({ event, points }: PieHoverData<mendix.lib.MxObject[]>) => {
+    private onHover = ({ event, points }: PieHoverData<Container.MxClick[]>) => {
         if (event && this.tooltipNode) {
             unmountComponentAtNode(this.tooltipNode);
             const coordinates = getTooltipCoordinates(event, this.tooltipNode);
@@ -156,7 +156,7 @@ class PieChart extends Component<PieChartProps & PieChartState> {
                     this.props.onHover({
                         tooltipForm: this.props.tooltipForm,
                         tooltipNode: this.tooltipNode,
-                        mxObject: point.customdata[0],
+                        mxObjectCustom: point.customdata[0],
                         options: this.props,
                         trace: {
                             label: point.label,

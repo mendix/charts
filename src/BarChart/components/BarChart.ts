@@ -5,7 +5,7 @@ import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
 import { BarChartState } from "../store/BarChartReducer";
-import { Data } from "../../utils/namespaces";
+import { Container, Data } from "../../utils/namespaces";
 import { BarChartDataHandlerProps } from "./BarChartDataHandler";
 import {
     getConfigOptions,
@@ -117,11 +117,11 @@ class BarChart extends Component<BarChartProps & BarChartState> {
         });
     }
 
-    private onClick = ({ points }: ScatterHoverData<mendix.lib.MxObject>) => {
+    private onClick = ({ points }: ScatterHoverData<Container.MxClick>) => {
         const { customdata, data, x, y } = points[0];
         if (this.props.onClick) {
             this.props.onClick({
-                mxObject: customdata,
+                mxObjectCustom: customdata,
                 options: data.series,
                 mxForm: this.props.mxform,
                 trace: {
@@ -132,7 +132,7 @@ class BarChart extends Component<BarChartProps & BarChartState> {
         }
     }
 
-    private onHover = ({ event, points }: ScatterHoverData<mendix.lib.MxObject>) => {
+    private onHover = ({ event, points }: ScatterHoverData<Container.MxClick>) => {
         const { customdata, data, x, y } = points[0];
         if (event && this.tooltipNode && this.tooltipNode.style.opacity !== "1") {
             unmountComponentAtNode(this.tooltipNode);
@@ -144,7 +144,7 @@ class BarChart extends Component<BarChartProps & BarChartState> {
                     this.props.onHover({
                         tooltipForm: data.series.tooltipForm,
                         tooltipNode: this.tooltipNode,
-                        mxObject: customdata,
+                        mxObjectCustom: customdata,
                         options: data.series,
                         trace: {
                             x: this.props.orientation === "bar" ? y as string : x as string,

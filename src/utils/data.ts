@@ -13,16 +13,24 @@ import FetchByXPathOptions = Data.FetchByXPathOptions;
 import { Store } from "redux";
 
 type MxO = mendix.lib.MxObject;
+type Callback = mendix.lib.MxObject | mendix.lib.MxObject[] | boolean | number | string | mxui.lib.form._FormBase;
 
 export const validateSeriesProps = <T extends Partial<SeriesProps>>
     (dataSeries: T[], widgetId: string, layoutOptions: string, configurationOptions: string): ReactChild => {
         const errorMessage: string[] = [];
         if (dataSeries && dataSeries.length) {
-            dataSeries.forEach(series => {
+            dataSeries.forEach((series, index) => {
                 const identifier = series.name ? `series "${series.name}"` : "the widget";
                 if (series.seriesType === "dynamic") {
                     if (!series.seriesEntity) {
                         errorMessage.push(`'Dynamic series - Series entity' in ${identifier} is missing`);
+                    } else {
+                        const seriesPath = series.seriesEntity.split("/")[0];
+                        const { dataEntity } = series;
+                        const dataEntityMeta = (dataEntity && window.mx) && window.mx.meta.getEntity(dataEntity);
+                        if (!(dataEntity === seriesPath || (dataEntityMeta && dataEntityMeta.isReference(seriesPath)))) {
+                            errorMessage.push(`'Dynamic series - Series entity ${series.seriesEntity}' in 'series ${index + 1}' should be the same as ${dataEntity} or a reference of ${dataEntity}`);
+                        }
                     }
                     if (!series.seriesNameAttribute) {
                         errorMessage.push(`'Dynamic series - Series name attribute' in ${identifier} is missing`);
@@ -117,7 +125,13 @@ export const fetchData = <S>(options: FetchDataOptions<S>): Promise<FetchedData<
             } else if (options.type === "REST" && options.url && attributes) {
                 fetchByREST(options.url)
                     .then(restData => {
-                        const validationString = validateJSONData(restData, attributes);
+                        const valuesAttribute = (customData && (customData as any).seriesEntity.indexOf("/") > -1 && (customData as any).seriesType === "dynamic")
+                            ? customData && (customData as any).seriesEntity.split("/")[0].split(".")[1]
+                            : undefined ;
+                        const jsonData = (customData && (customData as any).seriesType === "dynamic")
+                            ? restData[0][valuesAttribute]
+                            : restData;
+                        const validationString = validateJSONData(jsonData, attributes);
                         if (validationString) {
                             reject({ message: validationString, customData: options.customData });
                         } else {
@@ -249,6 +263,14 @@ export const fetchByXPath = (options: FetchByXPathOptions): Promise<MxO[]> => ne
     });
 });
 
+export const fetchByXPathGuids = (guids: string[]): Promise<MxO[]> => new Promise<MxO[]>((resolve, reject) => {
+    window.mx.data.get({
+        guids,
+        callback: resolve,
+        error: error => reject(`An error occurred while retrieving data via GUIDS: ${guids}: ${error.message}`)
+    });
+});
+
 export const fetchByMicroflow = (actionname: string, guid: string): Promise<MxO[]> =>
     new Promise((resolve, reject) => {
         const errorMessage = `An error occurred while retrieving data by microflow (${actionname}): `;
@@ -273,43 +295,52 @@ export const fetchByREST = (url: string): Promise<any> => new Promise((resolve, 
     }).catch(error => reject(`${errorMessage} ${error.message}`));
 });
 
-export const handleOnClick = <T extends EventProps>(options: T, mxObject?: MxO, mxform?: mxui.lib.form._FormBase) => {
+export const handleOnClick = <T extends EventProps>(options: T, mxObjectCustom?: Container.MxClick, mxform?: mxui.lib.form._FormBase): Promise<Callback> => new Promise((resolve, reject) => {
     const context = new mendix.lib.MxContext();
 
-    if (!mxObject || options.onClickEvent === "doNothing") {
+    if (!mxObjectCustom || options.onClickEvent === "doNothing") {
+        resolve();
+
         return;
     } else {
-        context.setContext(mxObject.getEntity(), mxObject.getGuid());
+        context.setContext(mxObjectCustom.entity, mxObjectCustom.guid);
     }
 
     if (options.onClickEvent === "callMicroflow" && options.onClickMicroflow) {
         window.mx.ui.action(options.onClickMicroflow, {
-            error: error => window.mx.ui.error(`Error while executing microflow ${options.onClickMicroflow}: ${error.message}`), // tslint:disable-line max-line-length
+            callback: resolve,
+            error: error => reject(`Error while executing microflow ${options.onClickMicroflow}: ${error.message}`), // tslint:disable-line max-line-length
             params: {
                 applyto: "selection",
-                guids: [ mxObject.getGuid() ]
+                guids: mxObjectCustom ? [ mxObjectCustom.guid ] : undefined
             },
             origin: mxform
         });
     } else if (options.onClickEvent === "showPage" && options.onClickPage) {
         window.mx.ui.openForm(options.onClickPage, {
+            callback: resolve,
             context,
-            error: error => window.mx.ui.error(`Error while opening page ${options.onClickPage}: ${error.message}`),
+            error: error => reject(`Error while opening page ${options.onClickPage}: ${error.message}`),
             location: options.openPageLocation
         });
+
+        if (options.openPageLocation === "content") { // Callback is not called in this case
+            resolve();
+        }
     } else if (options.onClickEvent === "callNanoflow" && options.onClickNanoflow.nanoflow && mxform && context) {
         window.mx.data.callNanoflow({
+            callback: resolve,
             context,
-            error: error => mx.ui.error(`Error executing the on click nanoflow ${error.message}`),
+            error: error => reject(`Error executing the on click nanoflow ${error.message}`),
             nanoflow: options.onClickNanoflow,
             origin: mxform
         });
     }
-};
+});
 
-export const openTooltipForm = (domNode: HTMLDivElement, tooltipForm: string, dataObject: mendix.lib.MxObject) => {
+export const openTooltipForm = (domNode: HTMLDivElement, tooltipForm: string, dataObject: Container.MxClick) => {
     const context = new mendix.lib.MxContext();
-    context.setContext(dataObject.getEntity(), dataObject.getGuid());
+    context.setContext(dataObject.entity, dataObject.guid);
     window.mx.ui.openForm(tooltipForm, { domNode, context, location: "node" });
 };
 

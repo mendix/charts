@@ -11,6 +11,8 @@ import { Plotly, PlotlyChartInstance } from "./reducers/PlotlyChartReducer";
 import ReactResizeDetector from "react-resize-detector";
 import { getDimensionsFromNode } from "../utils/style";
 
+const aggregateLib = require("plotly.js/lib/aggregate"); // tslint:disable-line
+
 export interface ComponentProps {
     widgetID: string;
     type: "line" | "bar" | "pie" | "heatmap" | "full" | "polar";
@@ -97,9 +99,21 @@ class PlotlyChart extends Component<PlotlyChartProps> {
     private renderChart({ config, data, layout, onClick, onHover, onRestyle }: PlotlyChartProps, plotly: Plotly) {
         const rootNode = this.chartNode && this.chartNode.parentElement as HTMLDivElement;
         if (this.chartNode && rootNode && !this.props.loadingAPI && layout && data && config) {
+            const chartData = (data as Data[]).map(data_ => {
+                if (data_.customdata) {
+                    const customdata = data_.customdata.map(dataObject => ({
+                        entity: dataObject.getEntity() as string,
+                        guid: dataObject.getGuid() as string
+                    }));
+
+                    return { ...data_, customdata };
+                }
+
+                return { ...data_, customdata: [] };
+            });
             const layoutOptions = deepMerge.all([ layout, getDimensionsFromNode(rootNode) ]);
             const plotlyConfig = window.dojo && window.dojo.locale ? { ...config, locale: window.dojo.locale } : config;
-            plotly.newPlot(this.chartNode, data as Data[], layoutOptions, plotlyConfig)
+            plotly.newPlot(this.chartNode, chartData as Data[], layoutOptions, plotlyConfig)
                 .then(myPlot => {
                     if (onClick) {
                         myPlot.on("plotly_click", onClick as any);
@@ -126,7 +140,7 @@ class PlotlyChart extends Component<PlotlyChartProps> {
                 register([ await import("plotly.js/lib/pie") ]);
             }
             if (this.props.type === "bar" || this.props.type === "line") {
-                register([ await import("plotly.js/lib/bar"), await import("plotly.js/lib/scatter") ]);
+                register([ aggregateLib, await import("plotly.js/lib/bar"), await import("plotly.js/lib/scatter") ]);
             }
             if (this.props.type === "heatmap") {
                 register([ await import("plotly.js/lib/heatmap") ]);

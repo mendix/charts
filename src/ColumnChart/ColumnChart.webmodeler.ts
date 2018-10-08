@@ -15,8 +15,9 @@ import BarChartContainerProps = Container.BarChartContainerProps;
 
 // tslint:disable-next-line class-name
 export class preview extends Component<BarChartContainerProps, { updatingData: boolean }> {
-    state = { updatingData: true };
+    readonly state = { updatingData: true };
     private instanceID = getInstanceID(this.props.friendlyId, store, "bar");
+    private scatterData = this.getData(this.props);
 
     render() {
         const alertMessage = validateSeriesProps(
@@ -35,7 +36,7 @@ export class preview extends Component<BarChartContainerProps, { updatingData: b
                 updatingData: this.state.updatingData,
                 toggleUpdatingData: this.toggleUpdatingData,
                 instanceID: this.instanceID,
-                scatterData: this.getData(this.props),
+                scatterData: this.scatterData,
                 themeConfigs: { layout: {}, configuration: {}, data: {} }
             })
         );

@@ -1,6 +1,6 @@
 import deepMerge from "deepmerge";
 import { Config, Layout, ScatterData } from "plotly.js";
-import { configs } from "../../utils/configs";
+import { configs, getTransforms } from "../../utils/configs";
 import { Container, Data } from "../../utils/namespaces";
 import { defaultColours, getDimensionsFromNode } from "../../utils/style";
 import { LineChartDataHandlerProps as LineChartProps } from "../components/LineChartDataHandler";
@@ -30,7 +30,7 @@ export const getCustomLayoutOptions = (props: LineChartProps): Partial<Layout> =
     const sharedConfigs: Partial<Layout> = {
         showlegend: props.showLegend,
         margin: {
-            t: props.type === "polar" ? 60 : 10
+            t: props.type === "polar" ? 60 : 35
         }
     };
 
@@ -83,8 +83,10 @@ export const getCustomSeriesOptions = (series: Data.LineSeriesProps, props: Line
         fill: props.fill || series.fill
             ? props.type === "polar" ? "toself" : "tonexty"
             : "none",
-        marker: props.type === "bubble" ? { line: { width: 0 } } : {}
+        marker: props.type === "bubble" ? { line: { width: 0 } } : {},
+        transforms: series.aggregationType !== "none" && traces ? getTransforms(series, traces) : undefined
     };
+
     if (traces) {
         if (props.type === "polar") {
             return deepMerge.all([

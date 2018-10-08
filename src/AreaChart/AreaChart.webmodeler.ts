@@ -15,8 +15,10 @@ import LineChartContainerProps = Container.LineChartContainerProps;
 
 // tslint:disable-next-line class-name
 export class preview extends Component<LineChartContainerProps, { updatingData: boolean }> {
-    state = { updatingData: true };
+    readonly state = { updatingData: true };
     private instanceID = getInstanceID(this.props.friendlyId, store, "scatter");
+    private sampleData: Container.SampleTrace[] = [];
+    private firstTrace = preview.getSampleTraces();
 
     render() {
         const alertMessage = validateSeriesProps(
@@ -46,14 +48,41 @@ export class preview extends Component<LineChartContainerProps, { updatingData: 
         this.setState({ updatingData: true });
     }
 
+    updateTraces(props: LineChartContainerProps): Container.SampleTrace[] {
+        const sampleData: Container.SampleTrace[] = [];
+        if (!this.props.series.length) {
+            return [ {
+                seriesName: "Sample-0",
+                trace: this.firstTrace
+            } ];
+        } else if (props.series.length !== this.sampleData.length) {
+            props.series.forEach((series, index) => {
+                const filtered = this.sampleData.filter(sample => sample.seriesName === series.name);
+                if (!filtered.length) {
+                    sampleData.push({
+                        seriesName: series.name,
+                        trace: index ? preview.getSampleTraces() : this.firstTrace
+                    });
+                } else {
+                    sampleData.push(filtered[0]);
+                }
+            });
+
+            return sampleData;
+        }
+
+        return this.sampleData;
+    }
+
     private toggleUpdatingData = (_widgetID: string, updatingData: boolean): any => {
         this.setState({ updatingData });
     }
 
     private getData(props: LineChartContainerProps): ScatterData[] {
+        this.sampleData = this.updateTraces(props);
         if (props.series.length) {
             return props.series.map((series, index) => {
-                const sampleData = preview.getSampleTraces();
+                const { trace } = this.sampleData.filter(sample => sample.seriesName === series.name)[0];
 
                 return deepMerge.all([ {
                     connectgaps: true,
@@ -68,8 +97,8 @@ export class preview extends Component<LineChartContainerProps, { updatingData: 
                     type: "scatter",
                     fill: "tonexty",
                     fillcolor: series.fillColor || fillColours[index],
-                    x: sampleData.x || [],
-                    y: sampleData.y || [],
+                    x: trace.x || [],
+                    y: trace.y || [],
                     marker: {  color: series.lineColor || defaultColours()[index] },
                     series: {}
                 } as ScatterData ]);
@@ -86,7 +115,7 @@ export class preview extends Component<LineChartContainerProps, { updatingData: 
             fillcolor: fillColours[0],
             series: {},
             marker: {  color: defaultColours()[0] },
-            ...preview.getSampleTraces()
+            ...this.firstTrace
         } as any ];
     }
 

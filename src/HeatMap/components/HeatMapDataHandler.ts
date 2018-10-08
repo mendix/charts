@@ -25,6 +25,9 @@ export type HeatMapDataHandlerProps = ComponentProps & HeatMapState & Actions;
 class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
     private subscriptionHandles: number[] = [];
     private intervalID?: number;
+    private isRunningAction = false;
+    private showProgress?: number;
+    readonly onStopActionbound = this.onStopAction.bind(this);
 
     render() {
         return createElement("div", { className: "widget-charts-wrapper" },
@@ -121,13 +124,28 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
     }
 
     private handleOnClick = (options: Data.OnClickOptions<{ x: string, y: string, z: number }, HeatMapContainerProps>) => {
-        if (options.trace) {
+        if (!this.isRunningAction && options.trace) {
+            this.onStartAction();
             const mxObject = this.findSourceObject(options.trace.x, options.trace.y, options.trace.z);
+
             if (mxObject) {
-                handleOnClick(options.options, mxObject, options.mxForm);
+                handleOnClick(options.options, options.mxObjectCustom, options.mxForm)
+                    .then(this.onStopActionbound)
+                    .catch((error) => {
+                        mx.ui.error(error);
+                        this.onStopActionbound();
+                    });
             } else {
                 this.createDataPoint(options.options, options.trace)
-                    .then(newMxObject => handleOnClick(options.options, newMxObject, options.mxForm))
+                    .then(newMxObject => {
+                        const mxObjectCustom = { entity: newMxObject.getEntity(), guid: newMxObject.getGuid() };
+                        handleOnClick(options.options, mxObjectCustom, options.mxForm)
+                            .then(this.onStopActionbound)
+                            .catch(error => {
+                                mx.ui.error(error);
+                                this.onStopActionbound();
+                            });
+                    })
                     .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
             }
         }
@@ -137,10 +155,14 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
         if (options.trace) {
             const mxObject = this.findSourceObject(options.trace.x, options.trace.y, options.trace.z);
             if (mxObject) {
-                openTooltipForm(options.tooltipNode, options.tooltipForm, mxObject);
+                const mxObjectCustom = { entity: mxObject.getEntity(), guid: mxObject.getGuid() };
+                openTooltipForm(options.tooltipNode, options.tooltipForm, mxObjectCustom);
             } else {
                 this.createDataPoint(options.options, options.trace)
-                    .then(newMxObject => openTooltipForm(options.tooltipNode, options.tooltipForm, newMxObject))
+                    .then(newMxObject => {
+                        const mxObjectCustom = { entity: newMxObject.getEntity(), guid: newMxObject.getGuid() };
+                        openTooltipForm(options.tooltipNode, options.tooltipForm, mxObjectCustom);
+                    })
                     .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
             }
         }
@@ -167,6 +189,23 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
             data.get(getAttributeName(this.props.verticalNameAttribute)) === y &&
             Number(data.get(this.props.valueAttribute)) === z
         );
+    }
+
+    private onStartAction() {
+        this.isRunningAction = true;
+        setTimeout(() => {
+            if (this.isRunningAction) {
+                this.showProgress = mx.ui.showProgress();
+            }
+        } , 120);
+    }
+
+    private onStopAction() {
+        this.isRunningAction = false;
+        if (this.showProgress) {
+            mx.ui.hideProgress(this.showProgress);
+        }
+
     }
 }
 

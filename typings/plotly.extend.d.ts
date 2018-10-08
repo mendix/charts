@@ -66,12 +66,24 @@ declare module "plotly.js" {
             customdata: T;
         }>;
     }
+    export type AggregationType = "avg" | "sum" | "min" | "max" | "mode" | "median" | "count" | "stddev" | "first" | "last";
+    export interface Transform {
+        type: "aggregate";
+        groups: Datum[];
+        aggregations: [{
+            target: string;
+            func: AggregationType;
+            enabled: boolean
+        }];
+
+    }
 
     export interface ScatterData {
         series: any; // custom property, not part of the official plotly.js api
         orientation?: "h" | "v";
         customdata: any[];
         visible?: boolean | "legendonly"; // default = true
+        transforms?: Transform[];
     }
 
     export interface PieData {

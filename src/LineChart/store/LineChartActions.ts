@@ -28,75 +28,148 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
                     fetchingData: true
                 });
             }
-            const mixinSeries: Data.LineSeriesProps[] = props.series.filter(series => series.seriesType === "static");
-            const dynamicSeries = props.series.filter(series => series.seriesType === "dynamic");
 
-            Promise.all(dynamicSeries.map(dynSeries => {
-                const entity = dynSeries.seriesEntity.split("/")[1];
-                const dynAttributes = [];
-                if (dynSeries.seriesNameAttribute) {
-                    dynAttributes.push(dynSeries.seriesNameAttribute);
-                }
-                if (dynSeries.colorAttribute) {
-                    dynAttributes.push(dynSeries.colorAttribute);
-                }
-                if (dynSeries.fillColorAttribute) {
-                    dynAttributes.push(dynSeries.fillColorAttribute);
-                }
-
-                return fetchByXPath({
-                    entity,
-                    guid: "",
-                    constraint: "",
-                    attributes: dynAttributes
-                })
-                .then(mxObjects => {
-                    return mixinSeries.concat(mxObjects.map(mxSeries => {
-                        const lineColor = dynSeries.colorAttribute ? mxSeries.get(dynSeries.colorAttribute) : "";
-                        const fillColor = dynSeries.fillColorAttribute ? mxSeries.get(dynSeries.fillColorAttribute) : "";
-                        const name = dynSeries.seriesNameAttribute ? mxSeries.get(dynSeries.seriesNameAttribute) : "";
-                        const entityRef = dynSeries.seriesEntity.split("/")[0];
-                        const entityConstraint = dynSeries.entityConstraint + `[${entityRef} = '${mxSeries.getGuid()}']`;
-
-                        return {
-                            ...dynSeries,
-                            entityConstraint,
-                            fillColor,
-                            lineColor,
-                            name
-                        } as Data.LineSeriesProps;
-                    }));
-                });
-            })).then(mixedInSeries => {
-                const workableSeries = mixedInSeries.length ? mixedInSeries[0] : props.series;
-                Promise.all(workableSeries.map(series => {
-                    const attributes = [ series.xValueAttribute, series.yValueAttribute ];
-                    [ series.xValueSortAttribute, series.markerSizeAttribute ].forEach(attribute => {
-                        if (attribute) {
-                            attributes.push(attribute);
+            Promise.all(props.series.map(series => {
+                const attributes = [ series.xValueAttribute, series.yValueAttribute, series.xValueSortAttribute, series.markerSizeAttribute ]
+                    .reduce((cummulator: string[], attribute) => {
+                        if (attribute && series.seriesType === "static") {
+                            cummulator.push(attribute);
                         }
-                    });
-                    const mxObject = props.mxObject as mendix.lib.MxObject;
-                    const url = series.restUrl && generateRESTURL(mxObject, series.restUrl, props.restParameters);
 
-                    return fetchSeriesData<Data.SeriesProps>({
-                        guid: mxObject.getGuid(),
-                        entity: series.dataEntity,
-                        constraint: series.entityConstraint,
-                        sortAttribute: series.xValueSortAttribute || series.xValueAttribute,
-                        sortOrder: series.sortOrder,
-                        type: series.dataSourceType,
-                        attributes,
-                        microflow: series.dataSourceMicroflow,
-                        url: url && `${url}&seriesName=${series.name}`,
-                        customData: series
-                    });
-                }))
-                .then(seriesData => seriesData.map(({ mxObjects, restData, customData }) => ({
-                    data: mxObjects,
-                    restData,
-                    series: customData as Data.LineSeriesProps
-                })))
+                        return cummulator;
+                    }, []);
+
+                const { mxObject } = props;
+                const url = series.restUrl && generateRESTURL(mxObject, series.restUrl, props.restParameters);
+
+                return fetchSeriesData<Data.SeriesProps>({
+                    guid: mxObject.getGuid(),
+                    entity: series.dataEntity,
+                    constraint: series.entityConstraint,
+                    sortAttribute: series.xValueSortAttribute || series.xValueAttribute,
+                    sortOrder: series.sortOrder,
+                    type: series.dataSourceType,
+                    attributes,
+                    microflow: series.dataSourceMicroflow,
+                    url: (url && series.seriesType === "static") ? `${url}&seriesName=${series.name}` : url,
+                    customData: series
+                });
+            }))
+                .then(seriesData => {
+                    return seriesData.reduce(async (cummulator: Promise<Data.SeriesData<Data.LineSeriesProps>[]>, { mxObjects, restData, customData }) => {
+                        if (restData && customData && customData.seriesType === "dynamic" && customData.dataSourceType === "REST") {
+                            const returnData = await cummulator;
+                            const { seriesEntity, seriesNameAttribute, colorAttribute, fillColorAttribute, seriesSortAttribute, seriesSortOrder } = customData;
+                            const association = seriesEntity.indexOf("/") > -1
+                                ? seriesEntity.split("/")[0].split(".")[1]
+                                : seriesEntity.split(".")[1];
+
+                            if (seriesSortAttribute) { // sorting
+                                restData.sort((seriesA, seriesB) => {
+                                    const seriesSortA = seriesA[seriesSortAttribute] as string;
+                                    const seriesSortB = seriesB[seriesSortAttribute] as string;
+
+                                    return seriesSortOrder === "asc" ? seriesSortA.localeCompare(seriesSortB) : seriesSortB.localeCompare(seriesSortA);
+                                });
+                            }
+
+                            restData.forEach(restDataSeries => {
+                                const fillColor = fillColorAttribute ? restDataSeries[fillColorAttribute] : undefined;
+                                const lineColor = colorAttribute ? restDataSeries[colorAttribute] : undefined;
+                                const name = seriesNameAttribute ? restDataSeries[seriesNameAttribute] : undefined;
+                                returnData.push({
+                                    data: mxObjects,
+                                    restData: restDataSeries[association],
+                                    series: {
+                                        ...customData,
+                                        lineColor,
+                                        name,
+                                        fillColor
+                                    }
+                                } as Data.SeriesData<Data.LineSeriesProps>);
+                            });
+
+                            return returnData;
+                        } else if (mxObjects && customData && customData.seriesType === "dynamic" && (customData.dataSourceType === "microflow" || customData.dataSourceType === "XPath")) {
+                            const returnData = await cummulator;
+                            const { seriesEntity, colorAttribute, seriesNameAttribute, fillColorAttribute, seriesSortAttribute, seriesSortOrder } = customData;
+                            const association = seriesEntity.indexOf("/") > -1
+                                ? seriesEntity.split("/")[0]
+                                : seriesNameAttribute;
+
+                            const seriesItems: { [key: string]: mendix.lib.MxObject[] } = {};
+                            for (const item of mxObjects) {
+                                const identifier = item.get(association) as string;
+                                if (!seriesItems[identifier]) {
+                                    seriesItems[identifier] = [];
+                                }
+                                seriesItems[identifier].push(item);
+                            }
+                            if (seriesEntity.indexOf("/") > -1) {
+                                const seriesGuids = Object.keys(seriesItems);
+                                const constraint = `[id=${seriesGuids.join(" or id=")}]`;
+                                const associatedMxObjects = await fetchByXPath({
+                                    entity: seriesEntity.split("/")[1],
+                                    guid: "",
+                                    constraint,
+                                    sortAttribute: seriesSortAttribute,
+                                    sortOrder: seriesSortOrder
+                                });
+                                associatedMxObjects.forEach(associated => {
+                                    const name = seriesNameAttribute ? associated.get(seriesNameAttribute) : "";
+                                    const fillColor = fillColorAttribute ? associated.get(fillColorAttribute) : undefined;
+                                    const lineColor = colorAttribute ? associated.get(colorAttribute) : undefined;
+                                    returnData.push({
+                                        data: seriesItems[associated.getGuid()],
+                                        series: {
+                                            ...customData,
+                                            lineColor,
+                                            name,
+                                            fillColor
+                                        }
+                                    } as Data.SeriesData<Data.LineSeriesProps>);
+                                });
+                            } else {
+                                const seriesNames = Object.keys(seriesItems);
+                                if (seriesSortAttribute) { // sorting
+                                    seriesNames.sort((seriesNameA, seriesNameB) => {
+                                        const seriesSortA = seriesItems[seriesNameA][0].get(seriesSortAttribute) as string;
+                                        const seriesSortB = seriesItems[seriesNameB][0].get(seriesSortAttribute) as string;
+
+                                        return seriesSortOrder === "asc" ? seriesSortA.localeCompare(seriesSortB) : seriesSortB.localeCompare(seriesSortA);
+                                    });
+                                }
+
+                                seriesNames.forEach(name => {
+                                    const firstMxObject = seriesItems[name][0];
+                                    const fillColor = fillColorAttribute ? firstMxObject.get(fillColorAttribute) : undefined;
+                                    const lineColor = colorAttribute ? firstMxObject.get(colorAttribute) : undefined;
+                                    returnData.push({
+                                        data: seriesItems[name],
+                                        series: {
+                                            ...customData,
+                                            lineColor,
+                                            name,
+                                            fillColor
+                                        }
+                                    } as Data.SeriesData<Data.LineSeriesProps>);
+                                });
+                            }
+
+                            return returnData;
+                        } else {
+                            const returnData = await cummulator;
+                            returnData.push({
+                                data: mxObjects,
+                                restData,
+                                series: customData as Data.LineSeriesProps
+                            });
+
+                            return returnData;
+                        }
+
+                    }, Promise.resolve([])) as Promise<Data.SeriesData<Data.LineSeriesProps>[]>;
+                })
                 .then((data: Data.SeriesData<Data.LineSeriesProps>[]) => dispatch({
                     seriesData: data,
                     layoutOptions: props.layoutOptions || "{\n\n}",
@@ -110,7 +183,6 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
                     window.mx.ui.error(reason);
                     dispatch({ type: actionType.FETCH_DATA_FAILED, instanceID: props.instanceID });
                 });
-            });
         } else {
             dispatch({ type: actionType.NO_CONTEXT, instanceID: props.instanceID });
         }

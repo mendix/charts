@@ -11,7 +11,8 @@ describe("BarChart/utils/data", () => {
                 xValueAttribute: "xValue",
                 xValueSortAttribute: "createdDate",
                 yValueAttribute: "yValue",
-                barColor: ""
+                barColor: "",
+                aggregationType: "none"
             };
 
             const barProps: Partial<BarChartDataHandlerProps> = {
@@ -48,9 +49,10 @@ describe("BarChart/utils/data", () => {
                     marker: { color: "rgba(5, 149, 219, 1)" },
                     x: [ "Jan", "Feb", "Mar" ],
                     y: [ 4, 5, 6 ],
-                    series: { name: "Series 1", xValueAttribute: "xValue", xValueSortAttribute: "createdDate", yValueAttribute: "yValue", barColor: "" },
+                    series: { name: "Series 1", xValueAttribute: "xValue", xValueSortAttribute: "createdDate", yValueAttribute: "yValue", barColor: "", aggregationType: "none" },
                     orientation: "v",
-                    customdata: [ { get: jasmine.any(Function) } ]
+                    customdata: [ { get: jasmine.any(Function) } ],
+                    transforms: undefined
                 }
             ] as any);
         });

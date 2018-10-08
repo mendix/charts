@@ -14,7 +14,7 @@ export const getLayoutOptions = (props: AnyChartProps): Partial<Layout> => {
     const staticLayout: Partial<Layout> = JSON.parse(props.layoutStatic || "{}");
     const attributeLayout: Partial<Layout> = props.attributeLayout ? JSON.parse(props.attributeLayout || "{}") : {};
 
-    return deepMerge.all([ staticLayout, attributeLayout ], { arrayMerge });
+    return deepMerge.all([ { hovermode: "closest" }, staticLayout, attributeLayout ], { arrayMerge });
 };
 
 export const getData = (props: AnyChartProps): any[] => {

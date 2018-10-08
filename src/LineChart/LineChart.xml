@@ -94,6 +94,24 @@
                         <enumerationValue key="desc">Descending</enumerationValue>
                     </enumerationValues>
                 </property>
+                <property key="aggregationType" type="enumeration" defaultValue="none">
+                    <caption>Aggregation type</caption>
+                    <category>Data points</category>
+                    <description>Defines how data is aggregated when multiple Y values are available for a single X value</description>
+                    <enumerationValues>
+                        <enumerationValue key="none">None</enumerationValue>
+                        <enumerationValue key="count">Count</enumerationValue>
+                        <enumerationValue key="sum">Sum</enumerationValue>
+                        <enumerationValue key="avg">Average</enumerationValue>
+                        <enumerationValue key="min">Minimum</enumerationValue>
+                        <enumerationValue key="max">Maximum</enumerationValue>
+                        <enumerationValue key="median">Median</enumerationValue>
+                        <enumerationValue key="mode">Mode</enumerationValue>
+                        <enumerationValue key="first">First</enumerationValue>
+                        <enumerationValue key="last">Last</enumerationValue>
+                        <enumerationValue key="stddev">Standard deviation</enumerationValue>
+                    </enumerationValues>
+                </property>
                 <property key="mode" type="enumeration" defaultValue="linesXmarkers">
                     <caption>Line mode</caption>
                     <category>Appearance</category>
@@ -126,7 +144,7 @@
                     <category>Static series</category>
                     <description>Color of the line e.g. green, #00FF00, rgb(0,255,0)</description>
                 </property>
-                <property key="seriesEntity" type="entity" required="false" allowNonPersistableEntities="true" isPath="yes" pathType="reference" entityProperty="dataEntity">
+                <property key="seriesEntity" type="entity" required="false" allowNonPersistableEntities="true" isPath="optional" pathType="reference" entityProperty="dataEntity">
                     <caption>Series entity</caption>
                     <category>Dynamic series</category>
                     <description>The entity from which the series values will be retrieved</description>
@@ -148,6 +166,28 @@
                         <attributeType name="String"/>
                         <attributeType name="Enum"/>
                     </attributeTypes>
+                </property>
+                <property key="seriesSortAttribute" type="attribute" entityProperty="seriesEntity" required="false">
+                    <caption>Series sort attribute</caption>
+                    <category>Dynamic series</category>
+                    <description>Not supported for REST datasource</description>
+                    <attributeTypes>
+                        <attributeType name="Decimal"/>
+                        <attributeType name="Long"/>
+                        <attributeType name="Integer"/>
+                        <attributeType name="String"/>
+                        <attributeType name="AutoNumber"/>
+                        <attributeType name="DateTime"/>
+                    </attributeTypes>
+                </property>
+                <property key="seriesSortOrder" type="enumeration" defaultValue="asc">
+                    <caption>Series sort order</caption>
+                    <category>Dynamic series</category>
+                    <description/>
+                    <enumerationValues>
+                        <enumerationValue key="asc">Ascending</enumerationValue>
+                        <enumerationValue key="desc">Descending</enumerationValue>
+                    </enumerationValues>
                 </property>
                 <property key="onClickEvent" type="enumeration" defaultValue="doNothing">
                     <caption>On click</caption>
@@ -187,7 +227,7 @@
                     <description>The nanoflow that will be executed on click</description>
                     <returnType type="Void" />
                 </property>
-                <property key="tooltipForm" type="form" required="false">
+                <property key="tooltipForm" type="form" required="false">   
                     <caption>Tooltip form</caption>
                     <category>Events</category>
                     <description>The form to show when a user hovers over a chart plot point</description>

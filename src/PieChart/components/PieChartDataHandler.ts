@@ -18,6 +18,9 @@ export type PieChartDataHandlerProps = ComponentProps & PieChartState & Actions;
 export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
     private subscriptionHandles: number[] = [];
     private intervalID?: number;
+    private isRunningAction = false;
+    private showProgress?: number;
+    readonly onStopActionbound = this.onStopAction.bind(this);
 
     render() {
         return createElement("div", { className: "widget-charts-wrapper" },
@@ -114,21 +117,40 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
     }
 
     private handleOnClick = (options: Data.OnClickOptions<{ label: string, value: number }, PieChartContainerProps>) => {
-        if (options.mxObject) {
-            handleOnClick(options.options, options.mxObject, options.mxForm);
-        } else if (options.trace) {
-            this.createDataPoint(options.options, options.trace)
-                .then(mxObject => handleOnClick(options.options, mxObject, options.mxForm))
-                .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
+        if (!this.isRunningAction) {
+            this.onStartAction();
+            if (options.mxObjectCustom) {
+                handleOnClick(options.options, options.mxObjectCustom, options.mxForm)
+                    .then(this.onStopActionbound)
+                    .catch((error) => {
+                        mx.ui.error(error);
+                        this.onStopActionbound();
+                    });
+            } else if (options.trace) {
+                this.createDataPoint(options.options, options.trace)
+                    .then(mxObject => {
+                        const mxObjectCustom = { entity: mxObject.getEntity(), guid: mxObject.getGuid() };
+                        handleOnClick(options.options, mxObjectCustom, options.mxForm)
+                            .then(this.onStopActionbound)
+                            .catch((error) => {
+                                mx.ui.error(error);
+                                this.onStopActionbound();
+                            });
+                    })
+                    .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
+            }
         }
     }
 
     private handleOnHover = (options: Data.OnHoverOptions<{ label: string, value: number }, PieChartContainerProps>) => {
-        if (options.mxObject) {
-            openTooltipForm(options.tooltipNode, options.tooltipForm, options.mxObject);
+        if (options.mxObjectCustom) {
+            openTooltipForm(options.tooltipNode, options.tooltipForm, options.mxObjectCustom);
         } else if (options.trace && options.options.dataEntity) {
             this.createDataPoint(options.options, options.trace)
-                .then(mxObject => openTooltipForm(options.tooltipNode, options.tooltipForm, mxObject))
+                .then(mxObject => {
+                    const mxObjectCustom = { entity: mxObject.getEntity(), guid: mxObject.getGuid() };
+                    openTooltipForm(options.tooltipNode, options.tooltipForm, mxObjectCustom);
+                })
                 .catch(error => mx.ui.error(`An error occured while creating ${options.options.dataEntity} object: ${error}`));
         }
     }
@@ -145,6 +167,22 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
                 error: error => reject(error.message)
             });
         });
+    }
+
+    private onStartAction() {
+        this.isRunningAction = true;
+        setTimeout(() => {
+            if (this.isRunningAction) {
+                this.showProgress = mx.ui.showProgress();
+            }
+        } , 120);
+    }
+
+    private onStopAction() {
+        this.isRunningAction = false;
+        if (this.showProgress) {
+            mx.ui.hideProgress(this.showProgress);
+        }
     }
 }
 

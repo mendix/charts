@@ -5,6 +5,11 @@ import { ChartConfigs } from "./configs";
 export namespace Container {
     import SeriesProps = Data.SeriesProps;
 
+    export interface MxClick {
+        entity: string;
+        guid: string;
+    }
+
     export interface WrapperProps {
         "class"?: string;
         mxform: mxui.lib.form._FormBase;
@@ -139,6 +144,15 @@ export namespace Container {
         valuePercentage: number;
         colour: number;
     }
+
+    export interface SampleTrace {
+        seriesName: string;
+        trace: {
+            x: (string | number)[];
+            y: (string | number)[];
+        };
+    }
+
     export interface AnyChartContainerPropsBase extends WrapperProps, Style.Dimensions {
         dataStatic: string;
         dataAttribute: string;
@@ -212,6 +226,8 @@ export namespace Data {
         seriesNameAttribute: string;
         colorAttribute: string;
         fillColorAttribute: string;
+        seriesSortAttribute: string;
+        seriesSortOrder: SortOrder;
     }
 
     export interface SeriesDataSourceProps extends DataSourceProps {
@@ -222,6 +238,7 @@ export namespace Data {
     }
 
     export type SortOrder = "asc" | "desc";
+    export type AggregationType = "none" | "count" | "sum" | "avg" | "min" | "max" | "median" | "mode" | "first" | "last" | "stddev";
 
     export interface EventProps {
         onClickEvent: "doNothing" | "showPage" | "callMicroflow" | "callNanoflow";
@@ -233,14 +250,14 @@ export namespace Data {
     }
 
     export interface OnClickOptions<T = any, O extends EventProps = EventProps> {
-        mxObject?: mendix.lib.MxObject;
+        mxObjectCustom?: Container.MxClick;
         trace?: T;
         mxForm: mxui.lib.form._FormBase;
         options: O;
     }
 
     export interface OnHoverOptions<T = any, O extends DataSourceProps = DataSourceProps> {
-        mxObject?: mendix.lib.MxObject;
+        mxObjectCustom?: Container.MxClick;
         options: O;
         tooltipForm: string;
         tooltipNode: HTMLDivElement;
@@ -252,6 +269,7 @@ export namespace Data {
         seriesOptions: string;
         barColor: string;
         color?: string; // All serie barColor, lineColor, bubbleColor etc should be replaced with 'color'
+        aggregationType: AggregationType;
     }
 
     export interface LineSeriesProps extends SeriesProps {
