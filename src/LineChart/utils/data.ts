@@ -92,7 +92,7 @@ export const getMarkerSizeReference = (series: LineSeriesProps, markerSize: numb
 
 export const calculateBubbleSize = (series: LineSeriesProps[], scatterData: ScatterData[], dimensions: Dimensions) => {
     return scatterData.map((data, index) => {
-        const sizeref = getMarkerSizeReference(series[index], data.marker.size as number[], dimensions);
+        const sizeref = series.length ? getMarkerSizeReference(series[index], data.marker.size as number[], dimensions) : 1;
 
         return {
             ...deepMerge.all<ScatterData>([ data, {
