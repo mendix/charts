@@ -2,6 +2,7 @@ import {
     ALERT_MESSAGE,
     AnyChartAction,
     AnyChartData,
+    CLEAR_INSTANCE_STATE,
     FETCHED_DATA,
     NO_CONTEXT,
     TOGGLE_FETCHING_DATA,
@@ -48,3 +49,5 @@ export const fetchData = (props: AnyChartDataHandlerProps) => {
 };
 export const updateDataFromPlayground = (instanceID: string, data: AnyChartData) =>
     ({ type: UPDATE_DATA_FROM_PLAYGROUND, instanceID, ...data });
+export const clearInstanceState = (instanceID: string) =>
+    ({ type: CLEAR_INSTANCE_STATE, instanceID });

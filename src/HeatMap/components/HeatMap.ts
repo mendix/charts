@@ -138,12 +138,13 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
                     z: point.z as number
                 }
             });
+            window.isHovered = true;
         }
     }
 
     private onHover = ({ points, event }: ScatterHoverData<any>) => {
         const { x, y, z, text } = points[0];
-        if (event && this.tooltipNode) {
+        if (event && this.tooltipNode && !window.isHovered) {
             unmountComponentAtNode(this.tooltipNode);
             const coordinates = getTooltipCoordinates(event, this.tooltipNode);
             if (coordinates) {
@@ -159,6 +160,7 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
                             z: z as number
                         }
                     });
+                    window.isHovered = true;
                 } else if (points[0].data.hoverinfo === "none" as any) {
                     render(createElement(HoverTooltip, { text: text || z }), this.tooltipNode);
                 } else {

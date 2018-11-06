@@ -26,6 +26,12 @@ export interface ComponentProps {
     onResize?: (node: HTMLDivElement) => void;
 }
 
+declare global {
+    interface Window { isHovered: boolean; }
+}
+
+window.isHovered = window.isHovered || false;
+
 type PlotlyChartProps = ComponentProps & typeof PlotlyChartActions & PlotlyChartInstance;
 
 class PlotlyChart extends Component<PlotlyChartProps> {
@@ -119,7 +125,7 @@ class PlotlyChart extends Component<PlotlyChartProps> {
                         myPlot.on("plotly_click", onClick as any);
                     }
                     if (onHover) {
-                        myPlot.on("plotly_hover", onHover as any);
+                        myPlot.on("plotly_hover", onHover as any); // TODO: apply chat fix from the github issue
                     }
                     myPlot.on("plotly_unhover", this.clearTooltip);
                     if (onRestyle) {
@@ -153,6 +159,7 @@ class PlotlyChart extends Component<PlotlyChartProps> {
     private clearTooltip = () => {
         if (this.tooltipNode) {
             this.tooltipNode.style.opacity = "0";
+            window.isHovered = false;
         }
     }
 

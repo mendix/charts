@@ -142,11 +142,12 @@ class PieChart extends Component<PieChartProps & PieChartState> {
                     value: point.value
                 }
             });
+            window.isHovered = true;
         }
     }
 
     private onHover = ({ event, points }: PieHoverData<Container.MxClick[]>) => {
-        if (event && this.tooltipNode) {
+        if (event && this.tooltipNode && !window.isHovered) {
             unmountComponentAtNode(this.tooltipNode);
             const coordinates = getTooltipCoordinates(event, this.tooltipNode);
             if (coordinates) {
@@ -163,6 +164,7 @@ class PieChart extends Component<PieChartProps & PieChartState> {
                             value: point.value
                         }
                     });
+                    window.isHovered = true;
                 } else if (points[0].data.hoverinfo === "none") {
                     render(createElement(HoverTooltip, { text: points[0].label }), this.tooltipNode);
                 } else {

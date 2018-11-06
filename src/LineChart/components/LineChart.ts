@@ -141,12 +141,13 @@ class LineChart extends Component<LineChartProps & LineChartState> {
                     size: (points[0] as any)["marker.size"]
                 } as any // FIXME: some type issue making noise here
             });
+            window.isHovered = true;
         }
     }
 
     private onHover = ({ event, points }: ScatterHoverData<Container.MxClick>) => {
         const { customdata, data, r, x, y, text } = points[0];
-        if (event && this.tooltipNode) {
+        if (event && this.tooltipNode && !window.isHovered) {
             unmountComponentAtNode(this.tooltipNode);
             const coordinates = getTooltipCoordinates(event, this.tooltipNode);
             if (coordinates) {
@@ -164,6 +165,7 @@ class LineChart extends Component<LineChartProps & LineChartState> {
                             size: (points[0] as any)["marker.size"]
                         } as any // FIXME: some type issue making noise here
                     });
+                    window.isHovered = true;
                 } else if (points[0].data.hoverinfo === "none" as any) {
                     render(createElement(HoverTooltip, { text: text || y || r }), this.tooltipNode);
                 } else {

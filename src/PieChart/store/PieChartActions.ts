@@ -2,6 +2,7 @@ import { ReactChild } from "react";
 import { Dispatch } from "react-redux";
 import {
     ALERT_MESSAGE,
+    CLEAR_INSTANCE_STATE,
     FETCH_DATA_FAILED,
     FETCH_THEME_CONFIGS,
     FETCH_THEME_CONFIGS_COMPLETE,
@@ -86,3 +87,5 @@ export const updateDataFromPlayground = (instanceID: string, dataOptions: string
     });
 export const toggleUpdatingData = (instanceID: string, updatingData: boolean): Partial<PieChartAction> =>
     ({ type: TOGGLE_UPDATING_DATA, instanceID, updatingData });
+export const clearInstanceState = (instanceID: string) =>
+    ({ type: CLEAR_INSTANCE_STATE, instanceID });

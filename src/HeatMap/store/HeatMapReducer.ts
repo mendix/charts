@@ -41,6 +41,7 @@ export const LOAD_PLAYGROUND = `${prefix}.LOAD_PLAYGROUND`;
 export const UPDATE_DATA_FROM_PLAYGROUND = `${prefix}.UPDATE_DATA_FROM_PLAYGROUND`;
 export const FETCH_THEME_CONFIGS = `${prefix}.FETCH_THEME_CONFIGS`;
 export const FETCH_THEME_CONFIGS_COMPLETE = `${prefix}.FETCH_THEME_CONFIGS_COMPLETE`;
+export const CLEAR_INSTANCE_STATE = `${prefix}.CLEAR_INSTANCE_STATE`;
 
 export const defaultInstanceState: Partial<HeatMapState> = {
     fetchingData: false,
@@ -136,6 +137,10 @@ export const heatmapReducer: Reducer<HeatMapReducerState> = (state = {} as HeatM
                     updatingData: true
                 }
             };
+        case CLEAR_INSTANCE_STATE:
+            delete state[action.instanceID];
+
+            return { ...state };
         default:
             return state;
     }

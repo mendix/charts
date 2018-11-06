@@ -83,6 +83,7 @@ class HeatMapDataHandler extends Component<HeatMapDataHandlerProps> {
     componentWillUnmount() {
         this.unsubscribe();
         this.clearRefreshInterval();
+        this.props.clearInstanceState(this.props.instanceID);
     }
 
     private unsubscribe() {
