@@ -81,6 +81,7 @@ export class BarChartDataHandler extends Component<BarChartDataHandlerProps> {
     componentWillUnmount() {
         this.unsubscribe();
         this.clearRefreshInterval();
+        this.props.clearInstanceState(this.props.instanceID);
     }
 
     private resetSubscriptions(props: BarChartDataHandlerProps) {

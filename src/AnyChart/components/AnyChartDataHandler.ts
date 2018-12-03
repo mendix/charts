@@ -68,6 +68,10 @@ export class AnyChartDataHandler extends Component<AnyChartDataHandlerProps> {
         return toggleFetchingData || optionsUpdated || playgroundLoaded || !nextProps.mxObject;
     }
 
+    componentWillUnmount() {
+      this.props.clearInstanceState(this.props.instanceID);
+    }
+
     private resetSubscriptions(mxObject?: mendix.lib.MxObject) {
         this.subscriptionHandles.forEach(window.mx.data.unsubscribe);
         this.subscriptionHandles = [];

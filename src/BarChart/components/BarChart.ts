@@ -129,12 +129,13 @@ class BarChart extends Component<BarChartProps & BarChartState> {
                     y: this.props.orientation === "bar" ? x as number : y as number
                 }
             });
+            window.isHovered = true;
         }
     }
 
     private onHover = ({ event, points }: ScatterHoverData<Container.MxClick>) => {
         const { customdata, data, x, y } = points[0];
-        if (event && this.tooltipNode && this.tooltipNode.style.opacity !== "1") {
+        if (event && this.tooltipNode && this.tooltipNode.style.opacity !== "1" && !window.isHovered) {
             unmountComponentAtNode(this.tooltipNode);
             const coordinates = getTooltipCoordinates(event, this.tooltipNode);
             if (coordinates) {
@@ -151,6 +152,7 @@ class BarChart extends Component<BarChartProps & BarChartState> {
                             y: this.props.orientation === "bar" ? x as number : y as number
                         }
                     });
+                    window.isHovered = true;
                 } else if (points[0].data.hoverinfo === "none" as any) {
                     render(createElement(HoverTooltip, {
                         text: this.props.orientation === "bar" ? x : y

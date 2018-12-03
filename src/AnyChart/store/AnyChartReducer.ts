@@ -33,6 +33,7 @@ export const TOGGLE_FETCHING_DATA = `${prefix}.TOGGLE_FETCHING_DATA`;
 export const NO_CONTEXT = `${prefix}.NO_CONTEXT`;
 export const LOAD_PLAYGROUND = `${prefix}.LOAD_PLAYGROUND`;
 export const UPDATE_DATA_FROM_PLAYGROUND = `${prefix}.UPDATE_DATA_FROM_PLAYGROUND`;
+export const CLEAR_INSTANCE_STATE = `${prefix}.CLEAR_INSTANCE_STATE`;
 
 export const defaultInstanceState: Partial<AnyChartInstanceState> = {
     alertMessage: "",
@@ -100,6 +101,10 @@ export const anyChartReducer: Reducer<AnyChartReducerState> = (state = {} as Any
                     ...state[action.instanceID],
                     alertMessage: action.alertMessage
                 } };
+        case CLEAR_INSTANCE_STATE:
+            delete state[action.instanceID];
+
+            return { ...state };
         default:
             return state;
     }

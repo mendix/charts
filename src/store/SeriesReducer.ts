@@ -37,7 +37,8 @@ export const seriesActionType = (prefix: string) => ({
     LOAD_PLAYGROUND: `${prefix}.LOAD_PLAYGROUND`,
     UPDATE_DATA_FROM_PLAYGROUND: `${prefix}.UPDATE_DATA_FROM_PLAYGROUND`,
     FETCH_THEME_CONFIGS: `${prefix}.FETCH_THEME_CONFIGS`,
-    FETCH_THEME_CONFIGS_COMPLETE: `${prefix}.FETCH_THEME_CONFIGS_COMPLETE`
+    FETCH_THEME_CONFIGS_COMPLETE: `${prefix}.FETCH_THEME_CONFIGS_COMPLETE`,
+    CLEAR_INSTANCE_STATE: `${prefix}.CLEAR_INSTANCE_STATE`
 });
 
 export const seriesReducer = <T extends SeriesInstanceState, A extends InstanceAction>
@@ -144,6 +145,10 @@ export const seriesReducer = <T extends SeriesInstanceState, A extends InstanceA
                             alertMessage: action.alertMessage
                         } as T
                     };
+                case seriesActionType(actionPrefix).CLEAR_INSTANCE_STATE:
+                    delete state[action.instanceID];
+
+                    return { ...state };
                 default:
                     return state;
             }

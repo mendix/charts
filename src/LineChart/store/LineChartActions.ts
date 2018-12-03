@@ -222,3 +222,5 @@ export const updateDataFromPlayground = (instanceID: string, scatterData: Scatte
 };
 export const toggleUpdatingData = (instanceID: string, updatingData: boolean): Partial<LineChartAction> =>
     ({ type: actionType.TOGGLE_UPDATING_DATA, instanceID, updatingData });
+export const clearInstanceState = (instanceID: string) =>
+    ({ type: actionType.CLEAR_INSTANCE_STATE, instanceID });

@@ -76,6 +76,7 @@ export class PieChartDataHandler extends Component<PieChartDataHandlerProps> {
     componentWillUnmount() {
         this.unsubscribe();
         this.clearRefreshInterval();
+        this.props.clearInstanceState(this.props.instanceID);
     }
 
     private unsubscribe() {
