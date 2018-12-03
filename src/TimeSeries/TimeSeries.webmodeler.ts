@@ -2,6 +2,7 @@ import { Component, createElement } from "react";
 import { Provider } from "react-redux";
 import deepMerge from "deepmerge";
 import { store } from "../store";
+import "../LineChart/store/LineChartReducer"; // ==important==: without this, the reducer shall not be registered.
 
 import LineChart from "../LineChart/components/LineChart";
 
