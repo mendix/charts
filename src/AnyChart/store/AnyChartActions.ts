@@ -47,7 +47,9 @@ export const fetchData = (props: AnyChartDataHandlerProps) => {
         instanceID
     };
 };
+
 export const updateDataFromPlayground = (instanceID: string, data: AnyChartData) =>
     ({ type: UPDATE_DATA_FROM_PLAYGROUND, instanceID, ...data });
+
 export const clearInstanceState = (instanceID: string) =>
     ({ type: CLEAR_INSTANCE_STATE, instanceID });

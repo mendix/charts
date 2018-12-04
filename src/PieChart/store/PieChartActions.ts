@@ -85,7 +85,9 @@ export const updateDataFromPlayground = (instanceID: string, dataOptions: string
         layoutOptions,
         configurationOptions
     });
+
 export const toggleUpdatingData = (instanceID: string, updatingData: boolean): Partial<PieChartAction> =>
     ({ type: TOGGLE_UPDATING_DATA, instanceID, updatingData });
+
 export const clearInstanceState = (instanceID: string) =>
     ({ type: CLEAR_INSTANCE_STATE, instanceID });
