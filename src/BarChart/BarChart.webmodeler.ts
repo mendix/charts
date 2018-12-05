@@ -16,7 +16,7 @@ import BarChartContainerProps = Container.BarChartContainerProps;
 // tslint:disable-next-line class-name
 export class preview extends Component<BarChartContainerProps, { updatingData: boolean }> {
     readonly state = { updatingData: true };
-    private instanceID = getInstanceID(this.props.friendlyId, store, "bar");
+    private instanceID = this.props.uniqueid || getInstanceID(this.props.friendlyId, store, "bar");
     private scatterData = preview.getData(this.props);
 
     render() {

@@ -17,6 +17,7 @@ export namespace Container {
         style?: string;
         readOnly: boolean;
         friendlyId: string;
+        uniqueid: string;
     }
 
     export interface LayoutProps {

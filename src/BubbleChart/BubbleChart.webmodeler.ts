@@ -16,7 +16,7 @@ import LineChartContainerProps = Container.LineChartContainerProps;
 // tslint:disable-next-line class-name
 export class preview extends Component<LineChartContainerProps, { updatingData: boolean }> {
     readonly state = { updatingData: true };
-    private instanceID = getInstanceID(this.props.friendlyId, store, "scatter");
+    private instanceID = this.props.uniqueid || getInstanceID(this.props.friendlyId, store, "scatter");
     private scatterData = preview.getData(this.props);
 
     render() {

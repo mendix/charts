@@ -12,7 +12,7 @@ __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../wi
 
 class LineChartContainer extends Component<LineChartContainerProps> {
     static defaultProps: Partial<LineChartContainerProps> = { fill: false, type: "line" };
-    private instanceID = getInstanceID(this.props.friendlyId, store, "scatter");
+    private instanceID = this.props.uniqueid || getInstanceID(this.props.friendlyId, store, "scatter");
 
     render() {
         return createElement(Provider, { store },

@@ -12,7 +12,7 @@ __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../wi
 
 class BarChartContainer extends Component<BarChartContainerProps> {
     static defaultProps: Partial<BarChartContainerProps> = { orientation: "bar" };
-    private instanceID = getInstanceID(this.props.friendlyId, store, "bar");
+    private instanceID = this.props.uniqueid || getInstanceID(this.props.friendlyId, store, "bar");
 
     render() {
         return createElement(Provider, { store },

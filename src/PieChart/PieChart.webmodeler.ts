@@ -16,7 +16,7 @@ import PieChartContainerProps = Container.PieChartContainerProps;
 // tslint:disable-next-line class-name
 export class preview extends Component<PieChartContainerProps, { updatingData: boolean }> {
     readonly state = { updatingData: true };
-    private instanceID = getInstanceID(this.props.friendlyId, store, "pie");
+    private instanceID = this.props.uniqueid || getInstanceID(this.props.friendlyId, store, "pie");
     private scatterData = preview.getData(this.props);
 
     render() {
