@@ -10,7 +10,7 @@ import HeatMapDataHandler from "./HeatMapDataHandler";
 __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
 class HeatMapContainer extends Component<Container.HeatMapContainerProps> {
-    private instanceID = getInstanceID(this.props.friendlyId, store, "heatmap");
+    private instanceID = this.props.uniqueid || getInstanceID(this.props.friendlyId, store, "heatmap");
 
     render() {
         return createElement(Provider, { store },

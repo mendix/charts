@@ -11,7 +11,7 @@ import AnyChartContainerProps = Container.AnyChartContainerProps;
 __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
 class AnyChartContainer extends Component<AnyChartContainerProps> {
-    private instanceID = getInstanceID(this.props.friendlyId, store, "any");
+    private instanceID = this.props.uniqueid || getInstanceID(this.props.friendlyId, store, "any");
 
     render() {
         return createElement(Provider, { store },

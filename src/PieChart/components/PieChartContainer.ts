@@ -11,7 +11,7 @@ import PieChartContainerProps = Container.PieChartContainerProps;
 __webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
 
 class PieChartContainer extends Component<PieChartContainerProps> {
-    private instanceID = getInstanceID(this.props.friendlyId, store, "pie");
+    private instanceID = this.props.uniqueid || getInstanceID(this.props.friendlyId, store, "pie");
 
     render() {
         return createElement(Provider, { store },

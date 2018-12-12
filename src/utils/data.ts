@@ -525,7 +525,8 @@ export const renderError = (id: string, errorMessages: string[]) => {
 
 type ReduxStoreKey = "scatter" | "bar" | "pie" | "heatmap" | "any";
 
-export const generateInstanceID = (friendlyId: string) => `${friendlyId}-${Math.round(Math.random() * 20)}`;
+export const generateInstanceID = (friendlyId: string) => `${friendlyId}-${Math.round(Math.random() * 2000)}`; // Needed to uniquely identify charts in listview.
+
 export const getInstanceID = (friendlyId: string, store: Store, reduxStoreKey: ReduxStoreKey): string => {
     let instanceID = generateInstanceID(friendlyId);
     const instances: string[] = Object.keys(store.getState()[reduxStoreKey]);

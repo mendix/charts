@@ -147,6 +147,7 @@ export const updateDataFromPlayground = (instanceID: string, dataOptions: string
         layoutOptions,
         configurationOptions
     });
+
 export const toggleUpdatingData = (instanceID: string, updatingData: boolean): Partial<HeatMapAction> =>
     ({ type: TOGGLE_UPDATING_DATA, instanceID, updatingData });
 

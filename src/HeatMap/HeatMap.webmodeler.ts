@@ -17,7 +17,7 @@ import HeatMapContainerProps = Container.HeatMapContainerProps;
 // tslint:disable-next-line class-name
 export class preview extends Component<HeatMapContainerProps, { updatingData: boolean }> {
     readonly state = { updatingData: true };
-    private instanceID = getInstanceID(this.props.friendlyId, store, "heatmap");
+    private instanceID = this.props.uniqueid || getInstanceID(this.props.friendlyId, store, "heatmap");
     private scatterData = deepMerge.all([
         getDefaultDataOptions(this.props as HeatMapProps),
         preview.getData(this.props)
