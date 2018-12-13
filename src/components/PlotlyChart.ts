@@ -78,6 +78,7 @@ class PlotlyChart extends Component<PlotlyChartProps> {
     componentWillUnmount() {
         if (this.chartNode && this.props.plotly) {
             this.props.plotly.purge(this.chartNode);
+            this.props.clearInstanceState(this.props.widgetID);
         }
     }
 

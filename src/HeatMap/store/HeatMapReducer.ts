@@ -138,9 +138,10 @@ export const heatmapReducer: Reducer<HeatMapReducerState> = (state = {} as HeatM
                 }
             };
         case CLEAR_INSTANCE_STATE:
-            delete state[action.instanceID];
+            const newState = { ...state };
+            delete newState[action.instanceID];
 
-            return { ...state };
+            return newState;
         default:
             return state;
     }

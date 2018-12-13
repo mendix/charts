@@ -29,6 +29,7 @@ export const RESET = `${prefix}.RESET`;
 export const TOGGLE_PLOTLY_API_LOADING = `${prefix}.TOGGLE_PLOTLY_API_LOADING`;
 export const TOGGLE_PLOTLY_DATA_LOADING = `${prefix}.TOGGLE_PLOTLY_DATA_LOADING`;
 export const UPDATE_DATA = `${prefix}.UPDATE_DATA`;
+export const CLEAR_INSTANCE_STATE = `${prefix}.CLEAR_INSTANCE_STATE`;
 
 export const defaultPlotlyInstanceState: Partial<PlotlyChartInstance> = {
     loadingAPI: true,
@@ -74,6 +75,11 @@ export const plotlyChartReducer: Reducer<PlotlyChartState> = (state = defaultSta
             };
         case RESET:
             return defaultState as PlotlyChartState;
+        case CLEAR_INSTANCE_STATE:
+            const newState: PlotlyChartState = { ...state };
+            delete newState[action.widgetID];
+
+            return newState;
         default:
             return state;
     }

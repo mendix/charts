@@ -102,9 +102,10 @@ export const anyChartReducer: Reducer<AnyChartReducerState> = (state = {} as Any
                     alertMessage: action.alertMessage
                 } };
         case CLEAR_INSTANCE_STATE:
-            delete state[action.instanceID];
+            const newState = { ...state };
+            delete newState[action.instanceID];
 
-            return { ...state };
+            return newState;
         default:
             return state;
     }
