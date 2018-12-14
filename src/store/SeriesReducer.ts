@@ -146,9 +146,10 @@ export const seriesReducer = <T extends SeriesInstanceState, A extends InstanceA
                         } as T
                     };
                 case seriesActionType(actionPrefix).CLEAR_INSTANCE_STATE:
-                    delete state[action.instanceID];
+                    const newState = { ...state };
+                    delete newState[action.instanceID];
 
-                    return { ...state };
+                    return newState;
                 default:
                     return state;
             }

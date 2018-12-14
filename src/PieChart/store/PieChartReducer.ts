@@ -139,9 +139,10 @@ export const pieChartReducer: Reducer<PieChartReducerState> = (state = {} as Pie
                 }
             };
         case CLEAR_INSTANCE_STATE:
-            delete state[action.instanceID];
+            const newState = { ...state };
+            delete newState[action.instanceID];
 
-            return { ...state };
+            return newState;
         default:
             return state;
     }

@@ -1,4 +1,5 @@
 import {
+    CLEAR_INSTANCE_STATE,
     ChartData,
     Plotly,
     RESET,
@@ -13,3 +14,6 @@ export const togglePlotlyAPILoading = (widgetID: string, loadingAPI: boolean, pl
 export const togglePlotlyDataLoading = (widgetID: string, loadingData: boolean) =>
     ({ type: TOGGLE_PLOTLY_DATA_LOADING, widgetID, loadingData });
 export const updateData = (widgetID: string, data: ChartData) => ({ type: UPDATE_DATA, widgetID, ...data });
+
+export const clearInstanceState = (instanceID: string) =>
+    ({ type: CLEAR_INSTANCE_STATE, instanceID });
