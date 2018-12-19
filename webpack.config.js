@@ -3,9 +3,13 @@ const webpack = require("webpack");
 const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const ForkTsCheckerWebpackPlugin = require("fork-ts-checker-webpack-plugin");
 // const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 // new BundleAnalyzerPlugin()
 
+const packageName = process.env.npm_package_name;
+const mxHost = process.env.npm_package_config_mendixHost || "http://localhost:8287";
+const developmentPort = process.env.npm_package_config_developmentPort || "3000";
 const widgetName = require("./package").widgetName[0];
 
 const widgetConfig = {
@@ -22,11 +26,35 @@ const widgetConfig = {
     },
     output: {
         jsonpFunction: "webpackJsonpCharts",
-        path: path.resolve(__dirname, "dist/tmp/src"),
+        path: path.resolve(__dirname, "dist/tmp/widgets"),
         filename: "com/mendix/widget/custom/[name]/[name].js",
         chunkFilename: `com/mendix/widget/custom/${widgetName.toLowerCase()}/chunk[chunkhash].js`,
         libraryTarget: "umd",
         publicPath: "/"
+    },
+    devServer: {
+        port: developmentPort,
+        proxy: [ {
+            target: mxHost,
+            context: [ "**", `!/widgets/com/mendix/widget/custom/${widgetName}/*.js` ],
+            ws: true,
+            onError: function(err, req, res) {
+                if (res && res.writeHead) {
+                    res.writeHead(500, {
+                        "Content-Type": "text/plain"
+                    });
+                    if (err.code === "ECONNREFUSED") {
+                        res.end("Please make sure that the Mendix server is running at " + mxHost
+                            + " or change the configuration \n "
+                            + "> npm config set " + packageName + ":mendixhost http://host:port");
+                    } else {
+                        res.end("Error connecting to Mendix server"
+                        + "\n " + JSON.stringify(err, null, 2));
+                    }
+                }
+            }
+        } ],
+        stats: "errors-only"
     },
     resolve: {
         extensions: [ ".ts", ".js" ],
@@ -35,11 +63,16 @@ const widgetConfig = {
         }
     },
     devtool: "eval",
+    mode: "development",
     module: {
         rules: [
             {
                 test: /\.ts$/,
-                use: "ts-loader"
+                loader: "ts-loader",
+                options: {
+                    // disable type checker - we will use it in fork plugin
+                    transpileOnly: true 
+                }
             },
             {
                 test: /\.css$/, loader: ExtractTextPlugin.extract({
@@ -58,9 +91,18 @@ const widgetConfig = {
     },
     externals: [ "react", "react-dom" ],
     plugins: [
+        new ForkTsCheckerWebpackPlugin(),
         new CopyWebpackPlugin([
-            { from: "src/**/*.js", to: "../", ignore: [ "src/AnyChart/*.js" ] },
-            { from: "src/**/*.xml", to: "../", ignore: [ "src/AnyChart/*.xml" ] }
+            {
+                from: "src/**/*.xml",
+                toType: "template",
+                to: "[name]/[name].[ext]",
+                ignore: ["src/package.xml", "src/AnyChart/*.xml"]
+            },
+            {
+                from: "src/package.xml",
+                to: "package.xml"
+            }
         ], {
             copyUnmodified: true
         }),
@@ -138,8 +180,8 @@ const previewConfig = {
         // PolarChart: "./src/PolarChart/PolarChart.webmodeler.ts"
     },
     output: {
-        path: path.resolve(__dirname, "dist/tmp"),
-        filename: "src/[name]/[name].webmodeler.js",
+        path: path.resolve(__dirname, "dist/tmp/widgets"),
+        filename: "[name]/[name].webmodeler.js",
         libraryTarget: "commonjs"
     },
     resolve: {
