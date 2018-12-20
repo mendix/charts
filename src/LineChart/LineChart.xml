@@ -83,6 +83,7 @@
                         <attributeType name="String"/>
                         <attributeType name="AutoNumber"/>
                         <attributeType name="DateTime"/>
+                        <attributeType name="Enum"/>
                     </attributeTypes>
                 </property>
                 <property key="sortOrder" type="enumeration" defaultValue="asc">
@@ -178,6 +179,7 @@
                         <attributeType name="String"/>
                         <attributeType name="AutoNumber"/>
                         <attributeType name="DateTime"/>
+                        <attributeType name="Enum"/>
                     </attributeTypes>
                 </property>
                 <property key="seriesSortOrder" type="enumeration" defaultValue="asc">
