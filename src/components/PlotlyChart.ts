@@ -43,7 +43,7 @@ class PlotlyChart extends Component<PlotlyChartProps> {
         return createElement("div",
             {
                 className: classNames(`widget-charts widget-charts-${this.props.type}`, this.props.className, {
-                    loading: this.props.loadingData
+                    loading: this.props.loadingData && !this.props.refresh
                 }),
                 style: this.props.style
             },
@@ -87,7 +87,7 @@ class PlotlyChart extends Component<PlotlyChartProps> {
     }
 
     private renderLoadingIndicator() {
-        return this.props.loadingAPI || this.props.loadingData ? createElement(ChartLoading) : null;
+        return !this.props.refresh && (this.props.loadingAPI || this.props.loadingData) ? createElement(ChartLoading) : null;
     }
 
     private getPlotlyNodeRef = (node: HTMLDivElement) => {
