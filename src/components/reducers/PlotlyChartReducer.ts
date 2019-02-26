@@ -11,6 +11,7 @@ export interface ChartData {
 export interface PlotlyChartInstance extends ChartData {
     loadingAPI: boolean;
     loadingData: boolean;
+    refresh: boolean;
     plotly?: Plotly;
 }
 

@@ -88,6 +88,7 @@ class LineChart extends Component<LineChartProps & LineChartState> {
                 widgetID: this.props.instanceID,
                 loadingAPI: this.props.loadingAPI && playgroundLoaded,
                 loadingData: this.props.fetchingData,
+                refresh: this.props.refreshInterval > 0,
                 layout: this.props.layout,
                 data: this.props.data,
                 config: this.props.config,
