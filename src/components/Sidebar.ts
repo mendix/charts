@@ -42,10 +42,14 @@ export class Sidebar extends Component<SidebarProps, {}> {
                 const element = this.props.children.find(child =>
                     isValidElement(child) && child.type === (type === "HEADER" ? SidebarHeader : SidebarContent)
                 );
-
-                return type === "HEADER"
-                    ? cloneElement(element as ReactElement<any>, { onClose: this.props.onClose })
-                    : element;
+                if (element) {
+                    return type === "HEADER"
+                        ? cloneElement(element as ReactElement<any>, { onClose: this.props.onClose })
+                        : element;
+                } else {
+                    // can happen with hot module reloading
+                    return null;
+                }
             } else if (isValidElement(this.props.children)) {
                 return this.props.children.type === (type === "HEADER" ? SidebarHeader : SidebarContent)
                     ? cloneElement(this.props.children as ReactElement<any>, { onClose: this.props.onClose })

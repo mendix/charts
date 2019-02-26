@@ -8,7 +8,7 @@ import { Container } from "../../utils/namespaces";
 import PieChartDataHandler from "./PieChartDataHandler";
 import PieChartContainerProps = Container.PieChartContainerProps;
 
-__webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
+__webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../` : "../";
 
 class PieChartContainer extends Component<PieChartContainerProps> {
     private instanceID = this.props.uniqueid || getInstanceID(this.props.friendlyId, store, "pie");

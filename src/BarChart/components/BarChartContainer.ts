@@ -8,7 +8,7 @@ import BarChartDataHandler from "./BarChartDataHandler";
 import { Container } from "../../utils/namespaces";
 import BarChartContainerProps = Container.BarChartContainerProps;
 
-__webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
+__webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../` : "../";
 
 class BarChartContainer extends Component<BarChartContainerProps> {
     static defaultProps: Partial<BarChartContainerProps> = { orientation: "bar" };

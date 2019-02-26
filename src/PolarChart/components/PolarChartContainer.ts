@@ -3,7 +3,7 @@ import { SFC, createElement } from "react";
 import LineChartContainer from "../../LineChart/components/LineChartContainer";
 import { Container } from "../../utils/namespaces";
 
-__webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
+__webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../` : "../";
 
 const PolarChartContainer: SFC<Container.PolarChartContainerProps> = props =>
     createElement(LineChartContainer, {

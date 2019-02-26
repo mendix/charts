@@ -3,7 +3,7 @@ import { Component, createElement } from "react";
 import { Container, Data } from "../../utils/namespaces";
 import LineChartContainer from "../../LineChart/components/LineChartContainer";
 
-__webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
+__webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../` : "../";
 
 export default class BubbleChartContainer extends Component<Container.LineChartContainerProps> {
     render() {

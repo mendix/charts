@@ -2,17 +2,12 @@
 const webpack = require("webpack");
 const webpackConfig = require("./webpack.config");
 const merge = require("webpack-merge");
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 const widgetNames = Object.keys(webpackConfig[0].entry);
 
 const webpackConfigRelease = webpackConfig.map(config => merge(config, {
     mode: "production",
     devtool: false,
     plugins: [
-        new UglifyJsPlugin({
-            parallel: true,
-            cache: true
-        }),
         new webpack.DefinePlugin({
             "process.env.NODE_ENV": JSON.stringify("production")
         })
@@ -69,7 +64,7 @@ module.exports = function(grunt) {
                 files: [
                     {
                         dest: "./dist/MxTestProject/deployment/web/widgets",
-                        cwd: "./dist/tmp/widegts/",
+                        cwd: "./dist/tmp/widgets/",
                         src: [ "**/*" ],
                         expand: true
                     },

@@ -26,9 +26,9 @@ const widgetConfig = {
     },
     output: {
         jsonpFunction: "webpackJsonpCharts",
-        path: path.resolve(__dirname, "dist/tmp/widgets"),
-        filename: "com/mendix/widget/custom/[name]/[name].js",
-        chunkFilename: `com/mendix/widget/custom/${widgetName.toLowerCase()}/chunk[chunkhash].js`,
+        path: path.resolve(__dirname, "dist/tmp"),
+        filename: "widgets/com/mendix/widget/custom/[name]/[name].js",
+        chunkFilename: `widgets/com/mendix/widget/custom/${widgetName.toLowerCase()}/chunk[chunkhash].js`,
         libraryTarget: "umd",
         publicPath: "/"
     },
@@ -36,8 +36,19 @@ const widgetConfig = {
         port: developmentPort,
         proxy: [ {
             target: mxHost,
-            context: [ "**", `!/widgets/com/mendix/widget/custom/${widgetName}/*.js` ],
-            ws: true,
+            context: [ "**",
+                `!/widgets/com/mendix/widget/custom/ColumnChart/ColumnChart.js`,
+                `!/widgets/com/mendix/widget/custom/BarChart/BarChart.js`,
+                `!/widgets/com/mendix/widget/custom/LineChart/LineChart.js`,
+                `!/widgets/com/mendix/widget/custom/AreaChart/AreaChart.js`,
+                `!/widgets/com/mendix/widget/custom/TimeSeries/TimeSeries.js`,
+                `!/widgets/com/mendix/widget/custom/PieChart/PieChart.js`,
+                `!/widgets/com/mendix/widget/custom/HeatMap/HeatMap.js`,
+                `!/widgets/com/mendix/widget/custom/BubbleChart/BubbleChart.js`,
+                `!/widgets/com/mendix/widget/custom/PolarChart/PolarChart.js`,
+                `!/**/*.hot-update.json`,
+                `!/widgets/com/mendix/widget/custom/chart/*.js`
+            ],
             onError: function(err, req, res) {
                 if (res && res.writeHead) {
                     res.writeHead(500, {
@@ -96,16 +107,14 @@ const widgetConfig = {
             {
                 from: "src/**/*.xml",
                 toType: "template",
-                to: "[name]/[name].[ext]",
+                to: "widgets/[name]/[name].[ext]",
                 ignore: ["src/package.xml", "src/AnyChart/*.xml"]
             },
             {
                 from: "src/package.xml",
-                to: "package.xml"
+                to: "widgets/package.xml"
             }
-        ], {
-            copyUnmodified: true
-        }),
+        ], { copyUnmodified: true }),
         new ExtractTextPlugin({ filename: `./com/mendix/widget/custom/[name]/ui/[name].css` }),
         new webpack.LoaderOptionsPlugin({ debug: true }),
         new webpack.IgnorePlugin(/^plotly\.js\/dist\/plotly$/)
@@ -132,6 +141,7 @@ const anyChartConfig = {
         }
     },
     devtool: "eval",
+    mode: "development",
     module: {
         rules: [
             {
@@ -188,6 +198,7 @@ const previewConfig = {
         extensions: [ ".ts", ".js" ]
     },
     devtool: "eval",
+    mode: "development",
     module: {
         rules: [
             { test: /\.ts$/, loader: "ts-loader", options: {
@@ -222,6 +233,7 @@ const anyChartPreviewConfig = {
         }
     },
     devtool: "eval",
+    mode: "development",
     module: {
         rules: [
             { test: /\.ts$/, loader: "ts-loader", options: {

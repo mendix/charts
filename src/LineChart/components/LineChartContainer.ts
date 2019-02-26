@@ -1,5 +1,7 @@
 let __webpack_public_path__: string;
 import { Component, createElement } from "react";
+import { hot } from "react-hot-loader/root";
+
 import { Provider } from "react-redux";
 import { getInstanceID } from "../../utils/data";
 import { Container } from "../../utils/namespaces";
@@ -8,7 +10,7 @@ import { store } from "../../store";
 import LineChartDataHandler from "./LineChartDataHandler";
 import LineChartContainerProps = Container.LineChartContainerProps;
 
-__webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
+__webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../` : "../";
 
 class LineChartContainer extends Component<LineChartContainerProps> {
     static defaultProps: Partial<LineChartContainerProps> = { fill: false, type: "line" };
@@ -24,4 +26,5 @@ class LineChartContainer extends Component<LineChartContainerProps> {
     }
 }
 
-export { LineChartContainer as default, __webpack_public_path__ };
+const hotContainer = hot(LineChartContainer);
+export { hotContainer as default, __webpack_public_path__ };
