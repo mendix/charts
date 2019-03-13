@@ -3,7 +3,6 @@ import chart from "./pages/default.page";
 describe("Pie Chart", () => {
     beforeAll(() => {
         chart.open();
-        browser.pause(30000);
     });
 
     it("should generate a chart", () => {
