@@ -93,12 +93,15 @@ export const getMarkerSizeReference = (series: LineSeriesProps, markerSize: numb
 export const calculateBubbleSize = (series: LineSeriesProps[], scatterData: ScatterData[], dimensions: Dimensions) => {
     return scatterData.map((data, index) => {
         const sizeref = series.length ? getMarkerSizeReference(series[index], data.marker.size as number[], dimensions) : 1;
+        // Temporary remove custom data, as it contains mx objects with circular reference.
+        const customdata = data.customdata;
+        delete data.customdata;
 
         return {
             ...deepMerge.all<ScatterData>([ data, {
                 marker: { sizemode: "diameter", sizeref }
             } ]),
-            customdata: data.customdata
+            customdata
         };
     });
 };
