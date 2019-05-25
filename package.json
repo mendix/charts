@@ -1,6 +1,7 @@
 {
   "name": "charts",
-  "widgetName": [
+  "widgetName": "Charts",
+  "packages": [
     "Charts",
     "AnyChart"
   ],
@@ -132,6 +133,7 @@
     "deepmerge": "^2.1.1",
     "element-resize-detector": "^1.1.14",
     "fast-json-patch": "^2.0.6",
+    "fibers": "^4.0.1",
     "json-source-map": "^0.4.0",
     "plotly.js": "^1.42.1",
     "react-ace": "^6.1.0",

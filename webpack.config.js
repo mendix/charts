@@ -6,7 +6,7 @@ const ExtractTextPlugin = require("extract-text-webpack-plugin");
 // const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
 // new BundleAnalyzerPlugin()
 
-const widgetName = require("./package").widgetName[0];
+const widgetName = require("./package").widgetName;
 
 const widgetConfig = {
     entry: {
