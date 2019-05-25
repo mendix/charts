@@ -53,7 +53,7 @@ export const getCustomSeriesOptions = (series: Data.SeriesProps, orientation: "b
         marker: color ? { color } : {},
         name: series.name,
         orientation: orientation === "bar" ? "h" : "v",
-        transforms: series.aggregationType !== "none" && traces ? getTransforms(series, traces) : undefined
+        transforms: series.aggregationType && series.aggregationType !== "none" && traces ? getTransforms(series, traces) : undefined
     };
     if (traces) {
         return {
