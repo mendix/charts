@@ -11,6 +11,7 @@
     "start": "cross-env NODE_ENV=development grunt",
     "emit": "tsc",
     "pretest": "tsc && npm run lint && npm run build",
+    "typeCheck": "tsc --noEmit",
     "test": "npm run test:unit && npm run test:conditional",
     "test:conditional": "node ./node_modules/mendix-widget-build-script/dist/CheckPullRequestFromFork.js && echo 'Skip tests on forked pull request' || npm run deployAndTest",
     "test:dev": "karma start",
@@ -27,7 +28,7 @@
     "deployAndTest": "npm run deploy && npm run test:e2e"
   },
   "pre-commit": [
-    "emit",
+    "typeCheck",
     "lint"
   ],
   "repository": {
