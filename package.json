@@ -1,16 +1,18 @@
 {
   "name": "charts",
-  "widgetName": [
+  "widgetName": "Charts",
+  "packages": [
     "Charts",
     "AnyChart"
   ],
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Create charts based on the Plotly library",
   "copyright": "Mendix BV",
   "scripts": {
     "start": "cross-env NODE_ENV=development grunt",
     "emit": "tsc",
     "pretest": "tsc && npm run lint && npm run build",
+    "typeCheck": "tsc --noEmit",
     "test": "npm run test:unit && npm run test:conditional",
     "test:conditional": "node ./node_modules/mendix-widget-build-script/dist/CheckPullRequestFromFork.js && echo 'Skip tests on forked pull request' || npm run deployAndTest",
     "test:dev": "karma start",
@@ -27,7 +29,7 @@
     "deployAndTest": "npm run deploy && npm run test:e2e"
   },
   "pre-commit": [
-    "emit",
+    "typeCheck",
     "lint"
   ],
   "repository": {
@@ -131,8 +133,9 @@
     "deepmerge": "^2.1.1",
     "element-resize-detector": "^1.1.14",
     "fast-json-patch": "^2.0.6",
+    "fibers": "^4.0.1",
     "json-source-map": "^0.4.0",
-    "plotly.js": "^1.42.1",
+    "plotly.js": "^1.47.4",
     "react-ace": "^6.1.0",
     "react-redux": "^5.0.7",
     "react-resize-detector": "^2.3.0",

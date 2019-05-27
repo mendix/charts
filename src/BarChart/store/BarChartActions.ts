@@ -92,6 +92,12 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                                 : seriesNameAttribute;
 
                             const seriesItems: { [key: string]: mendix.lib.MxObject[] } = {};
+                            const getAttributeValue = (mxObject: mendix.lib.MxObject, attribute: string, defaultValue?: string | boolean | number) => attribute
+                                ? mxObject.isEnum(attribute)
+                                    ? mxObject.getEnumCaption(attribute, mxObject.get(attribute) as string)
+                                    : mxObject.get(attribute)
+                                : defaultValue;
+
                             for (const item of mxObjects) {
                                 const identifier = item.get(association) as string;
                                 if (!seriesItems[identifier]) {
@@ -110,9 +116,9 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                                     sortOrder: seriesSortOrder
                                 });
                                 associatedMxObjects.forEach(associated => {
-                                    const name = seriesNameAttribute ? associated.get(seriesNameAttribute) : "";
-                                    const fillColor = fillColorAttribute ? associated.get(fillColorAttribute) : "";
-                                    const lineColor = colorAttribute ? associated.get(colorAttribute) : "";
+                                    const name = getAttributeValue(associated, seriesNameAttribute, "");
+                                    const fillColor = getAttributeValue(associated, fillColorAttribute, "");
+                                    const lineColor = getAttributeValue(associated, colorAttribute, "");
                                     returnData.push({
                                         data: seriesItems[associated.getGuid()],
                                         series: {
@@ -135,8 +141,8 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                                 }
                                 seriesNames.forEach(name => {
                                     const firstMxObject = seriesItems[name][0];
-                                    const fillColor = fillColorAttribute ? firstMxObject.get(fillColorAttribute) : undefined;
-                                    const lineColor = colorAttribute ? firstMxObject.get(colorAttribute) : undefined;
+                                    const fillColor = getAttributeValue(firstMxObject, fillColorAttribute);
+                                    const lineColor = getAttributeValue(firstMxObject, colorAttribute);
                                     returnData.push({
                                         data: seriesItems[name],
                                         series: {

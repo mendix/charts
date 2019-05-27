@@ -43,7 +43,7 @@ class PlotlyChart extends Component<PlotlyChartProps> {
         return createElement("div",
             {
                 className: classNames(`widget-charts widget-charts-${this.props.type}`, this.props.className, {
-                    loading: this.props.loadingData
+                    loading: this.props.loadingData && !this.props.refresh
                 }),
                 style: this.props.style
             },
@@ -87,7 +87,7 @@ class PlotlyChart extends Component<PlotlyChartProps> {
     }
 
     private renderLoadingIndicator() {
-        return this.props.loadingAPI || this.props.loadingData ? createElement(ChartLoading) : null;
+        return !this.props.refresh && (this.props.loadingAPI || this.props.loadingData) ? createElement(ChartLoading) : null;
     }
 
     private getPlotlyNodeRef = (node: HTMLDivElement) => {
@@ -120,6 +120,7 @@ class PlotlyChart extends Component<PlotlyChartProps> {
             });
             const layoutOptions = deepMerge.all([ layout, getDimensionsFromNode(rootNode) ]);
             const plotlyConfig = window.dojo && window.dojo.locale ? { ...config, locale: window.dojo.locale } : config;
+            logger.debug("newPlot", this.chartNode, chartData as Data[], layoutOptions, plotlyConfig);
             plotly.newPlot(this.chartNode, chartData as Data[], layoutOptions, plotlyConfig)
                 .then(myPlot => {
                     if (onClick) {

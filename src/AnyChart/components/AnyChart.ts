@@ -42,6 +42,7 @@ class AnyChart extends Component<AnyChartProps> {
             data: getData(this.props),
             loadingAPI: this.props.loadingAPI,
             loadingData: this.props.fetchingData,
+            refresh: false,
             layout: getLayoutOptions(this.props),
             config: getConfigOptions(this.props),
             plotly: this.props.plotly,

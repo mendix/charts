@@ -20,8 +20,8 @@ const webpackConfigRelease = webpackConfig.map(config => merge(config, {
 
 module.exports = function(grunt) {
     const pkg = grunt.file.readJSON("package.json");
-    const packageNameCharts = pkg.widgetName[0];
-    const packageNameAnyChart = pkg.widgetName[1];
+    const packageNameCharts = pkg.packages[0];
+    const packageNameAnyChart = pkg.packages[1];
     grunt.initConfig({
 
         watch: {
