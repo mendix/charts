@@ -120,7 +120,9 @@ class PlotlyChart extends Component<PlotlyChartProps> {
             });
             const layoutOptions = deepMerge.all([ layout, getDimensionsFromNode(rootNode) ]);
             const plotlyConfig = window.dojo && window.dojo.locale ? { ...config, locale: window.dojo.locale } : config;
-            logger.debug("newPlot", this.chartNode, chartData as Data[], layoutOptions, plotlyConfig);
+            if (window.logger) {
+                logger.debug("newPlot", this.chartNode, chartData as Data[], layoutOptions, plotlyConfig);
+            }
             plotly.newPlot(this.chartNode, chartData as Data[], layoutOptions, plotlyConfig)
                 .then(myPlot => {
                     if (onClick) {
