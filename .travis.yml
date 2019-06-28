@@ -1,3 +1,4 @@
+dist: trusty
 sudo: required
 language: node_js
 node_js:
@@ -38,4 +39,3 @@ deploy:
   on:
     repo: $TRAVIS_REPO_SLUG
     tags: true
-    
