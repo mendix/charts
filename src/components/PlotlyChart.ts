@@ -105,7 +105,7 @@ class PlotlyChart extends Component<PlotlyChartProps> {
 
     private renderChart({ config, data, layout, onClick, onHover, onRestyle }: PlotlyChartProps, plotly: Plotly) {
         const rootNode = this.chartNode && this.chartNode.parentElement as HTMLDivElement;
-        if (this.chartNode && rootNode && !this.props.loadingAPI && layout && data && config) {
+        if (this.chartNode && rootNode && !this.props.loadingAPI && layout && data && Array.isArray(data) && config) {
             const chartData = (data as Data[]).map(data_ => {
                 if (data_.customdata) {
                     const customdata = data_.customdata.map(dataObject => ({
