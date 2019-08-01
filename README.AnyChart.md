@@ -13,13 +13,16 @@ The Any Charts can be configured with a JSON `Data` array and `Layout` object. T
 ### Use building blocks
 [Building blocks](https://docs.mendix.com/refguide/building-block) can provide pre-configured widget. The modules contains various chart samples for a quick start.
 
-1. Download the [Any Chart building blocks](https://appstore.home.mendix.com/link/app/106459/Mendix/Any-Chart-Building-blocks-Module) module from the app store into your project
+1. Download the [Any Chart building blocks](https://appstore.home.mendix.com/link/app/106459/Mendix/Any-Chart-Building-blocks-Module) This link is broken. Where are the buildingblocks? Can you correct this?
+module from the app store into your project
 1. Create a Chart entity
 1. Create a page with a data view and use the Chart entity above as the data source entity
 1. Add the required building block into the data view
 1. Run the project to preview the chart
 
 ### Start from scratch
+1. Create a Chart entity, no need for any attribute.
+1. Create a page with a data view and use the Chart entity above as the data source entity.
 1. Select one of the chart samples from the [Any Chart cheat sheet](/AnyChartCheatSheet.md). For example the line chart:  
 `[ { "x": [ 1, 2 ], "y": [ 1, 2 ], "type": "scatter" } ]`
 1. In the modeler, copy the data into the widget tab `Data`, field `Static`
@@ -31,11 +34,12 @@ Static : `[ { "type": "scatter" } ]` and Sample data `[ { "x": [ 1, 2 ], "y": [ 
 ![Any Chart Configuration](/assets/cheatsheet/AnyChartConfiguration.png)
 
 ### Generating data and layout
-1. Add a `Data` attribute to the Chart entity
-1. In the widget set the `Source attribute` field in the `Data` tab
+1. Add a `Data` attribute to the Chart entity, type string unlimited
+1. In the widget set the `Source attribute` field in the `Data` tab to the `Data` attribute.
+1. Create an entity ChartObject with a 1-* association from Chart to ChartObject and with attributes x and y of type integer. Generate the overview pages so you can add values to ChartObject at runtime.
 1. Create a `JSON Structure` and use the `Sample data` as the snippet
-1. Create an `Export Mapping` with the `JSON Structure`
-1. Create a microflow that retrieves the data and use the `Export Mapping` to generate a `String Variable`. Store the value in the object attribute that is select as `Source attribute`
+1. Create an `Export Mapping` with the `JSON Structure`, set Chart as root-parameter and set ChartObject once at the x-value, once at the y-value linking the x and y field respectively.
+1. Create a microflow that calls the `Export Mapping` with Chart and store the generated value, wrapped in \[ and \]  in the Chart attribute 'Data'
 
 If need be, the layout can also be generated in the same way as the data. In most cases a `Static` layout will suffice.
 
