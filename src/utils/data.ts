@@ -10,6 +10,7 @@ import ReferencesSpec = Data.ReferencesSpec;
 import FetchedData = Data.FetchedData;
 import FetchDataOptions = Data.FetchDataOptions;
 import FetchByXPathOptions = Data.FetchByXPathOptions;
+import FetchByIdOptions = Data.FetchByGuidsOptions;
 import { Store } from "redux";
 
 type MxO = mendix.lib.MxObject;
@@ -263,11 +264,17 @@ export const fetchByXPath = (options: FetchByXPathOptions): Promise<MxO[]> => ne
     });
 });
 
-export const fetchByXPathGuids = (guids: string[]): Promise<MxO[]> => new Promise<MxO[]>((resolve, reject) => {
+export const fetchByGuids = (options: FetchByIdOptions): Promise<MxO[]> => new Promise<MxO[]>((resolve, reject) => {
+    const { guids, sortAttribute, sortOrder, attributes, references } = options;
     window.mx.data.get({
-        guids,
         callback: resolve,
-        error: error => reject(`An error occurred while retrieving data via GUIDS: ${guids}: ${error.message}`)
+        guids,
+        filter: {
+            sort: sortAttribute && sortAttribute.indexOf("/") === -1 ? [ [ sortAttribute, sortOrder || "asc" ] ] : [],
+            references,
+            attributes
+        },
+        error: error => reject(`An error occurred while retrieving data for ids (${guids.join(", ")}): ${error.message}`)
     });
 });
 

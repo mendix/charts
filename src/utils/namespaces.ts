@@ -215,6 +215,14 @@ export namespace Data {
         references?: any;
     }
 
+    export interface FetchByGuidsOptions {
+        guids: string[];
+        sortAttribute?: string;
+        sortOrder?: SortOrder;
+        attributes?: string[];
+        references?: any;
+    }
+
     export interface DataSourceProps {
         dataSourceMicroflow: string;
         dataSourceType: "XPath" | "microflow" | "REST";

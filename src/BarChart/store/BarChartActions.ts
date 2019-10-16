@@ -4,7 +4,7 @@ import { ReactChild } from "react";
 import { Action, Dispatch } from "redux";
 import { seriesActionType } from "../../store/SeriesReducer";
 import { fetchThemeConfigs as fetchBarThemeConfig } from "../../utils/configs";
-import { fetchByXPath, fetchData as fetchSeriesData, generateRESTURL, parseAdvancedOptions } from "../../utils/data";
+import { fetchByGuids, fetchData as fetchSeriesData, generateRESTURL, parseAdvancedOptions } from "../../utils/data";
 import { Data } from "../../utils/namespaces";
 import { BarChartDataHandlerProps } from "../components/BarChartDataHandler";
 import { getData } from "../utils/data";
@@ -106,12 +106,9 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                                 seriesItems[identifier].push(item);
                             }
                             if (seriesEntity.indexOf("/") > -1) {
-                                const seriesGuids = Object.keys(seriesItems);
-                                const constraint = `[id=${seriesGuids.join(" or id=")}]`;
-                                const associatedMxObjects = await fetchByXPath({
-                                    entity: seriesEntity.split("/")[1],
-                                    guid: "",
-                                    constraint,
+                                const guids = Object.keys(seriesItems);
+                                const associatedMxObjects = await fetchByGuids({
+                                    guids,
                                     sortAttribute: seriesSortAttribute,
                                     sortOrder: seriesSortOrder
                                 });
