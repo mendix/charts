@@ -86,6 +86,7 @@
     "grunt-file-append": "0.0.7",
     "grunt-newer": "^1.1.1",
     "grunt-webpack": "^3.1.2",
+    "ify-loader": "^1.1.0",
     "istanbul": "^0.4.3",
     "istanbul-instrumenter-loader": "^3.0.1",
     "jasmine": "^3.1.0",
