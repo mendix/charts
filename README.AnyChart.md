@@ -32,7 +32,7 @@ Static : `[ { "type": "scatter" } ]` and Sample data `[ { "x": [ 1, 2 ], "y": [ 
 
 ![Any Chart Configuration](/assets/cheatsheet/AnyChartConfiguration.png)
 
-Making chart from cratch is not an easy task. This guide helps you get started. Also have a look at https://chart-studio.plot.ly/create this allows to create a chart visually and peek the JSON output from the left menu bottom section.
+Making charts from scratch is not an easy task. This guide helps you get started. Also have a look at https://chart-studio.plot.ly/create this allows to create a chart visually and peek the JSON output from the left menu bottom section.
 
 ### Generating data and layout
 1. Add a `Data` attribute to the Chart entity, type string unlimited
