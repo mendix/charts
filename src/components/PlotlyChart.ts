@@ -37,7 +37,6 @@ type PlotlyChartProps = ComponentProps & typeof PlotlyChartActions & PlotlyChart
 class PlotlyChart extends Component<PlotlyChartProps> {
     private chartNode?: HTMLDivElement;
     private tooltipNode?: HTMLDivElement;
-    private timeoutId?: number;
 
     render() {
         return createElement("div",
@@ -168,18 +167,13 @@ class PlotlyChart extends Component<PlotlyChartProps> {
     }
 
     private onResize = () => {
-        if (this.timeoutId) {
-            clearTimeout(this.timeoutId);
-        }
         if (!this.props.loadingAPI && !this.props.loadingData) {
-            this.timeoutId = window.setTimeout(() => {
-                if (this.props.plotly && this.chartNode) {
-                    this.renderChart(this.props, this.props.plotly);
-                    if (this.props.onResize) {
-                        this.props.onResize(this.chartNode);
-                    }
+            if (this.props.plotly && this.chartNode) {
+                this.renderChart(this.props, this.props.plotly);
+                if (this.props.onResize) {
+                    this.props.onResize(this.chartNode);
                 }
-            }, 100);
+            }
         }
     }
 }
