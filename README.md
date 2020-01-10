@@ -18,7 +18,7 @@ Plot and compare your data across different charts.
 * Bubble Chart
 
 ## Dependencies
-* Mendix 7.11.0
+* Mendix 7.13.1
 
 ## Development test projects
 [https://charts102.mxapps.io](https://charts102.mxapps.io)
