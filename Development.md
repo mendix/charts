@@ -1,9 +1,7 @@
 ## Development
 Prerequisite: Install git, node package manager, webpack CLI, grunt CLI, Karma CLI
 
-To contribute, fork and clone.
-
-    <!-- TODO: Add repo link here -->
+To contribute, fork and clone this repo.
 
 The code is in typescript. Use a typescript IDE of your choice, like Visual Studio Code or WebStorm.
 
