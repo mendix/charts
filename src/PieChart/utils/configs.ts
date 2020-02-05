@@ -40,6 +40,10 @@ export const getData = (props: PieChartProps): PieData[] => {
         const { dataOptions } = props;
         const advancedOptions = props.devMode !== "basic" && dataOptions ? JSON.parse(dataOptions) : {};
 
+        // Temporary remove custom data, as it contains mx objects with circular reference.
+        const customdata = props.pieData[0].customdata;
+        delete props.pieData[0].customdata;
+
         return [
             {
                 ...deepMerge.all(
@@ -50,7 +54,7 @@ export const getData = (props: PieChartProps): PieData[] => {
                     ],
                     { arrayMerge }
                 ),
-                customdata: props.pieData[0].customdata
+                customdata
             }
         ];
     }

@@ -112,6 +112,9 @@ class PlotlyChart extends Component<PlotlyChartProps> {
                         guid: dataObject.getGuid() as string
                     }));
 
+                    // Temporary remove custom data, as it contains mx objects with circular reference.
+                    delete data_.customdata;
+
                     return { ...data_, customdata };
                 }
 
