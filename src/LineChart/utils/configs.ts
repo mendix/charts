@@ -83,6 +83,7 @@ export const getCustomSeriesOptions = (series: Data.LineSeriesProps, props: Line
         fill: props.fill || series.fill
             ? props.type === "polar" ? "toself" : "tonexty"
             : "none",
+        fillcolor: series.fillColor,
         marker: props.type === "bubble" ? { line: { width: 0 } } : {},
         transforms: series.aggregationType && series.aggregationType !== "none" && traces ? getTransforms(series, traces) : undefined
     };
