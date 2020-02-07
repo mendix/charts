@@ -25,7 +25,7 @@ cache:
   - node_modules
 env:
   global:
-  - MX_APP_NAME=charts102
+  - MX_APP_NAME=charts102-sandbox
   - MX_BRANCH_NAME=trunk
   - MX_PROJECT_ID=649a8fda-c4a6-4303-9d8e-31402bc2840e
   - MX_ENVIRONMENT=Sandbox
