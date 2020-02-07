@@ -55,3 +55,23 @@ exports.settings = {
 ```
 
 More information about the [Mendix widget build script](https://github.com/FlockOfBirds/mendix-widget-build-script).
+
+# Releasing
+
+Since this repo contains two widgets (Any charts and Charts), release process will require follows:
+
+Charts:
+
+- Update version to x.x.x in `package.json` and `package.xml`
+- Draft a new release in github with name "App store release x.x.x". This will automatically update the test project in the cloud and generate necessary mpk.
+- Go to mendix appstore and release the widget. The release will be automatically picked up since its connected to the github repo.
+
+AnyChart:
+
+- Open Charts mendix project, update the widgets if necessary (During the process of releasing Charts, this step is already taken care of)
+- Go to `AnyChart_BuildingBlocks` module and increase the version
+- Commit your changes
+- Right click the `AnyChart_BuildingBlocks` and export the module.
+- Draft another release in github with name "App store release Any Chart x.x.x"
+- Add `AnyChart_BuildingBlocks` module as extra assets (In order to track previous releases)
+- Since in the appstore the rule is one repo = one widget, our release wont get picked up automatically. Thus we will use the exported module. 

@@ -5,7 +5,7 @@ With the AnyChart it is possible to build all the chart types that are possible 
 * Mendix 7.11.0
 
 ## Demo projects
-[https://charts102.mxapps.io](https://charts102.mxapps.io)
+[https://charts102-sandbox.mxapps.io](https://charts102-sandbox.mxapps.io)
 
 ## Configuration
 The Any Charts can be configured with a JSON `Data` array and `Layout` object. The configuration can be set statically, via the `Source attribute` or with the `Sample data`. The data of the attribute will be merged into the static settings and will overwrite any common properties. The `Sample data` is for demo purposes at run time when there is no `Source attribute` selected or when rendering sample data in the web modeler preview.

@@ -21,7 +21,7 @@ Plot and compare your data across different charts.
 * Mendix 7.13.1
 
 ## Development test projects
-[https://charts102.mxapps.io](https://charts102.mxapps.io)
+[https://charts102-sandbox.mxapps.io](https://charts102-sandbox.mxapps.io)
 
 ## Basic configuration
 

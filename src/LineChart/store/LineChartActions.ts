@@ -210,8 +210,12 @@ export const updateDataFromPlayground = (instanceID: string, scatterData: Scatte
         newScatterData = scatterData.map((data, index) => {
             const parsedOptions = parseAdvancedOptions("developer", seriesOptions[index]);
 
+            // Temporary remove custom data, as it contains mx objects with circular reference.
+            const customdata = data.customdata;
+            delete data.customdata;
+
             // deepmerge doesn't go into the prototype chain, so it can't be used for copying mxObjects
-            return { ...deepMerge.all<ScatterData>([ data, parsedOptions ]), customdata: data.customdata };
+            return { ...deepMerge.all<ScatterData>([ data, parsedOptions ]), customdata };
         });
     }
 
