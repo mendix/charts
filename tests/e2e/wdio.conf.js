@@ -19,7 +19,7 @@ exports.config = {
     coloredLogs: true,
     bail: 0,
     screenshotPath: "dist/wdio/",
-    baseUrl: debug ? "http://localhost:8080/" : "https://charts102.mxapps.io/",
+    baseUrl: debug ? "http://localhost:8080/" : "https://charts102-sandbox.mxapps.io/",
     waitforTimeout: 180000,
     connectionRetryTimeout: 200000,
     connectionRetryCount: 2,
