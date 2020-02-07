@@ -44,6 +44,7 @@ describe("LineChart/utils/data", () => {
                 hoveron: "points",
                 line: { color: "rgba(5, 149, 219, 1)", shape: undefined },
                 mode: "lines",
+                fillcolor: undefined,
                 name: "Series 1",
                 type: "scatter",
                 fill: "none",

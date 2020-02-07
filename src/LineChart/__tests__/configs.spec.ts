@@ -90,9 +90,37 @@ describe("LineChart/utils/configs", () => {
         });
     });
 
-    describe("#getCustomSeriesOptions", () => {
-        // FIXME: separate the many test assertions in here into separate tests
-        it("returns custom series options", () => {
+    describe("#getCustomSeriesOptions returns custom series data", () => {
+
+        it("returns correctly", () => {
+            const traces: Data.ScatterTrace = {
+                marker: { },
+                x: [ "Jan", "Feb", "Mar", "Apr" ],
+                y: [ 66, 88, 99, 40 ]
+            };
+            const props: Partial<LineChartProps> = { fill: true, type: "bubble", grid: "both" };
+            const serie: Partial<Data.LineSeriesProps> = { lineColor: "green", aggregationType: "none", fillColor: "yellow" };
+            const customSeriesOptions4 = LineChartConfigs.getCustomSeriesOptions(serie as Data.LineSeriesProps, props as LineChartProps, 1, traces);
+
+            expect(customSeriesOptions4).toEqual(
+                {
+                    line: { color: "green", shape: undefined },
+                    mode: "markers",
+                    name: undefined,
+                    type: "scatter",
+                    fill: "tonexty",
+                    fillcolor: "yellow",
+                    marker: { line: { width: 0 } },
+                    x: [ "Jan", "Feb", "Mar", "Apr" ],
+                    y: [ 66, 88, 99, 40 ],
+                    text: "",
+                    transforms: undefined
+                } as Partial<ScatterData>
+            );
+        });
+
+        it ("with 'polar' type set", () => {
+            const serie: Partial<Data.LineSeriesProps> = { lineColor: "green", aggregationType: "none", fillColor: "yellow" };
             const traces: Data.ScatterTrace = {
                 marker: {
                     size: [ 20, 18, 38, 26, 38, 16, 18, 39, 36, 16, 18, 45 ]
@@ -100,7 +128,62 @@ describe("LineChart/utils/configs", () => {
                 x: [ "Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec" ],
                 y: [ 66, 88, 99, 40, 30, 62, 11, 32, 23, 69, 33, 81 ]
             };
-            const serie: Partial<Data.LineSeriesProps> = { lineColor: "green", aggregationType: "none" };
+            const polarProps: Partial<LineChartProps> = { type: "polar" };
+            const customSeriesOptions = LineChartConfigs.getCustomSeriesOptions(
+                serie as Data.LineSeriesProps,
+                polarProps as LineChartProps,
+                1,
+                traces
+            );
+
+            expect(customSeriesOptions).toEqual(
+                {
+                    line: { color: "green", shape: undefined },
+                    mode: "lines",
+                    name: undefined,
+                    type: "scatterpolar" as any,
+                    fill: "none",
+                    fillcolor: "yellow",
+                    marker: { size: [ 20, 18, 38, 26, 38, 16, 18, 39, 36, 16, 18, 45 ] },
+                    x: [ "Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec" ],
+                    y: [ 66, 88, 99, 40, 30, 62, 11, 32, 23, 69, 33, 81 ],
+                    r: [ 66, 88, 99, 40, 30, 62, 11, 32, 23, 69, 33, 81, 66 ],
+                    theta: [ "Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec", "Jan" ],
+                    transforms: undefined
+                } as Partial<ScatterData>
+            );
+        });
+
+        it("with 'polar' and 'fill' set", () => {
+            const serie: Partial<Data.LineSeriesProps> = { mode: "linesXmarkers" as any, aggregationType: "none", fillColor: "yellow" };
+            const polarProps: Partial<LineChartProps> = { fill: true, type: "polar" };
+            const customSeriesOptions = LineChartConfigs.getCustomSeriesOptions(
+                serie as Data.LineSeriesProps,
+                polarProps as LineChartProps,
+                1
+            );
+
+            expect(customSeriesOptions).toEqual({
+                line: { color: "rgba(23, 52, 123, 1)", shape: undefined },
+                mode: "lines+markers",
+                name: undefined,
+                type: "scatterpolar" as any,
+                fill: "toself",
+                fillcolor: "yellow",
+                marker: {},
+                transforms: undefined
+            });
+        });
+
+        it("with 'grid both' set", () => {
+            const traces: Data.ScatterTrace = {
+                marker: {
+                    size: [ 20, 18, 38, 26, 38, 16, 18, 39, 36, 16, 18, 45 ]
+                },
+                x: [ "Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec" ],
+                y: [ 66, 88, 99, 40, 30, 62, 11, 32, 23, 69, 33, 81 ]
+            };
+            const serie: Partial<Data.LineSeriesProps> = { lineColor: "green", aggregationType: "none", fillColor: "yellow" };
             const props: Partial<LineChartProps> = { fill: true, type: "bubble", grid: "both" };
             const customSeriesOptions = LineChartConfigs.getCustomSeriesOptions(serie as Data.LineSeriesProps, props as LineChartProps, 1, traces);
 
@@ -111,6 +194,7 @@ describe("LineChart/utils/configs", () => {
                     name: undefined,
                     type: "scatter",
                     fill: "tonexty",
+                    fillcolor: "yellow",
                     marker: { line: { width: 0 }, size: [ 20, 18, 38, 26, 38, 16, 18, 39, 36, 16, 18, 45 ] },
                     x: [ "Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec" ],
                     y: [ 66, 88, 99, 40, 30, 62, 11, 32, 23, 69, 33, 81 ],
@@ -118,71 +202,6 @@ describe("LineChart/utils/configs", () => {
                     transforms: undefined
                 }
             );
-
-            const polarProps: Partial<LineChartProps> = { type: "polar" };
-            const customSeriesOptions2 = LineChartConfigs.getCustomSeriesOptions(
-                serie as Data.LineSeriesProps,
-                polarProps as LineChartProps,
-                1,
-                traces
-            );
-
-            expect(customSeriesOptions2).toEqual(
-                {
-                    line: { color: "green", shape: undefined },
-                    mode: "lines",
-                    name: undefined,
-                    type: "scatterpolar" as any,
-                    fill: "none",
-                    marker: { size: [ 20, 18, 38, 26, 38, 16, 18, 39, 36, 16, 18, 45 ] },
-                    x: [ "Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec" ],
-                    y: [ 66, 88, 99, 40, 30, 62, 11, 32, 23, 69, 33, 81 ],
-                    r: [ 66, 88, 99, 40, 30, 62, 11, 32, 23, 69, 33, 81, 66 ],
-                    theta: [ "Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec", "Jan" ],
-                    transforms: undefined
-                } as Partial<ScatterData>
-            );
-
-            const serie2: Partial<Data.LineSeriesProps> = { mode: "linesXmarkers" as any, aggregationType: "none" };
-            const polarProps2: Partial<LineChartProps> = { fill: true, type: "polar" };
-            const customSeriesOptions3 = LineChartConfigs.getCustomSeriesOptions(
-                serie2 as Data.LineSeriesProps,
-                polarProps2 as LineChartProps,
-                1
-            );
-
-            expect(customSeriesOptions3).toEqual({
-                line: { color: "rgba(23, 52, 123, 1)", shape: undefined },
-                mode: "lines+markers",
-                name: undefined,
-                type: "scatterpolar" as any,
-                fill: "toself",
-                marker: {},
-                transforms: undefined
-            });
-
-            const traces3: Data.ScatterTrace = {
-                marker: { },
-                x: [ "Jan", "Feb", "Mar", "Apr" ],
-                y: [ 66, 88, 99, 40 ]
-            };
-            const customSeriesOptions4 = LineChartConfigs.getCustomSeriesOptions(serie as Data.LineSeriesProps, props as LineChartProps, 1, traces3);
-
-            expect(customSeriesOptions4).toEqual(
-                {
-                    line: { color: "green", shape: undefined },
-                    mode: "markers",
-                    name: undefined,
-                    type: "scatter",
-                    fill: "tonexty",
-                    marker: { line: { width: 0 } },
-                    x: [ "Jan", "Feb", "Mar", "Apr" ],
-                    y: [ 66, 88, 99, 40 ],
-                    text: "",
-                    transforms: undefined
-                } as Partial<ScatterData>
-            );
-
         });
     });
 
