@@ -68,10 +68,11 @@ Charts:
 
 AnyChart:
 
+- Update version to x.x.x in `src/AnyChart/package.xml`
 - Open Charts mendix project, update the widgets if necessary (During the process of releasing Charts, this step is already taken care of)
 - Go to `AnyChart_BuildingBlocks` module and increase the version
 - Commit your changes
 - Right click the `AnyChart_BuildingBlocks` and export the module.
 - Draft another release in github with name "App store release Any Chart x.x.x"
-- Add `AnyChart_BuildingBlocks` module as extra assets (In order to track previous releases)
+- Add `AnyChart_BuildingBlocks` module as extra assets 
 - Since in the appstore the rule is one repo = one widget, our release wont get picked up automatically. Thus we will use the exported module. 
