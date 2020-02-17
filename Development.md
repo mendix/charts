@@ -60,18 +60,18 @@ More information about the [Mendix widget build script](https://github.com/Flock
 
 Since this repo contains two widgets (Any charts and Charts), release process will require follows:
 
-Charts:
-
 - Update version to x.x.x in `package.json` and `package.xml`
+- Update version to x.x.x in `src/AnyChart/package.xml` (If needed)
+- Open Charts project in modeler
+- Go to `AnyChart_BuildingBlocks` module and increase the version (If needed)
+- Commit your changes in charts app (If needed)
+
+Charts: 
 - Draft a new release in github with name "App store release x.x.x". This will automatically update the test project in the cloud and generate necessary mpk.
 - Go to mendix appstore and release the widget. The release will be automatically picked up since its connected to the github repo.
 
 AnyChart:
 
-- Update version to x.x.x in `src/AnyChart/package.xml`
-- Open Charts mendix project, update the widgets if necessary (During the process of releasing Charts, this step is already taken care of)
-- Go to `AnyChart_BuildingBlocks` module and increase the version
-- Commit your changes
 - Right click the `AnyChart_BuildingBlocks` and export the module.
 - Draft another release in github with name "App store release Any Chart x.x.x"
 - Add `AnyChart_BuildingBlocks` module as extra assets 
