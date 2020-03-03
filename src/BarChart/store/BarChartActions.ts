@@ -54,7 +54,7 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                     return seriesData.reduce(async (cummulator: Promise<Data.SeriesData<Data.SeriesProps>[]>, { mxObjects, restData, customData }) => {
                         if (restData && customData && customData.seriesType === "dynamic" && customData.dataSourceType === "REST") {
                             const returnData = await cummulator;
-                            const { seriesEntity, seriesNameAttribute, colorAttribute, fillColorAttribute, seriesSortAttribute, seriesSortOrder } = customData;
+                            const { seriesEntity, seriesNameAttribute, colorAttribute, seriesSortAttribute, seriesSortOrder } = customData;
                             const association = seriesEntity.indexOf("/") > -1
                                 ? seriesEntity.split("/")[0].split(".")[1]
                                 : seriesEntity.split(".")[1];
@@ -68,17 +68,15 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                                 });
                             }
                             restData.forEach(restDataSeries => {
-                                const fillColor = fillColorAttribute ? restDataSeries[fillColorAttribute] : undefined;
-                                const lineColor = colorAttribute ? restDataSeries[colorAttribute] : undefined;
+                                const barColor = colorAttribute ? restDataSeries[colorAttribute] : undefined;
                                 const name = seriesNameAttribute ? restDataSeries[seriesNameAttribute] : undefined;
                                 returnData.push({
                                     data: mxObjects,
                                     restData: restDataSeries[association],
                                     series: {
                                         ...customData,
-                                        lineColor,
-                                        name,
-                                        fillColor
+                                        barColor,
+                                        name
                                     }
                                 } as Data.SeriesData<Data.SeriesProps>);
                             });
@@ -86,7 +84,7 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                             return returnData;
                         } else if (mxObjects && customData && customData.seriesType === "dynamic" && (customData.dataSourceType === "microflow" || customData.dataSourceType === "XPath")) {
                             const returnData = await cummulator;
-                            const { seriesEntity, colorAttribute, seriesNameAttribute, fillColorAttribute, seriesSortAttribute, seriesSortOrder } = customData;
+                            const { seriesEntity, colorAttribute, seriesNameAttribute, seriesSortAttribute, seriesSortOrder } = customData;
                             const association = seriesEntity.indexOf("/") > -1
                                 ? seriesEntity.split("/")[0]
                                 : seriesNameAttribute;
@@ -114,15 +112,13 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                                 });
                                 associatedMxObjects.forEach(associated => {
                                     const name = getAttributeValue(associated, seriesNameAttribute, "");
-                                    const fillColor = getAttributeValue(associated, fillColorAttribute, "");
-                                    const lineColor = getAttributeValue(associated, colorAttribute, "");
+                                    const barColor = getAttributeValue(associated, colorAttribute, "");
                                     returnData.push({
                                         data: seriesItems[associated.getGuid()],
                                         series: {
                                             ...customData,
-                                            lineColor,
-                                            name,
-                                            fillColor
+                                            barColor,
+                                            name
                                         }
                                     } as Data.SeriesData<Data.LineSeriesProps>);
                                 });
@@ -138,15 +134,13 @@ export const fetchData = (props: BarChartDataHandlerProps) => (dispatch: Dispatc
                                 }
                                 seriesNames.forEach(name => {
                                     const firstMxObject = seriesItems[name][0];
-                                    const fillColor = getAttributeValue(firstMxObject, fillColorAttribute);
-                                    const lineColor = getAttributeValue(firstMxObject, colorAttribute);
+                                    const barColor = getAttributeValue(firstMxObject, colorAttribute);
                                     returnData.push({
                                         data: seriesItems[name],
                                         series: {
                                             ...customData,
-                                            lineColor,
-                                            name,
-                                            fillColor
+                                            barColor,
+                                            name
                                         }
                                     } as Data.SeriesData<Data.LineSeriesProps>);
                                 });
