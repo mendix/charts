@@ -450,7 +450,7 @@ export const getAttributeValue = (mxObject: MxO, attribute: string): Datum => {
         }
     }
     if (valueObject.isDate(attributeName)) {
-        return new Date(valueObject.get(attributeName) as number);
+        return new Date(valueObject.get(attributeName) as number).toISOString();
     }
     if (valueObject.isEnum(attributeName)) {
         const enumValue = valueObject.get(attributeName) as string;
