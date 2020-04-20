@@ -402,6 +402,20 @@ A mode and line configuration can be added in the `Advanced` configuration of th
   }
 ]
 ```
+
+### Formatting x/y tick labels
+
+Labels of x or y axis can be formatted. Ex: if you have DateTime as data and you want to format X axis as `Date/Month/Year`, add the following configuration to `layout`
+
+```json
+{
+  "xaxis": {
+    "tickformat": "%x"
+  }
+}
+```
+See more [X Y axis label formatting](https://plotly.com/javascript/reference/#layout-xaxis-tickformat)
+
 ### Combine Chart Types
 The type of a series can be changes. Make a bar series into line series
 ![ Column chart data properties ](/assets/cheatsheet/CombineListBar.gif)
