@@ -101,7 +101,7 @@
     "karma-webpack": "^3.0.0",
     "mendix-client": "^7.13.4",
     "mendix-widget-build-script": "^1.0.3",
-    "node-sass": "^4.9.4",
+    "node-sass": "^4.13.1",
     "pre-commit": "^1.2.2",
     "raw-loader": "^0.5.1",
     "react": "^16.3.1",
