@@ -8,6 +8,9 @@
   "version": "1.4.10",
   "description": "Create charts based on the Plotly library",
   "copyright": "Mendix BV",
+  "engines": {
+    "node": "^10.0.0"
+  },
   "scripts": {
     "start": "cross-env NODE_ENV=development grunt",
     "emit": "tsc",
@@ -67,7 +70,7 @@
     "babel-preset-env": "^1.7.0",
     "check-dependencies": "^1.1.0",
     "clean-webpack-plugin": "^0.1.19",
-    "copy-webpack-plugin": "^5.0.5",
+    "copy-webpack-plugin": "^4.5.1",
     "core-js": "^2.5.7",
     "cross-env": "^5.1.6",
     "css-loader": "^0.28.11",
@@ -110,7 +113,7 @@
     "source-map-loader": "^0.2.3",
     "style-loader": "^0.21.0",
     "transform-loader": "^0.2.4",
-    "ts-loader": "^6.0.0",
+    "ts-loader": "^3.5.0",
     "tslint": "^5.10.0",
     "tslint-eslint-rules": "^5.1.0",
     "typescript": "^2.7.2",
