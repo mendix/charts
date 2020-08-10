@@ -7,12 +7,12 @@ before_install:
 - npm i -g npm
 - npm install grunt-cli -g
 - export CHROME_BIN=chromium-browser
+- wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
 - wget -q -O - http://opensource.wandisco.com/wandisco-debian.gpg | sudo apt-key add -
+- sudo sh -c "echo 'deb http://dl.google.com/linux/chrome/deb/ stable main' > /etc/apt/sources.list.d/google-chrome.list"
 - sudo sh -c "echo 'deb http://opensource.wandisco.com/debian/ wheezy svn17' > /etc/apt/sources.list.d/wandisco-subversion.list"
 - sudo apt-get -qq update
-- sudo apt-get install -y --allow-downgrades subversion=1.7.22-1+WANdisco libsvn1=1.7.22-1+WANdisco dpkg
-- wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-- sudo dpkg -i google-chrome*.deb
+- sudo apt-get install -y --allow-downgrades subversion=1.7.22-1+WANdisco libsvn1=1.7.22-1+WANdisco google-chrome-stable
 - svn --version
 - npm --version
 script: npm test
