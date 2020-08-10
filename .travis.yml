@@ -3,8 +3,6 @@ dist: trusty
 language: node_js
 node_js:
   - "10.0.0"
-addons:
-  chrome: stable
 before_install:
 - npm i -g npm
 - npm install grunt-cli -g
@@ -12,7 +10,9 @@ before_install:
 - wget -q -O - http://opensource.wandisco.com/wandisco-debian.gpg | sudo apt-key add -
 - sudo sh -c "echo 'deb http://opensource.wandisco.com/debian/ wheezy svn17' > /etc/apt/sources.list.d/wandisco-subversion.list"
 - sudo apt-get -qq update
-- sudo apt-get install -y --allow-downgrades subversion=1.7.22-1+WANdisco libsvn1=1.7.22-1+WANdisco
+- sudo apt-get install -y --allow-downgrades subversion=1.7.22-1+WANdisco libsvn1=1.7.22-1+WANdisco dpkg
+- wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+- sudo dpkg -i google-chrome*.deb
 - svn --version
 - npm --version
 script: npm test
