@@ -4,6 +4,7 @@ import { Component, ReactChild, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import * as deepEqual from "deep-equal";
 
 import { HoverTooltip } from "../../components/HoverTooltip";
 import { Alert } from "../../components/Alert";
@@ -28,6 +29,12 @@ export type AnyChartProps = AnyChartComponentProps & typeof PlotlyChartActions &
 
 class AnyChart extends Component<AnyChartProps> {
     private tooltipNode?: HTMLDivElement;
+
+    shouldComponentUpdate(nextProps: Readonly<AnyChartProps>): boolean {
+        // TODO: this version of TypeScript and the types from @types/deep-equal are not compatible. As an interim solution, the compilation error is ignored. Either fix typings/deep-equal or upgrade TS.
+        // @ts-ignore
+        return !deepEqual(nextProps, this.props, { strict: true });
+    }
 
     render() {
         if (this.props.alertMessage) {

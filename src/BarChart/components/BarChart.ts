@@ -3,6 +3,7 @@ import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import * as deepEqual from "deep-equal";
 
 import { BarChartState } from "../store/BarChartReducer";
 import { Container, Data } from "../../utils/namespaces";
@@ -64,6 +65,12 @@ class BarChart extends Component<BarChartProps & BarChartState> {
         if (nextProps.updatingData) {
             nextProps.toggleUpdatingData(nextProps.instanceID, false);
         }
+    }
+
+    shouldComponentUpdate(nextProps: Readonly<BarChartProps & BarChartState>): boolean {
+        // TODO: this version of TypeScript and the types from @types/deep-equal are not compatible. As an interim solution, the compilation error is ignored. Either fix typings/deep-equal or upgrade TS.
+        // @ts-ignore
+        return !deepEqual(nextProps, this.props, { strict: true });
     }
 
     private getTooltipNodeRef = (node: HTMLDivElement) => {

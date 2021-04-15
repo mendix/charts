@@ -4,6 +4,7 @@ import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 import { bindActionCreators } from "redux";
+import * as deepEqual from "deep-equal";
 
 import { Alert } from "../../components/Alert";
 import { HoverTooltip } from "../../components/HoverTooltip";
@@ -72,6 +73,12 @@ class PieChart extends Component<PieChartProps & PieChartState> {
         if (nextProps.updatingData) {
             nextProps.toggleUpdatingData(nextProps.instanceID, false);
         }
+    }
+
+    shouldComponentUpdate(nextProps: Readonly<PieChartProps & PieChartState>): boolean {
+        // TODO: this version of TypeScript and the types from @types/deep-equal are not compatible. As an interim solution, the compilation error is ignored. Either fix typings/deep-equal or upgrade TS.
+        // @ts-ignore
+        return !deepEqual(nextProps, this.props, { strict: true });
     }
 
     private getTooltipNodeRef = (node: HTMLDivElement) => {
