@@ -15,9 +15,8 @@ import { SidebarHeader } from "./SidebarHeader";
 import { SidebarContent } from "./SidebarContent";
 import { SidebarHeaderTools } from "./SidebarHeaderTools";
 
-import "brace";
-import "brace/mode/json";
-import "brace/theme/github";
+import "ace-builds/src-min-noconflict/mode-json";
+import "ace-builds/src-min-noconflict/theme-github";
 import "../ui/Playground.scss";
 
 interface PlaygroundState {
