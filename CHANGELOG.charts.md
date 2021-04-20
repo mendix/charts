@@ -5,8 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 ### Fixed
-- The component now has a `shouldComponentUpdate` method that compares the new props with the previous props. If there is a difference, it re-renders. This fixes issues arising due to re-plotting the Plotly Chart unnecessarily, such as when grouped legends are configured.
-- In MX 9.1 certain public client methods were removed. A check is now in-place to check the function's existence before use, else it fallsback to an alternative approach. This means ensures compatibility with MX 7, 8 and 9.
+- Fixed an issue where grouped legends were not working. 
+- Maintain compatibility with Mendix client in MX 7, 8 and 9. 
 
 ## Changed
 - Update `plotly.js` dependency
