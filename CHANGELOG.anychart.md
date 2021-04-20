@@ -22,17 +22,3 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 See [marketplace](https://marketplace.mendix.com/link/component/105695) notes.
 
---------------------------------------------------------------------
-
-`<heading>` should be one of:
-
-- `Added` for new features.
-- `Changed` for changes in existing functionality.
-- `Deprecated` for soon-to-be removed features.
-- `Removed` for now removed features.
-- `Fixed` for any bug fixes.
-- `Security` in case of vulnerabilities.
-
-Add [YANKED] after the release date if the release was unpublished.
-
---------------------------------------------------------------------
