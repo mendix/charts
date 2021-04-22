@@ -2,6 +2,7 @@ import { ScatterHoverData } from "plotly.js";
 import { Component, ReactChild, ReactElement, createElement } from "react";
 import { render, unmountComponentAtNode } from "react-dom";
 import { bindActionCreators } from "redux";
+import * as deepEqual from "deep-equal";
 import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 
 import "../../ui/Charts.scss";
@@ -73,6 +74,12 @@ class LineChart extends Component<LineChartProps & LineChartState> {
         if (nextProps.updatingData) {
             nextProps.toggleUpdatingData(nextProps.instanceID, false);
         }
+    }
+
+    shouldComponentUpdate(nextProps: Readonly<LineChartProps & LineChartState>): boolean {
+        // TODO: this version of TypeScript and the types from @types/deep-equal are not compatible. As an interim solution, the compilation error is ignored. Either fix typings/deep-equal or upgrade TS.
+        // @ts-ignore
+        return !deepEqual(nextProps, this.props, { strict: true });
     }
 
     private getTooltipNodeRef = (node: HTMLDivElement) => {

@@ -12,6 +12,7 @@ import FetchDataOptions = Data.FetchDataOptions;
 import FetchByXPathOptions = Data.FetchByXPathOptions;
 import FetchByIdOptions = Data.FetchByGuidsOptions;
 import { Store } from "redux";
+import MxMetaObject = mendix.lib.MxMetaObject;
 
 type MxO = mendix.lib.MxObject;
 type Callback = mendix.lib.MxObject | mendix.lib.MxObject[] | boolean | number | string | mxui.lib.form._FormBase;
@@ -67,7 +68,7 @@ export const validateSeriesProps = <T extends Partial<SeriesProps>>
                 }
                 if (series.dataEntity && window.mx) {
                     const dataEntityMeta = window.mx.meta.getEntity(series.dataEntity);
-                    if (series.dataSourceType === "XPath" && !dataEntityMeta.isPersistable()) {
+                    if (series.dataSourceType === "XPath" && !isPersistable(dataEntityMeta, series.dataEntity)) {
                         errorMessage.push(`Entity ${series.dataEntity} should be persistable when using Data source 'Database'`);
                     }
                 }
@@ -89,6 +90,17 @@ export const validateSeriesProps = <T extends Partial<SeriesProps>>
 
         return errorMessage.length ? renderError(widgetId, errorMessage) : "";
 };
+
+function isPersistable(metaObject: MxMetaObject, entity: string) {
+    // In MX9.1 `isPersistable` was removed from MxMetaObject.
+    if (typeof metaObject.isPersistable === "function") {
+        return metaObject.isPersistable();
+    }
+
+    // The types defined in `mendix-client` are outdated.
+    // @ts-ignore
+    return window.mx.session.getConfig("metadata").find((metaJsonObject: any) => metaJsonObject.objectType === entity).persistable;
+}
 
 export const validateAdvancedOptions = (rawData: string): string => {
     if (rawData && rawData.trim()) {

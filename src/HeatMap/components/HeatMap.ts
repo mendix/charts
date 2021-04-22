@@ -5,6 +5,8 @@ import { render, unmountComponentAtNode } from "react-dom";
 import { MapDispatchToProps, MapStateToProps, connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { ScatterHoverData } from "plotly.js";
+import * as deepEqual from "deep-equal";
+
 import { HoverTooltip } from "../../components/HoverTooltip";
 import PlotlyChart from "../../components/PlotlyChart";
 import { arrayOverwrite } from "../../utils/configs";
@@ -66,6 +68,12 @@ class HeatMap extends Component<HeatMapProps & HeatMapState> {
         if (nextProps.updatingData) {
             nextProps.toggleUpdatingData(nextProps.instanceID, false);
         }
+    }
+
+    shouldComponentUpdate(nextProps: Readonly<HeatMapProps & HeatMapState>): boolean {
+        // TODO: this version of TypeScript and the types from @types/deep-equal are not compatible. As an interim solution, the compilation error is ignored. Either fix typings/deep-equal or upgrade TS.
+        // @ts-ignore
+        return !deepEqual(nextProps, this.props, { strict: true });
     }
 
     private getTooltipNodeRef = (node: HTMLDivElement) => {
