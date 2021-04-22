@@ -28,9 +28,7 @@
     "build": "cross-env NODE_ENV=production grunt release",
     "updateProject": "node ./node_modules/mendix-widget-build-script/dist/UpdateMxProject.js",
     "deployApp": "node ./node_modules/mendix-widget-build-script/dist/DeployMxApp.js",
-    "deployAndTest": "npm run deploy && npm run test:e2e",
-    "snyk-protect": "snyk protect",
-    "prepare": "npm run snyk-protect"
+    "deployAndTest": "npm run deploy && npm run test:e2e"
   },
   "pre-commit": [
     "typeCheck",
@@ -146,8 +144,6 @@
     "react-resize-detector": "^2.3.0",
     "redux": "^4.0.0",
     "redux-logger": "^3.0.6",
-    "redux-thunk": "^2.2.0",
-    "snyk": "^1.563.0"
-  },
-  "snyk": true
+    "redux-thunk": "^2.2.0"
+  }
 }
