@@ -2,6 +2,8 @@ import { ReactChild, createElement } from "react";
 import deepMerge from "deepmerge";
 import { Datum } from "plotly.js";
 import { Container, Data } from "./namespaces";
+import { Store } from "redux";
+import { asString } from "date-format";
 import SeriesProps = Data.SeriesProps;
 import SeriesData = Data.SeriesData;
 import EventProps = Data.EventProps;
@@ -11,7 +13,6 @@ import FetchedData = Data.FetchedData;
 import FetchDataOptions = Data.FetchDataOptions;
 import FetchByXPathOptions = Data.FetchByXPathOptions;
 import FetchByIdOptions = Data.FetchByGuidsOptions;
-import { Store } from "redux";
 import MxMetaObject = mendix.lib.MxMetaObject;
 
 type MxO = mendix.lib.MxObject;
@@ -462,7 +463,10 @@ export const getAttributeValue = (mxObject: MxO, attribute: string): Datum => {
         }
     }
     if (valueObject.isDate(attributeName)) {
-        return new Date(valueObject.get(attributeName) as number).toISOString();
+        const dateValue: number = valueObject.get(attributeName) as number;
+
+        // Converts the timestamp to ISO-8601
+        return asString(new Date(dateValue));
     }
     if (valueObject.isEnum(attributeName)) {
         const enumValue = valueObject.get(attributeName) as string;
