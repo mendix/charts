@@ -8,7 +8,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [1.3.6] - 28-04-2021
 ### Fixed
 - Fixed an issue where grouped legends were not working.
-- Maintain compatibility with Mendix client in MX 7, 8 and 9.
 
 ## Changed
 - Update `plotly.js` dependency.
