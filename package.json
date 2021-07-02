@@ -135,7 +135,7 @@
     "date-format": "^3.0.0",
     "deep-equal": "^2.0.5",
     "deepmerge": "^2.1.1",
-    "element-resize-detector": "^1.1.14",
+    "element-resize-detector": "^1.2.2",
     "fast-json-patch": "^2.2.1",
     "fibers": "^4.0.1",
     "json-source-map": "^0.4.0",
