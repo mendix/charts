@@ -131,7 +131,7 @@
   },
   "dependencies": {
     "ace-builds": "^1.4.12",
-    "classnames": "^2.2.6",
+    "classnames": "^2.3.1",
     "date-format": "^3.0.0",
     "deep-equal": "^2.0.5",
     "deepmerge": "^2.1.1",
