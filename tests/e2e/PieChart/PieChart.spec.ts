@@ -13,9 +13,12 @@ describe("Pie Chart", () => {
     });
 
     it("should have multiple slices", () => {
-        chart.slices.waitForExist();
+        browser.waitUntil(() => {
+            return chart.slices.map((elem) => elem.isDisplayed()).length > 1;
+        });
 
-        expect(chart.slices.value.length).toBeGreaterThan(1);
+        expect(chart.slices.map((elem) => elem.isDisplayed()).length).toBeGreaterThan(1);
+
     });
 
 });

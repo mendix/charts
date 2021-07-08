@@ -6,7 +6,7 @@
     "sourceMap": true,
     "module": "amd",
     "target": "es5",
-    "lib": [ "es2015", "dom" ],
+    "lib": [ "es2015", "dom"],
     "types": [
       "mendix-client",
       "jasmine",
@@ -30,6 +30,7 @@
   },
   "exclude": [
     "dist/",
-    "node_modules/"
+    "node_modules/",
+    "tests/"
   ]
 }

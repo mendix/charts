@@ -12,9 +12,12 @@ describe("Bubble chart", () => {
         expect(isExist).toBeTruthy();
     });
 
-    it("should have atleast 2 bubbles for each trace", () => {
-        chart.bubbles.waitForVisible();
+    it("should have at least 2 bubbles for each trace", () => {
+        browser.waitUntil(() => {
+            return chart.bubbles.map((elem) => elem.isDisplayed()).length > 1;
+        });
 
-        expect(chart.bubbles.value.length).toBeGreaterThan(1);
+        expect(chart.bubbles.map((elem) => elem.isDisplayed()).length).toBeGreaterThan(1);
+
     });
 });

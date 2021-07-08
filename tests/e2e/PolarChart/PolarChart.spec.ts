@@ -6,24 +6,25 @@ xdescribe("Polar chart", () => {
     });
 
     xit("should generate a chart", () => {
-        chart.polar.waitForVisible();
+        chart.polar.waitForDisplayed();
         const nodeName = chart.polar.getAttribute("nodeName");
 
         expect(nodeName).toBe("svg");
     });
 
     xit("should be generated with two traces", () => {
-        chart.traces.waitForValue();
-
-        expect(chart.traces.value.length).toBe(2);
+        browser.waitUntil(() => {
+            return chart.traces.map((elem) => elem.isDisplayed()).length > 1;
+        });
+        expect(chart.traces.map((elem) => elem.isDisplayed()).length).toBe(2);
     });
 
     // with other drivers apart from chrome it does not autoscroll to the element in overflow:auto block
     xit("should hide a line serie when a serie toggle item is clicked", () => {
-        chart.trace1.waitForVisible();
+        chart.trace1.waitForDisplayed();
         chart.trace1.click();
-        const serie1 = chart.trace1.getCssProperty("opacity");
-        chart.trace1.waitForValue();
+        const serie1 = chart.trace1.getCSSProperty("opacity");
+        chart.trace1.waitForDisplayed();
         const value = Number(serie1.value);
 
         expect(value).toBe(0.5);

@@ -14,6 +14,7 @@ class MxMock implements mx.MxInterface {
     server!: mx.server;
     session!: mx.session;
     ui!: mx.ui;
+    onlineData!: mx.OnlineData;
     onError(_error: Error): void { /* */ }
     isOffline(): boolean { return false; }
 }
@@ -88,7 +89,7 @@ class MxContextMock implements mendix.lib.MxContext {
     setContext(_trackEntity: string, _guid: string): void { }
 }
 
-class MxObjectMock implements mendix.lib.MxObject {
+class MxObjectMock extends mendix.lib.MxObject {
     addReference(_attr: string, _guid: string | number): boolean { return false; }
     addReferences(_attr: string, _guids: string[] | number[]): boolean { return false; }
     compare(_mxobj: mendix.lib.MxObject): boolean { return false; }

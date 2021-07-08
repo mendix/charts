@@ -1,0 +1,4 @@
+[submodule "tests/testProject"]
+	path = tests/testProject
+	url = https://github.com/mendix/testProjects.git
+	branch = charts

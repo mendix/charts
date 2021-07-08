@@ -7,15 +7,17 @@ describe("Area chart", () => {
     });
 
     it("should generate a chart", () => {
-        chart.svgElement.waitForVisible();
+        chart.svgElement.waitForDisplayed();
         const isExist = chart.svgElement.isExisting();
 
         expect(isExist).toBeTruthy();
     });
 
     it("should be generated with two traces", () => {
-        chart.traces.waitForValue();
+        browser.waitUntil(() => {
+            return chart.traces.map((elem) => elem.isDisplayed()).length > 1;
+        });
 
-        expect(chart.traces.value.length).toBe(2);
+        expect(chart.traces.map((elem) => elem.isDisplayed()).length).toBe(2);
     });
 });
