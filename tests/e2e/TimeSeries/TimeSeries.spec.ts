@@ -1,6 +1,6 @@
 import chart from "./pages/default.page";
 
-fdescribe("Time series", () => {
+describe("Time series", () => {
     beforeAll(() => {
         chart.open();
     });

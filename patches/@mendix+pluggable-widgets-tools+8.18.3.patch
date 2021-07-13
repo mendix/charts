@@ -1,0 +1,17 @@
+diff --git a/node_modules/@mendix/pluggable-widgets-tools/scripts/e2e.js b/node_modules/@mendix/pluggable-widgets-tools/scripts/e2e.js
+index a533efb..0f015e3 100644
+--- a/node_modules/@mendix/pluggable-widgets-tools/scripts/e2e.js
++++ b/node_modules/@mendix/pluggable-widgets-tools/scripts/e2e.js
+@@ -29,10 +29,10 @@ async function main() {
+     }
+ 
+     const packageConf = JSON.parse(await readFile("package.json"));
+-    const widgetVersion = packageConf?.version;
++    const widgetVersion = packageConf.version;
+ 
+     // Downloading test project
+-    if (!process.argv.includes("--no-update-testProject") && packageConf?.testProject?.githubUrl && packageConf?.testProject?.branchName) {
++    if (!process.argv.includes("--no-update-testProject") && packageConf.testProject.githubUrl && packageConf.testProject.branchName) {
+         await unzipTestProject();
+     } else {
+         const projectMpr = ls(`tests/testProject/*.mpr`).length;

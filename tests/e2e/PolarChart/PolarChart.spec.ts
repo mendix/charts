@@ -1,5 +1,7 @@
 import chart from "./pages/default.page";
 
+// TO DO: Check why we're skipping this spec
+
 xdescribe("Polar chart", () => {
     beforeAll(() => {
         chart.open();
@@ -19,7 +21,7 @@ xdescribe("Polar chart", () => {
         expect(chart.traces.map((elem) => elem.isDisplayed()).length).toBe(2);
     });
 
-    // with other drivers apart from chrome it does not autoscroll to the element in overflow:auto block
+    // TO DO: with other drivers apart from chrome it does not autoscroll to the element in overflow:auto block
     xit("should hide a line serie when a serie toggle item is clicked", () => {
         chart.trace1.waitForDisplayed();
         chart.trace1.click();

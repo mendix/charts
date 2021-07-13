@@ -15,9 +15,9 @@ describe("Area chart", () => {
 
     it("should be generated with two traces", () => {
         browser.waitUntil(() => {
-            return chart.traces.map((elem) => elem.isDisplayed()).length > 1;
+            return chart.traces.filter((elem) => elem.isDisplayed()).length > 1;
         });
 
-        expect(chart.traces.map((elem) => elem.isDisplayed()).length).toBe(2);
+        expect(chart.traces.filter((elem) => elem.isDisplayed()).length).toBe(2);
     });
 });

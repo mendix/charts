@@ -8,6 +8,10 @@
   "version": "1.4.11",
   "description": "Create charts based on the Plotly library",
   "copyright": "Mendix BV",
+  "testProject": {
+    "githubUrl": "https://github.com/mendix/testProjects",
+    "branchName": "charts"
+  },
   "scripts": {
     "start": "cross-env NODE_ENV=development grunt",
     "emit": "tsc",
@@ -41,7 +45,7 @@
     "url": "https://github.com/mendixlabs/charts/issues"
   },
   "devDependencies": {
-    "@mendix/pluggable-widgets-tools": "^8.18.1",
+    "@mendix/pluggable-widgets-tools": "^8.18.3",
     "@types/big.js": "^4.0.5",
     "@types/classnames": "^2.2.4",
     "@types/core-js": "^0.9.46",

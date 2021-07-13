@@ -19,7 +19,7 @@ describe("Bar chart", () => {
         expect(chart.traces.map((elem) => elem.isDisplayed()).length).toBe(2);
     });
 
-    // with other drivers apart from chrome it does not autoscroll to the element in overflow:auto block
+    // TO DO: with other drivers apart from chrome it does not autoscroll to the element in overflow:auto block
     xit("should hide a bar serie when a serie toggle item is clicked", () => {
         chart.trace1.waitForExist();
         chart.trace1.click();

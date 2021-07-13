@@ -14,10 +14,10 @@ describe("Pie Chart", () => {
 
     it("should have multiple slices", () => {
         browser.waitUntil(() => {
-            return chart.slices.map((elem) => elem.isDisplayed()).length > 1;
+            return chart.slices.filter((elem) => elem.isDisplayed()).length > 1;
         });
 
-        expect(chart.slices.map((elem) => elem.isDisplayed()).length).toBeGreaterThan(1);
+        expect(chart.slices.filter((elem) => elem.isDisplayed()).length).toBeGreaterThan(1);
 
     });
 
