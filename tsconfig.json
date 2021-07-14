@@ -11,6 +11,7 @@
       "mendix-client",
       "jasmine",
       "core-js",
+      "node",
       "redux",
       "redux-thunk"
     ],
