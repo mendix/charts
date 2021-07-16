@@ -1,4 +1,4 @@
-import { DefaultPage } from "../../DefaultPage/home.page";
+import { DefaultPage } from "./home.page";
 
 class LineChart extends DefaultPage {
 

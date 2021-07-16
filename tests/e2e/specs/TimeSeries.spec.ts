@@ -1,4 +1,4 @@
-import chart from "./pages/default.page";
+import chart from "../pages/timeSeries.page";
 
 describe("Time series", () => {
     beforeAll(() => {

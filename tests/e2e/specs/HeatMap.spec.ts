@@ -1,4 +1,4 @@
-import heatMap from "./pages/default.page";
+import heatMap from "../pages/heatmap.page";
 
 describe("Heat Map", () => {
     beforeAll(() => {
