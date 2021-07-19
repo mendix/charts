@@ -42,9 +42,9 @@ describe("Bar chart", () => {
 
     it("should be generated with two traces", () => {
         browser.waitUntil(() => {
-            return barChart.traces.map((elem) => elem.isDisplayed()).length > 1;
+            return barChart.traces.filter((elem) => elem.isDisplayed()).length > 1;
         });
-        expect(barChart.traces.map((elem) => elem.isDisplayed()).length).toBe(2);
+        expect(barChart.traces.filter((elem) => elem.isDisplayed()).length).toBe(2);
     });
 
     // TO DO: with other drivers apart from chrome it does not autoscroll to the element in overflow:auto block
@@ -75,9 +75,9 @@ describe("Column chart", () => {
 
     it("should be generated with two traces", () => {
         browser.waitUntil(() => {
-            return columnChart.traces.map((elem) => elem.isDisplayed()).length > 1;
+            return columnChart.traces.filter((elem) => elem.isDisplayed()).length > 1;
         });
-        expect(columnChart.traces.map((elem) => elem.isDisplayed()).length).toBe(2);
+        expect(columnChart.traces.filter((elem) => elem.isDisplayed()).length).toBe(2);
     });
 
     // TO DO: with other drivers apart from chrome it does not autoscroll to the element in overflow:auto block
@@ -108,9 +108,9 @@ describe("Line chart", () => {
 
     it("should be generated with two traces", () => {
         browser.waitUntil(() => {
-            return lineChart.traces.map((elem) => elem.isDisplayed()).length > 1;
+            return lineChart.traces.filter((elem) => elem.isDisplayed()).length > 1;
         });
-        expect(lineChart.traces.map((elem) => elem.isDisplayed()).length).toBe(2);
+        expect(lineChart.traces.filter((elem) => elem.isDisplayed()).length).toBe(2);
     });
 
     // TO DO: With other drivers apart from chrome it does not autoscroll to the element in overflow:auto block
@@ -188,9 +188,9 @@ xdescribe("Polar chart", () => {
 
     xit("should be generated with two traces", () => {
         browser.waitUntil(() => {
-            return polarChart.traces.map((elem) => elem.isDisplayed()).length > 1;
+            return polarChart.traces.filter((elem) => elem.isDisplayed()).length > 1;
         });
-        expect(polarChart.traces.map((elem) => elem.isDisplayed()).length).toBe(2);
+        expect(polarChart.traces.filter((elem) => elem.isDisplayed()).length).toBe(2);
     });
 
     // TO DO: with other drivers apart from chrome it does not autoscroll to the element in overflow:auto block
