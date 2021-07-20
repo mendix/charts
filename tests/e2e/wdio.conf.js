@@ -1,5 +1,11 @@
 const debug = process.env.DEBUG;
-const browser = process.env.BROWSER || "firefox";
+const browserName = process.env.BROWSER || "firefox";
+const url = process.env.URL || "http://localhost:8080/";
+const tsNode = require('ts-node');
+tsNode.register({
+    files: true,
+    project: "./tsconfig.json"
+});
 
 exports.config = {
     host: "127.0.0.1",
@@ -8,36 +14,33 @@ exports.config = {
     maxInstances: 1,
     capabilities: [
         {
-            browserName: "chrome",
-            "goog:chromeOptions": {
-                args: debug
-                    ? []
-                    : [
-                          "--no-sandbox",
-                          "--headless",
-                          "--disable-gpu",
-                          "--disable-extensions",
-                      ],
-            },
-        },
+            browserName,
+            ...(!process.env.CI
+                ? {
+                    "moz:firefoxOptions": {
+                        prefs: { "media.navigator.streams.fake": true, "media.navigator.permission.disabled": true }
+                    }
+                }
+                : {})
+        }
     ],
     sync: true,
     logLevel: "silent",
     coloredLogs: true,
     bail: 0,
     screenshotPath: "dist/wdio/",
-    baseUrl: debug
-        ? "http://localhost:8080/"
-        : "https://charts102-sandbox.mxapps.io/",
-    waitforTimeout: 180000,
-    connectionRetryTimeout: 200000,
-    connectionRetryCount: 2,
+    baseUrl: url,
+    waitForTimeout: 30000,
+    connectionRetryTimeout: 90000,
+    connectionRetryCount: 0,
     killInstances: true,
     services: ["selenium-standalone"],
     framework: "jasmine",
-    reporters: ["dot", "spec"],
+    reporters: ["spec"],
     execArgv: debug ? ["--inspect"] : undefined,
     jasmineNodeOpts: {
+        // Required for Typescript
+        requires: ["tsconfig-paths/register"],
         defaultTimeoutInterval: debug ? 60 * 60 * 1000 : 100 * 1000,
         expectationResultHandler: function (passed, assertion) {
             if (passed) {

@@ -1,0 +1,13 @@
+diff --git a/node_modules/webdriver/webdriver.d.ts b/node_modules/webdriver/webdriver.d.ts
+index e44c78f..fcdfde9 100644
+--- a/node_modules/webdriver/webdriver.d.ts
++++ b/node_modules/webdriver/webdriver.d.ts
+@@ -9,8 +9,6 @@
+ // Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
+ /// <reference types="node"/>
+ 
+-declare type HTTPRequestOptions = import('request').CoreOptions;
+-declare type HTTPResponse = import('request').Response;
+ 
+ declare namespace WebDriver {
+     type PageLoadingStrategy = 'none' | 'eager' | 'normal';

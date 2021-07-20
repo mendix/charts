@@ -7,7 +7,12 @@
       "experimentalDecorators": true,
       "removeComments": true,
       "noImplicitAny": false,
-      "outDir": "../../dist/e2e"
+      "outDir": "../../dist/e2e",
+      "types": [
+        "node",
+        "@wdio/sync",
+        "@wdio/jasmine-framework"
+      ]
     },
     "exclude": [
       "node_modules"

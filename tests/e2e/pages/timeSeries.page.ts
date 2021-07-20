@@ -1,13 +1,13 @@
-import { DefaultPage } from "../../DefaultPage/home.page";
+import { DefaultPage } from "./home.page";
 
 class TimeSeries extends DefaultPage {
 
     public get timeSeries() {
-        return browser.element(".mx-name-timeSeries1 .js-plotly-plot svg");
+        return $(".mx-name-timeSeries1 .js-plotly-plot svg");
     }
 
     public get miniSlider() {
-        return browser.element(".rangeslider-grabber-min");
+        return $(".rangeslider-grabber-min");
     }
 
     public open(): void {

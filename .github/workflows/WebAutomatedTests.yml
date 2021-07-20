@@ -1,0 +1,35 @@
+name: Run automated end-to-end tests
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    name: "Automated tests"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: "Checking-out code"
+        uses: actions/checkout@v2
+        with:
+          submodules: false
+      - name: "Defining cache"
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+      - name: "Defining node version"
+        uses: actions/setup-node@v2
+        with:
+          node-version: '10'
+      - name: "Installing dependencies"
+        run: npm install
+      - name: "Building package in production mode"
+        run: npm run build
+      - name: "Executing E2E tests"
+        run: npm run test:e2e -- ${{ steps.variables.outputs.arg }}
