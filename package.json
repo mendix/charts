@@ -140,7 +140,7 @@
     "fast-json-patch": "^2.2.1",
     "json-source-map": "^0.4.0",
     "plotly.js": "^1.58.4",
-    "react-ace": "^9.4.0",
+    "react-ace": "^9.4.1",
     "react-redux": "^5.1.2",
     "react-resize-detector": "^2.3.0",
     "redux": "^4.0.0",
