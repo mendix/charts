@@ -17,6 +17,14 @@ class MxMock implements mx.MxInterface {
     onlineData!: mx.OnlineData;
     onError(_error: Error): void { /* */ }
     isOffline(): boolean { return false; }
+    logger = {
+        error(...info: any[]): void { console.error(info as any); },
+        debug(...info: any[]): void { console.debug(info as any); },
+        info(...info: any[]): void { console.info(info as any); },
+        warn(...info: any[]): void { console.warn(info as any); },
+        exception(...info: any[]): void{ console.exception(info as any); },
+        scream(...info: any[]): void{ console.log(info as any); }
+    };
 }
 
 class MxUiMock implements mx.ui {

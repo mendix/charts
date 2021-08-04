@@ -5,7 +5,7 @@
     "Charts",
     "AnyChart"
   ],
-  "version": "1.4.11",
+  "version": "1.4.12",
   "description": "Create charts based on the Plotly library",
   "copyright": "Mendix BV",
   "testProject": {

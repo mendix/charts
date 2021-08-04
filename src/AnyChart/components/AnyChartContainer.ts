@@ -8,7 +8,7 @@ import { getInstanceID } from "../../utils/data";
 import { Container } from "../../utils/namespaces";
 import AnyChartContainerProps = Container.AnyChartContainerProps;
 
-__webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
+__webpack_public_path__ = window.mx ? `${window.mx.remoteUrl}widgets/` : "../widgets";
 
 class AnyChartContainer extends Component<AnyChartContainerProps> {
     private instanceID = this.props.uniqueid || getInstanceID(this.props.friendlyId, store, "any");

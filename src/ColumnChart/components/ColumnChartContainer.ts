@@ -4,7 +4,7 @@ import BarChartContainer from "../../BarChart/components/BarChartContainer";
 import { Container } from "../../utils/namespaces";
 import BarChartContainerProps = Container.BarChartContainerProps;
 
-__webpack_public_path__ = window.mx ? `${window.mx.baseUrl}../widgets/` : "../widgets";
+__webpack_public_path__ = window.mx ? `${window.mx.remoteUrl}widgets/` : "../widgets";
 
 const ColumnChartContainer: SFC<BarChartContainerProps> = (props) =>
     createElement(BarChartContainer, { ...props as BarChartContainerProps, orientation: "column" });

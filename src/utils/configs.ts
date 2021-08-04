@@ -33,7 +33,7 @@ export const fetchThemeConfigs = (type: ChartType): Promise<ChartConfigs> =>
     new Promise<ChartConfigs>((resolve, reject) => {
         try {
             const cacheBurst = window.dojoConfig.cacheBust;
-            window.fetch(`${window.mx.baseUrl}../com.mendix.charts.json?${cacheBurst}`)
+            window.fetch(`${window.mx.remoteUrl}com.mendix.charts.json?${cacheBurst}`)
                 .then(response => {
                     if (response.ok) {
                         return response.json();
