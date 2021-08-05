@@ -7,6 +7,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [1.4.12] - 2021-08-04
 
+### Fixed
+- We fixed an issue with sorting using XPath and attribute over-association (Ticket #105229).
+
 ### Removed
 - We've removed deprecated APIs warnings
 

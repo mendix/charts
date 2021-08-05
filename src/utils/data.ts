@@ -269,7 +269,7 @@ export const fetchByXPath = (options: FetchByXPathOptions): Promise<MxO[]> => ne
         callback: resolve,
         error: error => reject(`An error occurred while retrieving data via XPath (${xpath}): ${error.message}`),
         filter: {
-            sort: sortAttribute && sortAttribute.indexOf("/") === -1 ? [ [ sortAttribute, sortOrder || "asc" ] ] : [],
+            sort: (sortAttribute && !window.mx.isOffline()) || (sortAttribute && sortAttribute.indexOf("/") === -1) ? [ [ sortAttribute, sortOrder || "asc" ] ] : [],
             references,
             attributes
         },
@@ -283,7 +283,7 @@ export const fetchByGuids = (options: FetchByIdOptions): Promise<MxO[]> => new P
         callback: resolve,
         guids,
         filter: {
-            sort: sortAttribute && sortAttribute.indexOf("/") === -1 ? [ [ sortAttribute, sortOrder || "asc" ] ] : [],
+            sort: (sortAttribute && !window.mx.isOffline()) || (sortAttribute && sortAttribute.indexOf("/") === -1) ? [ [ sortAttribute, sortOrder || "asc" ] ] : [],
             references,
             attributes
         },
