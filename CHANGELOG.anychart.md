@@ -5,7 +5,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-## [1.3.6] - 28-04-2021
+## [1.3.7] - 2021-08-04
+
+### Removed
+- We've removed deprecated APIs warnings
+
+## [1.3.6] - 2021-04-28
 ### Fixed
 - Fixed an issue where grouped legends were not working.
 

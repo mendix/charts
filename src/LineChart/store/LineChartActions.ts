@@ -31,12 +31,12 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
 
             Promise.all(props.series.map(series => {
                 const attributes = [ series.xValueAttribute, series.yValueAttribute, series.xValueSortAttribute, series.markerSizeAttribute ]
-                    .reduce((cummulator: string[], attribute) => {
+                    .reduce((accumulator: string[], attribute) => {
                         if (attribute && series.seriesType === "static") {
-                            cummulator.push(attribute);
+                            accumulator.push(attribute);
                         }
 
-                        return cummulator;
+                        return accumulator;
                     }, []);
 
                 const { mxObject } = props;
@@ -56,9 +56,9 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
                 });
             }))
                 .then(seriesData => {
-                    return seriesData.reduce(async (cummulator: Promise<Data.SeriesData<Data.LineSeriesProps>[]>, { mxObjects, restData, customData }) => {
+                    return seriesData.reduce(async (accumulator: Promise<Data.SeriesData<Data.LineSeriesProps>[]>, { mxObjects, restData, customData }) => {
                         if (restData && customData && customData.seriesType === "dynamic" && customData.dataSourceType === "REST") {
-                            const returnData = await cummulator;
+                            const returnData = await accumulator;
                             const { seriesEntity, seriesNameAttribute, colorAttribute, fillColorAttribute, seriesSortAttribute, seriesSortOrder } = customData;
                             const association = seriesEntity.indexOf("/") > -1
                                 ? seriesEntity.split("/")[0].split(".")[1]
@@ -91,7 +91,7 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
 
                             return returnData;
                         } else if (mxObjects && customData && customData.seriesType === "dynamic" && (customData.dataSourceType === "microflow" || customData.dataSourceType === "XPath")) {
-                            const returnData = await cummulator;
+                            const returnData = await accumulator;
                             const { seriesEntity, colorAttribute, seriesNameAttribute, fillColorAttribute, seriesSortAttribute, seriesSortOrder } = customData;
                             const association = seriesEntity.indexOf("/") > -1
                                 ? seriesEntity.split("/")[0]
@@ -162,7 +162,7 @@ export const fetchData = (props: LineChartDataHandlerProps) => (dispatch: Dispat
 
                             return returnData;
                         } else {
-                            const returnData = await cummulator;
+                            const returnData = await accumulator;
                             returnData.push({
                                 data: mxObjects,
                                 restData,

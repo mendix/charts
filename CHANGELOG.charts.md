@@ -5,7 +5,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
-## [1.4.11] - 28-04-2021
+## [1.4.12] - 2021-08-04
+
+### Fixed
+- We fixed an issue with sorting using XPath and attribute over-association (Ticket #105229).
+
+### Removed
+- We've removed deprecated APIs warnings
+
+## [1.4.11] - 2021-04-28
 ### Fixed
 - Fixed an issue where grouped legends were not working.
 - Maintain compatibility with Mendix client in MX 7, 8 and 9.

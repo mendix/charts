@@ -269,7 +269,7 @@ export const fetchByXPath = (options: FetchByXPathOptions): Promise<MxO[]> => ne
         callback: resolve,
         error: error => reject(`An error occurred while retrieving data via XPath (${xpath}): ${error.message}`),
         filter: {
-            sort: sortAttribute && sortAttribute.indexOf("/") === -1 ? [ [ sortAttribute, sortOrder || "asc" ] ] : [],
+            sort: (sortAttribute && !window.mx.isOffline()) || (sortAttribute && sortAttribute.indexOf("/") === -1) ? [ [ sortAttribute, sortOrder || "asc" ] ] : [],
             references,
             attributes
         },
@@ -283,7 +283,7 @@ export const fetchByGuids = (options: FetchByIdOptions): Promise<MxO[]> => new P
         callback: resolve,
         guids,
         filter: {
-            sort: sortAttribute && sortAttribute.indexOf("/") === -1 ? [ [ sortAttribute, sortOrder || "asc" ] ] : [],
+            sort: (sortAttribute && !window.mx.isOffline()) || (sortAttribute && sortAttribute.indexOf("/") === -1) ? [ [ sortAttribute, sortOrder || "asc" ] ] : [],
             references,
             attributes
         },
@@ -294,10 +294,14 @@ export const fetchByGuids = (options: FetchByIdOptions): Promise<MxO[]> => new P
 export const fetchByMicroflow = (actionname: string, guid: string): Promise<MxO[]> =>
     new Promise((resolve, reject) => {
         const errorMessage = `An error occurred while retrieving data by microflow (${actionname}): `;
-        window.mx.ui.action(actionname, {
+        window.mx.data.action({
+            params: {
+                actionname,
+                applyto: "selection",
+                guids: [ guid ]
+            },
             callback: (mxObjects: MxO[]) => resolve(mxObjects),
-            error: error => reject(`${errorMessage} ${error.message}`),
-            params: { applyto: "selection", guids: [ guid ] }
+            error: error => reject(`${errorMessage} ${error.message}`)
         });
     });
 
@@ -327,10 +331,11 @@ export const handleOnClick = <T extends EventProps>(options: T, mxObjectCustom?:
     }
 
     if (options.onClickEvent === "callMicroflow" && options.onClickMicroflow) {
-        window.mx.ui.action(options.onClickMicroflow, {
+        window.mx.data.action({
             callback: resolve,
             error: error => reject(`Error while executing microflow ${options.onClickMicroflow}: ${error.message}`), // tslint:disable-line max-line-length
             params: {
+                actionname: options.onClickMicroflow,
                 applyto: "selection",
                 guids: mxObjectCustom ? [ mxObjectCustom.guid ] : undefined
             },

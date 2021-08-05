@@ -105,8 +105,8 @@ export class AnyChartDataHandler extends Component<AnyChartDataHandlerProps> {
                 entity: eventEntity,
                 callback: object => {
                     object.set(eventDataAttribute, JSON.stringify(data));
-                    mx.ui.action(onClickMicroflow, {
-                        params: { applyto: "selection", guids: [ object.getGuid() ] },
+                    mx.data.action({
+                        params: { actionname: onClickMicroflow, applyto: "selection", guids: [ object.getGuid() ] },
                         error: error => window.mx.ui.error(`Error executing on click microflow ${onClickMicroflow} : ${error.message}`)
                     });
                 },
@@ -140,9 +140,9 @@ export class AnyChartDataHandler extends Component<AnyChartDataHandlerProps> {
                 entity: eventEntity,
                 callback: object => {
                     object.set(eventDataAttribute, JSON.stringify(data));
-                    mx.ui.action(tooltipMicroflow, {
+                    mx.data.action({
                         callback: (toolTipObjects: mendix.lib.MxObject[]) => this.openTooltipForm(tooltipNode, tooltipForm, toolTipObjects[0]),
-                        params: { applyto: "selection", guids: [ object.getGuid() ] },
+                        params: { actionname: tooltipMicroflow, applyto: "selection", guids: [ object.getGuid() ] },
                         error: error => window.mx.ui.error(`Error executing on hover microflow ${tooltipMicroflow} : ${error.message}`)
                     });
                 },
