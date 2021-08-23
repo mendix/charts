@@ -28,6 +28,40 @@ describe("Area chart", () => {
     });
 });
 
+describe("Line chart", () => {
+    beforeAll(() => {
+        lineChart.open();
+        browser.pause(3000);
+    });
+
+    it("should generate a chart", () => {
+        lineChart.svgElement.waitForExist();
+        const isExist = lineChart.svgElement.isExisting();
+
+        expect(isExist).toBeTruthy();
+    });
+
+    it("should be generated with two traces", () => {
+        browser.waitUntil(() => {
+            return lineChart.traces.filter((elem) => elem.isDisplayed()).length > 1;
+        });
+        expect(lineChart.traces.filter((elem) => elem.isDisplayed()).length).toBe(2);
+    });
+
+    it("should hide a line series when a trace toggle item is clicked", () => {
+        lineChart.trace1.waitForExist();
+        $(".mx-name-lineChart1 .legendtoggle").click();
+
+        browser.waitUntil(() => {
+            const serie1 = lineChart.trace1.getCSSProperty("opacity");
+            const value = Number(serie1.value);
+
+            return value === 0.5;
+        }, 1000, "expected trace to hide with value 0.5");
+    });
+
+});
+
 describe("Bar chart", () => {
     beforeAll(() => {
         barChart.open();
@@ -47,10 +81,9 @@ describe("Bar chart", () => {
         expect(barChart.traces.filter((elem) => elem.isDisplayed()).length).toBe(2);
     });
 
-    // TO DO: with other drivers apart from chrome it does not autoscroll to the element in overflow:auto block
-    xit("should hide a bar serie when a serie toggle item is clicked", () => {
+    it("should hide a bar serie when a serie toggle item is clicked", () => {
         barChart.trace1.waitForExist();
-        barChart.trace1.click();
+        $(".mx-name-barChart1 .legendtoggle").click();
 
         browser.waitUntil(() => {
             const serie1 = barChart.trace1.getCSSProperty("opacity");
@@ -80,46 +113,12 @@ describe("Column chart", () => {
         expect(columnChart.traces.filter((elem) => elem.isDisplayed()).length).toBe(2);
     });
 
-    // TO DO: with other drivers apart from chrome it does not autoscroll to the element in overflow:auto block
-    xit("should hide a column when a trace toggle item is clicked", () => {
+    it("should hide a column when a trace toggle item is clicked", () => {
         columnChart.trace1.waitForExist();
-        columnChart.trace1.click();
+        $(".mx-name-columnChart1 .legendtoggle").click();
 
         browser.waitUntil(() => {
             const serie1 = columnChart.trace1.getCSSProperty("opacity");
-            const value = Number(serie1.value);
-
-            return value === 0.5;
-        }, 1000, "expected trace to hide with value 0.5");
-    });
-});
-
-describe("Line chart", () => {
-    beforeAll(() => {
-        lineChart.open();
-    });
-
-    it("should generate a chart", () => {
-        lineChart.svgElement.waitForExist();
-        const isExist = lineChart.svgElement.isExisting();
-
-        expect(isExist).toBeTruthy();
-    });
-
-    it("should be generated with two traces", () => {
-        browser.waitUntil(() => {
-            return lineChart.traces.filter((elem) => elem.isDisplayed()).length > 1;
-        });
-        expect(lineChart.traces.filter((elem) => elem.isDisplayed()).length).toBe(2);
-    });
-
-    // TO DO: With other drivers apart from chrome it does not autoscroll to the element in overflow:auto block
-    xit("should hide a line series when a trace toggle item is clicked", () => {
-        lineChart.trace1.waitForExist();
-        lineChart.trace1.click();
-
-        browser.waitUntil(() => {
-            const serie1 = lineChart.trace1.getCSSProperty("opacity");
             const value = Number(serie1.value);
 
             return value === 0.5;
