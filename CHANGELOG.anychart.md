@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Added
+- We've added new large icons
+
 ## [1.3.7] - 2021-08-04
 
 ### Removed
