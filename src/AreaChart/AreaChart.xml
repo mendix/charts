@@ -2,7 +2,8 @@
 <widget id="com.mendix.widget.custom.AreaChart.AreaChart" needsEntityContext="true" offlineCapable="false" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
     <name>Area chart</name>
     <description>Create an area chart</description>
-    <icon>iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAArlBMVEUAAAD///9V//+Av/9Jtv9Ns/9Jtv9Osf9Ktf9OsfhNs/lJsPlMs/pLtPtIs/tMs/dJs/hXV1dIsflKs/lJsflJsPpIsfpKsvdJsvhKsvhKsPhKsfhKsflIsfhKsvhIsPhJsfdJsfdIsPdJsPhIsfhJsfdJsfdJsfhJsfhIsPhJsfdIsPdJsPdVVVVJsfdIsPdJsfdIsPdIsPdIsPdJsfhIsPhJsfhJsfhIsPdVVVXTsqtpAAAAOHRSTlMAAQMEBwoOFx8nKCovOjxARklYWlteX2BmZ25vfI2Om6Choq+7wMHR1d/h4uPj5Obn6ezt7vDy9d5pWRkAAAGeSURBVHgB7ZfbTsJAGISXcgALIogHOSAgKIhslXJgef8XUyST/Oqkf7P1wkTmzrTzzdfseoE55a+kaW0zE8Du9zYTYP8RH2tvAKy9Aej8b0D7JROgMnEuC6C9db4AzKcCBJ3Fctyt5di8cxMVUJ+6z6wkBPPbtnYK5ZFDJATzFeUYg85G9gG5wLx2D2D/cN4dryQE88kA2E/rh79yNQHBfBIA9ptugKeAYD4BIOzLeCYgy/md8r8g7JNT6kUEIOy1+prcRGmv1wmA2/M6BRztO0G6+rpHAaNy2nrJEAC353VyjAtuz+sM8O31uWNBXQFgjddVgF7nAK0+l3UOQB1rCTnrRwSQtl5oPbKbmLYe9mN+lXmdjnPA1/r1czRo5H98eYz6U4sCUC8O3SGxZIjx+D4kpyDkqzOHgBGK8asCPcYIdXO7w7tgiPF+qFwk6M8uB7Gg4MsL2k2E/rBoTL4BBr5cvYnQ392YY8DAuAaAfhUPjoy3V3y5AhD6WghA6nsBhL4fQNdXAND3BkDfD+CR3wVYv741SNOLgJ88p7wDbAoSV1VLHnwAAAAASUVORK5CYII=</icon>
+    <studioProCategory>Charts</studioProCategory>
+    <studioCategory>Charts</studioCategory>
     <properties>
         <property key="series" type="object" isList="true">
             <caption>Series</caption>

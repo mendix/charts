@@ -2,7 +2,8 @@
 <widget id="com.mendix.widget.custom.HeatMap.HeatMap" needsEntityContext="true" offlineCapable="false" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
     <name>Heat map</name>
     <description>Renders a heat map chart</description>
-    <icon>iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAFVBMVEUAAABXV1dVVVUGf9NIsPdVVVWMz/0hsSibAAAAA3RSTlMASePizoNQAAAAV0lEQVR4Ae3XMQqAQAxE0WQ03v/ICjYpg9NI+L+b5sE2C4k3SinDSVUKp3r6B3C1JnslAABgtAk4W4O9EwAAcFoEHK3B3ggAAPAffErpAf3OkguknCfQDbOmHi9KZ9bOAAAAAElFTkSuQmCC</icon>
+    <studioProCategory>Charts</studioProCategory>
+    <studioCategory>Charts</studioCategory>
     <properties>
         <property key="dataEntity" type="entity" allowNonPersistableEntities="true">
             <caption>Entity</caption>

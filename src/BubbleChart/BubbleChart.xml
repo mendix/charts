@@ -2,7 +2,8 @@
 <widget id="com.mendix.widget.custom.BubbleChart.BubbleChart" needsEntityContext="true" offlineCapable="false" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
     <name>Bubble chart</name>
     <description>Create a bubble chart</description>
-    <icon>iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAM1BMVEUAAAD///9SuP9Jtv9JsvhXV1dJsfdIsfdJsfhJsfdJsPdVVVVIsPdIsPdIsPhIsPdVVVXtoLZfAAAAD3RSTlMAARkcSUllpr3I4+Pm7fNA+GwYAAAA6UlEQVR4Ae2WSw7DIBBDmw8fGALc/7RtShqkkbzBXWSBNwGFPnUYm/BqmjIihgJIrUIB6kfPAyw25BzsMgpYffnKr2OAxZdL/vcfNpeS2/QYAWy5Za/fHOfk2PRYAfYY9/MZOiC0N67NnBprQCwlns/cAbm9SW2W9JgH8CXwm8i3kTcSb+VHpnECUFNHAcpWGKAtioyNrKxDgqIFw6Rj2qTDjeOsD4omfbzodTyAL4HfRL6NvJF4Kz8/jfOGgi0GAdi8WvDzjuPTV+ELBg5wX8UD+BL4TfxrG+cNZUhiSECVGyAswAhTwtQbUKs9YKBSph8AAAAASUVORK5CYII=</icon>
+    <studioProCategory>Charts</studioProCategory>
+    <studioCategory>Charts</studioCategory>
     <properties>
         <property key="series" type="object" isList="true">
             <caption>Series</caption>
