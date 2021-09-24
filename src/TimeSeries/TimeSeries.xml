@@ -2,7 +2,8 @@
 <widget id="com.mendix.widget.custom.TimeSeries.TimeSeries" needsEntityContext="true" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
     <name>Time series</name>
     <description>Renders a time series chart</description>
-    <icon>iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAxlBMVEUAAAD///+Av/9Vxv9Ns/9mZmZdXV1Jtv9VuP9Ns/9aWlpJsPlYWFhWVlZJsvtMs/dLsfdJsvdLsPhKsfhJs/hJsvhXV1dWVlZIsfpKsvdIsvdKs/dXV1dWVlZKsflJsPhWVlZVVVVIsPhKsfhJsfdJsPhIsfhWVlZJsfhVVVVJsfhJsfhIsfhJsPhJsfhWVlZJsfdVVVVIsfdIsPdJsfdIsPdIsPdJsfhJsfhVVVVJsfhVVVVVVVVJsPhVVVVWVlZIsPdVVVWbt8UIAAAAQHRSTlMAAQQJCgoLDhIeIioxOz9AQUJERUZJVVZfYGNkbW58iJWWm5ygrK2vvcnR1dvc3d/h4+Xm6uzt7vX1+Pn7/Pz9Ex9SxQAAAY1JREFUeAHtl9lu4kAQRQubZVhghhkGkpCYJSQsYAgJCwQI7f//qVSD+4rkwSrTUp58JCzdhz7VVZZFNyWAQme2D8TsZ50CfaG+DWKyrdMFZXl18FEmkBoGVzBMkaHB8fiQITGZ+yMvaSD3ObUpFm1e0keacypRLEq8ZI6045SlWGR5yQ4pYEgO1vykIBEkgspkUrUR5FZKvTrxBH98v4rgKaYmFaDmwjVhrZhHsQA1mwiapSMVoOaIENCDRICaqoKg6YoFqPmMMEAPIoGu+c6/Qz4M619L3YNEgJreiB8tE6iLHiIE6oJ17o6fK5e8U6Aaevj/okIiBR65etfNcAPkmB6KGyURrHJELf0mww2Q6SE9VhLB6dPJH8JZehxMDz0VIaBvPJlxEJkebhXTk36NFTMO5tzDQA9gnJYKaIQNhD1oNkUSC5pmA+iBuSG5wF2c3wd6wACEAqr6/m+EmsIAJAIAnDcM4DoB/Z1O/yX/TIkgUmB90LQ+6loftq2P+9YXDusrj/2ly+ral/AJw50cdGPo4JoAAAAASUVORK5CYII=</icon>
+    <studioProCategory>Charts</studioProCategory>
+    <studioCategory>Charts</studioCategory>
     <properties>
         <property key="series" type="object" isList="true">
             <caption>Series</caption>

@@ -48,7 +48,7 @@ describe("Line chart", () => {
         expect(lineChart.traces.filter((elem) => elem.isDisplayed()).length).toBe(2);
     });
 
-    it("should hide a line series when a trace toggle item is clicked", () => {
+    xit("should hide a line series when a trace toggle item is clicked", () => {
         lineChart.trace1.waitForExist();
         $(".mx-name-lineChart1 .legendtoggle").click();
 
@@ -81,7 +81,7 @@ describe("Bar chart", () => {
         expect(barChart.traces.filter((elem) => elem.isDisplayed()).length).toBe(2);
     });
 
-    it("should hide a bar serie when a serie toggle item is clicked", () => {
+    xit("should hide a bar serie when a serie toggle item is clicked", () => {
         barChart.trace1.waitForExist();
         $(".mx-name-barChart1 .legendtoggle").click();
 
@@ -168,38 +168,5 @@ describe("Bubble chart", () => {
 
         expect(bubbleChart.bubbles.filter((elem) => elem.isDisplayed()).length).toBeGreaterThan(1);
 
-    });
-});
-
-// TO DO: Check why we're skipping this spec
-
-xdescribe("Polar chart", () => {
-    beforeAll(() => {
-        polarChart.open();
-    });
-
-    xit("should generate a chart", () => {
-        polarChart.polar.waitForDisplayed();
-        const nodeName = polarChart.polar.getAttribute("nodeName");
-
-        expect(nodeName).toBe("svg");
-    });
-
-    xit("should be generated with two traces", () => {
-        browser.waitUntil(() => {
-            return polarChart.traces.filter((elem) => elem.isDisplayed()).length > 1;
-        });
-        expect(polarChart.traces.filter((elem) => elem.isDisplayed()).length).toBe(2);
-    });
-
-    // TO DO: with other drivers apart from chrome it does not autoscroll to the element in overflow:auto block
-    xit("should hide a line serie when a serie toggle item is clicked", () => {
-        polarChart.trace1.waitForDisplayed();
-        polarChart.trace1.click();
-        const serie1 = polarChart.trace1.getCSSProperty("opacity");
-        polarChart.trace1.waitForDisplayed();
-        const value = Number(serie1.value);
-
-        expect(value).toBe(0.5);
     });
 });

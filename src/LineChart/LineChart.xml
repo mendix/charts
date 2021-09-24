@@ -2,7 +2,8 @@
 <widget id="com.mendix.widget.custom.LineChart.LineChart" needsEntityContext="true" offlineCapable="false" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
     <name>Line chart</name>
     <description>Create a line chart</description>
-    <icon>iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAABRFBMVEUAAAD///+A//9V//+Av/9mzP9Vxv9duf9Vu/9VuP9RvP9Ns/9Jtv9Osf9SuP9Osf9Ms/9Qt/dNsvdLtPhOsfhKtflJsfpLtPtLtPtKsftMs/dXV1dKsvlLtPlKsvlKs/lJsflKsvdIsvdKs/dJsfdJsvhKsfhJsfhIsvhJsfhJsvhKsfhJsflJsvlJsflIsfdJsvdJtPlJsfhIsfhJsvhJsPhJsfhJsfdJsPdIsvlJsfdJsPhIsfhJsPhJsfhIsfhIsfhJsPhJsfhIsfhIsfhJsfdJsfdJsfhJsfdIsvdJsPhIsfhJsvhJsfhJsPhIsfhIsfdIsPhIsPdVVVVIsPdJsfdJsfdJsfdJsfhIsPhIsPhIsfhJsfhIsPhIsfhIsfhJsfhIsfhIsfhJsPhIsPhIsfhIsPhJsPdJsflIsfhIsPdVVVXhHAqfAAAAanRSTlMAAQIDBAUJCw8SExQVFxkaGyAhIictMTo9PkBJT1JZWltgY2RlZmhpamxtb3Z3fYCBgYmKi5KToKWmp6yxsra3u7y9vsDAxMTIyczNzc7S1djf4uPm5+rr7vDx8fLz9PX19/j5+vv8/P3+s4eVTwAAAeFJREFUeNrtl9dTwkAQhwnYFeyiYkGNvfdeQMVYwBIbalDsLP//u/Fw3MObZDN3D77wvSVz+W7ubveXxFeiQMQ0I0oCM583lQR5G69jNd2wLEPXZAWhODDiITmBxp5nBk1KoMMvupTAQIEhJbBQYCkLlJfwP5vY/kkfo1htSOgKgCoksdqQ8oR9N3dGlLJQbcgi2MwQzSRsFNILNtt+UmCg4FTj9mT6yb5zXk23swXIxVwr7olNto3Og9pXKCI1cYAXfWSg+EduwZk9MpHCSeB5/iM4JATB5RzwxCujW2/AYbkKysbTbNTD7C5XSHWj7x4FHSlgrISwlIUOdBGs/Ox5B9WBqC8WsAHp8QAZpNgpgiC3HCSiXNTxgmSYfJmIC0LB7bBfJtRQUOPzxiMKLIlIa14HFUHV/AuA0xLoN/Lg0DUgwiYSb2TkTjhGKpU1/vmLKFaFcyrHgHHS3fnNAtfeUxWod07lGDhx7OkTZwkcsTwIGjZBSTCQBo6PfZt7Mg9Q0BQTZhTax0XgH8tAMYaQB26ClgQblVnlZhTywFkQmMyyUTuNwox48m6Co0Km9dMzImImbtS7zEgLbnqIcYRgrc6nIrjsUvzcr1L+X/hfgRRmRE3A/2eZqoKIKbmEEowvLGILbrcNZbQAAAAASUVORK5CYII=</icon>
+    <studioProCategory>Charts</studioProCategory>
+    <studioCategory>Charts</studioCategory>
     <properties>
         <property key="series" type="object" isList="true">
             <caption>Series</caption>
@@ -229,7 +230,7 @@
                     <description>The nanoflow that will be executed on click</description>
                     <returnType type="Void" />
                 </property>
-                <property key="tooltipForm" type="form" required="false">   
+                <property key="tooltipForm" type="form" required="false">
                     <caption>Tooltip form</caption>
                     <category>Events</category>
                     <description>The form to show when a user hovers over a chart plot point</description>

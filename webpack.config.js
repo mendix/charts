@@ -3,8 +3,6 @@ const webpack = require("webpack");
 const path = require("path");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
-// const BundleAnalyzerPlugin = require("webpack-bundle-analyzer").BundleAnalyzerPlugin;
-// new BundleAnalyzerPlugin()
 
 const widgetName = require("./package").widgetName;
 
@@ -18,7 +16,6 @@ const widgetConfig = {
         TimeSeries: "./src/TimeSeries/components/TimeSeriesContainer.ts",
         HeatMap: "./src/HeatMap/components/HeatMapContainer.ts",
         BubbleChart: "./src/BubbleChart/components/BubbleChartContainer.ts"
-        // PolarChart: "./src/PolarChart/components/PolarChartContainer.ts"
     },
     output: {
         jsonpFunction: "webpackJsonpCharts",
@@ -64,7 +61,8 @@ const widgetConfig = {
     plugins: [
         new CopyWebpackPlugin([
             { from: "src/**/*.js", to: "../", ignore: [ "src/AnyChart/*.js" ] },
-            { from: "src/**/*.xml", to: "../", ignore: [ "src/AnyChart/*.xml" ] }
+            { from: "src/**/*.xml", to: "../", ignore: [ "src/AnyChart/*.xml" ] },
+            { from: "src/**/*.@(tile|icon).png", to: "../", ignore: [ "src/AnyChart/*.@(tile|icon).png" ] }
         ], {
             copyUnmodified: true
         }),
@@ -119,7 +117,8 @@ const anyChartConfig = {
     plugins: [
         new CopyWebpackPlugin([
             { from: "src/AnyChart/AnyChart.xml", to: "../AnyChart/AnyChart/" },
-            { from: "src/AnyChart/package.xml", to: "../AnyChart/" }
+            { from: "src/AnyChart/package.xml", to: "../AnyChart/" },
+            { from: "src/AnyChart/AnyChart.@(tile|icon).png", to: "../AnyChart/AnyChart/[name].[ext]", toType: "template" }
         ], {
             copyUnmodified: true
         }),
@@ -139,7 +138,6 @@ const previewConfig = {
         TimeSeries: "./src/TimeSeries/TimeSeries.webmodeler.ts",
         HeatMap:  "./src/HeatMap/HeatMap.webmodeler.ts",
         BubbleChart: "./src/BubbleChart/BubbleChart.webmodeler.ts"
-        // PolarChart: "./src/PolarChart/PolarChart.webmodeler.ts"
     },
     output: {
         path: path.resolve(__dirname, "dist/tmp"),

@@ -5,9 +5,13 @@
     "Charts",
     "AnyChart"
   ],
-  "version": "1.4.12",
+  "version": "2.0.0",
   "description": "Create charts based on the Plotly library",
   "copyright": "Mendix BV",
+  "marketplace": {
+    "minimumMXVersion": "9.6.0",
+    "marketplaceId": 105695
+  },
   "testProject": {
     "githubUrl": "https://github.com/mendix/testProjects",
     "branchName": "charts"
