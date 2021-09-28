@@ -5,8 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [2.0.0] - 2021-09-28
+
 ### Added
-- We added new large icons
 - We added a toolbox category and toolbox tile image for Studio & Studio Pro.
 
 ## [1.4.12] - 2021-08-04
