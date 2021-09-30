@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+## [3.0.1] - 2021-09-30
+
+### Changed
+- We fixed an issue where AnyChart could not find `worker-json.js` file.
+
 ## [3.0.1] - 2021-09-28
 
 ### Changed
