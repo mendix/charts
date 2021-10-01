@@ -1,5 +1,6 @@
 import { Component, ReactChild, createElement, isValidElement } from "react";
 import AceEditor, { Marker } from "react-ace";
+import AceBuild from "ace-builds";
 import * as classNames from "classnames";
 import { Operation, compare } from "fast-json-patch";
 import * as jsonMap from "json-source-map";
@@ -14,6 +15,10 @@ import { Sidebar } from "./Sidebar";
 import { SidebarHeader } from "./SidebarHeader";
 import { SidebarContent } from "./SidebarContent";
 import { SidebarHeaderTools } from "./SidebarHeaderTools";
+import { join } from "path";
+
+// tslint:disable-next-line:no-var-requires
+AceBuild.config.setModuleUrl("ace/mode/json_worker", join("widgets", require("file-loader!ace-builds/src-noconflict/worker-json.js")));
 
 import "ace-builds/src-min-noconflict/mode-json";
 import "ace-builds/src-min-noconflict/theme-github";
