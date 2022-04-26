@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased]
 
+### Fixed
+- We fixed issue with preview on Studio and design mode.
+
 ## [1.4.12] - 2021-08-04
 
 ### Fixed
