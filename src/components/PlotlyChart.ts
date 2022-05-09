@@ -119,8 +119,9 @@ class PlotlyChart extends Component<PlotlyChartProps> {
             });
             const layoutOptions = deepMerge.all([ layout, getDimensionsFromNode(rootNode) ]);
             const plotlyConfig = window.dojo && window.dojo.locale ? { ...config, locale: window.dojo.locale } : config;
-            if (mx.logger) {
-                mx.logger.debug("newPlot", this.chartNode, chartData as Data[], layoutOptions, plotlyConfig);
+            const logger = window.mx && window.mx.logger ? window.mx.logger : window.logger;
+            if (logger && logger.debug) {
+                logger.debug("newPlot", this.chartNode, chartData as Data[], layoutOptions, plotlyConfig);
             }
             plotly.newPlot(this.chartNode, chartData as Data[], layoutOptions, plotlyConfig)
                 .then(myPlot => {

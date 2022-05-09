@@ -24,3 +24,13 @@ index a533efb..560cb87 100644
      } catch (e) {
          throw new Error("Couldn't reach github.com. Make sure you are connected to internet.");
      }
+diff --git a/node_modules/@mendix/pluggable-widgets-tools/scripts/mxbuild.Dockerfile b/node_modules/@mendix/pluggable-widgets-tools/scripts/mxbuild.Dockerfile
+index da7f229..7885937 100644
+--- a/node_modules/@mendix/pluggable-widgets-tools/scripts/mxbuild.Dockerfile
++++ b/node_modules/@mendix/pluggable-widgets-tools/scripts/mxbuild.Dockerfile
+@@ -1,4 +1,4 @@
+-FROM mono:5.20.1
++FROM mono:6.12
+ ARG MENDIX_VERSION
+ 
+ RUN \
