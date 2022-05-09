@@ -1,14 +1,15 @@
-import { CSSProperties, Component, createElement } from "react";
-import { MapDispatchToProps, connect } from "react-redux";
-import { bindActionCreators } from "redux";
+import * as PlotlyChartActions from "./actions/PlotlyChartActions";
 import * as classNames from "classnames";
-import deepMerge from "deepmerge";
+
+import { CSSProperties, Component, createElement } from "react";
+import { Data, PieHoverData, ScatterHoverData } from "plotly.js";
+import { MapDispatchToProps, connect } from "react-redux";
+import { Plotly, PlotlyChartInstance } from "./reducers/PlotlyChartReducer";
 
 import { ChartLoading } from "./ChartLoading";
-import { Data, PieHoverData, ScatterHoverData } from "plotly.js";
-import * as PlotlyChartActions from "./actions/PlotlyChartActions";
-import { Plotly, PlotlyChartInstance } from "./reducers/PlotlyChartReducer";
 import ReactResizeDetector from "react-resize-detector";
+import { bindActionCreators } from "redux";
+import deepMerge from "deepmerge";
 import { getDimensionsFromNode } from "../utils/style";
 
 const aggregateLib = require("plotly.js/lib/aggregate"); // tslint:disable-line
@@ -119,8 +120,9 @@ class PlotlyChart extends Component<PlotlyChartProps> {
             });
             const layoutOptions = deepMerge.all([ layout, getDimensionsFromNode(rootNode) ]);
             const plotlyConfig = window.dojo && window.dojo.locale ? { ...config, locale: window.dojo.locale } : config;
-            if (mx.logger) {
-                mx.logger.debug("newPlot", this.chartNode, chartData as Data[], layoutOptions, plotlyConfig);
+            const logger = window.mx && window.mx.logger ? window.mx.logger : window.logger;
+            if (logger && logger.debug) {
+                logger.debug("newPlot", this.chartNode, chartData as Data[], layoutOptions, plotlyConfig);
             }
             plotly.newPlot(this.chartNode, chartData as Data[], layoutOptions, plotlyConfig)
                 .then(myPlot => {
