@@ -5,7 +5,7 @@
     "Charts",
     "AnyChart"
   ],
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "Create charts based on the Plotly library",
   "copyright": "Mendix BV",
   "marketplace": {
@@ -31,6 +31,8 @@
     "lint:fix": "npm run lint -- --fix",
     "deploy": " npm run updateProject && npm run deployApp",
     "build": "cross-env NODE_ENV=production grunt release",
+    "buildChartsV2": "cross-env NODE_ENV=production grunt buildChartsV2",
+    "compress": "cross-env NODE_ENV=production grunt compress:dist",
     "updateProject": "node ./node_modules/mendix-widget-build-script/dist/UpdateMxProject.js",
     "deployApp": "node ./node_modules/mendix-widget-build-script/dist/DeployMxApp.js",
     "deployAndTest": "npm run deploy && npm run test:e2e",
