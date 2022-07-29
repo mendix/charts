@@ -2,8 +2,8 @@
 <widget id="com.mendix.widget.custom.BarChart.BarChart" needsEntityContext="true" offlineCapable="false" xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../../xsd/widget.xsd">
     <name>Bar chart</name>
     <description>Create a bar chart</description>
-    <studioProCategory>Charts</studioProCategory>
-    <studioCategory>Charts</studioCategory>
+    <studioProCategory>Charts (Deprecated)</studioProCategory>
+    <studioCategory>Charts (Deprecated)</studioCategory>
     <properties>
         <property key="barMode" type="enumeration" defaultValue="group">
             <caption>Bar mode</caption>
