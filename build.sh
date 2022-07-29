@@ -69,23 +69,3 @@ do
 done
 
 npm run compress
-### Changing dir to charts, open Charts.mpk
-# cd $root/dist
-# mkdir -p target
-# cd target
-# find -E .. -regex '../[0-9.]+/Charts.mpk' | xargs tar -xf
-
-### Open packages content
-# cd $root/dist
-# mkdir -p v3
-# cd ../v3
-# tar -xvf ../../com.mendix.widget.web.AreaChart.mpk
-# cd ..
-# mkdir -p target/v3/AreaChart
-# cp v3/* target/v3/AreaChart
-# rm target/v3/AreaChart/package.xml
-# cp -R v3/com/mendix/shared target/com/mendix/
-# cp -R v3/com/mendix/widget/web target/com/mendix/widget/
-# rm Charts.mpk
-# cd target
-# zip -r ../Charts.mpk *

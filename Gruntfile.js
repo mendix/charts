@@ -72,7 +72,7 @@ module.exports = function(grunt) {
         copy: {
             renameWidgetFiles: {
                 files: widgetNames.map(widgetName => {
-                    const base = `${widgetName}_v2`;
+                    const base = `${widgetName}Version2`;
                     const files = {
                         dest: `./dist/tmp/src/${base}`,
                         cwd: `./dist/tmp/src/${widgetName}`,
