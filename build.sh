@@ -44,7 +44,7 @@ cd $mxwr
 # use node version from monorepo
 nvm use
 # npm install
-npx lerna run release --scope '*-chart-web' --concurrency 1
+npx lerna run release --scope '*-chart-web' --include-dependencies
 mkdir -p $pkgsdir
 npx lerna exec "find -E dist -regex 'dist/[0-9.]+/.*.mpk' | xargs -I % cp % $pkgsdir" --scope '*-chart-web'
 

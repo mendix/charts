@@ -5,7 +5,7 @@
     "Charts",
     "AnyChart"
   ],
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Create charts based on the Plotly library",
   "copyright": "Mendix BV",
   "marketplace": {
